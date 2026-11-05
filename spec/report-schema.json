@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:0.1:report-schema",
+  "$defs": {
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec",
+        "provider",
+        "driver",
+        "sdk_versions",
+        "started_at",
+        "finished_at",
+        "revision",
+        "suite_digest",
+        "clean",
+        "baseline",
+        "tests",
+        "selected_tests"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finished_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spec": {
+          "const": "sandbox-provider-spec/0.1"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "suite_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "check_digests": {
+          "type": "object",
+          "propertyNames": {"minLength": 1},
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "implementation_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "implementation": {"type": "string", "minLength": 1},
+        "clean": {
+          "type": "boolean"
+        },
+        "driver": {
+          "type": "object",
+          "required": [
+            "name",
+            "version"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "sdk_versions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "baseline": {
+          "enum": [
+            "passed",
+            "differs",
+            "unsupported",
+            "not_run",
+            "error"
+          ]
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/test"
+          }
+        },
+        "selected_tests": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "result",
+        "steps",
+        "cleanup",
+        "duration_ms",
+        "rules",
+        "proves"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "passed",
+            "differs",
+            "unsupported",
+            "not_run",
+            "error"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "proves": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "gate",
+                  "knob",
+                  "value"
+                ],
+                "properties": {
+                  "gate": {
+                    "type": "string"
+                  },
+                  "knob": {
+                    "type": "string"
+                  },
+                  "value": {}
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "value"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string"
+                  },
+                  "value": {}
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "gate",
+                  "value"
+                ],
+                "properties": {
+                  "gate": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "cleanup": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "result"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string"
+              },
+              "result": {
+                "enum": [
+                  "deleted",
+                  "expires",
+                  "already_released",
+                  "error"
+                ]
+              },
+              "expires_at": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$ref": "#/$defs/run"
+}

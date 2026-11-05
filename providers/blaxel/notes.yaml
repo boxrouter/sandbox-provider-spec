@@ -1,0 +1,13 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.open_source: The sandbox API and SDKs are open source; the platform and control plane are proprietary.
+fact.snapshots: Snapshots are in private preview and are not recommended for production use.
+in_development.disk-fio: the default filesystem is memory backed and refuses direct I/O, so this disk test
+  has no result
+in_development.rl-rollouts: snapshots restore in the original sandbox; Core cannot create the four new
+  sandboxes this benchmark needs
+in_development.snapshot: snapshots restore in the original sandbox; Core cannot create a new sandbox from
+  one yet
+in_development.snapshot-fork: snapshots restore in the original sandbox; Core cannot create four new
+  sandboxes from one yet
+in_development.terminal-bench: our account's image storage is full, so these tasks' images aren't prepared
+  yet

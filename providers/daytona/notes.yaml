@@ -1,0 +1,11 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.open_source: Daytona's public code is frozen at v0.190.0; its service reports v0.221.0 and its core
+  is now private.
+fact.snapshots: Container snapshots keep files; VM snapshots keep files and memory. One snapshot can start
+  multiple sandboxes.
+in_development.rl-rollouts: our adapter refuses the requested sandbox size when creating from a snapshot;
+  this benchmark is in development
+in_development.snapshot: our adapter refuses the requested sandbox size when creating from a snapshot;
+  this benchmark is in development
+in_development.snapshot-fork: our adapter refuses the requested sandbox size when creating from a snapshot;
+  this benchmark is in development

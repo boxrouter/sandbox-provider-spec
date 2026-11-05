@@ -1,0 +1,219 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.image_config.env": "sha256:f34d6746a9247f833ee51621cf9f69aa45968d7038f2e63b9c6ebaf32ad207fd",
+    "coverage.custom_images.prepare.image_config.workdir": "sha256:fb5843b60f5cae932429a55a34959279456731477ea6c6d93243347bf9d1c089",
+    "coverage.custom_images.prepare.registry": "sha256:0e1ee9b43196c9b2b049bedd3ccf9e62f6f1be206fa429fdd482b24413e131d6"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ModalDriver",
+    "version": "0.3.141"
+  },
+  "finished_at": "2026-10-29T00:54:51.556645+00:00",
+  "provider": "modal",
+  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
+  "run_id": "sps-native-modal-default-coverage-20261029T005341Z",
+  "sdk_versions": {
+    "modal": "1.6.1"
+  },
+  "selected_tests": [
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.image_config.env",
+    "coverage.custom_images.prepare.image_config.workdir"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T00:53:47.930360+00:00",
+  "suite_digest": "sha256:864b6f5253d02d6656d54d1dfd10bd9747d655df02626f448d6db48159f94a37",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 37689,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 14829,
+      "id": "coverage.custom_images.prepare.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "L3Vzci9zaGFyZS9ncmFmYW5hCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11107,
+      "id": "coverage.custom_images.prepare.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "L3Vzci9zaGFyZS9ncmFmYW5hCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

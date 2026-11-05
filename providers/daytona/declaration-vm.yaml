@@ -1,0 +1,35 @@
+spec: sandbox-provider-spec/0.1
+provider: daytona
+class: vm
+verified:
+  date: '2026-10-21'
+  sdks:
+    daytona: 0.220.0
+resources:
+  kernel: dedicated
+  sizes:
+  - cpu: 1
+    memory_mib: 1024
+    disk_mib: 3072
+  - cpu: 2
+    memory_mib: 4096
+    disk_mib: 8192
+  - cpu: 4
+    memory_mib: 8192
+    disk_mib: 10240
+  paused_retention_seconds: unlimited
+gates: {}
+evidence:
+  resources.kernel:
+    source: https://www.daytona.io/docs/en/isolation/
+    read: '2026-10-04'
+    quote: Full virtual machine with its own kernel.
+  resources.sizes:
+    source: https://www.daytona.io/docs/en/snapshots/
+    read: '2026-10-04'
+    quote: daytona-vm-small 1 1GiB 3GiB Linux VM; daytona-vm-medium 2 4GiB 8GiB Linux VM; daytona-vm-large
+      4 8GiB 10GiB Linux VM.
+  resources.paused_retention_seconds:
+    source: https://www.daytona.io/docs/en/persistence/
+    read: '2026-10-04'
+    quote: Sandboxes in stopped, paused, and archived states are retained until you delete them.

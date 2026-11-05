@@ -1,0 +1,191 @@
+spec: sandbox-provider-spec/0.1
+provider: blaxel
+verified:
+  date: '2026-11-05'
+  sdks:
+    blaxel: 0.4.8
+resources:
+  kernel: dedicated
+  sizes:
+  - cpu: 2
+    memory_mib: 4096
+  - cpu: 4
+    memory_mib: 8192
+  - cpu: 6
+    memory_mib: 16384
+  default_user: root
+  regions:
+  - blaxel:us-pdx-1
+  - blaxel:us-was-1
+  - blaxel:eu-lon-1
+  - blaxel:eu-fra-1
+  max_lifetime_seconds: unlimited
+  extendable_lifetime: true
+  size_is_ceiling: true
+  paused_retention_seconds: unlimited
+  needs:
+    regions:
+    - region_enabled_for_workspace
+    max_lifetime_seconds:
+    - tier_2_or_higher
+    paused_retention_seconds:
+    - tier_2_or_higher
+  unmet_limits:
+    max_lifetime_seconds:
+      tier_2_or_higher: 604800
+  default_cwd: /blaxel
+gates:
+  processes:
+  - cancel: true
+    reattach: true
+  previews:
+  - access: public
+    revocable: true
+    max_ports:
+      at_least: 2
+  hidden_secrets:
+  - rotates: unknown
+    scrubs_responses: false
+    injection: sets_header
+    intercepts: all_https
+    transparent: false
+  custom_images:
+  - source: provider_artifact
+  terminal:
+  - {}
+evidence:
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
+  resources.kernel:
+    source: https://blaxel.ai/platform/sandboxes
+    read: '2026-10-16'
+    quote: Every sandbox runs in its own microVM with no shared kernel.
+  resources.sizes:
+    source: https://docs.blaxel.ai/Get-started
+    read: '2026-10-22'
+    quote: 'memory: 4096,   // in MB'
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/native-default-core.json
+  resources.regions:
+    source: https://docs.blaxel.ai/Infrastructure/Regions
+    read: '2026-10-04'
+    quote: us-pdx-1 | Oregon | United States; us-was-1 | North Virginia | United States; eu-lon-1 | London
+      | United Kingdom; eu-fra-1 | Frankfurt | Germany.
+  resources.max_lifetime_seconds:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: In higher tiers, unlimited persistence is permitted.
+  resources.extendable_lifetime:
+    tests:
+    - facts.extendable_lifetime
+    report: reports/native-default-core.json
+  resources.paused_retention_seconds:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: If these parameters are absent, sandboxes will not be deleted.
+  resources.needs.regions:
+    source: https://docs.blaxel.ai/Infrastructure/Regions
+    read: '2026-10-04'
+    quote: All regions are not necessarily available in self-service by default. Please contact us if
+      you would like access to a specific region.
+  resources.needs.max_lifetime_seconds:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: Some quota tiers enforce expiration dates (Tier 0 and 1, with respectively up to 7 and 30 days).
+      In higher tiers, unlimited persistence is permitted.
+  resources.unmet_limits.max_lifetime_seconds.tier_2_or_higher:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: Some quota tiers enforce expiration dates (Tier 0 and 1, with respectively up to 7 and 30 days).
+      In higher tiers, unlimited persistence is permitted.
+  resources.needs.paused_retention_seconds:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: Some quota tiers enforce expiration dates (Tier 0 and 1, with respectively up to 7 and 30 days).
+      In higher tiers, unlimited persistence is permitted.
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/native-default-core.json
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.counts_paused_time:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-04'
+    quote: expire after a total maximum lifetime (time-to-live or TTL) from creation using the ttl parameter
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.adjustable:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-11'
+    quote: "Updating a sandbox\u2019s TTL or expiration policies applies to the running sandbox: it is\
+      \ not restarted and keeps its filesystem, forks included."
+  lifetime_timer.counts_from:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-11'
+    quote: expire after a total maximum lifetime (time-to-live or TTL) from creation using the ttl parameter
+  lifetime_timer.min_seconds:
+    source: https://docs.blaxel.ai/Sandboxes/Expiration
+    read: '2026-10-21'
+    quote: The minimum value for `ttl` and `ttl-max-age` is `5m`, and for `ttl-idle` it is `1m`.
+  gates.processes.0.cancel:
+    tests:
+    - processes.cancel.true
+    report: reports/native-default-core.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/native-default-core.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.true
+    report: reports/native-default-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-default-core.json
+  gates.hidden_secrets.0.scrubs_responses:
+    tests:
+    - coverage.hidden_secrets.scrubs_responses.false
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.injection:
+    tests:
+    - coverage.hidden_secrets.injection.sets_header
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.intercepts:
+    tests:
+    - coverage.hidden_secrets.intercepts.all_https
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.transparent:
+    tests:
+    - coverage.hidden_secrets.transparent.false
+    report: reports/native-default-coverage.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/adapter-provider-artifact.json
+  gates.terminal.0:
+    tests:
+    - terminal.interactive
+    report: reports/adapter-default-core.json
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: true
+  at_end:
+  - destroyed
+  adjustable: true
+  step_seconds: unknown
+  counts_from: create
+  min_seconds: 300

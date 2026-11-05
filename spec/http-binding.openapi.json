@@ -1,0 +1,5869 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Provider HTTP binding 0.2 and 0.3",
+    "version": "0.3"
+  },
+  "security": [
+    {
+      "accountBearer": []
+    }
+  ],
+  "paths": {
+    "/sps/v1/create": {
+      "post": {
+        "operationId": "create",
+        "x-sps-rules": [
+          "baseline/lifecycle"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CreateRequest03"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CreateResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CreateResult03"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "SPS-Request-Digest",
+            "in": "header",
+            "required": true,
+            "description": "SHA-256 of exact UTF-8 request body bytes; retries reuse those bytes.",
+            "schema": {
+              "$ref": "#/components/schemas/Digest"
+            }
+          }
+        ]
+      }
+    },
+    "/sps/v1/get": {
+      "post": {
+        "operationId": "get",
+        "x-sps-rules": [
+          "baseline/lifecycle"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GetResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GetResult03"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/list": {
+      "post": {
+        "operationId": "list",
+        "x-sps-rules": [
+          "baseline/lifecycle"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ListResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ListResult03"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/destroy": {
+      "post": {
+        "operationId": "destroy",
+        "x-sps-rules": [
+          "baseline/lifecycle"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DestroyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestroyResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/run": {
+      "post": {
+        "operationId": "run",
+        "x-sps-rules": [
+          "baseline/run"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/files.read_bytes": {
+      "post": {
+        "operationId": "files_read_bytes",
+        "x-sps-rules": [
+          "baseline/files"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/files.write": {
+      "post": {
+        "operationId": "files_write",
+        "x-sps-rules": [
+          "baseline/files"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/process.start": {
+      "post": {
+        "operationId": "process_start",
+        "x-sps-rules": [
+          "baseline/process-output"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sps/v1/process.output": {
+      "post": {
+        "operationId": "process_output",
+        "x-sps-rules": [
+          "baseline/process-output"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Binding error; inspect outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/sandbox-provider-spec.json": {
+      "get": {
+        "operationId": "discovery",
+        "responses": {
+          "200": {
+            "description": "Account-scoped discovery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discovery"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated; empty body"
+          },
+          "403": {
+            "description": "Forbidden; empty body"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "accountBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Identifier": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+      },
+      "Path": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "pattern": "^/[^\\u0000]*$(?![\\s\\S])"
+      },
+      "Environment": {
+        "type": "object",
+        "maxProperties": 256,
+        "propertyNames": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$(?![\\s\\S])"
+        },
+        "additionalProperties": {
+          "type": "string",
+          "maxLength": 65536,
+          "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+        }
+      },
+      "Base64": {
+        "type": "string",
+        "maxLength": 22369624,
+        "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$(?![\\s\\S])"
+      },
+      "Digest": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$(?![\\s\\S])"
+      },
+      "AllocationKey": {
+        "type": "string",
+        "pattern": "^[0-9]{10}:[a-f0-9]{32}$(?![\\s\\S])"
+      },
+      "SandboxIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider_id",
+          "account_id",
+          "offering_id",
+          "sandbox_id",
+          "incarnation"
+        ],
+        "properties": {
+          "provider_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "offering_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "incarnation": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "ProcessIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sandbox",
+          "process_id",
+          "incarnation"
+        ],
+        "properties": {
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "process_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "incarnation": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "Limits": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "request_bytes",
+          "response_bytes",
+          "command_output_bytes",
+          "file_bytes",
+          "page_size",
+          "output_frames",
+          "observation_ms",
+          "process_buffer_bytes"
+        ],
+        "properties": {
+          "request_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 33554432
+          },
+          "response_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 67108864
+          },
+          "command_output_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          },
+          "file_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "output_frames": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "observation_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60000
+          },
+          "process_buffer_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          },
+          "buffered_command_output_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216,
+            "description": "Maximum decoded bytes retained and returned per stream for buffered_commands_v1."
+          },
+          "execution_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "description": "Maximum independent execution_limit_ms for buffered_commands_v1."
+          }
+        }
+      },
+      "Offering": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "offering_id",
+          "declaration_id",
+          "declaration"
+        ],
+        "properties": {
+          "offering_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "declaration_id": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "For 0.2 this is a selection token binding native declaration content, effective binding version, modes and admitted capacities; change it when any bound promise changes."
+          },
+          "declaration": {
+            "$ref": "urn:sandbox-provider-spec:0.1:declaration-schema"
+          }
+        }
+      },
+      "Discovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding",
+          "endpoint_origin",
+          "provider_id",
+          "account_id",
+          "server_revision",
+          "operations",
+          "limits",
+          "create_key_window_seconds",
+          "process_retention_seconds",
+          "process_addressability",
+          "core_modes",
+          "offerings"
+        ],
+        "properties": {
+          "binding": {
+            "enum": [
+              "sandbox-provider-http/0.1",
+              "sandbox-provider-http/0.2",
+              "sandbox-provider-http/0.3"
+            ]
+          },
+          "endpoint_origin": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "^https://[^/?#@]+(?::[0-9]+)?$(?![\\s\\S])"
+          },
+          "provider_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "server_revision": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "operations": {
+            "const": [
+              "create",
+              "get",
+              "list",
+              "destroy",
+              "run",
+              "files.read_bytes",
+              "files.write",
+              "process.start",
+              "process.output"
+            ]
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "create_key_window_seconds": {
+            "const": 86400
+          },
+          "process_retention_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 604800
+          },
+          "process_addressability": {
+            "const": "endpoint_lifetime"
+          },
+          "core_modes": {
+            "type": "array",
+            "items": {
+              "const": "buffered_commands_v1"
+            },
+            "uniqueItems": true,
+            "maxItems": 1
+          },
+          "offerings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Offering"
+            },
+            "maxItems": 100
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "binding": {
+                  "const": "sandbox-provider-http/0.1"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "core_modes": {
+                  "const": []
+                },
+                "limits": {
+                  "properties": {
+                    "request_bytes": {
+                      "maximum": 33554432
+                    },
+                    "response_bytes": {
+                      "maximum": 33554432
+                    },
+                    "command_output_bytes": {
+                      "maximum": 16777216
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "buffered_command_output_bytes"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "execution_ms"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "else": {
+              "required": [
+                "core_modes"
+              ],
+              "properties": {
+                "limits": {
+                  "properties": {
+                    "request_bytes": {
+                      "maximum": 33554432
+                    },
+                    "response_bytes": {
+                      "maximum": 67108864
+                    },
+                    "command_output_bytes": {
+                      "maximum": 16777216
+                    }
+                  }
+                },
+                "core_modes": {
+                  "items": {
+                    "const": "buffered_commands_v1"
+                  },
+                  "uniqueItems": true,
+                  "maxItems": 1
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "core_modes": {
+                        "contains": {
+                          "const": "buffered_commands_v1"
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "limits": {
+                        "required": [
+                          "buffered_command_output_bytes",
+                          "execution_ms"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "binding": {
+                  "const": "sandbox-provider-http/0.3"
+                }
+              },
+              "required": [
+                "binding"
+              ]
+            },
+            "then": {
+              "properties": {
+                "core_modes": {
+                  "contains": {
+                    "const": "buffered_commands_v1"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "allocation_key",
+          "offering_id",
+          "declaration_id",
+          "request",
+          "env"
+        ],
+        "properties": {
+          "operation": {
+            "const": "create"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "allocation_key": {
+            "$ref": "#/components/schemas/AllocationKey"
+          },
+          "offering_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "declaration_id": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "Selection token from current discovery. For a new 0.2 create it binds native declaration content, effective binding version, modes and admitted capacities."
+          },
+          "request": {
+            "$ref": "urn:sandbox-provider-spec:0.1:request-schema"
+          },
+          "env": {
+            "$ref": "#/components/schemas/Environment"
+          }
+        }
+      },
+      "CreateResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "allocation_key",
+          "request_digest",
+          "key_expires_at",
+          "state",
+          "sandbox"
+        ],
+        "properties": {
+          "operation": {
+            "const": "create"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "allocation_key": {
+            "$ref": "#/components/schemas/AllocationKey"
+          },
+          "request_digest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "key_expires_at": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9999999999
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "ready",
+              "unknown",
+              "unavailable"
+            ]
+          },
+          "sandbox": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SandboxIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "enum": [
+                    "ready",
+                    "unavailable"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sandbox": {
+                  "$ref": "#/components/schemas/SandboxIdentity"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "GetRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox"
+        ],
+        "properties": {
+          "operation": {
+            "const": "get"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          }
+        }
+      },
+      "GetResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "state"
+        ],
+        "properties": {
+          "operation": {
+            "const": "get"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "state": {
+            "enum": [
+              "active",
+              "paused",
+              "destroyed",
+              "absent",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "ListRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "offering_id",
+          "cursor",
+          "page_size"
+        ],
+        "properties": {
+          "operation": {
+            "const": "list"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "offering_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          }
+        }
+      },
+      "InventoryItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sandbox",
+          "state"
+        ],
+        "properties": {
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "state": {
+            "enum": [
+              "active",
+              "paused",
+              "destroyed",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "ListResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "operation": {
+            "const": "list"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem"
+            },
+            "maxItems": 1000
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "DestroyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox"
+        ],
+        "properties": {
+          "operation": {
+            "const": "destroy"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          }
+        }
+      },
+      "DestroyResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "state"
+        ],
+        "properties": {
+          "operation": {
+            "const": "destroy"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "state": {
+            "enum": [
+              "accepted",
+              "destroyed",
+              "absent"
+            ]
+          }
+        }
+      },
+      "RunRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "argv",
+          "cwd",
+          "env",
+          "observation_timeout_ms",
+          "encoding"
+        ],
+        "properties": {
+          "operation": {
+            "const": "run"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "argv": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 65536,
+              "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+            },
+            "maxItems": 1024,
+            "minItems": 1,
+            "prefixItems": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 65536,
+                "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+              }
+            ]
+          },
+          "cwd": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Path"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "env": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "observation_timeout_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60000
+          },
+          "encoding": {
+            "enum": [
+              "utf8",
+              "base64"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Optional command semantics; accepted only when discovery binds this mode in 0.2."
+          },
+          "execution_limit_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "output_limit_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "buffered_commands_v1"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "required": [
+                "execution_limit_ms",
+                "output_limit_bytes"
+              ],
+              "properties": {
+                "encoding": {
+                  "const": "base64"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "not": {
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "then": {
+              "properties": {
+                "encoding": {
+                  "const": "utf8"
+                }
+              },
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "execution_limit_ms"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "output_limit_bytes"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "RunResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "exit_code",
+          "output_complete"
+        ],
+        "properties": {
+          "operation": {
+            "const": "run"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "stdout": {
+            "type": "string",
+            "maxLength": 16777216
+          },
+          "stderr": {
+            "type": "string",
+            "maxLength": 16777216
+          },
+          "exit_code": {
+            "type": "integer",
+            "minimum": -2147483648,
+            "maximum": 2147483647
+          },
+          "output_complete": {
+            "const": true
+          },
+          "mode": {
+            "const": "buffered_commands_v1"
+          },
+          "encoding": {
+            "const": "base64"
+          },
+          "stdout_base64": {
+            "$ref": "#/components/schemas/Base64"
+          },
+          "stderr_base64": {
+            "$ref": "#/components/schemas/Base64"
+          },
+          "stdout_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          },
+          "stderr_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          },
+          "stdout_truncated": {
+            "type": "boolean"
+          },
+          "stderr_truncated": {
+            "type": "boolean"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "buffered_commands_v1"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "required": [
+                "encoding",
+                "stdout_base64",
+                "stderr_base64",
+                "stdout_bytes",
+                "stderr_bytes",
+                "stdout_truncated",
+                "stderr_truncated"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "stdout"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stderr"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "not": {
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "then": {
+              "required": [
+                "stdout",
+                "stderr"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "encoding"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stdout_base64"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stderr_base64"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stdout_bytes"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stderr_bytes"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stdout_truncated"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "stderr_truncated"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "ReadRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "path",
+          "limit_bytes"
+        ],
+        "properties": {
+          "operation": {
+            "const": "files.read_bytes"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "path": {
+            "$ref": "#/components/schemas/Path"
+          },
+          "limit_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          }
+        }
+      },
+      "ReadResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "data_base64",
+          "byte_count",
+          "complete"
+        ],
+        "properties": {
+          "operation": {
+            "const": "files.read_bytes"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "data_base64": {
+            "$ref": "#/components/schemas/Base64"
+          },
+          "byte_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          },
+          "complete": {
+            "const": true
+          }
+        }
+      },
+      "WriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "path",
+          "data_base64",
+          "byte_count"
+        ],
+        "properties": {
+          "operation": {
+            "const": "files.write"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "path": {
+            "$ref": "#/components/schemas/Path"
+          },
+          "data_base64": {
+            "$ref": "#/components/schemas/Base64"
+          },
+          "byte_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          }
+        }
+      },
+      "WriteResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "written_bytes"
+        ],
+        "properties": {
+          "operation": {
+            "const": "files.write"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "written_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16777216
+          }
+        }
+      },
+      "StartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "argv",
+          "cwd",
+          "env",
+          "observation_timeout_ms"
+        ],
+        "properties": {
+          "operation": {
+            "const": "process.start"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "argv": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 65536,
+              "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+            },
+            "maxItems": 1024,
+            "minItems": 1,
+            "prefixItems": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 65536,
+                "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+              }
+            ]
+          },
+          "cwd": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Path"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "env": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "observation_timeout_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60000
+          }
+        }
+      },
+      "StartResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "process"
+        ],
+        "properties": {
+          "operation": {
+            "const": "process.start"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "process": {
+            "$ref": "#/components/schemas/ProcessIdentity"
+          }
+        }
+      },
+      "Frame": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "stream",
+          "text"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "stream": {
+            "enum": [
+              "stdout",
+              "stderr"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 16777216,
+            "minLength": 1
+          }
+        }
+      },
+      "OutputRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "process",
+          "cursor",
+          "max_frames",
+          "observation_timeout_ms",
+          "limit_bytes"
+        ],
+        "properties": {
+          "operation": {
+            "const": "process.output"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "process": {
+            "$ref": "#/components/schemas/ProcessIdentity"
+          },
+          "cursor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "max_frames": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "observation_timeout_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60000
+          },
+          "limit_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          }
+        }
+      },
+      "OutputResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "process",
+          "frames",
+          "first_available_cursor",
+          "next_cursor",
+          "gap",
+          "stdout_eof",
+          "stderr_eof",
+          "execution_state",
+          "exit_code",
+          "observation_end"
+        ],
+        "properties": {
+          "operation": {
+            "const": "process.output"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "process": {
+            "$ref": "#/components/schemas/ProcessIdentity"
+          },
+          "frames": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Frame"
+            },
+            "maxItems": 1000
+          },
+          "first_available_cursor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "next_cursor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "gap": {
+            "type": "boolean"
+          },
+          "stdout_eof": {
+            "type": "boolean"
+          },
+          "stderr_eof": {
+            "type": "boolean"
+          },
+          "execution_state": {
+            "enum": [
+              "running",
+              "exited",
+              "unknown"
+            ]
+          },
+          "exit_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -2147483648,
+                "maximum": 2147483647
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observation_end": {
+            "enum": [
+              "page",
+              "wait_timeout",
+              "stream_end",
+              "process_exit",
+              "unavailable"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "execution_state": {
+                  "const": "exited"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "exit_code": {
+                  "type": "integer",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "exit_code": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_end": {
+                  "const": "process_exit"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "execution_state": {
+                  "const": "exited"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_end": {
+                  "const": "stream_end"
+                }
+              }
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "stdout_eof": {
+                      "const": true
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "stderr_eof": {
+                      "const": true
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "observation_end": {
+                  "const": "unavailable"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "execution_state": {
+                  "const": "unknown"
+                },
+                "stdout_eof": {
+                  "const": false
+                },
+                "stderr_eof": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "error"
+        ],
+        "properties": {
+          "operation": {
+            "enum": [
+              "create",
+              "get",
+              "list",
+              "destroy",
+              "run",
+              "files.read_bytes",
+              "files.write",
+              "process.start",
+              "process.output"
+            ]
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "account_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/Failure"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "error": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_request",
+                        "unauthenticated",
+                        "forbidden",
+                        "unsupported_mode",
+                        "conflict",
+                        "expired_key"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "error": {
+                  "properties": {
+                    "outcome": {
+                      "const": "not_dispatched"
+                    },
+                    "exit_code": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "error": {
+                  "properties": {
+                    "exit_code": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "operation": {
+                  "const": "run"
+                },
+                "error": {
+                  "properties": {
+                    "outcome": {
+                      "const": "completed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Failure": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "outcome",
+          "message",
+          "exit_code"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_request",
+              "unauthenticated",
+              "forbidden",
+              "unsupported_mode",
+              "conflict",
+              "expired_key",
+              "limit_exceeded",
+              "timeout",
+              "provider_error",
+              "output_unavailable"
+            ]
+          },
+          "outcome": {
+            "enum": [
+              "not_dispatched",
+              "failed",
+              "unknown",
+              "completed"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Sanitized diagnostic, never credentials or command/file content."
+          },
+          "exit_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -2147483648,
+                "maximum": 2147483647
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Labels": {
+        "type": "object",
+        "maxProperties": 32,
+        "propertyNames": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\u0000]+$"
+        },
+        "additionalProperties": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "description": "Caller-supplied or observed public labels; labels never grant capabilities. There are at most 32 entries; UTF-8 keys are at most 63 bytes and values at most 255 bytes, with NUL forbidden. The ASCII-escaped serialized map is bounded to 64 KiB. Provider-internal ownership, identity and grant metadata is separate and is never returned as labels."
+      },
+      "LifetimeObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ready_at",
+          "ends_at"
+        ],
+        "properties": {
+          "ready_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(?:Z|\\+00:00)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "(?:Z|\\+00:00)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AdmissionRequirements": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fuse_mount": {
+            "type": "object"
+          },
+          "idle_shutdown": {
+            "type": "object"
+          },
+          "pause_resume": {
+            "type": "object"
+          },
+          "previews": {
+            "type": "object"
+          },
+          "network_lockdown": {
+            "type": "object"
+          },
+          "hidden_secrets": {
+            "type": "object"
+          },
+          "snapshots": {
+            "type": "object"
+          },
+          "volumes": {
+            "type": "object"
+          },
+          "custom_images": {
+            "type": "object"
+          },
+          "user_selection": {
+            "type": "object"
+          },
+          "processes": {
+            "type": "object"
+          },
+          "terminal": {
+            "type": "object"
+          },
+          "docker": {
+            "type": "object"
+          },
+          "tcp_ports": {
+            "type": "object"
+          },
+          "desktop": {
+            "type": "object"
+          }
+        },
+        "patternProperties": {
+          "^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {
+            "type": "object"
+          }
+        }
+      },
+      "SelectedSize": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "cpu": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "memory_mib": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "disk_mib": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "SelectedGpu": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "model",
+          "count"
+        ],
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "SelectedResources": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "size": {
+            "$ref": "#/components/schemas/SelectedSize"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gpu": {
+            "$ref": "#/components/schemas/SelectedGpu"
+          },
+          "root": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "by_default",
+                "sudo",
+                "per_command"
+              ]
+            }
+          },
+          "arch": {
+            "enum": [
+              "amd64",
+              "arm64"
+            ]
+          },
+          "egress_ips": {
+            "enum": [
+              "published_ranges",
+              "dedicated"
+            ]
+          },
+          "kernel_features": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "fuse",
+                "ebpf",
+                "nested_cgroups",
+                "netfilter"
+              ]
+            }
+          },
+          "outbound_traffic": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "http",
+                "any_tcp",
+                "udp"
+              ]
+            }
+          }
+        }
+      },
+      "AdmissionSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding",
+          "core_modes",
+          "limits",
+          "process_retention_seconds",
+          "process_addressability",
+          "offering"
+        ],
+        "properties": {
+          "binding": {
+            "const": "sandbox-provider-http/0.3"
+          },
+          "core_modes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "process_retention_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "process_addressability": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "offering": {
+            "$ref": "#/components/schemas/Offering"
+          }
+        }
+      },
+      "Admission": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "selection",
+          "requirements",
+          "resources",
+          "lifetime_seconds",
+          "at_end"
+        ],
+        "properties": {
+          "selection": {
+            "$ref": "#/components/schemas/AdmissionSelection"
+          },
+          "requirements": {
+            "$ref": "#/components/schemas/AdmissionRequirements"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/SelectedResources"
+          },
+          "lifetime_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "at_end": {
+            "anyOf": [
+              {
+                "enum": [
+                  "destroyed",
+                  "paused"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "CreateRequest03": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "allocation_key",
+          "offering_id",
+          "declaration_id",
+          "request",
+          "env",
+          "labels"
+        ],
+        "properties": {
+          "operation": {
+            "const": "create"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "allocation_key": {
+            "$ref": "#/components/schemas/AllocationKey"
+          },
+          "offering_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "declaration_id": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "Selection token from current discovery. For a new 0.2 create it binds native declaration content, effective binding version, modes and admitted capacities."
+          },
+          "request": {
+            "$ref": "urn:sandbox-provider-spec:0.1:request-schema"
+          },
+          "env": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "labels": {
+            "$ref": "#/components/schemas/Labels",
+            "description": "Labels are observations only and never grants."
+          }
+        }
+      },
+      "CreateResult03": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "allocation_key",
+          "request_digest",
+          "key_expires_at",
+          "state",
+          "sandbox",
+          "admission",
+          "labels",
+          "lifetime"
+        ],
+        "properties": {
+          "operation": {
+            "const": "create"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "allocation_key": {
+            "$ref": "#/components/schemas/AllocationKey"
+          },
+          "request_digest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "key_expires_at": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9999999999
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "ready",
+              "unknown",
+              "unavailable"
+            ]
+          },
+          "sandbox": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SandboxIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "admission": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Admission"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Labels"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lifetime": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifetimeObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "enum": [
+                    "ready",
+                    "unavailable"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sandbox": {
+                  "$ref": "#/components/schemas/SandboxIdentity"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "GetResult03": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "sandbox",
+          "state",
+          "admission",
+          "labels",
+          "lifetime"
+        ],
+        "properties": {
+          "operation": {
+            "const": "get"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "state": {
+            "enum": [
+              "active",
+              "paused",
+              "destroyed",
+              "absent",
+              "unknown"
+            ]
+          },
+          "admission": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Admission"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Labels"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lifetime": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifetimeObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "InventoryItem03": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sandbox",
+          "state",
+          "labels",
+          "lifetime"
+        ],
+        "properties": {
+          "sandbox": {
+            "$ref": "#/components/schemas/SandboxIdentity"
+          },
+          "state": {
+            "enum": [
+              "active",
+              "paused",
+              "destroyed",
+              "unknown"
+            ]
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Labels"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lifetime": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifetimeObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ListResult03": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "request_id",
+          "account_id",
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "operation": {
+            "const": "list"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "account_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem03"
+            },
+            "maxItems": 1000
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "SPSRequest": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "urn:sandbox-provider-spec:0.1:request-schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "lifetime_seconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "at_end": {
+            "enum": [
+              "destroyed",
+              "paused"
+            ]
+          },
+          "requirements": {
+            "$ref": "#/$defs/requirements"
+          },
+          "resources": {
+            "$ref": "#/$defs/resources"
+          },
+          "image": {
+            "$ref": "#/$defs/image"
+          },
+          "restores_need": {
+            "$ref": "#/$defs/restores_need"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "requirements"
+              ],
+              "properties": {
+                "requirements": {
+                  "required": [
+                    "custom_images"
+                  ],
+                  "properties": {
+                    "custom_images": {
+                      "required": [
+                        "build_context"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "image"
+              ],
+              "properties": {
+                "image": {
+                  "type": "object",
+                  "required": [
+                    "dockerfile"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "requirements"
+              ],
+              "properties": {
+                "requirements": {
+                  "required": [
+                    "custom_images"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "image"
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "image"
+              ]
+            },
+            "then": {
+              "properties": {
+                "resources": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "root"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "package_manager"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "libc"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "pick": {
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "any",
+                  "files_only",
+                  "files_and_memory",
+                  "paused",
+                  "stopped",
+                  "destroyed",
+                  "continues",
+                  "briefly_paused",
+                  "public",
+                  "private",
+                  "link",
+                  "header",
+                  "deny_all",
+                  "allowlist",
+                  "one_sandbox",
+                  "many_writers",
+                  "filesystem",
+                  "object_store",
+                  "oci",
+                  "private_oci",
+                  "dockerfile",
+                  "provider_artifact",
+                  "shared",
+                  "filtered",
+                  "dedicated",
+                  "host",
+                  "key",
+                  "token",
+                  "password",
+                  "none",
+                  "python",
+                  "javascript",
+                  "typescript",
+                  "r",
+                  "java",
+                  "bash",
+                  "amd64",
+                  "arm64",
+                  "apt",
+                  "apk",
+                  "dnf",
+                  "pacman",
+                  "glibc",
+                  "musl",
+                  "denylist",
+                  "open",
+                  "sets_header",
+                  "injected_hosts",
+                  "all_https",
+                  "published_ranges",
+                  "by_default",
+                  "sudo",
+                  "per_command"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "requirements": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "fuse_mount": {
+                "type": "object",
+                "additionalProperties": false
+              },
+              "idle_shutdown": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "on_idle": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "paused",
+                          "stopped",
+                          "destroyed"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "paused",
+                            "stopped",
+                            "destroyed"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "custom_idle_time": {
+                    "type": "boolean"
+                  },
+                  "auto_wake": {
+                    "type": "boolean"
+                  },
+                  "idle_seconds": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "required": [
+                        "idle_seconds"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "custom_idle_time": {
+                          "const": true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "on_idle"
+                      ],
+                      "properties": {
+                        "on_idle": {
+                          "enum": [
+                            "destroyed",
+                            [
+                              "destroyed"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "then": {
+                      "not": {
+                        "required": [
+                          "auto_wake"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "pause_resume": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "keeps": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "files_only",
+                          "files_and_memory"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "files_only",
+                            "files_and_memory"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "previews": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "access",
+                  "ports"
+                ],
+                "properties": {
+                  "access": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "any",
+                          "public",
+                          "private"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "public",
+                            "private"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "credential": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "link",
+                          "header"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "link",
+                            "header"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "revocable": {
+                    "type": "boolean"
+                  },
+                  "link_lifetime_seconds": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "websocket": {
+                    "type": "boolean"
+                  },
+                  "loopback": {
+                    "type": "boolean"
+                  },
+                  "any_port": {
+                    "type": "boolean"
+                  },
+                  "survives_pause": {
+                    "type": "boolean"
+                  },
+                  "ports": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 65535
+                    }
+                  }
+                }
+              },
+              "network_lockdown": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "policy"
+                ],
+                "properties": {
+                  "policy": {
+                    "enum": [
+                      "deny_all",
+                      "allowlist",
+                      "denylist",
+                      "open"
+                    ]
+                  },
+                  "changeable": {
+                    "type": "boolean"
+                  },
+                  "switchable": {
+                    "type": "boolean"
+                  },
+                  "switches_to": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "deny_all",
+                        "allowlist",
+                        "denylist",
+                        "open"
+                      ]
+                    }
+                  },
+                  "allow": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "deny": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[^*]*$"
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "policy": {
+                          "const": "deny_all"
+                        }
+                      },
+                      "required": [
+                        "policy"
+                      ]
+                    },
+                    "then": {
+                      "not": {
+                        "anyOf": [
+                          {
+                            "required": [
+                              "allow"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "deny"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "policy": {
+                          "const": "allowlist"
+                        }
+                      },
+                      "required": [
+                        "policy"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "allow"
+                      ],
+                      "not": {
+                        "required": [
+                          "deny"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "policy": {
+                          "const": "denylist"
+                        }
+                      },
+                      "required": [
+                        "policy"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "deny"
+                      ],
+                      "not": {
+                        "required": [
+                          "allow"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "policy": {
+                          "const": "open"
+                        }
+                      },
+                      "required": [
+                        "policy"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "switchable"
+                      ],
+                      "properties": {
+                        "switchable": {
+                          "const": true
+                        }
+                      },
+                      "not": {
+                        "anyOf": [
+                          {
+                            "required": [
+                              "allow"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "deny"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "switches_to": {
+                          "contains": {
+                            "const": "open"
+                          }
+                        }
+                      },
+                      "required": [
+                        "switches_to"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "switchable"
+                      ],
+                      "properties": {
+                        "switchable": {
+                          "const": true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "changeable"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "policy": {
+                          "enum": [
+                            "allowlist",
+                            "denylist"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "switchable": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "switchable"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "switches_to"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "switches_to"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "switchable"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "hidden_secrets": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "inject_into"
+                ],
+                "properties": {
+                  "rotates": {
+                    "type": "boolean"
+                  },
+                  "scrubs_responses": {
+                    "type": "boolean"
+                  },
+                  "transparent": {
+                    "type": "boolean"
+                  },
+                  "injection": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "sets_header"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "sets_header"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "intercepts": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "injected_hosts",
+                          "all_https"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "injected_hosts",
+                            "all_https"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "header_templates": {
+                    "type": "boolean"
+                  },
+                  "headers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+                        },
+                        "prefix": {
+                          "type": "string"
+                        },
+                        "suffix": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "inject_into": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/$defs/hostname"
+                    }
+                  }
+                }
+              },
+              "snapshots": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "original_after"
+                ],
+                "properties": {
+                  "keeps": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "files_only",
+                          "files_and_memory"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "files_only",
+                            "files_and_memory"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "original_after": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "any",
+                          "continues",
+                          "briefly_paused",
+                          "terminated"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "continues",
+                            "briefly_paused",
+                            "terminated"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "deletable": {
+                    "type": "boolean"
+                  },
+                  "retention_seconds": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "volumes": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "mounts"
+                ],
+                "properties": {
+                  "sharing": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "one_sandbox",
+                          "many_writers"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "one_sandbox",
+                            "many_writers"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "read_only_mounts": {
+                    "type": "boolean"
+                  },
+                  "kind": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "any",
+                          "filesystem",
+                          "object_store"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "filesystem",
+                            "object_store"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "mounts": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "provider",
+                        "volume",
+                        "path"
+                      ],
+                      "properties": {
+                        "provider": {
+                          "$ref": "#/$defs/provider_name"
+                        },
+                        "volume": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "path": {
+                          "type": "string",
+                          "pattern": "^/[^\\u0000]*$"
+                        },
+                        "read_only": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "custom_images": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "prepared": {
+                    "type": "boolean"
+                  },
+                  "runs_entrypoint": {
+                    "type": "boolean"
+                  },
+                  "image_config": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "env",
+                        "workdir",
+                        "user"
+                      ]
+                    }
+                  },
+                  "build_context": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "user_selection": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "commands": {
+                    "type": "boolean"
+                  },
+                  "files_write": {
+                    "type": "boolean"
+                  },
+                  "process_start": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "processes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "input": {
+                    "type": "boolean"
+                  },
+                  "cancel": {
+                    "type": "boolean"
+                  },
+                  "reattach": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "terminal": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "reattach": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "docker": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "networking": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "host"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "host"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "tcp_ports": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "tls",
+                  "ports"
+                ],
+                "properties": {
+                  "tls": {
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "any",
+                          "none"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "none"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "ports": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 65535
+                    }
+                  }
+                }
+              },
+              "desktop": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "live_view": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "file_links": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "operations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "read",
+                        "write"
+                      ]
+                    }
+                  },
+                  "user_selection": {
+                    "type": "boolean"
+                  },
+                  "link_lifetime_seconds": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "revocable": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "patternProperties": {
+              "^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {
+                "type": "object"
+              }
+            },
+            "if": {
+              "required": [
+                "previews"
+              ],
+              "properties": {
+                "previews": {
+                  "required": [
+                    "survives_pause"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "required": [
+                    "pause_resume"
+                  ]
+                },
+                {
+                  "required": [
+                    "idle_shutdown"
+                  ]
+                }
+              ]
+            }
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "cpu_min": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "memory_min_mib": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "disk_min_mib": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "extendable_lifetime": {
+                "type": "boolean"
+              },
+              "region": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gpu_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "gpu_model": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                ]
+              },
+              "kernel": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "shared",
+                      "filtered",
+                      "dedicated"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "shared",
+                        "filtered",
+                        "dedicated"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "kernel_features": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "fuse",
+                    "ebpf",
+                    "nested_cgroups",
+                    "netfilter"
+                  ]
+                }
+              },
+              "outbound_traffic": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "http",
+                    "any_tcp",
+                    "udp"
+                  ]
+                }
+              },
+              "outbound_ip_families": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "ipv4",
+                    "ipv6"
+                  ]
+                }
+              },
+              "long_running": {
+                "type": "boolean"
+              },
+              "size_is_ceiling": {
+                "type": "boolean"
+              },
+              "paused_retention_seconds": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "root": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "by_default",
+                      "sudo",
+                      "per_command"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "by_default",
+                        "sudo",
+                        "per_command"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "arch": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "amd64",
+                      "arm64"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "amd64",
+                        "arm64"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "package_manager": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "apt",
+                      "apk",
+                      "dnf",
+                      "pacman",
+                      "none"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "apt",
+                        "apk",
+                        "dnf",
+                        "pacman",
+                        "none"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "libc": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "glibc",
+                      "musl"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "glibc",
+                        "musl"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "on_memory_exhausted": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "process_killed",
+                      "sandbox_ended"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "process_killed",
+                        "sandbox_ended"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "run_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "process_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "egress_ips": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "published_ranges",
+                      "dedicated"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "published_ranges",
+                        "dedicated"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "file_stream_bytes": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": false,
+                "properties": {
+                  "read": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "write": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          },
+          "image": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "dockerfile"
+                ],
+                "properties": {
+                  "dockerfile": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "private_oci"
+                ],
+                "properties": {
+                  "private_oci": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "provider_artifact",
+                  "provider"
+                ],
+                "properties": {
+                  "provider_artifact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "provider": {
+                    "$ref": "#/$defs/provider_name"
+                  }
+                }
+              }
+            ]
+          },
+          "restores_need": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "lifetime_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "requirements": {
+                "$ref": "#/$defs/requirements"
+              },
+              "resources": {
+                "$ref": "#/$defs/resources"
+              }
+            }
+          },
+          "hostname": {
+            "type": "string",
+            "oneOf": [
+              {
+                "pattern": "^(?=.{1,253}(?![\\s\\S]))(?![0-9.]+(?![\\s\\S]))[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?![\\s\\S])"
+              },
+              {
+                "pattern": "^(?=.{3,255}(?![\\s\\S]))\\*\\.(?![0-9.]+(?![\\s\\S]))[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?![\\s\\S])"
+              }
+            ]
+          },
+          "provider_name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        }
+      },
+      "SPSDeclaration": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "urn:sandbox-provider-spec:0.1:declaration-schema",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "spec",
+          "provider",
+          "verified",
+          "resources",
+          "gates",
+          "evidence"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "resources"
+              ],
+              "properties": {
+                "resources": {
+                  "required": [
+                    "outbound_traffic"
+                  ],
+                  "properties": {
+                    "outbound_traffic": {
+                      "type": "array",
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "evidence": {
+                  "properties": {
+                    "resources.outbound_traffic": {
+                      "not": {
+                        "required": [
+                          "source"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "spec": {
+            "const": "sandbox-provider-spec/0.1"
+          },
+          "provider": {
+            "$ref": "#/$defs/provider_name"
+          },
+          "class": {
+            "$ref": "#/$defs/provider_name"
+          },
+          "verified": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "date",
+              "sdks"
+            ],
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "sdks": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kernel": {
+                "$ref": "#/$defs/kernel"
+              },
+              "kernel_features": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "fuse",
+                        "ebpf",
+                        "nested_cgroups",
+                        "netfilter"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "outbound_traffic": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "http",
+                        "any_tcp",
+                        "udp"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "outbound_ip_families": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "ipv4",
+                        "ipv6"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "ipv4_destination_reach": {
+                "enum": [
+                  "native",
+                  "nat64",
+                  "none",
+                  "unknown"
+                ]
+              },
+              "guest_reserved_tcp_ports": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 65535
+                    }
+                  }
+                ]
+              },
+              "files_write_executable_effect": {
+                "enum": [
+                  "preserved",
+                  "may_clear",
+                  "unverified"
+                ]
+              },
+              "file_stream_max_bytes": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": false,
+                "properties": {
+                  "read": {
+                    "$ref": "#/$defs/bytes_or_unknown"
+                  },
+                  "write": {
+                    "$ref": "#/$defs/bytes_or_unknown"
+                  }
+                }
+              },
+              "long_running": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "size_is_ceiling": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "max_lifetime_seconds": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/positive_number"
+                  },
+                  {
+                    "$ref": "#/$defs/at_least"
+                  },
+                  {
+                    "enum": [
+                      "unlimited",
+                      "unknown"
+                    ]
+                  }
+                ]
+              },
+              "sizes": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/size"
+                    }
+                  }
+                ]
+              },
+              "default_size": {
+                "$ref": "#/$defs/default_size"
+              },
+              "disk_mib": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "regions": {
+                "$ref": "#/$defs/string_list_or_unknown"
+              },
+              "located_in": {
+                "$ref": "#/$defs/string_list_or_unknown"
+              },
+              "gpus": {
+                "$ref": "#/$defs/string_list_or_unknown"
+              },
+              "max_gpus": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "extendable_lifetime": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "default_user": {
+                "type": "string",
+                "minLength": 1
+              },
+              "default_cwd": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^/"
+              },
+              "paused_retention_seconds": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "root": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "by_default",
+                        "sudo",
+                        "per_command"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "arch": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "amd64",
+                        "arm64"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "package_manager": {
+                "enum": [
+                  "apt",
+                  "apk",
+                  "dnf",
+                  "pacman",
+                  "none",
+                  "unknown"
+                ]
+              },
+              "libc": {
+                "enum": [
+                  "glibc",
+                  "musl",
+                  "unknown"
+                ]
+              },
+              "on_memory_exhausted": {
+                "enum": [
+                  "process_killed",
+                  "sandbox_ended",
+                  "unknown"
+                ]
+              },
+              "max_run_seconds": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "max_process_seconds": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "disk_in_memory": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "egress_ips": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "published_ranges",
+                        "dedicated"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "needs": {
+                "$ref": "#/$defs/needs"
+              },
+              "unmet_limits": {
+                "$ref": "#/$defs/unmet_limits"
+              }
+            }
+          },
+          "lifetime_timer": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "enforced_by",
+              "counts_paused_time",
+              "at_end"
+            ],
+            "properties": {
+              "enforced_by": {
+                "const": "provider"
+              },
+              "counts_paused_time": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "at_end": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "paused",
+                      "stopped",
+                      "destroyed",
+                      "unknown"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "paused",
+                        "stopped",
+                        "destroyed"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "adjustable": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "step_seconds": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "const": "unknown"
+                  }
+                ]
+              },
+              "counts_from": {
+                "enum": [
+                  "create",
+                  "ready",
+                  "unknown"
+                ]
+              },
+              "min_seconds": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "const": "unknown"
+                  }
+                ]
+              },
+              "after_resume": {
+                "enum": [
+                  "same",
+                  "pauses",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "gates": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "fuse_mount": {
+                "$ref": "#/$defs/gate"
+              },
+              "idle_shutdown": {
+                "$ref": "#/$defs/gate"
+              },
+              "pause_resume": {
+                "$ref": "#/$defs/gate"
+              },
+              "previews": {
+                "$ref": "#/$defs/gate"
+              },
+              "network_lockdown": {
+                "$ref": "#/$defs/gate"
+              },
+              "hidden_secrets": {
+                "$ref": "#/$defs/gate"
+              },
+              "snapshots": {
+                "$ref": "#/$defs/gate"
+              },
+              "volumes": {
+                "$ref": "#/$defs/gate"
+              },
+              "custom_images": {
+                "$ref": "#/$defs/gate"
+              },
+              "processes": {
+                "$ref": "#/$defs/gate"
+              },
+              "user_selection": {
+                "$ref": "#/$defs/gate"
+              },
+              "terminal": {
+                "$ref": "#/$defs/gate"
+              },
+              "docker": {
+                "$ref": "#/$defs/gate"
+              },
+              "tcp_ports": {
+                "$ref": "#/$defs/gate"
+              },
+              "desktop": {
+                "$ref": "#/$defs/gate"
+              },
+              "file_links": {
+                "$ref": "#/$defs/gate"
+              }
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/evidence_entry"
+            }
+          }
+        },
+        "patternProperties": {
+          "^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {
+            "type": "object"
+          }
+        },
+        "$defs": {
+          "provider_name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "positive_number": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "number_or_unknown": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/positive_number"
+              },
+              {
+                "$ref": "#/$defs/at_least"
+              },
+              {
+                "enum": [
+                  "unlimited",
+                  "unknown"
+                ]
+              }
+            ]
+          },
+          "bytes_or_unknown": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "at_least"
+                ],
+                "properties": {
+                  "at_least": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          },
+          "at_least": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "at_least"
+            ],
+            "properties": {
+              "at_least": {
+                "$ref": "#/$defs/positive_number"
+              }
+            }
+          },
+          "boolean_or_unknown": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          },
+          "string_list_or_unknown": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            ]
+          },
+          "kernel": {
+            "enum": [
+              "shared",
+              "filtered",
+              "dedicated",
+              "unknown"
+            ]
+          },
+          "size_value": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/positive_number"
+              },
+              {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "$ref": "#/$defs/positive_number"
+                }
+              }
+            ]
+          },
+          "size": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "cpu": {
+                "$ref": "#/$defs/size_value"
+              },
+              "memory_mib": {
+                "$ref": "#/$defs/size_value"
+              },
+              "disk_mib": {
+                "$ref": "#/$defs/size_value"
+              }
+            }
+          },
+          "default_size": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cpu",
+                  "memory_mib"
+                ],
+                "properties": {
+                  "cpu": {
+                    "$ref": "#/$defs/positive_number"
+                  },
+                  "memory_mib": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "disk_mib": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            ]
+          },
+          "unmet_limits": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "const": "unknown"
+                  }
+                ]
+              }
+            }
+          },
+          "needs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "limit": {
+            "$ref": "#/$defs/number_or_unknown"
+          },
+          "knob_value": {
+            "oneOf": [
+              {
+                "type": [
+                  "string",
+                  "boolean",
+                  "number"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": [
+                    "string",
+                    "boolean",
+                    "number"
+                  ]
+                }
+              },
+              {
+                "$ref": "#/$defs/at_least"
+              }
+            ]
+          },
+          "policy_value": {
+            "oneOf": [
+              {
+                "enum": [
+                  "deny_all",
+                  "allowlist",
+                  "denylist",
+                  "open",
+                  "unknown"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "deny_all",
+                    "allowlist",
+                    "denylist",
+                    "open"
+                  ]
+                }
+              }
+            ]
+          },
+          "variant": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "on_idle": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "keeps": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "custom_idle_time": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "auto_wake": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "access": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "credential": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "revocable": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "link_lifetime_seconds": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "websocket": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "loopback": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "any_port": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "survives_pause": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "reserved_ports": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                }
+              },
+              "policy": {
+                "$ref": "#/$defs/policy_value"
+              },
+              "changeable": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "switchable": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "rotates": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "scrubs_responses": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "header_templates": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "transparent": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "injection": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "intercepts": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "original_after": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "deletable": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "retention_seconds": {
+                "$ref": "#/$defs/number_or_unknown"
+              },
+              "sharing": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "read_only_mounts": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "kind": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "source": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "prepared": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "runs_entrypoint": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "build_context": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "image_config": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "networking": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "tls": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "live_view": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "operations": {
+                "$ref": "#/$defs/knob_value"
+              },
+              "user_selection": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "max_ports": {
+                "$ref": "#/$defs/limit"
+              },
+              "max_allow": {
+                "$ref": "#/$defs/limit"
+              },
+              "max_deny": {
+                "$ref": "#/$defs/limit"
+              },
+              "allow_wildcards": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "inject_wildcards": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "entry_kinds": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "names",
+                        "addresses"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "max_mounts": {
+                "$ref": "#/$defs/limit"
+              },
+              "max_tcp_ports": {
+                "$ref": "#/$defs/limit"
+              },
+              "max_inject_into": {
+                "$ref": "#/$defs/limit"
+              },
+              "idle_seconds": {
+                "$ref": "#/$defs/positive_number"
+              },
+              "ports": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                }
+              },
+              "allow": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "deny": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "inject_into": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "mounts": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "object"
+                }
+              },
+              "image": {
+                "type": [
+                  "string",
+                  "object"
+                ]
+              },
+              "resizes_on_restore": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "input": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "cancel": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "reattach": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "commands": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "files_write": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "process_start": {
+                "$ref": "#/$defs/boolean_or_unknown"
+              },
+              "needs": {
+                "$ref": "#/$defs/needs"
+              },
+              "conflicts": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "policy"
+                  ],
+                  "properties": {
+                    "policy": {
+                      "anyOf": [
+                        {
+                          "const": "open"
+                        },
+                        {
+                          "type": "array",
+                          "contains": {
+                            "const": "open"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "switchable"
+                  ],
+                  "properties": {
+                    "switchable": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "gate": {
+            "oneOf": [
+              {
+                "const": "unsupported"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/variant"
+                }
+              }
+            ]
+          },
+          "evidence_entry": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/report_evidence"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "reports"
+                ],
+                "properties": {
+                  "reports": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "$ref": "#/$defs/report_evidence"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "source",
+                  "read",
+                  "quote"
+                ],
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "read": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "quote": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            ]
+          },
+          "report_evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tests",
+              "report"
+            ],
+            "properties": {
+              "tests": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "report": {
+                "type": "string",
+                "pattern": "^reports/[^/]+\\.json$"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

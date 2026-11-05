@@ -1,0 +1,3821 @@
+{
+  "baseline": "passed",
+  "check_digests": {
+    "baseline.create_env": "sha256:be20199ca810593a687cb56b9761ecffc7a085555f9892f447c4c9c6189e692d",
+    "baseline.destroy": "sha256:c130d5e6f76351f473589ff94ef239b3b79b94330c1dce4797101bfb9d3ffd76",
+    "baseline.environment_bash": "sha256:ca8c4433c98200c75879e784c593fbd72e6e54031b3a6f01c87e349235bb4284",
+    "baseline.environment_python3": "sha256:2063242bf550546c9690290a5365c88e4b302a3e495aeb5d4808e5f8b5dc8261",
+    "baseline.files_read": "sha256:ec2e1e6d138c42ccd27a98c81bd4147f231aa5ea234d63cc785dfab5fcc1a1b6",
+    "baseline.files_write": "sha256:2dd99b6f397509ad9ea73531d398f9b2427610f0c65bb5133720ad46f43be760",
+    "baseline.files_write_binary": "sha256:773294ae5dc3cc4b15cc47399c4a7f4a2bc58bcc16625993a0efcd1a2d234c0e",
+    "baseline.get": "sha256:cc48f0eba7bd405b3078492e2ce7a3f15b76bed294fd73102c915d81d6d291b7",
+    "baseline.list": "sha256:207c0ee57d23f170e1347a5360cc8e810d12466d8d3e11885af6505fc9e63fca",
+    "baseline.no_metadata": "sha256:25380597ed668fff6aee87f6b41489c1b1a2f5220d4dcf92c15ff896fe025c24",
+    "baseline.outbound_network": "sha256:7eac4cd68762b763906ecb10e9b56b0036a290a6fa29cfde8a5187c4ccac262d",
+    "baseline.process_stream": "sha256:9889635a234a758729bf6271ae6fc8f80e6efbe35b203e50d0c27e1649cdc007",
+    "baseline.run_cwd": "sha256:ba4992892f1c86ae31cc4591587d2d34642eebbac9e2b3036a56e7fdba6b8efe",
+    "baseline.run_env": "sha256:494a3a431e9381a0ba64d61d811b9a39ec546e49f58104237cc328e24985256e",
+    "baseline.run_exit_code": "sha256:fe4d7dba377b96e6c88d3229abdc26b2b13eaf4504c41cf65232e45de74cf198",
+    "baseline.run_output": "sha256:b8173753bc128d1da0218de7156bc561e7aa32009fc6cf452ba8a94e44b4b899",
+    "baseline.run_separate_streams": "sha256:bff5a351121d4627d9d8dfff72fae18e092f1db04cf1b47b7f80c47cc766a8df",
+    "coverage.custom_images.build_context": "sha256:e63b67d367eab8ec9d5ea74401f162bc1d73858b409bc0307100ab2a0467ee29",
+    "coverage.custom_images.prepare.delete": "sha256:6c1bbe7de9afd87564ff081720866203c7578b0e5caca690907435aa0f2227b5",
+    "coverage.custom_images.prepare.dockerfile_context": "sha256:82f5121d688544c6e95cfa175b6cad70cc97466566af482c7d2816b546af375b",
+    "coverage.custom_images.prepare.idempotent": "sha256:080e84d19091bf70122a91eedaea007604dc20f7eb51f9ecc6e5cf36eb99efc3",
+    "coverage.custom_images.prepare.image_config.env": "sha256:3ec87da3e9410dc5fd5d230880211c6a4992339b59b5fb35f143643885c91b1a",
+    "coverage.custom_images.prepare.image_config.user": "sha256:38924b1a0f626cff6ec6395b05d21e4608a64c28e62959db33c618cc77932cdd",
+    "coverage.custom_images.prepare.image_config.workdir": "sha256:2025d60a67677338bb05355102c278f458338f9fdb94c7b83c8f062b21a7194b",
+    "coverage.custom_images.prepare.registry": "sha256:f3f3ee545f1a1b96b8a1413649f33e1297522826679efcb7250b194ee9e1f289",
+    "coverage.custom_images.prepare.size": "sha256:50e7d74347dc2e9cbdd624a86aebbc04aa897c327be99475a84cc2970108ad86",
+    "coverage.custom_images.prepared_size_without_request": "sha256:d579867505d6af8a5d9e1ef2f69b1cb4f20ea8be03f06094a471a2d0cfcbd77d",
+    "coverage.custom_images.runs_entrypoint.false": "sha256:8d9d7dce0450eed258b835f7603f94fc274a4f6851dc18333df59f177e58c924",
+    "coverage.custom_images.runs_entrypoint.true": "sha256:4c7eca6e19d2e1467c8a7264e085e0ec996195404f72b37fda29309f997566a2",
+    "coverage.desktop.control": "sha256:b6cb6be449104deed53ae1e76c026320da5fe028c71c60a8ad654f72e320ac28",
+    "coverage.desktop.live_view": "sha256:d15f791a1b09ba128d675e981e2af65937dbadfb02a0b6dc6bfd147f86b6de0a",
+    "coverage.docker.host": "sha256:314f094f7e6094654b88d97aa6f5db3cf6b93585d85e35340cbfd8ba883f2b76",
+    "coverage.facts.arch.amd64": "sha256:423da8c560aaafc2cd5ac7259a7be827c6f7bfa0d9641c47c6b94907048ccf73",
+    "coverage.facts.arch.arm64": "sha256:1b18c5c2d85eb2e9b57cb56db5fe951714f26e5e861806735308409efc763f99",
+    "coverage.facts.disk_in_memory.false": "sha256:ac12a62193296aefc513120da7ae15c56256a0aec0ce0dcb2ba0af0d78b28d39",
+    "coverage.facts.disk_in_memory.true": "sha256:7b8101a5e8af797bdc650a64804f6d28f0435f6994ee5f569e4180ca1cfa2d40",
+    "coverage.facts.kernel_features.ebpf": "sha256:40306ce10427e17e71ce34f787e65628a22452dc3e7ad6c568ef31dd0e53f648",
+    "coverage.facts.kernel_features.fuse": "sha256:2611002d7392fa73bd58103ffd19ea98c303881b0dd73eb1429de122e8e14703",
+    "coverage.facts.kernel_features.nested_cgroups": "sha256:d152062bd5fe90c31d71031f3354b98f253decaecd944ad1fde9cd7899490624",
+    "coverage.facts.kernel_features.netfilter": "sha256:d705d995daa793d57227ebb1180dd14fe290d7b23dfae2f2dc875b5e68c8c9d5",
+    "coverage.facts.libc.glibc": "sha256:06a1049b7e7f8baeeec6b0f6d54cf4de887bc8f8413e448b4d50054c637b46e5",
+    "coverage.facts.libc.musl": "sha256:b4d30d0e79e9248a451f5f4a5df9299e675d4f6921f3e270db6d5285e15bc9c4",
+    "coverage.facts.max_lifetime.active": "sha256:ef14274dbd10ac97dd8213ac1406ee450473cd6c7216f8c2519308a02e3b31e2",
+    "coverage.facts.max_process": "sha256:1df9c26c702da0ac881027de0533bebd31f0206a636f875b8fd699bf3cc75df9",
+    "coverage.facts.max_run": "sha256:cba151ee982d806ea0681771a0b61e36f8e3a65c8b00798494ea982850cbf23b",
+    "coverage.facts.on_memory_exhausted.process_killed": "sha256:8d700493870860a48472f65de8a5fa1bf364fac916ea04020ef5ac96deb84fd7",
+    "coverage.facts.on_memory_exhausted.sandbox_ended": "sha256:b0d65e432361266178861ea2df5aa608e287282ec0bc610e2ac48c914fd77843",
+    "coverage.facts.outbound_traffic.any_tcp": "sha256:9156f9dd8c1ad4b7ff37a22ca1f06b6e1a8047f64fc8af7849ac7f6e260314c5",
+    "coverage.facts.outbound_traffic.http": "sha256:b2c3d6633b67806e350e5931c76390babfe96a8e3caffb2c0a7e70ae2faa49a9",
+    "coverage.facts.outbound_traffic.udp": "sha256:6fdb99ee55433ae90180978066d6b49dad701552d751facbf92bd2e4cc3ad09b",
+    "coverage.facts.package_manager.apk": "sha256:56daab3fdfe82153832b0187c9997bcc7499fba58f93b21436bae624dcf86388",
+    "coverage.facts.package_manager.apt": "sha256:2e3c0d436deb570ba3c48967dc5711e184854a2229558c4c19c6a00957cc87b9",
+    "coverage.facts.package_manager.dnf": "sha256:384189e7175a9031810858efe5d32109be1c639c97a4ccff8effdacdfdb81521",
+    "coverage.facts.package_manager.none": "sha256:82e498409bad1d0bffec76705bd294f5b9bcfc65b8c8f67d29e147eb62c40dea",
+    "coverage.facts.package_manager.pacman": "sha256:8ae68f7d46a58282c48a5956f00c090f01c53a86f9daea1bd8f5e26699f644d0",
+    "coverage.facts.root.by_default": "sha256:45018ca6679c4fce93c0c6eab52b885d486acde0a6ebaffeafcf0a9142f1cb29",
+    "coverage.facts.root.per_command": "sha256:d5bf04228cdbcc5024c108a0be286f0566db03c2854d33144473730fb9d9ff7e",
+    "coverage.facts.root.sudo": "sha256:98893e1813a8c2aef6bcdd3f9fdec469e5b8884aa95e1fd1611b32ddfa62c9d9",
+    "coverage.facts.size_is_ceiling.false": "sha256:a444f8eb05a050894eac4398aadc0b90757a4cba3411a4fed3245d4db08078d0",
+    "coverage.facts.size_is_ceiling.true": "sha256:fcafad5daf0fd2e757d8712959642af2252ed381641512dc672b87325ce9a1bd",
+    "coverage.facts.sizes.delivered": "sha256:6a88743146db635898580d2306c79d1d7e853120ca07f805259c4856489d82bc",
+    "coverage.hidden_secrets.injection.sets_header": "sha256:49c0b51e98d0182f018f956355ab1098cfe193510470782ace6cee3b15359e11",
+    "coverage.hidden_secrets.intercepts.all_https": "sha256:e70269dae430448ac212c90a1d4e937db00e60eb71380ac58587c078da8cd314",
+    "coverage.hidden_secrets.intercepts.injected_hosts": "sha256:916cd628d5e601c502d5cb807774c643e52f82093d74c826a1ec85a505edeb92",
+    "coverage.hidden_secrets.max_inject_into": "sha256:961f5eb78e26046b5cdd7c542df6885d900efdaecdfa2714b5f84d9050795ecf",
+    "coverage.hidden_secrets.rotates.false": "sha256:653399032865fcb666192986a4e8154ae303c54196d37759d638336589c9c7ab",
+    "coverage.hidden_secrets.rotates.true": "sha256:dc2fa5cde14df902e9f58f2730bd4343c21a2f4780fda4e9ec57226471a1e7e3",
+    "coverage.hidden_secrets.scrubs_responses.false": "sha256:28f164dffd83dbb01e4c0df645744714462a7e9a1e9f21bbbbe2dc17b35b7685",
+    "coverage.hidden_secrets.scrubs_responses.true": "sha256:a0ed676be521f2689187838b89892f97097a05d1bc30b2e536b3b150e9c2eeda",
+    "coverage.hidden_secrets.transparent.false": "sha256:2508776d0c3472518e1007f4b200147c3b9e466e3a480cd7e6086a335b6ffbd2",
+    "coverage.hidden_secrets.transparent.true": "sha256:16d7a3f814002b391c441a0a9a820a699ad7ac0221728287d57c78d9e4f2b3e2",
+    "coverage.hidden_secrets.wildcards": "sha256:4629796d3f6dbea7c44c191172645fb8c662ab23a34435cd8ebad6d919d119be",
+    "coverage.network_lockdown.allowlist.mixed": "sha256:dc426f39cd6c955245f5308d40f20d1a826f5a1a197b062cc182162c35c2d2f4",
+    "coverage.network_lockdown.allowlist.range": "sha256:5680791105a39081d8d019ff7aa297a4bd169e86c9c4010efac2b667eb96c930",
+    "coverage.network_lockdown.changeable.false": "sha256:a55464df137f46c0850aafa6efc5963d4355f6af59c0c39edd47be6ff823ed4c",
+    "coverage.network_lockdown.changeable.true": "sha256:e18d94df32b9d74a5ac94545fc964057d2809247d1aaf3fce403c61890ac6cd2",
+    "coverage.network_lockdown.denylist.addresses": "sha256:46f3d69e578d48ca6c73f415093693dfc2e319c1ae924c8ab6290ff0d5389161",
+    "coverage.network_lockdown.denylist.mixed": "sha256:d2243c2c230a508b5b2592f0718545a73b451297fb920168279ce7be9840e79a",
+    "coverage.network_lockdown.denylist.names": "sha256:e3466b145cf288122f20d3401b4538855472a8735661d4497e9be62c19ffe37e",
+    "coverage.network_lockdown.max_deny": "sha256:2cec5f0e0008b4c2b1f9e2a00e33c489cf77b23252d078612dd37303d7e1a86c",
+    "coverage.network_lockdown.open": "sha256:66e6bc80a0c38ed94da6c2d64440c133f61b00dd5fe6df59933df50bc9522eb2",
+    "coverage.network_lockdown.policy_transition.denylist": "sha256:dde9b23298dadb7fb6e2bec8f844f853f27619c3b3db4a1b1fd3ee20fb03cb4b",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:56977acb0267b0cee4346ae2ec0997435918b5c2f548f4d43eaedc3b27f3177a",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:f4f1a814c03f33cd53580bad1ca0e722d7a73e6061c39c7b75ec5e704a1c180d",
+    "coverage.network_lockdown.switchable.false": "sha256:57ca856af72cd8768c85402d4bb0e2b952a48527a12410cfd99108d92e76eb9d",
+    "coverage.network_lockdown.switchable.true": "sha256:7bed0ee0fd4f6d4cac272e187d6f74f712aadf783a6d0611a59b853773e4d47b",
+    "coverage.previews.any_port": "sha256:df98297ef863a0f9cfd2c3e4cbab4566df77c472d4a30cae01272695c82b49c4",
+    "coverage.previews.loopback": "sha256:ba15d18ec36e3684409e9b9406a2fc03bfe8215961987f80d75ac6742e69dbc9",
+    "coverage.previews.reserved_ports": "sha256:bfa21e8c02b01b9161132fab8d5741ac1be7860863f6268b3f23b4b3b73361ac",
+    "coverage.previews.survives_pause": "sha256:fc49e00c0e4a9c72534bb5cb9ea726a68799eafdd441310ba837fc8883655e9c",
+    "coverage.previews.websocket": "sha256:2a2974fe012a858b5f0aec7d227d229a41ccf7d2f3b34a8a54285217f130d214",
+    "coverage.tcp_ports.none": "sha256:ed6bf3fc00dd32d96045df7c8dec4b5cfb37b3f2ba6ed7f529c7d651ada3e07e",
+    "coverage.terminal.reattach": "sha256:ae3efd3702775dea6ba7a152a5622a625ca917ccf73d38d6d6892552d504d741",
+    "coverage.volumes.read_only": "sha256:13ba79158507dc072b56c8cc1fde2dd9480f414bae3c3b273440393a1e5cd1df"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.53"
+  },
+  "finished_at": "2026-10-12T15:26:01.180230+00:00",
+  "provider": "e2b",
+  "revision": "ded5bf03ae8f3a48b4aea382a5516d31e8b733ca",
+  "run_id": "run-20261012T145608Z-28d9",
+  "sdk_versions": {
+    "e2b": "2.51.0",
+    "e2b-code-interpreter": "2.10.0",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "baseline.create_env",
+    "baseline.get",
+    "baseline.list",
+    "baseline.destroy",
+    "baseline.run_output",
+    "baseline.run_exit_code",
+    "baseline.run_separate_streams",
+    "baseline.run_cwd",
+    "baseline.run_env",
+    "baseline.files_write",
+    "baseline.files_read",
+    "baseline.process_stream",
+    "baseline.environment_bash",
+    "baseline.environment_python3",
+    "baseline.outbound_network",
+    "coverage.facts.max_lifetime.active",
+    "baseline.no_metadata",
+    "baseline.files_write_binary",
+    "coverage.volumes.read_only",
+    "coverage.facts.arch.amd64",
+    "coverage.facts.arch.arm64",
+    "coverage.facts.root.by_default",
+    "coverage.facts.root.sudo",
+    "coverage.facts.root.per_command",
+    "coverage.facts.kernel_features.fuse",
+    "coverage.facts.kernel_features.ebpf",
+    "coverage.facts.kernel_features.nested_cgroups",
+    "coverage.facts.kernel_features.netfilter",
+    "coverage.facts.outbound_traffic.http",
+    "coverage.facts.outbound_traffic.any_tcp",
+    "coverage.facts.outbound_traffic.udp",
+    "coverage.facts.package_manager.apt",
+    "coverage.facts.package_manager.apk",
+    "coverage.facts.package_manager.dnf",
+    "coverage.facts.package_manager.pacman",
+    "coverage.facts.package_manager.none",
+    "coverage.facts.libc.glibc",
+    "coverage.facts.libc.musl",
+    "coverage.facts.on_memory_exhausted.process_killed",
+    "coverage.facts.on_memory_exhausted.sandbox_ended",
+    "coverage.facts.disk_in_memory.true",
+    "coverage.facts.disk_in_memory.false",
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.size_is_ceiling.false",
+    "coverage.facts.sizes.delivered",
+    "coverage.facts.max_run",
+    "coverage.facts.max_process",
+    "coverage.docker.host",
+    "coverage.tcp_ports.none",
+    "coverage.desktop.control",
+    "coverage.desktop.live_view",
+    "coverage.previews.websocket",
+    "coverage.previews.loopback",
+    "coverage.previews.any_port",
+    "coverage.previews.survives_pause",
+    "coverage.previews.reserved_ports",
+    "coverage.terminal.reattach",
+    "coverage.custom_images.runs_entrypoint.true",
+    "coverage.custom_images.runs_entrypoint.false",
+    "coverage.network_lockdown.denylist.names",
+    "coverage.network_lockdown.denylist.addresses",
+    "coverage.network_lockdown.denylist.mixed",
+    "coverage.network_lockdown.allowlist.mixed",
+    "coverage.network_lockdown.allowlist.range",
+    "coverage.network_lockdown.changeable.true",
+    "coverage.network_lockdown.changeable.false",
+    "coverage.network_lockdown.switchable.true",
+    "coverage.network_lockdown.policy_transition.denylist",
+    "coverage.network_lockdown.open",
+    "coverage.network_lockdown.switchable.false",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false",
+    "coverage.hidden_secrets.rotates.true",
+    "coverage.hidden_secrets.rotates.false",
+    "coverage.hidden_secrets.scrubs_responses.true",
+    "coverage.hidden_secrets.scrubs_responses.false",
+    "coverage.hidden_secrets.injection.sets_header",
+    "coverage.hidden_secrets.intercepts.injected_hosts",
+    "coverage.hidden_secrets.intercepts.all_https",
+    "coverage.hidden_secrets.max_inject_into",
+    "coverage.hidden_secrets.wildcards",
+    "coverage.network_lockdown.max_deny",
+    "coverage.hidden_secrets.transparent.true",
+    "coverage.hidden_secrets.transparent.false",
+    "coverage.custom_images.build_context",
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.image_config.env",
+    "coverage.custom_images.prepare.image_config.workdir",
+    "coverage.custom_images.prepare.image_config.user",
+    "coverage.custom_images.prepare.dockerfile_context",
+    "coverage.custom_images.prepare.size",
+    "coverage.custom_images.prepared_size_without_request",
+    "coverage.custom_images.prepare.idempotent",
+    "coverage.custom_images.prepare.delete"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-12T14:56:08.676303+00:00",
+  "suite_digest": "sha256:0e4bd34089375b796bdff1888aff17103137d1cbc786d264f15ec8ffcc54a870",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1277,
+      "id": "baseline.create_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "present"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1185,
+      "id": "baseline.get",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 564,
+      "id": "baseline.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 358,
+      "id": "baseline.destroy",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 767,
+      "id": "baseline.run_output",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "out"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1137,
+      "id": "baseline.run_exit_code",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 652,
+      "id": "baseline.run_separate_streams",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stderr": {
+              "actual": {
+                "truncated": false,
+                "utf8": "err\n"
+              },
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "out\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 807,
+      "id": "baseline.run_cwd",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/tmp\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 594,
+      "id": "baseline.run_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "command"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1179,
+      "id": "baseline.files_write",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVsbG8=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 918,
+      "id": "baseline.files_read",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AP9maWxl",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 15823,
+      "id": "baseline.process_stream",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/process-output"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 14,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 729,
+      "id": "baseline.environment_bash",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/bin/bash\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 562,
+      "id": "baseline.environment_python3",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/local/bin/python3\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 764,
+      "id": "baseline.outbound_network",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/outbound-network"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 300495,
+      "id": "coverage.facts.max_lifetime.active",
+      "proves": [
+        {
+          "fact": "resources.max_lifetime_seconds",
+          "value": {
+            "at_least": 300
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/max-lifetime"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            },
+            "window_completed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_active_lifetime",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1468,
+      "id": "baseline.no_metadata",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/no-metadata"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "host_metadata_hidden": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1133,
+      "id": "baseline.files_write_binary",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "00ff0080fe6600\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 139,
+      "id": "coverage.volumes.read_only",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "read_only_mounts",
+          "value": true
+        }
+      ],
+      "reason": "account_volumes_not_enabled",
+      "result": "not_run",
+      "rules": [
+        "volumes/read-only"
+      ],
+      "steps": [
+        {
+          "operation": "volume.create",
+          "reason": "account_volumes_not_enabled",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 996,
+      "id": "coverage.facts.arch.amd64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "amd64"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "arch": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 949,
+      "id": "coverage.facts.arch.arm64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "arm64"
+          ]
+        }
+      ],
+      "reason": "arch",
+      "result": "differs",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "arch": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 896,
+      "id": "coverage.facts.root.by_default",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "by_default"
+          ]
+        }
+      ],
+      "reason": "uid_zero",
+      "result": "differs",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1140,
+      "id": "coverage.facts.root.sudo",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "sudo"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 781,
+      "id": "coverage.facts.root.per_command",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "per_command"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 963,
+      "id": "coverage.facts.kernel_features.fuse",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "fuse"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/kernel-fuse"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "works": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_kernel_feature",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1432,
+      "id": "coverage.facts.kernel_features.ebpf",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "ebpf"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/kernel-ebpf"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "works": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_kernel_feature",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 709,
+      "id": "coverage.facts.kernel_features.nested_cgroups",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "nested_cgroups"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/kernel-nested-cgroups"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "works": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_kernel_feature",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1196,
+      "id": "coverage.facts.kernel_features.netfilter",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "netfilter"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/kernel-netfilter"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "works": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_kernel_feature",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.http",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-http"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.any_tcp",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-tcp"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.udp",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-udp"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4959,
+      "id": "coverage.facts.package_manager.apt",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apt"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1229,
+      "id": "coverage.facts.package_manager.apk",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apk"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 999,
+      "id": "coverage.facts.package_manager.dnf",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "dnf"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 837,
+      "id": "coverage.facts.package_manager.pacman",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "pacman"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 961,
+      "id": "coverage.facts.package_manager.none",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "none"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 855,
+      "id": "coverage.facts.libc.glibc",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "glibc"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "libc": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 775,
+      "id": "coverage.facts.libc.musl",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "musl"
+        }
+      ],
+      "reason": "libc",
+      "result": "differs",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "libc": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10959,
+      "id": "coverage.facts.on_memory_exhausted.process_killed",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "process_killed"
+        }
+      ],
+      "reason": "ValueError",
+      "result": "error",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "ValueError",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10988,
+      "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "sandbox_ended"
+        }
+      ],
+      "reason": "ValueError",
+      "result": "error",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "ValueError",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4853,
+      "id": "coverage.facts.disk_in_memory.true",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": true
+        }
+      ],
+      "reason": "disk_in_memory",
+      "result": "differs",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5510,
+      "id": "coverage.facts.disk_in_memory.false",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "reason": "E2B SDK has no per-sandbox disk allocation selector",
+      "result": "unsupported",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "E2B SDK has no per-sandbox disk allocation selector",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11495,
+      "id": "coverage.facts.size_is_ceiling.false",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": false
+        }
+      ],
+      "reason": "size_is_ceiling",
+      "result": "differs",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "size_is_ceiling": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 600873,
+      "id": "coverage.facts.max_run",
+      "proves": [
+        {
+          "fact": "resources.max_run_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/max-run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "sps-runtime-proof\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 601884,
+      "id": "coverage.facts.max_process",
+      "proves": [
+        {
+          "fact": "resources.max_process_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/max-process"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "NjAw",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 943,
+      "id": "coverage.docker.host",
+      "proves": [
+        {
+          "gate": "docker",
+          "knob": "networking",
+          "value": "host"
+        }
+      ],
+      "reason": "docker_fixture_cli_missing",
+      "result": "not_run",
+      "rules": [
+        "docker/runs-containers",
+        "docker/host"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "fixture.coverage_docker_create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_docker",
+          "reason": "docker_fixture_cli_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2162,
+      "id": "coverage.tcp_ports.none",
+      "proves": [
+        {
+          "gate": "tcp_ports",
+          "knob": "tls",
+          "value": "none"
+        },
+        {
+          "gate": "tcp_ports",
+          "knob": "max_tcp_ports",
+          "value": {
+            "at_least": 2
+          }
+        }
+      ],
+      "reason": "E2B SDK exposes HTTP preview hosts, not public raw TCP endpoints",
+      "result": "unsupported",
+      "rules": [
+        "tcp_ports/reachable",
+        "tcp_ports/tls-none"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "operation": "tcp.link",
+          "reason": "E2B SDK exposes HTTP preview hosts, not public raw TCP endpoints",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 7988,
+      "id": "coverage.desktop.control",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "desktop/control"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "keyboard_received": {
+              "matches": true
+            },
+            "pointer_received": {
+              "matches": true
+            },
+            "screenshot_valid": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_desktop",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 9558,
+      "id": "coverage.desktop.live_view",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        },
+        {
+          "gate": "desktop",
+          "knob": "live_view",
+          "value": true
+        }
+      ],
+      "reason": "desktop_browser_failed",
+      "result": "error",
+      "rules": [
+        "desktop/control",
+        "desktop/live-view"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "keyboard_received": {
+              "matches": true
+            },
+            "pointer_received": {
+              "matches": true
+            },
+            "screenshot_valid": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_desktop",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "desktop.live_link",
+          "result": "passed"
+        },
+        {
+          "operation": "probe.desktop_browser",
+          "reason": "desktop_browser_failed",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1586,
+      "id": "coverage.previews.websocket",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "websocket",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/websocket"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "binary_echo": {
+              "matches": true
+            }
+          },
+          "operation": "probe.websocket",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2298,
+      "id": "coverage.previews.loopback",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "loopback",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/loopback"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1270,
+      "id": "coverage.previews.any_port",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "any_port",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/any-port"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3370,
+      "id": "coverage.previews.survives_pause",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "survives_pause",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/survives-pause"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.reserved_ports",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "previews/reserved-ports"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "observer",
+          "result": "deleted"
+        },
+        {
+          "kind": "terminal",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2754,
+      "id": "coverage.terminal.reattach",
+      "proves": [
+        {
+          "gate": "terminal",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "terminal/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.open",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.write",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "terminal": {
+              "actual": {
+                "length": 86,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "terminal.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 33528,
+      "id": "coverage.custom_images.runs_entrypoint.true",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "runs_entrypoint",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/runs-entrypoint"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 32529,
+      "id": "coverage.custom_images.runs_entrypoint.false",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "runs_entrypoint",
+          "value": false
+        }
+      ],
+      "reason": "exists",
+      "result": "differs",
+      "rules": [
+        "custom_images/runs-entrypoint"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": false
+            }
+          },
+          "operation": "files.exists",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.names",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.addresses",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.mixed",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.mixed",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.range",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 433,
+      "id": "coverage.network_lockdown.changeable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": true
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_policy_change",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 440,
+      "id": "coverage.network_lockdown.changeable.false",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": false
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_policy_change",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 422,
+      "id": "coverage.network_lockdown.switchable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_policy_change",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 591,
+      "id": "coverage.network_lockdown.policy_transition.denylist",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_policy_change",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 593,
+      "id": "coverage.network_lockdown.open",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "open"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/open"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_network_checks",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 341,
+      "id": "coverage.network_lockdown.switchable.false",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": false
+        }
+      ],
+      "reason": "network_receiver_observer_unavailable",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "detail": "HTTP status 403",
+          "operation": "fixture.coverage_policy_change",
+          "reason": "network_receiver_observer_unavailable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5951,
+      "id": "coverage.hidden_secrets.rotates.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": true
+        }
+      ],
+      "reason": "secret_running_client_changed_or_failed",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "secret_running_client_changed_or_failed",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5057,
+      "id": "coverage.hidden_secrets.rotates.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": false
+        }
+      ],
+      "reason": "secret_running_client_changed_or_failed",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "secret_running_client_changed_or_failed",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4090,
+      "id": "coverage.hidden_secrets.scrubs_responses.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": true
+        }
+      ],
+      "reason": "scrubs_responses",
+      "result": "differs",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "scrubs_responses": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3845,
+      "id": "coverage.hidden_secrets.scrubs_responses.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "scrubs_responses": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3570,
+      "id": "coverage.hidden_secrets.injection.sets_header",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "sets_header"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "injection": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6053,
+      "id": "coverage.hidden_secrets.intercepts.injected_hosts",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "injected_hosts"
+        }
+      ],
+      "reason": "SandboxException",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "SandboxException",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6548,
+      "id": "coverage.hidden_secrets.intercepts.all_https",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "all_https"
+        }
+      ],
+      "reason": "SandboxException",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "SandboxException",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.max_inject_into",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "hidden_secrets/max-inject-into"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.wildcards",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "hidden_secrets/wildcards"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.max_deny",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/max-deny"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3985,
+      "id": "coverage.hidden_secrets.transparent.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": true
+        }
+      ],
+      "reason": "SandboxException",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "SandboxException",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3958,
+      "id": "coverage.hidden_secrets.transparent.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": false
+        }
+      ],
+      "reason": "SandboxException",
+      "result": "error",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "SandboxException",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 7406,
+      "id": "coverage.custom_images.build_context",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "dockerfile"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "build_context",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/build-context"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c3BzLWNvcHktY29udGV4dA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c3BzLWFkZC1jb250ZXh0",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6308,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 9338,
+      "id": "coverage.custom_images.prepare.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "reason": "exit_code",
+      "result": "differs",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 1,
+              "matches": false
+            }
+          },
+          "operation": "run",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6172,
+      "id": "coverage.custom_images.prepare.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "reason": "stdout",
+      "result": "differs",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "<HOME>\n"
+              },
+              "matches": false
+            }
+          },
+          "operation": "run",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6240,
+      "id": "coverage.custom_images.prepare.image_config.user",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "user"
+          ]
+        }
+      ],
+      "reason": "stdout",
+      "result": "differs",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "1000\n"
+              },
+              "matches": false
+            }
+          },
+          "operation": "run",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.dockerfile_context",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "dockerfile"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        },
+        {
+          "gate": "custom_images",
+          "knob": "build_context",
+          "value": true
+        }
+      ],
+      "reason": "ValueError",
+      "result": "error",
+      "rules": [
+        "custom_images/prepared",
+        "custom_images/build-context"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "ValueError",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.size",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepared_size_without_request",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "template",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10820,
+      "id": "coverage.custom_images.prepare.idempotent",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "reason": "observation_unmapped",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "bindings.compare",
+          "reason": "observation_unmapped",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5566,
+      "id": "coverage.custom_images.prepare.delete",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "image.delete",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+  },
+  "clean": true,
+  "driver": {
+    "name": "BoxdDriver",
+    "version": "0.24.293"
+  },
+  "finished_at": "2026-11-02T19:19:28.058742+00:00",
+  "implementation": "boxrouter_boxd",
+  "implementation_digest": "sha256:c99d5108cf79ab7f13b971b69a074e5677d19c460467f7bb62ed991dce2ccc85",
+  "provider": "boxd",
+  "revision": "ea74b95c5ad3b556cde796ba1d4cfcdad15326cc",
+  "run_id": "spec-run-20261102T191858Z-fd0a",
+  "sdk_versions": {
+    "boxd": "0.2.22",
+    "boxrouter-adapter-kit": "0.24.293",
+    "boxrouter-boxd": "0.1.18",
+    "boxrouter-core": "0.13.353"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-02T19:18:58.703964+00:00",
+  "suite_digest": "sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 29354,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.816, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.954, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

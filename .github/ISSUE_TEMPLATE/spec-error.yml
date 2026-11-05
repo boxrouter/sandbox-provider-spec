@@ -1,0 +1,24 @@
+name: Specification error
+description: Report an incorrect or ambiguous existing rule
+title: "Spec error: "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Affected release or draft commit
+      description: Give a tag or commit rather than "latest".
+    validations:
+      required: true
+  - type: input
+    id: section
+    attributes:
+      label: Exact section link or rule ID
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal input, observed result, and expected result
+      description: Remove credentials, account IDs, and private workload data.
+    validations:
+      required: true

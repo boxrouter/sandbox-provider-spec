@@ -1,0 +1,5 @@
+# An app builder that shows a work-in-progress site only to its own user. The preview must be
+# private, carry live reload over WebSocket, and still work after the sandbox is resumed.
+requirements:
+  pause_resume: {}
+  previews: {access: private, ports: [5173], websocket: true, survives_pause: true}

@@ -1,0 +1,7 @@
+# A CI job that builds images and runs containers with a Docker Engine inside the sandbox.
+requirements:
+  docker: {}
+resources:
+  cpu_min: 4
+  memory_min_mib: 8192
+  disk_min_mib: 20480

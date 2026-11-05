@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: outbound-traffic-partial
+verified: {date: 2026-10-02, sdks: {synthetic-sdk: 1.0.0}}
+resources:
+  outbound_traffic: [http, udp]
+gates: {}
+evidence: {}

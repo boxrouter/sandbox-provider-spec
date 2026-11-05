@@ -1,0 +1,4012 @@
+spec: sandbox-provider-spec/0.1
+tests:
+- id: baseline.create_env
+  title: Creation passes environment variables to guest code.
+  steps:
+  - op: create
+    in:
+      environment:
+        SPS_PROBE: present
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf "$SPS_PROBE"
+    expect:
+      equals:
+        stdout:
+          utf8: present
+  rules:
+  - baseline/lifecycle
+  proves: []
+- id: baseline.get
+  title: Get observes a created sandbox without creating another.
+  steps:
+  - op: create
+    as: box
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  rules:
+  - baseline/lifecycle
+  proves: []
+- id: baseline.list
+  title: Native list includes the created sandbox identity.
+  steps:
+  - op: create
+    as: box
+  - op: list
+    expect:
+      contains:
+        sandboxes:
+          identity: $box.identity
+      eventually_ms: 30000
+  rules:
+  - baseline/lifecycle
+  proves: []
+- id: baseline.destroy
+  title: Destroy ends the sandbox and get confirms native absence.
+  steps:
+  - op: create
+    as: box
+  - op: destroy
+    target: box
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+      eventually_ms: 30000
+  rules:
+  - baseline/lifecycle
+  proves: []
+- id: baseline.run_output
+  title: A completed command returns its stdout.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf out
+    expect:
+      equals:
+        stdout:
+          utf8: out
+  rules:
+  - baseline/run
+  proves: []
+- id: baseline.run_exit_code
+  title: A failed command returns its native exit status.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: exit 7
+    expect:
+      equals:
+        exit_code: 7
+  rules:
+  - baseline/run
+  proves: []
+- id: baseline.run_separate_streams
+  title: A command preserves the distinction between stdout and stderr.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf 'out\n'; printf 'err\n' >&2
+      separate_streams: true
+    expect:
+      equals:
+        stdout:
+          utf8: 'out
+
+            '
+        stderr:
+          utf8: 'err
+
+            '
+  rules:
+  - baseline/run
+  proves: []
+- id: baseline.run_cwd
+  title: The SDK selects a command working directory.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: pwd
+      cwd: /tmp
+    expect:
+      equals:
+        stdout:
+          utf8: '/tmp
+
+            '
+  rules:
+  - baseline/run
+  proves: []
+- id: baseline.run_env
+  title: The SDK passes per-command environment variables.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf "$SPS_PROBE"
+      environment:
+        SPS_PROBE: command
+    expect:
+      equals:
+        stdout:
+          utf8: command
+  rules:
+  - baseline/run
+  proves: []
+- id: baseline.files_write
+  title: The file API writes bytes that can be read back.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: mkdir -p /tmp/sps-files
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-files/a
+      data: aGVsbG8=
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /tmp/sps-files/a
+    expect:
+      equals:
+        data:
+          utf8: hello
+  rules:
+  - baseline/files
+  proves: []
+- id: baseline.files_read
+  title: The file API reads binary bytes created by guest code.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf '\000\377file' >/tmp/sps-read
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /tmp/sps-read
+    expect:
+      equals:
+        data:
+          b64: AP9maWxl
+  rules:
+  - baseline/files
+  proves: []
+- id: baseline.process_stream
+  title: A native background process exposes streamed output.
+  steps:
+  - op: create
+    as: box
+  - op: clock.start
+    as: stream_clock
+  - op: process.start
+    target: box
+    in:
+      bash_script: printf "stream-marker\n"; sleep 15; printf released
+    as: proc
+  - op: process.output
+    target: proc
+    expect:
+      equals:
+        stdout:
+          utf8_contains: stream-marker
+    in:
+      first_chunk: true
+  - op: clock.observe
+    in:
+      started: $stream_clock.started
+      limit_ms: 15000
+    expect:
+      equals:
+        within_window: true
+  - op: process.wait
+    target: proc
+    expect:
+      equals:
+        exit_code: 0
+      eventually_ms: 5000
+  rules:
+  - baseline/process-output
+  proves: []
+- id: processes.input.true
+  title: A native process receives interactive stdin.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        processes:
+          input: true
+  - op: process.start
+    target: box
+    in:
+      bash_script: read line; printf "%s" "$line"
+    as: proc
+  - op: process.write_stdin
+    target: proc
+    in:
+      data: aGVsbG8K
+  - op: process.output
+    target: proc
+    expect:
+      equals:
+        stdout:
+          utf8_contains: hello
+      eventually_ms: 5000
+  rules:
+  - processes/input
+  proves:
+  - gate: processes
+    knob: input
+    value: true
+- id: processes.input.false
+  title: The pinned native SDK has no input operation.
+  rules:
+  - processes/input
+  proves:
+  - gate: processes
+    knob: input
+    value: false
+  steps:
+  - op: native.operation_absent
+    in:
+      operation: process.write_stdin
+    expect:
+      equals:
+        absent: true
+- id: processes.cancel.true
+  title: A native process can be cancelled.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        processes:
+          cancel: true
+      lifetime_seconds: 300
+  - op: clock.start
+    as: cancel_clock
+  - op: process.start
+    target: box
+    in:
+      bash_script: echo $$ >/tmp/sps-cancel-pid; exec sleep 180
+      timeout_ms: 240000
+    as: proc
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-cancel-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: fixture.process_state
+    target: box
+    as: running
+    expect:
+      equals:
+        stopped: false
+  - op: process.cancel
+    target: proc
+  - op: fixture.process_state
+    target: box
+    in:
+      identity: $running.identity
+    expect:
+      equals:
+        stopped: true
+      eventually_ms: 5000
+  - op: clock.observe
+    in:
+      started: $cancel_clock.started
+      limit_ms: 120000
+    expect:
+      equals:
+        within_window: true
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  rules:
+  - processes/cancel
+  proves:
+  - gate: processes
+    knob: cancel
+    value: true
+- id: processes.cancel.false
+  title: The pinned native SDK has no cancel operation.
+  rules:
+  - processes/cancel
+  proves:
+  - gate: processes
+    knob: cancel
+    value: false
+  steps:
+  - op: native.operation_absent
+    in:
+      operation: process.cancel
+    expect:
+      equals:
+        absent: true
+- id: processes.reattach.true
+  title: The SDK reconnects to a running process and observes subsequent output.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        processes:
+          reattach: true
+      lifetime_seconds: 300
+  - op: process.start
+    target: box
+    in:
+      bash_script: printf before; while [ ! -f /tmp/sps-reattach-release ]; do sleep 0.1; done; printf
+        after
+      timeout_ms: 240000
+    as: proc
+  - op: process.disconnect
+    target: proc
+  - op: process.reattach
+    target: box
+    in:
+      identity: $proc.identity
+    as: again
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-reattach-release
+      data: Z28=
+  - op: process.output
+    target: again
+    expect:
+      equals:
+        stdout:
+          utf8_contains: after
+      eventually_ms: 5000
+  rules:
+  - processes/reattach
+  proves:
+  - gate: processes
+    knob: reattach
+    value: true
+- id: processes.reattach.false
+  title: The pinned native SDK has no reattach operation.
+  rules:
+  - processes/reattach
+  proves:
+  - gate: processes
+    knob: reattach
+    value: false
+  steps:
+  - op: native.operation_absent
+    in:
+      operation: process.reattach
+    expect:
+      equals:
+        absent: true
+- id: terminal.interactive
+  title: A native PTY accepts input and returns terminal output.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    in:
+      columns: 80
+      rows: 24
+    as: tty
+  - op: terminal.write
+    target: tty
+    in:
+      data: dGVzdCAtdCAwICYmIHRlc3QgLXQgMSAmJiBwcmludGYgUFRZX09LOyBleGl0DQ==
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: PTY_OK
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: PTY_OK
+  rules:
+  - terminal/interactive
+  proves:
+  - gate: terminal
+    value: true
+- id: baseline.environment_bash
+  title: The default environment contains bash.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: command -v bash
+    expect:
+      equals:
+        exit_code: 0
+      record:
+      - stdout
+  rules:
+  - baseline/environment
+  proves: []
+- id: baseline.environment_python3
+  title: The default environment contains python3.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: command -v python3
+    expect:
+      equals:
+        exit_code: 0
+      record:
+      - stdout
+  rules:
+  - baseline/environment
+  proves: []
+- id: facts.default_user
+  title: Observe the provider default guest user.
+  steps:
+  - op: create
+    as: box
+  - op: environment.observe
+    target: box
+    in:
+      fact: default_user
+    as: environment
+    expect:
+      record:
+      - default_user
+  rules:
+  - facts/default-environment
+  proves:
+  - fact: resources.default_user
+    value: $observed.default_user
+- id: facts.default_cwd
+  title: Observe the provider default guest cwd.
+  steps:
+  - op: create
+    as: box
+  - op: environment.observe
+    target: box
+    in:
+      fact: default_cwd
+    as: environment
+    expect:
+      record:
+      - default_cwd
+  rules:
+  - facts/default-environment
+  proves:
+  - fact: resources.default_cwd
+    value: $observed.default_cwd
+- id: baseline.outbound_network
+  title: The default environment can reach a positively checked public endpoint.
+  steps:
+  - op: create
+    as: box
+  - op: probe.http
+    in:
+      url: $runner.reachable_url
+    expect:
+      equals:
+        served: true
+  - op: run
+    target: box
+    in:
+      bash_script: if command -v curl >/dev/null; then curl --noproxy '*' -fsS -m 15 -o /dev/null "$TARGET";
+        else python3 -c 'import os, urllib.request; urllib.request.build_opener(urllib.request.ProxyHandler({})).open(os.environ["TARGET"],
+        timeout=15).read(1)'; fi
+      environment:
+        TARGET: $runner.reachable_url
+    expect:
+      equals:
+        exit_code: 0
+  rules:
+  - baseline/outbound-network
+  proves: []
+- id: facts.extendable_lifetime
+  title: Observe the native extendable lifetime guarantee.
+  rules:
+  - facts/extendable-lifetime
+  proves:
+  - fact: resources.extendable_lifetime
+    value: true
+  steps:
+  - lane: extended
+    op: create
+    in:
+      lifetime_seconds: 300
+    as: box
+  - lane: extended
+    op: lifetime.extend
+    target: box
+    in:
+      lifetime_seconds: 420
+  - lane: extended
+    wait_ms: 305000
+  - lane: extended
+    op: run
+    target: box
+    in:
+      bash_script: 'true'
+    expect:
+      equals:
+        exit_code: 0
+  - lane: extended
+    op: get
+    target: box
+    expect:
+      equals:
+        state:
+          one_of:
+          - active
+          - paused
+  - lane: control
+    op: create
+    in:
+      lifetime_seconds: 300
+    as: control
+  - lane: control
+    wait_ms: 305000
+  - lane: control
+    op: get
+    target: control
+    expect:
+      equals:
+        state:
+          one_of:
+          - paused
+          - stopped
+          - destroyed
+      eventually_ms: 30000
+- id: lifetime_timer.at_end.destroyed
+  title: The native lifetime timer ends in state destroyed.
+  rules:
+  - facts/lifetime-timer
+  proves:
+  - fact: lifetime_timer.at_end
+    value: destroyed
+  - fact: lifetime_timer.enforced_by
+    value: provider
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 300
+      at_end: destroyed
+    as: box
+  - wait_ms: 305000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+      eventually_ms: 30000
+- id: lifetime_timer.at_end.stopped
+  title: The native lifetime timer ends in state stopped.
+  rules: [facts/lifetime-timer]
+  proves:
+  - fact: lifetime_timer.at_end
+    value: stopped
+  - fact: lifetime_timer.enforced_by
+    value: provider
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 60
+      at_end: stopped
+    as: box
+  - wait_ms: 65000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: stopped
+      eventually_ms: 30000
+- id: lifetime_timer.at_end.paused
+  title: The native lifetime timer ends in state paused.
+  rules: [facts/lifetime-timer]
+  proves:
+  - fact: lifetime_timer.at_end
+    value: paused
+  - fact: lifetime_timer.enforced_by
+    value: provider
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 60
+      at_end: paused
+    as: box
+  - wait_ms: 65000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: paused
+      eventually_ms: 30000
+- id: lifetime_timer.counts_paused_time.true
+  title: A paused sandbox expires across its initial lifetime.
+  rules: [facts/lifetime-timer]
+  proves:
+  - fact: lifetime_timer.counts_paused_time
+    value: true
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 60
+      requirements:
+        pause_resume:
+          keeps: any
+    as: box
+  - op: pause
+    target: box
+  - wait_ms: 65000
+  - op: lifetime.observe_paused_countdown
+    target: box
+    in:
+      original_lifetime_seconds: 60
+    expect:
+      equals:
+        counts_paused_time: true
+- id: lifetime_timer.counts_paused_time.false
+  title: A paused sandbox stays available across its initial lifetime.
+  rules: [facts/lifetime-timer]
+  proves:
+  - fact: lifetime_timer.counts_paused_time
+    value: false
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 60
+      requirements:
+        pause_resume:
+          keeps: any
+    as: box
+  - op: pause
+    target: box
+  - wait_ms: 65000
+  - op: lifetime.observe_paused_countdown
+    target: box
+    in:
+      original_lifetime_seconds: 60
+    expect:
+      equals:
+        counts_paused_time: false
+- id: pause_resume.files_only
+  title: Pause and resume preserve files only.
+  rules:
+  - pause_resume/files-only
+  proves:
+  - gate: pause_resume
+    knob: keeps
+    value: files_only
+  steps:
+  - op: create
+    in:
+      requirements:
+        pause_resume:
+          keeps: files_only
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: process.start
+    target: box
+    in:
+      bash_script: echo $$ >/tmp/sps-pid; SPS_MEMORY_PAYLOAD=memory-marker; while [ ! -f /tmp/sps-release
+        ]; do sleep 0.1; done; printf "%s" "$SPS_MEMORY_PAYLOAD" >/tmp/sps-result
+      timeout_ms: 180000
+    as: proc
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: pause
+    target: box
+    in:
+      keeps: files_only
+  - op: resume
+    target: box
+    in:
+      keeps: files_only
+    as: again
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        exists: true
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: run
+    target: again
+    in:
+      bash_script: if [ -r /proc/"$(cat /tmp/sps-pid)"/cmdline ]; then tr "\000" " " </proc/"$(cat /tmp/sps-pid)"/cmdline;
+        fi
+    expect:
+      equals: &id001
+        stdout:
+          utf8_absent: SPS_MEMORY_PAYLOAD
+- id: pause_resume.files_and_memory
+  title: Pause and resume preserve files and memory.
+  rules:
+  - pause_resume/files-and-memory
+  proves:
+  - gate: pause_resume
+    knob: keeps
+    value: files_and_memory
+  steps:
+  - op: create
+    in:
+      requirements:
+        pause_resume:
+          keeps: files_and_memory
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: process.start
+    target: box
+    in:
+      bash_script: echo $$ >/tmp/sps-pid; SPS_MEMORY_PAYLOAD=memory-marker; while [ ! -f /tmp/sps-release
+        ]; do sleep 0.1; done; printf "%s" "$SPS_MEMORY_PAYLOAD" >/tmp/sps-result
+      timeout_ms: 180000
+    as: proc
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: pause
+    target: box
+    in:
+      keeps: files_and_memory
+  - op: resume
+    target: box
+    in:
+      keeps: files_and_memory
+    as: again
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        exists: true
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: files.write
+    target: again
+    in:
+      path: /tmp/sps-release
+      data: Z28=
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        exists: true
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        data:
+          utf8: memory-marker
+- id: idle_shutdown.on_idle.paused
+  title: Native idle shutdown ends in state paused.
+  rules:
+  - idle_shutdown/paused
+  proves:
+  - gate: idle_shutdown
+    knob: on_idle
+    value: paused
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.idle_lifetime_seconds
+      requirements:
+        idle_shutdown:
+          on_idle: paused
+    as: box
+  - wait_ms: $runner.idle_before_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: paused
+- id: idle_shutdown.on_idle.stopped
+  title: Native idle shutdown ends in state stopped.
+  rules:
+  - idle_shutdown/stopped
+  proves:
+  - gate: idle_shutdown
+    knob: on_idle
+    value: stopped
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.idle_lifetime_seconds
+      requirements:
+        idle_shutdown:
+          custom_idle_time: true
+          idle_seconds: 60
+          on_idle: stopped
+    as: box
+  - wait_ms: $runner.idle_before_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: stopped
+- id: idle_shutdown.on_idle.destroyed
+  title: Native idle shutdown ends in state destroyed.
+  rules:
+  - idle_shutdown/destroyed
+  proves:
+  - gate: idle_shutdown
+    knob: on_idle
+    value: destroyed
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.idle_lifetime_seconds
+      requirements:
+        idle_shutdown:
+          custom_idle_time: true
+          idle_seconds: 60
+          on_idle: destroyed
+    as: box
+  - wait_ms: $runner.idle_before_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+- id: idle_shutdown.custom_idle_time.true
+  title: Idle timing is selectable.
+  rules:
+  - idle_shutdown/custom-idle-time
+  proves:
+  - gate: idle_shutdown
+    knob: custom_idle_time
+    value: true
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 600
+      requirements:
+        idle_shutdown:
+          custom_idle_time: true
+          idle_seconds: 60
+    as: box
+  - wait_ms: 55000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  - wait_ms: 65000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state:
+          one_of:
+          - destroyed
+          - stopped
+          - paused
+- id: idle_shutdown.custom_idle_time.false
+  title: A fixed native idle timer cannot accept a caller-selected duration.
+  rules: []
+  non_normative: >-
+    A false capability value has no positive behavior guarantee in the draft; this row is diagnostic and does not establish or disprove conformance.
+  proves:
+  - gate: idle_shutdown
+    knob: custom_idle_time
+    value: false
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 180
+      requirements:
+        idle_shutdown:
+          custom_idle_time: false
+    as: box
+  - op: idle.select_duration
+    target: box
+    in:
+      idle_seconds: 60
+    expect:
+      unsupported: true
+- id: snapshots.keeps.files_only
+  title: Restoring a snapshot preserves files only.
+  rules:
+  - snapshots/files-only
+  proves:
+  - gate: snapshots
+    knob: keeps
+    value: files_only
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          keeps: files_only
+          original_after: any
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: process.start
+    target: box
+    in:
+      bash_script: echo $$ >/tmp/sps-pid; SPS_MEMORY_PAYLOAD=memory-marker; while [ ! -f /tmp/sps-release
+        ]; do sleep 0.1; done; printf "%s" "$SPS_MEMORY_PAYLOAD" >/tmp/sps-result
+      timeout_ms: 180000
+    as: proc
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: snapshot.take
+    target: box
+    in:
+      keeps: files_only
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: run
+    target: again
+    in:
+      bash_script: if [ -r /proc/"$(cat /tmp/sps-pid)"/cmdline ]; then tr "\000" " " </proc/"$(cat /tmp/sps-pid)"/cmdline;
+        fi
+    expect:
+      equals:
+        stdout:
+          utf8_absent: SPS_MEMORY_PAYLOAD
+- id: snapshots.keeps.files_and_memory
+  title: Restoring a snapshot preserves files and memory.
+  rules:
+  - snapshots/files-and-memory
+  proves:
+  - gate: snapshots
+    knob: keeps
+    value: files_and_memory
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          keeps: files_and_memory
+          original_after: any
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: process.start
+    target: box
+    in:
+      bash_script: echo $$ >/tmp/sps-pid; SPS_MEMORY_PAYLOAD=memory-marker; while [ ! -f /tmp/sps-release
+        ]; do sleep 0.1; done; printf "%s" "$SPS_MEMORY_PAYLOAD" >/tmp/sps-result
+      timeout_ms: 180000
+    as: proc
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: snapshot.take
+    target: box
+    in:
+      keeps: files_and_memory
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: files.write
+    target: again
+    in:
+      path: /tmp/sps-release
+      data: Z28=
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        data:
+          utf8: memory-marker
+- id: snapshots.original_after.continues
+  title: A 100 ms source ticker observes the native default snapshot's continues behavior.
+  rules:
+  - snapshots/original-after
+  proves:
+  - gate: snapshots
+    knob: original_after
+    value: continues
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: continues
+    as: box
+  - op: fixture.snapshot_ticker_start
+    target: box
+    as: ticker
+  - op: snapshot.take
+    target: box
+    in:
+      original_after: continues
+    as: snap
+  - op: fixture.snapshot_ticker_observe
+    target: box
+    in:
+      ticker: $ticker
+    expect:
+      record:
+      - longest_gap_ms
+      - baseline_gap_ms
+      - capture
+      equals:
+        original_after: continues
+        advancing: true
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+- id: snapshots.original_after.briefly_paused
+  title: A 100 ms source ticker observes the native default snapshot's briefly_paused behavior.
+  rules: [snapshots/original-after]
+  proves:
+  - gate: snapshots
+    knob: original_after
+    value: briefly_paused
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: briefly_paused
+    as: box
+  - op: fixture.snapshot_ticker_start
+    target: box
+    as: ticker
+  - op: snapshot.take
+    target: box
+    in:
+      original_after: briefly_paused
+    as: snap
+  - op: fixture.snapshot_ticker_observe
+    target: box
+    in:
+      ticker: $ticker
+    expect:
+      record:
+      - longest_gap_ms
+      - baseline_gap_ms
+      - capture
+      equals:
+        original_after: briefly_paused
+        advancing: true
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+- id: snapshots.original_after.terminated
+  title: Snapshotting leaves the source terminated.
+  rules: [snapshots/original-after]
+  proves:
+  - gate: snapshots
+    knob: original_after
+    value: terminated
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: terminated
+    as: box
+  - op: snapshot.take
+    target: box
+    in:
+      original_after: terminated
+    as: snap
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+- id: snapshots.deletable.true
+  title: Snapshot deletion is available.
+  rules:
+  - snapshots/deletable
+  proves:
+  - gate: snapshots
+    knob: deletable
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.delete
+    target: snap
+    expect: {}
+- id: snapshots.deletable.false
+  title: Snapshot deletion is absent from the SDK.
+  rules: []
+  non_normative: >-
+    The draft guarantees snapshot deletion only when deletable is true; this row records the provider response for false and does not establish or disprove conformance.
+  proves:
+  - gate: snapshots
+    knob: deletable
+    value: false
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+          keeps: files_and_memory
+    as: box
+  - op: snapshot.take
+    target: box
+    in:
+      keeps: files_and_memory
+    as: snap
+  - op: snapshot.delete
+    target: snap
+    expect:
+      unsupported: true
+- id: snapshots.restores_many_times
+  title: One snapshot produces independent restored sandboxes.
+  rules:
+  - snapshots/restores-many-times
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+      lifetime_seconds: 300
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: snapshot.take
+    target: box
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in:
+      lifetime_seconds: 300
+    as: first
+  - op: snapshot.restore
+    target: snap
+    in:
+      lifetime_seconds: 300
+    as: second
+  - op: files.read_bytes
+    target: first
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: files.read_bytes
+    target: second
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: run
+    target: first
+    in:
+      bash_script: printf first >/tmp/sps-marker
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.read_bytes
+    target: first
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: first
+  - op: files.read_bytes
+    target: second
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: bindings.compare
+    in:
+      left: $first.identity
+      right: $second.identity
+    expect:
+      equals:
+        equal: false
+- id: snapshots.restore_options
+  title: A restore receives its own environment and native creation options.
+  rules:
+  - snapshots/restore-takes-its-own-options
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in:
+      environment:
+        SPS_RESTORE: new
+    as: again
+  - op: run
+    target: again
+    in:
+      bash_script: printf "%s" "$SPS_RESTORE"
+    expect:
+      equals:
+        stdout:
+          utf8: new
+- id: snapshots.resizes_on_restore
+  title: A native restore requests and observes a different allocation.
+  rules:
+  - snapshots/resizes-on-restore
+  proves:
+  - gate: snapshots
+    knob: resizes_on_restore
+    value: true
+  steps:
+  - op: create
+    in:
+      resources: $runner.original_size
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: allocation.observe
+    target: box
+    expect:
+      equals:
+        allocation: $runner.original_size
+  - op: snapshot.take
+    target: box
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in:
+      resources: $runner.restored_size
+    as: again
+  - op: allocation.observe
+    target: again
+    expect:
+      equals:
+        allocation: $runner.restored_size
+- id: network_lockdown.deny_all
+  title: Native deny all returns no destination data from outbound connections.
+  rules:
+  - network_lockdown/deny-all
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: deny_all
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: deny_all
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.denied_url
+        reachable: false
+        recorder: required
+      - url: $runner.allowed_ip_url
+        reachable: false
+        recorder: none
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.allowlist.names
+  title: Native allowlist enforces named destinations.
+  rules:
+  - network_lockdown/allowlist
+  - network_lockdown/entry-kinds
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: allowlist
+  - gate: network_lockdown
+    knob: entry_kinds
+    value: [names]
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.allowed_url
+        reachable: true
+        recorder: required
+      - url: $runner.denied_url
+        reachable: false
+        recorder: absent
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.allowlist.addresses
+  title: Native allowlist enforces address destinations.
+  rules:
+  - network_lockdown/allowlist
+  - network_lockdown/entry-kinds
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: allowlist
+  - gate: network_lockdown
+    knob: entry_kinds
+    value: [addresses]
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_ips
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.allowed_ip_url
+        reachable: true
+        recorder: none
+      - url: $runner.denied_url
+        reachable: false
+        recorder: absent
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.after_resume
+  title: Native lockdown survives pause and resume.
+  rules:
+  - network_lockdown/holds-after-resume
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: deny_all
+        pause_resume:
+          keeps: any
+  - op: pause
+    target: box
+  - op: resume
+    target: box
+    as: again
+  - op: fixture.coverage_network_checks
+    target: again
+    in:
+      requests:
+      - url: $runner.denied_url
+        reachable: false
+        recorder: absent
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.root_cannot_lift
+  title: Root attempts to remove network controls while egress stays blocked.
+  rules:
+  - network_lockdown/root-cannot-lift
+  proves: []
+  steps:
+  - op: create
+    as: control
+    in: {}
+  - op: fixture.root_attack
+    target: control
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: 'root-attempted
+
+            '
+  - op: fixture.coverage_network_checks
+    target: control
+    in:
+      requests:
+      - url: $runner.allowed_url
+        reachable: true
+        recorder: required
+      - url: $runner.allowed_ip_url
+        reachable: true
+        recorder: none
+    expect:
+      equals:
+        passed: true
+  - op: destroy
+    target: control
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: deny_all
+  - op: fixture.root_attack
+    target: box
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: 'root-attempted
+
+            '
+      not_run_if:
+        exit_code: 77
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.allowed_url
+        reachable: false
+        recorder: absent
+      - url: $runner.allowed_ip_url
+        reachable: false
+        recorder: none
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.max_allow
+  title: The selected domain allowlist is enforced against an unlisted host.
+  rules:
+  - network_lockdown/max-allow
+  proves:
+  - gate: network_lockdown
+    knob: max_allow
+    value:
+      at_least: $runner.max_allow_count
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.max_allow_entries
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      allowed_urls: $runner.max_allow_urls
+      blocked_urls: $runner.wildcard_denied_url
+      excluded_hosts: $runner.max_allow_entries
+    expect:
+      equals:
+        passed: true
+- id: network_lockdown.wildcards
+  title: The selected domain allowlist is enforced against an unlisted host.
+  rules:
+  - network_lockdown/wildcards
+  proves:
+  - gate: network_lockdown
+    knob: allow_wildcards
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.wildcard_domains
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.wildcard_allowed_url
+        reachable: true
+        recorder: required
+      - url: $runner.wildcard_denied_url
+        reachable: false
+        recorder: absent
+    expect:
+      equals:
+        passed: true
+- id: previews.access.public
+  title: A public preview serves only the appropriate client.
+  rules:
+  - previews/public-serves-anyone
+  proves:
+  - gate: previews
+    knob: access
+    value: public
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+      eventually_ms: 10000
+- id: previews.access.private
+  title: A private preview serves only the appropriate client.
+  rules:
+  - previews/private-needs-credential
+  proves:
+  - gate: previews
+    knob: access
+    value: private
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          credential: link
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: link
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+      eventually_ms: 10000
+  - op: probe.http
+    in:
+      url: $link.unauthorized_url
+    expect:
+      equals:
+        served: false
+- id: previews.credential.link
+  title: Private previews authenticate with a scoped link credential.
+  rules:
+  - previews/credential-link
+  proves:
+  - gate: previews
+    knob: credential
+    value: link
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          credential: link
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: link
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+      eventually_ms: 10000
+  - op: probe.http
+    in:
+      url: $link.unauthorized_url
+    expect:
+      equals:
+        served: false
+- id: previews.credential.header
+  title: Private previews authenticate with a scoped header credential.
+  rules:
+  - previews/credential-header
+  proves:
+  - gate: previews
+    knob: credential
+    value: header
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          credential: header
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: header
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+      eventually_ms: 10000
+  - op: probe.http
+    in:
+      url: $link.unauthorized_url
+    expect:
+      equals:
+        served: false
+- id: previews.revocable.true
+  title: A preview credential is individually revocable.
+  rules:
+  - previews/revocable
+  proves:
+  - gate: previews
+    knob: revocable
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          - 3001
+          credential: link
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: link
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.link
+    target: box
+    in:
+      port: 3001
+      access: private
+      credential: link
+      lifetime_seconds: 60
+    as: other
+  - op: probe.http
+    in:
+      url: $other.url
+      headers: $other.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.revoke
+    target: link
+    expect: {}
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: false
+  - op: probe.http
+    in:
+      url: $other.url
+      headers: $other.headers
+    expect:
+      equals:
+        served: true
+- id: previews.revocable.false
+  title: A preview credential is not individually revocable.
+  rules: []
+  non_normative: >-
+    The draft guarantees revocation only when revocable is true; this row records the provider response for false and does not establish or disprove conformance.
+  proves:
+  - gate: previews
+    knob: revocable
+    value: false
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          credential: link
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: link
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.revoke
+    target: link
+    expect:
+      unsupported: true
+- id: previews.link_lifetime_seconds
+  title: An issued preview remains usable for the requested bounded lifetime.
+  rules:
+  - previews/link-lifetime
+  proves:
+  - gate: previews
+    knob: link_lifetime_seconds
+    value:
+      at_least: $runner.link_lifetime_wait_seconds
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.preview_sandbox_lifetime_seconds
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          credential: link
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: $runner.preview_process_timeout_ms
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: link
+      lifetime_seconds: $runner.preview_link_lifetime_seconds
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - wait_ms: $runner.link_lifetime_wait_ms
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+- id: previews.listed_ports
+  title: Every requested preview port reaches its own server.
+  rules:
+  - previews/serves-listed-ports
+  proves:
+  - gate: previews
+    knob: max_ports
+    value:
+      at_least: 2
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+          - 3001
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-other\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: preview.link
+    target: box
+    in:
+      port: 3001
+      access: public
+    as: other
+  - op: probe.http
+    in:
+      url: $other.url
+      headers: $other.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-other
+      eventually_ms: 10000
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+- id: previews.credential_scope
+  title: A credential for one port does not authorize another port.
+  rules:
+  - previews/private-credential-is-its-own
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: private
+          ports:
+          - 3000
+          - 3001
+          credential: header
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: private
+      credential: header
+      lifetime_seconds: 60
+    as: link
+  - op: preview.link
+    target: box
+    in:
+      port: 3001
+      access: private
+      credential: header
+    as: other
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: probe.http
+    in:
+      url: $other.unauthorized_url
+      headers: $link.headers
+    expect:
+      equals:
+        served: false
+- id: idle_shutdown.auto_wake.true
+  title: A preview request wakes an idle sandbox.
+  rules:
+  - idle_shutdown/auto-wake
+  proves:
+  - gate: idle_shutdown
+    knob: auto_wake
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        idle_shutdown:
+          auto_wake: true
+        previews:
+          access: public
+          ports:
+          - 3000
+      lifetime_seconds: $runner.idle_lifetime_seconds
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: $runner.idle_process_timeout_ms
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: $runner.idle_lifetime_seconds
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state:
+          one_of:
+          - paused
+          - stopped
+      record:
+      - state
+    as: idle_state
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      record:
+      - served
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+      eventually_ms: 5000
+- id: idle_shutdown.auto_wake.false
+  title: A preview request does not wake an idle sandbox.
+  rules: []
+  non_normative: >-
+    The draft guarantees wake-on-preview only when auto_wake is true; this row records the false value and does not establish or disprove conformance.
+  proves:
+  - gate: idle_shutdown
+    knob: auto_wake
+    value: false
+  steps:
+  - op: create
+    in:
+      requirements:
+        idle_shutdown:
+          auto_wake: false
+        previews:
+          access: public
+          ports:
+          - 3000
+      lifetime_seconds: $runner.idle_lifetime_seconds
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: $runner.idle_process_timeout_ms
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: $runner.idle_lifetime_seconds
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state:
+          one_of:
+          - paused
+          - stopped
+          - destroyed
+      record:
+      - state
+    as: idle_state
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      record:
+      - served
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: $idle_state.state
+      eventually_ms: 5000
+- id: volumes.sharing.one_sandbox
+  title: Volume sharing supports one sandbox.
+  rules: [volumes/one-sandbox]
+  proves:
+  - gate: volumes
+    knob: sharing
+    value: one_sandbox
+  steps:
+  - op: volume.create
+    in:
+      kind: filesystem
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: one_sandbox
+          kind: filesystem
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          sharing: one_sandbox
+          kind: filesystem
+    expect:
+      error: volume_in_use
+- id: volumes.sharing.many_writers
+  title: Volume sharing supports many writers.
+  rules:
+  - volumes/many-writers
+  proves:
+  - gate: volumes
+    knob: sharing
+    value: many_writers
+  steps:
+  - op: volume.create
+    in:
+      kind: filesystem
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: many_writers
+          kind: filesystem
+    as: box
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: many_writers
+          kind: filesystem
+    as: again
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: true
+      requirements:
+        volumes:
+          sharing: many_writers
+          kind: filesystem
+          read_only_mounts: true
+    as: readonly
+  - op: run
+    target: readonly
+    in:
+      bash_script: if printf x > /sps-volume/readonly-write 2>/dev/null; then printf writable; else printf denied; fi
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: denied
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /sps-volume/a
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: files.write
+    target: again
+    in:
+      path: /sps-volume/b
+      data: c2F2ZWQ=
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /sps-volume/b
+    expect:
+      equals:
+        data:
+          utf8: saved
+- id: volumes.kind.filesystem
+  title: A filesystem volume preserves writes across sandbox deletion.
+  rules:
+  - volumes/persists
+  - volumes/filesystem-locks
+  proves:
+  - gate: volumes
+    knob: kind
+    value: filesystem
+  steps:
+  - op: volume.create
+    in:
+      kind: filesystem
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          kind: filesystem
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: destroy
+    target: box
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          kind: filesystem
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /sps-volume/a
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: process.start
+    target: again
+    in:
+      bash_script: flock /sps-volume/lock -c "printf held >/sps-volume/held; while [ ! -f /sps-volume/unlock
+        ]; do sleep 0.1; done"
+      timeout_ms: 120000
+    as: holder
+  - op: files.exists
+    target: again
+    in:
+      path: /sps-volume/held
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: run
+    target: again
+    in:
+      bash_script: flock -n -E 75 /sps-volume/lock -c true
+    expect:
+      equals:
+        exit_code: 75
+  - op: files.write
+    target: again
+    in:
+      path: /sps-volume/unlock
+      data: Z28=
+  - op: process.wait
+    target: holder
+    expect:
+      equals:
+        exit_code: 0
+      eventually_ms: 5000
+  - op: run
+    target: again
+    in:
+      bash_script: flock -n -E 75 /sps-volume/lock -c true
+    expect:
+      equals:
+        exit_code: 0
+- id: volumes.kind.object_store
+  title: A object store volume preserves writes across sandbox deletion.
+  rules:
+  - volumes/persists
+  proves:
+  - gate: volumes
+    knob: kind
+    value: object_store
+  steps:
+  - op: volume.create
+    in:
+      kind: object_store
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          kind: object_store
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: destroy
+    target: box
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          kind: object_store
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /sps-volume/a
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: volume.observe_kind
+    target: vol
+    expect:
+      equals:
+        kind: object_store
+- id: volumes.max_mounts
+  title: The observed mount limit serves every mounted artifact.
+  rules:
+  - volumes/max-mounts
+  proves:
+  - gate: volumes
+    knob: max_mounts
+    value:
+      at_least: $runner.max_mounts
+  steps:
+  - op: volume.create_many
+    in:
+      count: $runner.max_mounts
+      kind: $runner.volume_kind
+    as: volumes
+  - op: create
+    in:
+      volumes: $volumes.mounts
+      requirements:
+        volumes:
+          kind: $runner.volume_kind
+    as: box
+  - op: volume.observe_mounts
+    target: box
+    in:
+      mounts: $volumes.mounts
+    expect:
+      equals:
+        all_writable: true
+- id: custom_images.oci
+  title: A native oci image controls the sandbox environment.
+  rules:
+  - custom_images/oci
+  proves:
+  - gate: custom_images
+    knob: source
+    value: oci
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images:
+          source: oci
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: id -un; pwd
+    expect:
+      record:
+      - stdout
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: cat /etc/os-release
+    expect:
+      equals:
+        stdout:
+          utf8_contains: $runner.image_marker
+- id: custom_images.dockerfile
+  title: A native dockerfile image controls the sandbox environment.
+  rules:
+  - custom_images/dockerfile
+  proves:
+  - gate: custom_images
+    knob: source
+    value: dockerfile
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: 'FROM python:3.12-slim
+
+        RUN printf heredoc >/opt/sps-image-marker
+
+        '
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images:
+          source: dockerfile
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: id -un; pwd
+    expect:
+      record:
+      - stdout
+      equals:
+        exit_code: 0
+  - op: files.exists
+    target: box
+    in:
+      path: /opt/sps-image-marker
+    expect:
+      equals:
+        exists: true
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /opt/sps-image-marker
+    expect:
+      equals:
+        data:
+          utf8: heredoc
+- id: custom_images.provider_artifact
+  title: A native provider artifact image controls the sandbox environment.
+  rules:
+  - custom_images/provider-artifact
+  proves:
+  - gate: custom_images
+    knob: source
+    value: provider_artifact
+  steps:
+  - op: image.prepare
+    in:
+      source: provider_artifact
+      image: $runner.provider_artifact_image
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images:
+          source: provider_artifact
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: id -un; pwd
+    expect:
+      record:
+      - stdout
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: cat /etc/os-release
+    expect:
+      equals:
+        stdout:
+          utf8_contains: $runner.image_marker
+- id: hidden_secrets.injected
+  title: A generated credential is injected externally and remains absent from guest environment and procfs.
+  rules:
+  - hidden_secrets/injected
+  proves: []
+  steps:
+  - op: secret.create
+    in:
+      value: sps-generated-test-secret
+    as: secret
+  - op: fixture.secret_receiver
+    in:
+      value: sps-generated-test-secret
+    as: receiver
+  - op: probe.http
+    in:
+      url: $receiver.health_url
+    expect:
+      equals:
+        served: true
+  - op: create
+    in:
+      secret: $secret
+      requirements:
+        hidden_secrets:
+          inject_into: $receiver.hosts
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: env; cat /proc/self/environ
+    expect:
+      equals:
+        stdout:
+          utf8_absent: sps-generated-test-secret
+  - op: run
+    target: box
+    in:
+      bash_script: python3 -c 'import os, urllib.parse, urllib.request; u=os.environ["TARGET"]; urllib.request.build_opener(urllib.request.ProxyHandler()).open(u+("&"
+        if "?" in u else "?")+urllib.parse.urlencode({"sps_run":os.environ["SPS_RUN"]}), timeout=5).read(1)'
+      environment:
+        TARGET: $receiver.url
+        SPS_RUN: $runner.run_nonce
+    expect:
+      equals:
+        exit_code: 0
+  - op: probe.http
+    in:
+      url: $receiver.receipt_url
+      headers: $receiver.observer_headers
+      query:
+        sps_run: $runner.run_nonce
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: injected-and-not-echoed
+- id: hidden_secrets.header_templates
+  title: Selected header templates inject the credential with the requested affixes.
+  rules:
+  - hidden_secrets/injected
+  proves:
+  - gate: hidden_secrets
+    knob: header_templates
+    value: true
+  steps:
+  - op: fixture.secret_receiver
+    in:
+      value: sps-generated-test-secret
+      header: Authorization
+      expected_value: 'Bearer sps-generated-test-secret-sps'
+    as: receiver
+  - op: secret.create
+    # Bind the secret after the receiver exists and match create's template exactly.
+    in:
+      value: sps-generated-test-secret
+      hosts: $receiver.hosts
+      headers:
+      - name: Authorization
+        prefix: 'Bearer '
+        suffix: '-sps'
+    as: secret
+  - op: probe.http
+    in:
+      url: $receiver.health_url
+    expect:
+      equals:
+        served: true
+  - op: create
+    in:
+      secret: $secret
+      requirements:
+        hidden_secrets:
+          inject_into: $receiver.hosts
+          headers:
+          - name: Authorization
+            prefix: 'Bearer '
+            suffix: '-sps'
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: python3 -c 'import os, urllib.parse, urllib.request; u=os.environ["TARGET"]; urllib.request.build_opener(urllib.request.ProxyHandler()).open(u+("&" if "?" in u else "?")+urllib.parse.urlencode({"sps_run":os.environ["SPS_RUN"]}), timeout=5).read(1)'
+      environment:
+        TARGET: $receiver.url
+        SPS_RUN: $runner.run_nonce
+    expect:
+      equals:
+        exit_code: 0
+  - op: probe.http
+    in:
+      url: $receiver.receipt_url
+      headers: $receiver.observer_headers
+      query:
+        sps_run: $runner.run_nonce
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: injected-and-not-echoed
+- id: hidden_secrets.unreadable
+  title: A generated credential is injected externally and remains absent from guest environment and procfs.
+  rules:
+  - hidden_secrets/unreadable
+  proves: []
+  steps:
+  - op: secret.create
+    in:
+      value: sps-generated-test-secret
+    as: secret
+  - op: fixture.secret_receiver
+    in:
+      value: sps-generated-test-secret
+    as: receiver
+  - op: probe.http
+    in:
+      url: $receiver.health_url
+    expect:
+      equals:
+        served: true
+  - op: create
+    in:
+      secret: $secret
+      requirements:
+        hidden_secrets:
+          inject_into: $receiver.hosts
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: env; cat /proc/self/environ
+    expect:
+      equals:
+        stdout:
+          utf8_absent: sps-generated-test-secret
+  - op: run
+    target: box
+    in:
+      bash_script: python3 -c 'import os, urllib.parse, urllib.request; u=os.environ["TARGET"]; urllib.request.build_opener(urllib.request.ProxyHandler()).open(u+("&"
+        if "?" in u else "?")+urllib.parse.urlencode({"sps_run":os.environ["SPS_RUN"]}), timeout=5).read(1)'
+      environment:
+        TARGET: $receiver.url
+        SPS_RUN: $runner.run_nonce
+    expect:
+      equals:
+        exit_code: 0
+  - op: probe.http
+    in:
+      url: $receiver.receipt_url
+      headers: $receiver.observer_headers
+      query:
+        sps_run: $runner.run_nonce
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: injected-and-not-echoed
+- id: facts.sizes
+  title: Observe the native sizes guarantee.
+  rules:
+  - facts/sizes
+  proves:
+  - fact: resources.sizes
+    value: $runner.test_size_value
+  steps:
+  - op: create
+    in:
+      resources: $runner.test_size
+    as: box
+  - op: allocation.observe
+    target: box
+    expect:
+      equals:
+        allocation: $runner.test_size
+- id: facts.max_lifetime
+  title: Observe the native max lifetime guarantee.
+  rules:
+  - facts/max-lifetime
+  proves:
+  - fact: resources.max_lifetime_seconds
+    value:
+      at_least: $runner.max_lifetime_observed_seconds
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.max_lifetime_seconds
+    as: box
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  - op: fixture.coverage_active_lifetime
+    target: box
+    in:
+      wait_ms: $runner.max_lifetime_wait_ms
+    expect:
+      equals:
+        state: active
+        window_completed: true
+- id: facts.long_running
+  title: Observe the native long running guarantee.
+  rules:
+  - facts/long-running
+  proves:
+  - fact: resources.long_running
+    value: true
+  steps:
+  - op: create
+    in:
+      resources:
+        long_running: true
+      lifetime_seconds: $runner.idle_lifetime_seconds
+    as: box
+  - op: long_running.observe
+    target: box
+    expect:
+      equals:
+        idle_disabled: true
+  - wait_ms: $runner.idle_after_wait_ms
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+- id: facts.gpus
+  title: Observe the native gpus guarantee.
+  rules:
+  - facts/gpus
+  proves:
+  - fact: resources.gpus
+    value: $runner.test_gpu_models
+  steps:
+  - op: create
+    in:
+      resources: $runner.test_gpu
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: set -o pipefail; command -v nvidia-smi >/dev/null || exit 77; nvidia-smi --query-gpu=name
+        --format=csv,noheader | grep -E -- "$SPS_GPU_PATTERN"
+      environment:
+        SPS_GPU_PATTERN: $runner.gpu_name_pattern
+    expect:
+      not_run_if:
+        exit_code: 77
+      equals:
+        exit_code: 0
+        stdout:
+          utf8_contains: $runner.gpu_model
+- id: edge.commands.killed
+  title: A command killed by SIGKILL never reports success.
+  rules: []
+  non_normative: >-
+    The draft does not specify the reported exit status for a process killed by a signal; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in: {}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: kill -9 $$; printf should-not-run
+    expect:
+      not_equals:
+        exit_code: 0
+- id: edge.files.missing_parent
+  title: Observe whether the native write API creates a missing parent.
+  rules: []
+  non_normative: >-
+    The draft does not specify whether a native file-write call creates missing parent directories; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in: {}
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-missing-parent/a
+      data: dGVzdA==
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-missing-parent/a
+    expect:
+      record:
+      - exists
+- id: edge.files.owner
+  title: Observe the guest user and owner of an API-written file.
+  rules: []
+  non_normative: >-
+    The draft does not guarantee the owner of a file written through the SDK; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in: {}
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-owner
+      data: dGVzdA==
+  - op: run
+    target: box
+    in:
+      bash_script: id -un; stat -c "%U:%G" /tmp/sps-owner
+    expect:
+      equals:
+        exit_code: 0
+      record:
+      - stdout
+- id: edge.images.architecture
+  title: Observe the native default image architecture.
+  rules: []
+  non_normative: >-
+    The draft does not guarantee the architecture of the provider default image; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in: {}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: uname -m
+    expect:
+      equals:
+        exit_code: 0
+      record:
+      - stdout
+- id: edge.lifetime.granularity
+  title: Observe whether the native timer accepts 61 seconds.
+  rules: []
+  non_normative: >-
+    This observation does not test a declared timer step or minimum lifetime; it records native acceptance of one request and does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 61
+    as: box
+  - op: get
+    target: box
+    expect:
+      record:
+      - state
+- id: edge.volumes.default_user
+  title: The default guest user can write the mounted volume; observe its owner.
+  rules: []
+  non_normative: >-
+    The draft does not guarantee the default guest user or its ownership of mounted files; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: volume.create
+    in: {}
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes: {}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: id -un; stat -c "%U:%G" /sps-volume; touch /sps-volume/guest
+    expect:
+      equals:
+        exit_code: 0
+      record:
+      - stdout
+- id: edge.volumes.after_resume
+  title: A mounted volume remains readable after native pause and resume.
+  rules:
+  - volumes/persists
+  proves: []
+  steps:
+  - op: volume.create
+    in: {}
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes: {}
+        pause_resume:
+          keeps: files_and_memory
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: pause
+    target: box
+    in:
+      keeps: files_and_memory
+  - op: resume
+    target: box
+    in:
+      keeps: files_and_memory
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /sps-volume/a
+    expect:
+      equals:
+        data:
+          utf8: saved
+- id: edge.idle.command_activity
+  title: Observe idle state while a native exec workload remains running.
+  rules: []
+  non_normative: >-
+    The draft does not define whether an active command counts as activity for idle shutdown; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 180
+      requirements:
+        idle_shutdown: $runner.idle_activity_settings
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: sleep 120
+      timeout_ms: 150000
+    as: proc
+  - wait_ms: 65000
+  - op: get
+    target: box
+    expect:
+      record:
+      - state
+- id: edge.previews.public_under_lockdown
+  title: Observe public preview reachability with native deny-all egress.
+  rules: [previews/public-serves-anyone]
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+          - 3001
+        network_lockdown:
+          policy: deny_all
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      record:
+      - served
+      - status
+- id: edge.previews.old_link_after_resume
+  title: Observe whether a previously issued preview survives native resume.
+  rules: []
+  non_normative: >-
+    The draft does not guarantee that an issued preview link survives pause and resume unless that behavior is declared; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+          - 3001
+        pause_resume:
+          keeps: files_and_memory
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview
+      eventually_ms: 10000
+  - op: pause
+    target: box
+    in:
+      keeps: files_and_memory
+  - op: resume
+    target: box
+    in:
+      keeps: files_and_memory
+    as: again
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      record:
+      - served
+      - status
+- id: edge.snapshots.delete_again
+  title: Deleting an already deleted snapshot calls the native API again.
+  rules: []
+  non_normative: >-
+    The draft does not specify the result of deleting an already deleted snapshot; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.delete
+    target: snap
+  - op: snapshot.delete_again
+    target: snap
+    expect:
+      equals:
+        native_delete_attempted: true
+- id: edge.snapshots.delete_during_restore
+  title: Observe native snapshot deletion while a restore is in progress.
+  rules: []
+  non_normative: >-
+    The draft does not specify deletion behavior during an in-progress restore; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.restore_begin
+    target: snap
+    as: pending
+  - op: snapshot.delete
+    target: snap
+  - op: snapshot.restore_wait
+    target: pending
+    as: again
+  - op: get
+    target: again
+    expect:
+      record:
+      - state
+- id: edge.snapshots.retention
+  title: Record retention only when exposed by native snapshot metadata.
+  rules: []
+  non_normative: >-
+    Native metadata exposure is not a normative guarantee; this row records an observation and does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.retention
+    target: snap
+    expect:
+      record:
+      - retention_seconds
+- id: edge.snapshots.memory_pty
+  title: Native snapshot memory includes a workload started through the PTY route.
+  rules:
+  - snapshots/files-and-memory
+  proves: []
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          keeps: files_and_memory
+          original_after: any
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: terminal.open
+    target: box
+    as: proc
+    in:
+      columns: 80
+      rows: 24
+  - op: terminal.write
+    target: proc
+    in:
+      data: U1BTX01FTU9SWV9QQVlMT0FEPW1lbW9yeS1tYXJrZXI7IGVjaG8gJCQgPi90bXAvc3BzLXBpZDsgd2hpbGUgWyAhIC1mIC90bXAvc3BzLXJlbGVhc2UgXTsgZG8gc2xlZXAgMC4xOyBkb25lOyBwcmludGYgIiVzIiAiJFNQU19NRU1PUllfUEFZTE9BRCIgPi90bXAvc3BzLXJlc3VsdDsgZXhpdA0=
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: snapshot.take
+    target: box
+    in:
+      keeps: files_and_memory
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+  - op: files.write
+    target: again
+    in:
+      path: /tmp/sps-release
+      data: Z28=
+  - op: files.exists
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-result
+    expect:
+      equals:
+        data:
+          utf8: memory-marker
+- id: edge.lifetime.files_after_expiry
+  title: Observe native file survival after a resumable lifetime ending.
+  rules: []
+  non_normative: >-
+    The draft specifies the timer end state and resumability but does not guarantee file survival after expiry; this diagnostic does not establish or disprove conformance.
+  proves: []
+  steps:
+  - op: create
+    in: $runner.expiry_options
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-expiry-file
+      data: c2F2ZWQ=
+  - wait_ms: 65000
+  - op: get
+    target: box
+    expect:
+      record:
+      - state
+  - op: resume
+    target: box
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-expiry-file
+    expect:
+      equals:
+        data:
+          utf8: saved
+- id: volumes.sharing.one_sandbox.object_store
+  title: Volume sharing supports one sandbox. The native kind is object_store.
+  rules: [volumes/one-sandbox]
+  proves:
+  - gate: volumes
+    knob: sharing
+    value: one_sandbox
+  steps:
+  - op: volume.create
+    in:
+      kind: object_store
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: one_sandbox
+          kind: object_store
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: c2F2ZWQ=
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+      requirements:
+        volumes:
+          sharing: one_sandbox
+          kind: object_store
+    expect:
+      error: volume_in_use
+- id: volumes.sharing.many_writers.object_store
+  title: Volume sharing supports many writers. The native kind is object_store.
+  rules:
+  - volumes/many-writers
+  proves:
+  - gate: volumes
+    knob: sharing
+    value: many_writers
+  steps:
+  - op: volume.create
+    in:
+      kind: object_store
+    as: vol
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: many_writers
+          kind: object_store
+    as: box
+  - op: create
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          sharing: many_writers
+          kind: object_store
+    as: again
+  - op: files.write
+    target: box
+    in:
+      path: /sps-volume/a
+      data: bGVmdC1tYXJrZXI=
+  - op: files.write
+    target: again
+    in:
+      path: /sps-volume/b
+      data: cmlnaHQtbWFya2Vy
+  - op: fixture.volume_visibility
+    in:
+      volume: $vol
+      writers:
+      - sandbox: $box
+        path: /sps-volume/a
+        volume_path: /a
+        data: bGVmdC1tYXJrZXI=
+      - sandbox: $again
+        path: /sps-volume/b
+        volume_path: /b
+        data: cmlnaHQtbWFya2Vy
+      timeout_ms: 60000
+    expect:
+      equals:
+        left_reads_right: true
+        right_reads_left: true
+- id: previews.revocable.true.public
+  title: A preview credential is individually revocable. The link is public.
+  rules:
+  - previews/revocable
+  proves:
+  - gate: previews
+    knob: revocable
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+          - 3001
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3001),Handler); open("/tmp/sps-ready-3001","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: other_server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3001
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.link
+    target: box
+    in:
+      port: 3001
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: other
+  - op: probe.http
+    in:
+      url: $other.url
+      headers: $other.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.revoke
+    target: link
+    expect: {}
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: false
+  - op: probe.http
+    in:
+      url: $other.url
+      headers: $other.headers
+    expect:
+      equals:
+        served: true
+- id: previews.revocable.false.public
+  title: A preview credential is not individually revocable. The link is public.
+  rules: []
+  non_normative: >-
+    The draft guarantees link revocation only when revocable is true; this row records the false value and does not establish or disprove conformance.
+  proves:
+  - gate: previews
+    knob: revocable
+    value: false
+  steps:
+  - op: create
+    in:
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: 180000
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: 60
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - op: preview.revoke
+    target: link
+    expect:
+      unsupported: true
+- id: previews.link_lifetime_seconds.public
+  title: An issued preview remains usable for the requested bounded lifetime. The link is public.
+  rules:
+  - previews/link-lifetime
+  proves:
+  - gate: previews
+    knob: link_lifetime_seconds
+    value:
+      at_least: $runner.link_lifetime_wait_seconds
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: $runner.preview_sandbox_lifetime_seconds
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 3000
+    as: box
+  - op: process.start
+    target: box
+    in:
+      bash_script: 'python3 -u -c ''from http.server import BaseHTTPRequestHandler, HTTPServer; class_body="def
+        do_GET(self):\n self.send_response(200); self.end_headers(); self.wfile.write(b\"sps-preview\")\ndef
+        log_message(self,*args): pass"; Handler=type("Handler",(BaseHTTPRequestHandler,),{}); exec(class_body,globals(),ns:={});
+        [setattr(Handler,k,v) for k,v in ns.items()]; httpd=HTTPServer(("0.0.0.0",3000),Handler); open("/tmp/sps-ready-3000","w").close();
+        httpd.serve_forever()'''
+      timeout_ms: $runner.preview_process_timeout_ms
+    as: server
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-ready-3000
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 5000
+  - op: preview.link
+    target: box
+    in:
+      port: 3000
+      access: public
+      credential: null
+      lifetime_seconds: $runner.preview_link_lifetime_seconds
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+      eventually_ms: 10000
+  - wait_ms: $runner.link_lifetime_wait_ms
+  - op: probe.http
+    in:
+      url: $link.url
+      headers: $link.headers
+    expect:
+      equals:
+        served: true
+
+- id: baseline.process_eof_is_not_exit
+  title: Closing process output does not end execution or change its exit status.
+  steps:
+  - op: create
+    as: box
+  - op: fixture.process_eof
+    target: box
+    expect:
+      equals:
+        state_after_close: running
+        exit_code_after_close: null
+        exit_code: 7
+  rules:
+  - baseline/process-eof-not-exit
+  proves: []

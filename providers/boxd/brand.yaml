@@ -1,0 +1,5 @@
+# Brand: chart colour, logo and one-colour mark. All keys optional.
+order: 6
+color: '#DF6A5F'
+logo: brand/logo.svg
+mark: brand/mark.svg

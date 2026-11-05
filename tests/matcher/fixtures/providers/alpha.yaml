@@ -1,0 +1,53 @@
+spec: sandbox-provider-spec/0.1
+provider: alpha
+verified: {date: 2026-09-29, sdks: {alpha-sdk: 1.2.0}}
+resources:
+  max_lifetime_seconds: 3600
+  sizes:
+    - {cpu: [1, 8], memory_mib: [1024, 16384], disk_mib: [1024, 40960]}
+  disk_mib: unlimited
+  regions: [alpha:us-east]
+  located_in: [US]
+  kernel: shared
+  long_running: true
+  extendable_lifetime: true
+  default_user: app
+  default_cwd: /workspace
+  paused_retention_seconds: {at_least: 3600}
+  gpus: [nvidia:t4]
+  max_gpus: 2
+  needs:
+    max_lifetime_seconds: [plan.long]
+    gpus: [plan.gpu]
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: false
+  at_end: [stopped, destroyed]
+gates:
+  idle_shutdown:
+    - {on_idle: paused, custom_idle_time: true, auto_wake: true}
+    - {on_idle: stopped, auto_wake: false}
+  pause_resume:
+    - {keeps: files_only}
+    - {keeps: files_and_memory, needs: {keeps: [plan.memory]}}
+  previews:
+    - {access: public, revocable: false, link_lifetime_seconds: 7200, max_ports: 3}
+    - {access: private, credential: link, revocable: true, link_lifetime_seconds: unlimited, max_ports: 2}
+  network_lockdown:
+    - {policy: deny_all, conflicts: [previews.access=public, resources.gpus]}
+    - {policy: allowlist, entry_kinds: [names, addresses], max_allow: 5, allow_wildcards: true}
+  hidden_secrets:
+    - {max_inject_into: 2, inject_wildcards: true}
+  snapshots:
+    - {keeps: files_only, original_after: continues, deletable: true, retention_seconds: {at_least: 7200}, conflicts: [pause_resume.keeps=files_and_memory]}
+    - {keeps: files_and_memory, original_after: continues, deletable: true, retention_seconds: {at_least: 7200}, resizes_on_restore: true}
+  volumes:
+    - {sharing: many_writers, read_only_mounts: false, kind: filesystem, max_mounts: 2}
+  custom_images:
+    - {source: [oci, dockerfile, provider_artifact], prepared: false}
+  processes:
+    - {input: true, cancel: true, reattach: true}
+  terminal:
+    - {}
+x-alpha: {exclusive: true}
+evidence: {}

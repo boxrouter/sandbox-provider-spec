@@ -1,0 +1,3745 @@
+{
+  "baseline": "not_run",
+  "clean": true,
+  "driver": {
+    "name": "DockerDriver",
+    "version": "0.2.0rc1"
+  },
+  "finished_at": "2026-10-03T12:14:29.400293+00:00",
+  "provider": "docker-engine",
+  "revision": "ebe55fe84c6c1e0cec2e01640a271ea25073536b",
+  "sdk_versions": {
+    "docker": "7.2.0"
+  },
+  "selected_tests": [
+    "baseline.create_env",
+    "baseline.get",
+    "baseline.list",
+    "baseline.destroy",
+    "baseline.run_output",
+    "baseline.run_exit_code",
+    "baseline.run_separate_streams",
+    "baseline.run_cwd",
+    "baseline.run_env",
+    "baseline.files_write",
+    "baseline.files_read",
+    "baseline.process_stream",
+    "processes.input.true",
+    "processes.input.false",
+    "processes.cancel.true",
+    "processes.cancel.false",
+    "processes.reattach.true",
+    "processes.reattach.false",
+    "terminal.interactive",
+    "baseline.environment_bash",
+    "baseline.environment_python3",
+    "facts.default_user",
+    "facts.default_cwd",
+    "baseline.outbound_network",
+    "lifetime_timer.at_end.destroyed",
+    "lifetime_timer.at_end.stopped",
+    "lifetime_timer.at_end.paused",
+    "lifetime_timer.counts_paused_time.true",
+    "lifetime_timer.counts_paused_time.false",
+    "pause_resume.files_only",
+    "pause_resume.files_and_memory",
+    "idle_shutdown.on_idle.paused",
+    "idle_shutdown.on_idle.stopped",
+    "idle_shutdown.on_idle.destroyed",
+    "idle_shutdown.keeps.files_only",
+    "idle_shutdown.keeps.files_and_memory",
+    "idle_shutdown.custom_idle_time.true",
+    "idle_shutdown.custom_idle_time.false",
+    "snapshots.keeps.files_only",
+    "snapshots.keeps.files_and_memory",
+    "snapshots.original_after.continues",
+    "snapshots.original_after.briefly_paused",
+    "snapshots.original_after.stopped",
+    "snapshots.original_after.terminated",
+    "snapshots.deletable.true",
+    "snapshots.deletable.false",
+    "snapshots.restores_many_times",
+    "snapshots.restore_options",
+    "snapshots.resizes_on_restore",
+    "network_lockdown.deny_all",
+    "network_lockdown.allowlist.names",
+    "network_lockdown.allowlist.addresses",
+    "network_lockdown.after_resume",
+    "network_lockdown.root_cannot_lift",
+    "network_lockdown.max_allow",
+    "network_lockdown.wildcards",
+    "previews.access.public",
+    "previews.access.private",
+    "previews.credential.link",
+    "previews.credential.header",
+    "previews.revocable.true",
+    "previews.revocable.false",
+    "previews.link_lifetime_seconds",
+    "previews.listed_ports",
+    "previews.credential_scope",
+    "idle_shutdown.auto_wake.true",
+    "idle_shutdown.auto_wake.false",
+    "volumes.sharing.one_sandbox",
+    "volumes.sharing.many_writers",
+    "volumes.kind.filesystem",
+    "volumes.kind.object_store",
+    "volumes.max_mounts",
+    "custom_images.oci",
+    "custom_images.dockerfile",
+    "custom_images.provider_artifact",
+    "hidden_secrets.injected",
+    "hidden_secrets.unreadable",
+    "facts.sizes",
+    "facts.max_lifetime",
+    "facts.extendable_lifetime",
+    "facts.long_running",
+    "facts.gpus",
+    "edge.commands.killed",
+    "edge.files.missing_parent",
+    "edge.files.owner",
+    "edge.images.architecture",
+    "edge.lifetime.granularity",
+    "edge.volumes.default_user",
+    "edge.volumes.after_resume",
+    "edge.idle.command_activity",
+    "edge.previews.public_under_lockdown",
+    "edge.previews.old_link_after_resume",
+    "edge.snapshots.delete_again",
+    "edge.snapshots.delete_during_restore",
+    "edge.snapshots.retention",
+    "edge.snapshots.memory_pty",
+    "edge.lifetime.files_after_expiry",
+    "volumes.sharing.one_sandbox.object_store",
+    "volumes.sharing.many_writers.object_store",
+    "previews.revocable.true.public",
+    "previews.revocable.false.public",
+    "previews.link_lifetime_seconds.public"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-03T12:10:52.026154+00:00",
+  "suite_digest": "sha256:b52761bd597408e0b9279677946bfc160a29d53ec8e4e0d5cbc2efe672243d76",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4255,
+      "id": "baseline.create_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "cHJlc2VudA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3495,
+      "id": "baseline.get",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4218,
+      "id": "baseline.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3499,
+      "id": "baseline.destroy",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3688,
+      "id": "baseline.run_output",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "b3V0",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3786,
+      "id": "baseline.run_exit_code",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4584,
+      "id": "baseline.run_separate_streams",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stderr": {
+              "actual": {
+                "b64": "ZXJyCg==",
+                "truncated": false
+              },
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "b3V0Cg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3473,
+      "id": "baseline.run_cwd",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "L3RtcAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3551,
+      "id": "baseline.run_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "Y29tbWFuZA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4779,
+      "id": "baseline.files_write",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVsbG8=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3516,
+      "id": "baseline.files_read",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AP9maWxl",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19429,
+      "id": "baseline.process_stream",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/process-output"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 14,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3702,
+      "id": "processes.input.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": true
+        }
+      ],
+      "reason": "UnsupportedOperation",
+      "result": "error",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "operation": "process.write_stdin",
+          "reason": "UnsupportedOperation",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.input.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": false
+        }
+      ],
+      "reason": "absent",
+      "result": "differs",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": false
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.cancel.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "cancel",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "processes/cancel"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.cancel.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "cancel",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/cancel"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": true
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.reattach.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": true
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "terminal",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4619,
+      "id": "terminal.interactive",
+      "proves": [
+        {
+          "gate": "terminal",
+          "value": true
+        }
+      ],
+      "reason": "UnsupportedOperation",
+      "result": "error",
+      "rules": [
+        "terminal/interactive"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.open",
+          "result": "passed"
+        },
+        {
+          "operation": "terminal.write",
+          "reason": "UnsupportedOperation",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3899,
+      "id": "baseline.environment_bash",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/bin/bash\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3685,
+      "id": "baseline.environment_python3",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/local/bin/python3\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4921,
+      "id": "facts.default_user",
+      "proves": [
+        {
+          "fact": "resources.default_user",
+          "value": "root"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_user": "root"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4424,
+      "id": "facts.default_cwd",
+      "proves": [
+        {
+          "fact": "resources.default_cwd",
+          "value": "/"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_cwd": "/"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3998,
+      "id": "baseline.outbound_network",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/outbound-network"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "lifetime_timer.at_end.destroyed",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "destroyed"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/lifetime-timer"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "lifetime_timer.at_end.stopped",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "stopped"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "lifetime_timer.at_end.paused",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "paused"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "lifetime_timer.counts_paused_time.true",
+      "proves": [
+        {
+          "fact": "lifetime_timer.counts_paused_time",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "lifetime_timer.counts_paused_time.false",
+      "proves": [
+        {
+          "fact": "lifetime_timer.counts_paused_time",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 14710,
+      "id": "pause_resume.files_only",
+      "proves": [
+        {
+          "gate": "pause_resume",
+          "knob": "keeps",
+          "value": "files_only"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "pause_resume/files-only"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 0,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5312,
+      "id": "pause_resume.files_and_memory",
+      "proves": [
+        {
+          "gate": "pause_resume",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "pause_resume/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "bWVtb3J5LW1hcmtlcg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.on_idle.paused",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "on_idle",
+          "value": "paused"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "idle_shutdown/paused"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.on_idle.stopped",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "on_idle",
+          "value": "stopped"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "idle_shutdown/stopped"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.on_idle.destroyed",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "on_idle",
+          "value": "destroyed"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "idle_shutdown/destroyed"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.keeps.files_only",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "keeps",
+          "value": "files_only"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.keeps.files_and_memory",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.custom_idle_time.true",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "custom_idle_time",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "idle_shutdown/custom-idle-time"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.custom_idle_time.false",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "custom_idle_time",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4269,
+      "id": "snapshots.keeps.files_only",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "keeps",
+          "value": "files_only"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/files-only"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 115,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5457,
+      "id": "snapshots.keeps.files_and_memory",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "reason": "Docker commit captures files, not process memory",
+      "result": "unsupported",
+      "rules": [
+        "snapshots/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.take",
+          "reason": "Docker commit captures files, not process memory",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 7159,
+      "id": "snapshots.original_after.continues",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "original_after",
+          "value": "continues"
+        }
+      ],
+      "reason": "snapshot_ticker_gap_ambiguous",
+      "result": "not_run",
+      "rules": [
+        "snapshots/original-after"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.snapshot_ticker_start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.snapshot_ticker_observe",
+          "reason": "snapshot_ticker_gap_ambiguous",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6573,
+      "id": "snapshots.original_after.briefly_paused",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "original_after",
+          "value": "briefly_paused"
+        }
+      ],
+      "reason": "snapshot_ticker_gap_ambiguous",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.snapshot_ticker_start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.snapshot_ticker_observe",
+          "reason": "snapshot_ticker_gap_ambiguous",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3852,
+      "id": "snapshots.original_after.stopped",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "original_after",
+          "value": "stopped"
+        }
+      ],
+      "reason": "state",
+      "result": "differs",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": false
+            }
+          },
+          "operation": "get",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5531,
+      "id": "snapshots.original_after.terminated",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "original_after",
+          "value": "terminated"
+        }
+      ],
+      "reason": "state",
+      "result": "differs",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": false
+            }
+          },
+          "operation": "get",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4147,
+      "id": "snapshots.deletable.true",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "deletable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/deletable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4320,
+      "id": "snapshots.deletable.false",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "deletable",
+          "value": false
+        }
+      ],
+      "reason": "Docker commit captures files, not process memory",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.take",
+          "reason": "Docker commit captures files, not process memory",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "snapshots.restores_many_times",
+      "proves": [],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "snapshots/restores-many-times"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4704,
+      "id": "snapshots.restore_options",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "snapshots/restore-takes-its-own-options"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "bmV3",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "snapshots.resizes_on_restore",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "snapshots/resizes-on-restore"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.deny_all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "deny_all"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/deny-all"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.allowlist.names",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names"
+          ]
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.allowlist.addresses",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "addresses"
+          ]
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.after_resume",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/holds-after-resume"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3608,
+      "id": "network_lockdown.root_cannot_lift",
+      "proves": [],
+      "reason": "Docker exec has no native guest command deadline",
+      "result": "unsupported",
+      "rules": [
+        "network_lockdown/root-cannot-lift"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.root_attack",
+          "reason": "Docker exec has no native guest command deadline",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.max_allow",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/max-allow"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "network_lockdown.wildcards",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "allow_wildcards",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/wildcards"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.access.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "access",
+          "value": "public"
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/public-serves-anyone"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.access.private",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "access",
+          "value": "private"
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/private-needs-credential"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.credential.link",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "credential",
+          "value": "link"
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/credential-link"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.credential.header",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "credential",
+          "value": "header"
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/credential-header"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.revocable.true",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "revocable",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/revocable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.revocable.false",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "revocable",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.link_lifetime_seconds",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "previews/link-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.listed_ports",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "max_ports",
+          "value": {
+            "at_least": 2
+          }
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/serves-listed-ports"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.credential_scope",
+      "proves": [],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/private-credential-is-its-own"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.auto_wake.true",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "auto_wake",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "idle_shutdown/auto-wake"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "idle_shutdown.auto_wake.false",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "auto_wake",
+          "value": false
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5244,
+      "id": "volumes.sharing.one_sandbox",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "sharing",
+          "value": "one_sandbox"
+        }
+      ],
+      "reason": "expected_error",
+      "result": "differs",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "expected_error": {
+              "matches": false
+            }
+          },
+          "operation": "create",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3833,
+      "id": "volumes.sharing.many_writers",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "sharing",
+          "value": "many_writers"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "volumes/many-writers"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4174,
+      "id": "volumes.kind.filesystem",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "kind",
+          "value": "filesystem"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "volumes/persists",
+        "volumes/filesystem-locks"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 75,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "volumes.kind.object_store",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "kind",
+          "value": "object_store"
+        }
+      ],
+      "reason": "Docker's local volume driver does not expose an object-store kind",
+      "result": "unsupported",
+      "rules": [
+        "volumes/persists"
+      ],
+      "steps": [
+        {
+          "operation": "volume.create",
+          "reason": "Docker's local volume driver does not expose an object-store kind",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "volumes.max_mounts",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "volumes/max-mounts"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "custom_images.oci",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/oci"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4335,
+      "id": "custom_images.dockerfile",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "dockerfile"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/dockerfile"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVyZWRvYw==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "hidden_secrets.injected",
+      "proves": [],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injected"
+      ],
+      "steps": [
+        {
+          "operation": "secret.create",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "hidden_secrets.unreadable",
+      "proves": [],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/unreadable"
+      ],
+      "steps": [
+        {
+          "operation": "secret.create",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "facts.sizes",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "facts.max_lifetime",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/max-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "facts.extendable_lifetime",
+      "proves": [
+        {
+          "fact": "resources.extendable_lifetime",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/extendable-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "facts.long_running",
+      "proves": [
+        {
+          "fact": "resources.long_running",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/long-running"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "facts.gpus",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/gpus"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4340,
+      "id": "edge.commands.killed",
+      "proves": [],
+      "result": "passed",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 137,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3499,
+      "id": "edge.files.missing_parent",
+      "proves": [],
+      "reason": "NotFound",
+      "result": "error",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "files.write",
+          "reason": "NotFound",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3648,
+      "id": "edge.files.owner",
+      "proves": [],
+      "result": "passed",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\nroot:root\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3882,
+      "id": "edge.images.architecture",
+      "proves": [],
+      "result": "passed",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "aarch64\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "edge.lifetime.granularity",
+      "proves": [],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3386,
+      "id": "edge.volumes.default_user",
+      "proves": [],
+      "result": "passed",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\nroot:root\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3585,
+      "id": "edge.volumes.after_resume",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "volumes/persists"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "edge.idle.command_activity",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "edge.previews.public_under_lockdown",
+      "proves": [],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "edge.previews.old_link_after_resume",
+      "proves": [],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3965,
+      "id": "edge.snapshots.delete_again",
+      "proves": [],
+      "result": "passed",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "native_delete_attempted": {
+              "matches": true
+            }
+          },
+          "operation": "snapshot.delete_again",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3838,
+      "id": "edge.snapshots.delete_during_restore",
+      "proves": [],
+      "reason": "native_restore_progress_unobservable",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.restore_begin",
+          "reason": "native_restore_progress_unobservable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot_image",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4512,
+      "id": "edge.snapshots.retention",
+      "proves": [],
+      "reason": "native_snapshot_retention_unobservable",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.retention",
+          "reason": "native_snapshot_retention_unobservable",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "terminal",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "pulled_image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3966,
+      "id": "edge.snapshots.memory_pty",
+      "proves": [],
+      "reason": "UnsupportedOperation",
+      "result": "error",
+      "rules": [
+        "snapshots/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.open",
+          "result": "passed"
+        },
+        {
+          "operation": "terminal.write",
+          "reason": "UnsupportedOperation",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "edge.lifetime.files_after_expiry",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "volumes.sharing.one_sandbox.object_store",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "sharing",
+          "value": "one_sandbox"
+        }
+      ],
+      "reason": "Docker's local volume driver does not expose an object-store kind",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "volume.create",
+          "reason": "Docker's local volume driver does not expose an object-store kind",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "volumes.sharing.many_writers.object_store",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "sharing",
+          "value": "many_writers"
+        }
+      ],
+      "reason": "Docker's local volume driver does not expose an object-store kind",
+      "result": "unsupported",
+      "rules": [
+        "volumes/many-writers"
+      ],
+      "steps": [
+        {
+          "operation": "volume.create",
+          "reason": "Docker's local volume driver does not expose an object-store kind",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.revocable.true.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "revocable",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [
+        "previews/revocable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.revocable.false.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "revocable",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine port publishing is not a hosted preview link",
+      "result": "unsupported",
+      "rules": [],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine port publishing is not a hosted preview link",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "previews.link_lifetime_seconds.public",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "previews/link-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    }
+  ]
+}

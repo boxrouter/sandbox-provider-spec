@@ -1,0 +1,39 @@
+name: Normative change
+description: Propose a new rule or a change in meaning
+title: "Spec change: "
+body:
+  - type: textarea
+    id: workload
+    attributes:
+      label: Workload and failure
+      description: What program behavior fails under the current contract?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current rule, version, and smallest example
+      description: Link the section and show a request or declaration without private data.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Provider difference and evidence
+      description: Cite an SDK run or dated provider documentation for each differing behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed wording and test
+      description: Include rule IDs, catalog/schema changes, and a test or recorded waiver.
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Alternatives and compatibility
+      description: Explain alternatives, old-file behavior, migration, and version impact.
+    validations:
+      required: true

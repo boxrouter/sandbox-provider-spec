@@ -1,0 +1,10 @@
+# A coding agent that keeps its sandbox for a day, pauses between sessions with its
+# processes intact, shows its user a dev server, and may reach only two hosts.
+lifetime_seconds: 86400
+at_end: paused
+requirements:
+  pause_resume: {keeps: files_and_memory}
+  previews: {access: public, ports: [3000]}
+  network_lockdown: {policy: allowlist, allow: [api.github.com, pypi.org]}
+resources:
+  memory_min_mib: 4096

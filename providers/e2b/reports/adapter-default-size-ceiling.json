@@ -1,0 +1,69 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.24.312"
+  },
+  "finished_at": "2026-11-05T03:20:40.581095+00:00",
+  "implementation": "boxrouter_e2b",
+  "implementation_digest": "sha256:3effbb8dedeed32ef33bf8ae4324899a75468f17c2a83bf4e59b06201258b667",
+  "provider": "e2b",
+  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
+  "run_id": "spec-run-20261105T031957Z-8527",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.312",
+    "boxrouter-core": "0.13.366",
+    "boxrouter-e2b": "0.4.268",
+    "e2b": "2.59.0",
+    "e2b-code-interpreter": "2.11.3"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-05T03:19:57.557801+00:00",
+  "suite_digest": "sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 43021,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.978, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.9945, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 536870912}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

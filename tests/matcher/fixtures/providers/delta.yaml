@@ -1,0 +1,43 @@
+spec: sandbox-provider-spec/0.1
+provider: delta
+verified: {date: 2026-09-30, sdks: {delta-sdk: 1.0.0}}
+resources:
+  sizes:
+    - {cpu: 2, memory_mib: 4096, disk_mib: 8192}
+    - {cpu: [1, 16], memory_mib: [1024, 32768], disk_mib: [1024, 16384]}
+  disk_in_memory: true
+  root: [sudo, per_command]
+  arch: [amd64, arm64]
+  package_manager: apt
+  libc: glibc
+  max_run_seconds: 3600
+  max_process_seconds: {at_least: 600}
+  egress_ips: [published_ranges]
+gates:
+  idle_shutdown:
+    - {on_idle: paused, auto_wake: true}
+  network_lockdown:
+    - {policy: [allowlist, denylist], changeable: true, entry_kinds: [names, addresses], max_allow: 1, max_deny: 2, allow_wildcards: false}
+    - {policy: [allowlist, denylist], switchable: true, entry_kinds: [names, addresses]}
+    - {policy: [deny_all, denylist], changeable: false, entry_kinds: [addresses]}
+  hidden_secrets:
+    - {rotates: true, scrubs_responses: false, transparent: true, injection: sets_header, intercepts: injected_hosts, max_inject_into: 2}
+  previews:
+    - {access: public, websocket: true, loopback: false, any_port: true, survives_pause: false, max_ports: 4, reserved_ports: [22, 49983]}
+    - {access: private, credential: header, websocket: false, max_ports: 4}
+  volumes:
+    - {kind: filesystem, read_only_mounts: true}
+  custom_images:
+    - {source: oci, prepared: false, runs_entrypoint: false}
+    - {source: dockerfile, prepared: false, build_context: true}
+  processes:
+    - {needs: {variant: [sandbox_kvm]}}
+  terminal:
+    - {reattach: true}
+  docker:
+    - {networking: host}
+  tcp_ports:
+    - {tls: none, max_tcp_ports: 2}
+  desktop:
+    - {live_view: true, conflicts: [resources.package_manager]}
+evidence: {}

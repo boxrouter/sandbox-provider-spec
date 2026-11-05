@@ -1,0 +1,88 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "custom_images.provider_artifact": "sha256:7dfb8611fb246611105a28aae5056e30c436f02cfd1311753b73c1adc97f127d"
+  },
+  "clean": true,
+  "driver": {
+    "name": "VercelDriver",
+    "version": "0.24.306"
+  },
+  "finished_at": "2026-11-04T19:46:47.442293+00:00",
+  "implementation": "boxrouter_vercel",
+  "implementation_digest": "sha256:1ef0bda1858a429d20a6ab7a0f31764a9d651ed75ffdc890e21176e7d3b93675",
+  "provider": "vercel",
+  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
+  "run_id": "spec-run-20261104T194643Z-56d1",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.306",
+    "boxrouter-core": "0.13.366",
+    "boxrouter-vercel": "0.5.229",
+    "vercel-sandbox": "0.9.0"
+  },
+  "selected_tests": [
+    "custom_images.provider_artifact"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-04T19:46:43.148782+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4294,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 286,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

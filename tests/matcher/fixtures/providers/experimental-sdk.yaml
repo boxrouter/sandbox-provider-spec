@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: experimental-sdk
+verified: {date: 2026-10-02, sdks: {synthetic: "1.0.0"}}
+resources: {}
+gates:
+  network_lockdown:
+    - {policy: allowlist, changeable: true, entry_kinds: [names], needs: {changeable: [experimental_sdk]}}
+evidence: {}

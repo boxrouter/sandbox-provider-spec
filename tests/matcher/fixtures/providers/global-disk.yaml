@@ -1,0 +1,10 @@
+spec: sandbox-provider-spec/0.1
+provider: global-disk
+verified: {date: 2026-09-29, sdks: {global-disk-sdk: 1.0.0}}
+resources:
+  sizes:
+    - {cpu: 2, memory_mib: 4096}
+  size_is_ceiling: true
+  disk_mib: 8192
+gates: {}
+evidence: {}

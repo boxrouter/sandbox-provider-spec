@@ -1,0 +1,509 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.after_resume": "sha256:9b8dad82191900b769433daaddc15bbca625a65af61924a7c1b10737ce2473bd",
+    "network_lockdown.allowlist.names": "sha256:f9166496e0cc6eb8097e2dabe3de2bd23095e653617de53b244bc6cc3e3d5619",
+    "network_lockdown.max_allow": "sha256:0fc408f3b29fa24fcaa1831891ef68d954db039a25bf22e547be32a62e22bd9d",
+    "network_lockdown.wildcards": "sha256:f5144726bf5c98f6c8e06a8d76e2ab5bce9da9f20acaff4274503419d8b6656a",
+    "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce",
+    "processes.cancel.true": "sha256:4b3aa1ade5e0c2955b9a0b1d23a513b8b5b6577eddfd0a75f100e23115f0c970",
+    "processes.input.true": "sha256:c97400d0004d0de0f9410af8b7b953bf12f4894a073972c9553b6d5d1adaf185",
+    "processes.reattach.false": "sha256:92cc0a22ae9949a631134aa7c4c663322d302800d9775301152a6367139e329e"
+  },
+  "clean": true,
+  "driver": {
+    "name": "BoxdDriver",
+    "version": "0.24.293"
+  },
+  "finished_at": "2026-11-02T19:18:54.828687+00:00",
+  "implementation": "boxrouter_boxd",
+  "implementation_digest": "sha256:c99d5108cf79ab7f13b971b69a074e5677d19c460467f7bb62ed991dce2ccc85",
+  "provider": "boxd",
+  "revision": "ea74b95c5ad3b556cde796ba1d4cfcdad15326cc",
+  "run_id": "spec-run-20261102T191819Z-a27b",
+  "sdk_versions": {
+    "boxd": "0.2.22",
+    "boxrouter-adapter-kit": "0.24.293",
+    "boxrouter-boxd": "0.1.18",
+    "boxrouter-core": "0.13.353"
+  },
+  "selected_tests": [
+    "processes.input.true",
+    "processes.cancel.true",
+    "processes.reattach.false",
+    "pause_resume.files_and_memory",
+    "network_lockdown.allowlist.names",
+    "network_lockdown.after_resume",
+    "network_lockdown.max_allow",
+    "network_lockdown.wildcards"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-02T19:18:19.089346+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2567,
+      "id": "processes.input.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.write_stdin",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 5,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 2297,
+      "id": "processes.cancel.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "cancel",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/cancel"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stopped": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.cancel",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stopped": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_state",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.reattach.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": true
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2999,
+      "id": "pause_resume.files_and_memory",
+      "proves": [
+        {
+          "gate": "pause_resume",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "pause_resume/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "bWVtb3J5LW1hcmtlcg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2494,
+      "id": "network_lockdown.allowlist.names",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2152,
+      "id": "network_lockdown.after_resume",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/holds-after-resume"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 20919,
+      "id": "network_lockdown.max_allow",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "max_allow",
+          "value": {
+            "at_least": 32
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/max-allow"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2310,
+      "id": "network_lockdown.wildcards",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "allow_wildcards",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/wildcards"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

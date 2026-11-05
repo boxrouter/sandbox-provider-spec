@@ -1,0 +1,74 @@
+{
+  "gpu_models": {
+    "nvidia:t4": {
+      "vendor": "nvidia",
+      "family": "nvidia:turing",
+      "compute_capability": "7.5"
+    },
+    "nvidia:a10": {
+      "vendor": "nvidia",
+      "family": "nvidia:ampere",
+      "compute_capability": "8.6"
+    },
+    "nvidia:a100-40gb": {
+      "vendor": "nvidia",
+      "family": "nvidia:ampere",
+      "compute_capability": "8.0"
+    },
+    "nvidia:a100-80gb": {
+      "vendor": "nvidia",
+      "family": "nvidia:ampere",
+      "compute_capability": "8.0"
+    },
+    "nvidia:l4": {
+      "vendor": "nvidia",
+      "family": "nvidia:ada",
+      "compute_capability": "8.9"
+    },
+    "nvidia:l40s": {
+      "vendor": "nvidia",
+      "family": "nvidia:ada",
+      "compute_capability": "8.9"
+    },
+    "nvidia:rtx-4090": {
+      "vendor": "nvidia",
+      "family": "nvidia:ada",
+      "compute_capability": "8.9"
+    },
+    "nvidia:h100": {
+      "vendor": "nvidia",
+      "family": "nvidia:hopper",
+      "compute_capability": "9.0"
+    },
+    "nvidia:h200": {
+      "vendor": "nvidia",
+      "family": "nvidia:hopper",
+      "compute_capability": "9.0"
+    },
+    "nvidia:b200": {
+      "vendor": "nvidia",
+      "family": "nvidia:blackwell",
+      "compute_capability": "10.0"
+    },
+    "nvidia:b300": {
+      "vendor": "nvidia",
+      "family": "nvidia:blackwell",
+      "compute_capability": "10.3"
+    },
+    "nvidia:rtx-5090": {
+      "vendor": "nvidia",
+      "family": "nvidia:blackwell",
+      "compute_capability": "12.0"
+    },
+    "nvidia:rtx-pro-6000": {
+      "vendor": "nvidia",
+      "family": "nvidia:blackwell",
+      "compute_capability": "12.0"
+    },
+    "amd:mi355x": {
+      "vendor": "amd",
+      "family": null,
+      "compute_capability": null
+    }
+  }
+}

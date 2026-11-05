@@ -1,0 +1,88 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "custom_images.provider_artifact": "sha256:7dfb8611fb246611105a28aae5056e30c436f02cfd1311753b73c1adc97f127d"
+  },
+  "clean": true,
+  "driver": {
+    "name": "BlaxelDriver",
+    "version": "0.24.306"
+  },
+  "finished_at": "2026-11-04T19:48:53.364505+00:00",
+  "implementation": "boxrouter_blaxel",
+  "implementation_digest": "sha256:ce30c441a57509b21d1e5b01fa141b73da1fde592a6caf3a5ee9855d7f575c2c",
+  "provider": "blaxel",
+  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
+  "run_id": "spec-run-20261104T194849Z-965b",
+  "sdk_versions": {
+    "blaxel": "0.4.8",
+    "boxrouter-adapter-kit": "0.24.306",
+    "boxrouter-blaxel": "0.5.246",
+    "boxrouter-core": "0.13.366"
+  },
+  "selected_tests": [
+    "custom_images.provider_artifact"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-04T19:48:49.521926+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3841,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 286,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

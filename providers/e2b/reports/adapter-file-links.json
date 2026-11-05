@@ -1,0 +1,1025 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "file_links.v1.credential.read": "sha256:5545d455743cb2eaea97341f754746d805e579df0bfb7a2f12aecbe384b88a50",
+    "file_links.v1.credential.write": "sha256:52661565e0bf9b6b85a3b7a6260869760a1b0af05a34a9979102dede9e1e9d2e",
+    "file_links.v1.expiry.read": "sha256:110315ad30b6a7d6b6b7419e3584b8e75c7c6a9edcc4478c9e577b795df19f95",
+    "file_links.v1.expiry.write": "sha256:3c65098ef7a4e979de510a3e510f3e66b3f61b3a4852b7d585c665b117911937",
+    "file_links.v1.interrupted_write": "sha256:90df6e947b160b5e919e798a6dfe0057d6f3bc7e99e33b4e31e17982dc49ee07",
+    "file_links.v1.link_lifetime.read": "sha256:591444f7a82094aac38cc5f8603d532c86066ba209917abf4b8061da1a9fbefe",
+    "file_links.v1.link_lifetime.write": "sha256:cbe5d2bebdd718d7fd163894366bf8693928d5d6969b7b592fc780ad5856af4c",
+    "file_links.v1.one_operation": "sha256:ff2f9feb9cf3f9ed069fc36a9271819eebde4ad37f190759a5a645b0c2e9f372",
+    "file_links.v1.one_path.read": "sha256:48e389627966d055af4dce008b544b6b1a7c1d639e6ffdca48842f28b8ca9f3d",
+    "file_links.v1.one_path.write": "sha256:751641489209480dc37f2c953ad4a468a41b4cde58a41e37c8f8090cd336bc3a",
+    "file_links.v1.read_exact": "sha256:651ac745da092a8bff2acabb349083976586dd97b88c584a29cbe3fd39e84a34",
+    "file_links.v1.revocable.read": "sha256:1865d229b0c486621f26087c7d0d663700a90ebac715349099d7e8f79af88096",
+    "file_links.v1.revocable.write": "sha256:32cdb9b0e8061e512fd8a60b4fc6b2498b276b8e367714b565632a4273ecec51",
+    "file_links.v1.user_selection": "sha256:5e5b719f5e96b0e54734db005b38249733ed29d80abf1b4f91f2c46e7ecd5c6f",
+    "file_links.v1.write_exact": "sha256:b715aa690aa0bba19293e38aa88f3f04858816fa26be861af5dadffbb8effd41",
+    "file_links.v1.write_parents": "sha256:7f7da9ac447b7d85314741da70d21e033f16d52acc8e6f126c597b82d5513b0b",
+    "file_links.v1.write_usable": "sha256:52c50424466ea228cbc5c15bf3a68d1c0daae9e777a06c7feeb97a751831a8e4",
+    "files.stream.v1.read.1gib": "sha256:f809b5106e7d585bd452bd5e593eebf6c07a3b74d8518cf9f97c2b3517558fc9",
+    "files.stream.v1.read.5gib": "sha256:fc9d44b5d220baa1993e7d9fd254d382e9a58f08a3052af3f7ab8ea7460465cc",
+    "files.stream.v1.read.64mib": "sha256:7f9d1238f7ac98b4c7ffb79a3bc19cfac902b3eb6a2604f6024d75a1fb2e7226",
+    "files.stream.v1.write.1gib": "sha256:7318902452abdd5cb886dede859feed2e955fcb2dce8900d468a0c0caef1d3f4",
+    "files.stream.v1.write.5gib": "sha256:e289de34c835ea989c6dd1bcab8e68474849b84e506159799f6817684561c5b1",
+    "files.stream.v1.write.64mib": "sha256:ce30e191a21c077ff8f0b23bdddbc9f693274d992c59fe78a0e6b75d1d9f1e00"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.24.151"
+  },
+  "finished_at": "2026-10-29T01:25:54.070706+00:00",
+  "implementation": "boxrouter_e2b",
+  "implementation_digest": "sha256:f3eb32da628f2a1481f4702fc433aa7b8f6c3ad88796a139f24c9c824d97c311",
+  "provider": "e2b",
+  "revision": "226a061f6efc1406cdc986893952e9b407186a59",
+  "run_id": "sft-evidence-20261029T011359-e2b",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.151",
+    "boxrouter-core": "0.13.258",
+    "boxrouter-e2b": "0.4.197",
+    "e2b": "2.59.0",
+    "e2b-code-interpreter": "2.11.3"
+  },
+  "selected_tests": [
+    "file_links.v1.credential.read",
+    "file_links.v1.credential.write",
+    "file_links.v1.read_exact",
+    "file_links.v1.write_exact",
+    "file_links.v1.write_parents",
+    "file_links.v1.write_usable",
+    "file_links.v1.one_path.read",
+    "file_links.v1.one_path.write",
+    "file_links.v1.one_operation",
+    "file_links.v1.expiry.read",
+    "file_links.v1.expiry.write",
+    "file_links.v1.link_lifetime.read",
+    "file_links.v1.link_lifetime.write",
+    "file_links.v1.user_selection",
+    "file_links.v1.revocable.read",
+    "file_links.v1.revocable.write",
+    "file_links.v1.interrupted_write",
+    "files.stream.v1.write.64mib",
+    "files.stream.v1.write.1gib",
+    "files.stream.v1.write.5gib",
+    "files.stream.v1.read.64mib",
+    "files.stream.v1.read.1gib",
+    "files.stream.v1.read.5gib"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T01:14:11.664102+00:00",
+  "suite_digest": "sha256:864b6f5253d02d6656d54d1dfd10bd9747d655df02626f448d6db48159f94a37",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4369,
+      "id": "file_links.v1.credential.read",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read"
+          ]
+        },
+        {
+          "gate": "file_links",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/own-credential"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2476,
+      "id": "file_links.v1.credential.write",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        },
+        {
+          "gate": "file_links",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/own-credential"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2758,
+      "id": "file_links.v1.read_exact",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/read-exact-bytes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4014,
+      "id": "file_links.v1.write_exact",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/write-exact-bytes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1958,
+      "id": "file_links.v1.write_parents",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/write-parents"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1778,
+      "id": "file_links.v1.write_usable",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/write-usable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3106,
+      "id": "file_links.v1.one_path.read",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/one-path"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2705,
+      "id": "file_links.v1.one_path.write",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/one-path"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1418,
+      "id": "file_links.v1.one_operation",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read",
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/one-operation"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 16809,
+      "id": "file_links.v1.expiry.read",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/expiry"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 16377,
+      "id": "file_links.v1.expiry.write",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/expiry"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "file_links.v1.link_lifetime.read",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "file-links/link-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.file_links",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "file_links.v1.link_lifetime.write",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "file-links/link-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.file_links",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2082,
+      "id": "file_links.v1.user_selection",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read",
+            "write"
+          ]
+        },
+        {
+          "gate": "file_links",
+          "knob": "user_selection",
+          "value": true
+        }
+      ],
+      "reason": "outcome_unknown",
+      "result": "error",
+      "rules": [
+        "file-links/user-selection"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.file_links",
+          "reason": "outcome_unknown",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1286,
+      "id": "file_links.v1.revocable.read",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "read"
+          ]
+        },
+        {
+          "gate": "file_links",
+          "knob": "revocable",
+          "value": true
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "file-links/revocable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.file_links",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 905,
+      "id": "file_links.v1.revocable.write",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        },
+        {
+          "gate": "file_links",
+          "knob": "revocable",
+          "value": true
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "file-links/revocable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.file_links",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11436,
+      "id": "file_links.v1.interrupted_write",
+      "proves": [
+        {
+          "gate": "file_links",
+          "knob": "operations",
+          "value": [
+            "write"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "file-links/interrupted-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_links",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5525,
+      "id": "files.stream.v1.write.64mib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 67108864
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 72037,
+      "id": "files.stream.v1.write.1gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 1073741824
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 342985,
+      "id": "files.stream.v1.write.5gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 5368709120
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4963,
+      "id": "files.stream.v1.read.64mib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "read": {
+              "at_least": 67108864
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-read"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 32965,
+      "id": "files.stream.v1.read.1gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "read": {
+              "at_least": 1073741824
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-read"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 170452,
+      "id": "files.stream.v1.read.5gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "read": {
+              "at_least": 5368709120
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-read"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

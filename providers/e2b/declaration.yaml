@@ -1,0 +1,327 @@
+spec: sandbox-provider-spec/0.1
+provider: e2b
+verified:
+  date: '2026-11-05'
+  sdks:
+    e2b: 2.59.0
+    e2b-code-interpreter: 2.11.3
+    e2b-desktop: 2.6.0
+resources:
+  kernel: dedicated
+  sizes:
+  - cpu:
+    - 1
+    - 8
+    memory_mib:
+    - 128
+    - 8192
+  default_user: user
+  default_cwd: /home/user
+  located_in:
+  - US
+  max_lifetime_seconds: 86400
+  paused_retention_seconds: unlimited
+  disk_mib:
+    at_least: 20480
+  needs:
+    max_lifetime_seconds:
+    - pro_plan
+    disk_mib:
+    - pro_plan
+  unmet_limits:
+    max_lifetime_seconds:
+      pro_plan: 3600
+    disk_mib:
+      pro_plan: 10240
+  regions:
+  - e2b:us
+  arch:
+  - amd64
+  extendable_lifetime: true
+  size_is_ceiling: true
+  egress_ips: []
+  root:
+  - sudo
+  - per_command
+  package_manager: apt
+  gpus: unknown
+  max_run_seconds: unknown
+  disk_in_memory: false
+  libc: glibc
+  max_process_seconds:
+    at_least: 600
+  long_running: unknown
+gates:
+  previews:
+  - access: public
+    revocable: false
+    max_ports:
+      at_least: 2
+    link_lifetime_seconds:
+      at_least: 300
+    websocket: true
+    loopback: true
+    survives_pause: true
+    reserved_ports:
+    - 49983
+  network_lockdown:
+  - policy: allowlist
+    entry_kinds:
+    - addresses
+  - policy: deny_all
+  desktop:
+  - live_view: true
+  custom_images:
+  - source: provider_artifact
+  - source: dockerfile
+    prepared: true
+    build_context: true
+    runs_entrypoint: unknown
+  - source: oci
+    prepared: true
+  - prepared: true
+  processes:
+  - input: true
+    cancel: true
+    reattach: true
+  pause_resume:
+  - keeps: files_and_memory
+  snapshots:
+  - keeps: files_and_memory
+    original_after: unknown
+    deletable: true
+  terminal:
+  - reattach: true
+  file_links:
+  - operations:
+    - read
+    - write
+evidence:
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
+  resources.kernel:
+    source: https://docs.e2b.dev/faq/security-and-compliance
+    read: '2026-10-16'
+    quote: Every sandbox is a Firecracker microVM with an isolated kernel.
+  resources.sizes:
+    source: https://docs.e2b.dev/billing
+    read: '2026-10-22'
+    quote: 'Max vCPUs | 8 | 8+ | Custom; Max memory | 8 GiB | 8+ GiB | Custom'
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/native-default-core.json
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/native-default-core.json
+  resources.located_in:
+    source: https://docs.e2b.dev/faq/egress-ip-ranges
+    read: '2026-10-22'
+    quote: US | Google Cloud us-west1 | All plans | Default - no action needed
+  resources.max_lifetime_seconds:
+    source: https://docs.e2b.dev/sandbox
+    read: '2026-10-16'
+    quote: Sandboxes can run continuously for up to 24 hours (Pro) or 1 hour (Hobby).
+  resources.paused_retention_seconds:
+    source: https://docs.e2b.dev/sandbox/persistence
+    read: '2026-10-16'
+    quote: A paused sandbox is kept indefinitely. There is no time-to-live and no automatic deletion.
+  resources.disk_mib:
+    source: https://docs.e2b.dev/billing
+    read: '2026-10-22'
+    quote: Disk size | 10 GiB | 20+ GiB | Custom
+  resources.needs.max_lifetime_seconds:
+    source: https://docs.e2b.dev/sandbox
+    read: '2026-10-16'
+    quote: Sandboxes can run continuously for up to 24 hours (Pro) or 1 hour (Hobby).
+  resources.needs.disk_mib:
+    source: https://docs.e2b.dev/billing
+    read: '2026-10-22'
+    quote: Disk size | 10 GiB | 20+ GiB | Custom
+  resources.unmet_limits.max_lifetime_seconds.pro_plan:
+    source: https://docs.e2b.dev/sandbox
+    read: '2026-10-16'
+    quote: Sandboxes can run continuously for up to 24 hours (Pro) or 1 hour (Hobby).
+  resources.unmet_limits.disk_mib.pro_plan:
+    source: https://docs.e2b.dev/billing
+    read: '2026-10-22'
+    quote: Disk size | 10 GiB | 20+ GiB | Custom
+  resources.regions:
+    source: https://docs.e2b.dev/faq/egress-ip-ranges
+    read: '2026-10-22'
+    quote: US | Google Cloud us-west1 | All plans | Default - no action needed
+  resources.arch:
+    tests:
+    - coverage.facts.arch.amd64
+    report: reports/native-default-coverage.json
+  resources.extendable_lifetime:
+    tests:
+    - facts.extendable_lifetime
+    report: reports/native-default-core.json
+  resources.egress_ips:
+    source: https://docs.e2b.dev/faq/egress-ip-ranges
+    read: '2026-10-16'
+    quote: E2B does not publish a list of egress CIDRs, and there are no dedicated or static egress IP
+      addresses on any plan (including Enterprise).
+  resources.root:
+    tests:
+    - coverage.facts.root.per_command
+    - coverage.facts.root.sudo
+    report: reports/native-default-coverage.json
+  resources.package_manager:
+    tests:
+    - coverage.facts.package_manager.apt
+    report: reports/native-default-coverage.json
+  resources.disk_in_memory:
+    tests:
+    - coverage.facts.disk_in_memory.false
+    report: reports/native-default-coverage.json
+  resources.libc:
+    tests:
+    - coverage.facts.libc.glibc
+    report: reports/native-default-coverage.json
+  resources.max_process_seconds:
+    tests:
+    - coverage.facts.max_process
+    report: reports/native-default-coverage.json
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.counts_paused_time:
+    source: https://docs.e2b.dev/billing
+    read: '2026-09-30'
+    quote: Max continuous runtime is the time a sandbox can run without being paused, not a cap on how
+      long a sandbox can exist. Pausing and resuming resets it, and a paused sandbox is kept indefinitely
+      with no time-to-live.
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    - lifetime_timer.at_end.paused
+    report: reports/native-default-core.json
+  lifetime_timer.adjustable:
+    source: https://e2b.dev/docs/sandbox
+    read: '2026-10-11'
+    quote: "You can change the sandbox timeout when it\u2019s running by calling the setTimeout method"
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/native-default-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-default-core.json
+  gates.previews.0.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/native-default-core.json
+  gates.previews.0.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/native-default-coverage.json
+  gates.previews.0.loopback:
+    tests:
+    - coverage.previews.loopback
+    report: reports/native-default-coverage.json
+  gates.previews.0.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/native-default-coverage.json
+  gates.previews.0.reserved_ports:
+    tests:
+    - coverage.previews.reserved_ports
+    report: reports/native-default-coverage.json
+  gates.network_lockdown.0.policy:
+    tests:
+    - network_lockdown.allowlist.addresses
+    report: reports/native-default-core.json
+  gates.network_lockdown.0.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.addresses
+    report: reports/native-default-core.json
+  gates.network_lockdown.1.policy:
+    tests:
+    - network_lockdown.deny_all
+    report: reports/e2b-native-network-deny-all-sps0155-20261101.json
+  gates.desktop.0.live_view:
+    tests:
+    - coverage.desktop.live_view
+    report: reports/native-default-coverage.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/native-default-core.json
+  gates.custom_images.1.source:
+    tests:
+    - coverage.custom_images.prepare.dockerfile_context
+    report: reports/native-default-coverage.json
+  gates.custom_images.1.prepared:
+    tests:
+    - coverage.custom_images.prepare.dockerfile_context
+    report: reports/native-default-coverage.json
+  gates.custom_images.1.build_context:
+    tests:
+    - coverage.custom_images.prepare.dockerfile_context
+    report: reports/native-default-coverage.json
+  gates.custom_images.2.source:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/native-default-registry.json
+  gates.custom_images.2.prepared:
+    tests:
+    - coverage.custom_images.prepare.dockerfile_context
+    report: reports/native-default-coverage.json
+  gates.custom_images.3.prepared:
+    tests:
+    - coverage.custom_images.prepare.dockerfile_context
+    report: reports/native-default-coverage.json
+  gates.processes.0.input:
+    tests:
+    - processes.input.true
+    report: reports/native-default-core.json
+  gates.processes.0.cancel:
+    tests:
+    - processes.cancel.true
+    report: reports/native-default-core.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/native-default-core.json
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/native-default-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_and_memory
+    report: reports/native-default-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/native-default-core.json
+  gates.terminal.0.reattach:
+    tests:
+    - coverage.terminal.reattach
+    report: reports/native-default-coverage.json
+  gates.file_links.0.operations:
+    tests:
+    - file_links.v1.read_exact
+    - file_links.v1.write_exact
+    report: reports/adapter-file-links.json
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: false
+  at_end:
+  - destroyed
+  - paused
+  adjustable: true
+  step_seconds: unknown
+  counts_from: unknown
+  after_resume: unknown

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:0.1:fixture:regular-write-usability",
+  "title": "Regular-file write usability fixture inputs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case"],
+  "properties": {
+    "case": {
+      "enum": [
+        "exact_bytes",
+        "create_parents",
+        "create_access",
+        "overwrite_access",
+        "authority",
+        "executable_effect",
+        "byte_bound",
+        "outcome",
+        "staging_cleanup"
+      ]
+    },
+    "files_write_executable_effect": {
+      "enum": ["preserved", "may_clear", "unverified"]
+    }
+  }
+}

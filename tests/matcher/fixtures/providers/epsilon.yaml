@@ -1,0 +1,24 @@
+spec: sandbox-provider-spec/0.1
+provider: epsilon
+verified: {date: 2026-09-30, sdks: {epsilon-sdk: 1.0.0}}
+resources:
+  sizes:
+    - {cpu: 2, memory_mib: 4096, disk_mib: 8192}
+  disk_in_memory: false
+  root: []
+  arch: [arm64]
+  package_manager: apk
+  libc: musl
+  max_run_seconds: unlimited
+  max_process_seconds: 60
+  egress_ips: [dedicated]
+gates:
+  idle_shutdown:
+    - {on_idle: destroyed}
+  network_lockdown:
+    - {policy: [denylist], changeable: true, entry_kinds: [addresses]}
+  hidden_secrets:
+    - {}
+  tcp_ports:
+    - {tls: none}
+evidence: {}

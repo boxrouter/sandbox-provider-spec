@@ -1,0 +1,30 @@
+name: DCO
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  sign-off:
+    runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Require a matching sign-off on every commit
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import re, subprocess, os, sys
+          base, head = os.environ["BASE"], os.environ["HEAD"]
+          commits = subprocess.check_output(["git", "rev-list", "--reverse", f"{base}..{head}"], text=True).splitlines()
+          for commit in commits:
+              author, body = subprocess.check_output(["git", "show", "-s", "--format=%an <%ae>%n%B", commit], text=True).split("\n", 1)
+              signoffs = re.findall(r"(?im)^Signed-off-by:\s*(.+?)\s*$", body)
+              if author.casefold() not in {value.casefold() for value in signoffs}:
+                  print(f"{commit[:12]}: missing Signed-off-by matching {author}", file=sys.stderr)
+                  sys.exit(1)
+          print(f"DCO sign-off verified on {len(commits)} commit(s)")
+          PY

@@ -1,0 +1,10 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.open_source: E2B publishes its runtime under Apache-2.0.
+fact.snapshots: Snapshots capture a sandbox's files and memory for starting new sandboxes from that state.
+# Source: e2b-dev/runtime packages/orchestrator/pkg/template/build/commands/workdir.go at
+# https://github.com/e2b-dev/runtime/blob/7a69f45621f864495695e698dc5a2b93a56d2d52/packages/orchestrator/pkg/template/build/commands/workdir.go
+# (saveWorkdirMeta). The sentence is a ranking-reason fragment: no provider name, no final period.
+in_development.terminal-bench: >-
+  the template builder fails on this image while resolving the working directory: its login shell
+  lacks the image environment and a micromamba hook's stderr is treated as fatal
+price_reason.8x16: No published list price for the selected machine size.

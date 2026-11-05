@@ -1,0 +1,255 @@
+spec: sandbox-provider-spec/0.1
+provider: daytona
+class: container
+verified:
+  date: '2026-11-05'
+  sdks:
+    daytona: 0.226.1
+resources:
+  kernel: shared
+  default_size:
+    cpu: 1
+    memory_mib: 1024
+    disk_mib: 3072
+  sizes:
+  - cpu:
+    - 1
+    - 4
+    memory_mib:
+    - 1024
+    - 8192
+    disk_mib:
+    - 3072
+    - 10240
+  default_user: unknown
+  regions:
+  - daytona:us
+  - daytona:eu
+  default_cwd: /home/daytona
+  max_lifetime_seconds: unlimited
+  paused_retention_seconds: unlimited
+  extendable_lifetime: true
+  size_is_ceiling: true
+  root:
+  - sudo
+  arch:
+  - amd64
+  package_manager: apt
+  libc: glibc
+  disk_in_memory: false
+  max_run_seconds:
+    at_least: 600
+  max_process_seconds:
+    at_least: 600
+gates:
+  custom_images:
+  - source: dockerfile
+  processes:
+  - cancel: true
+    reattach: true
+  previews:
+  - access: public
+    revocable: false
+    max_ports:
+      at_least: 2
+    websocket: true
+    loopback: true
+    any_port: true
+    survives_pause: true
+  - access: private
+    credential: link
+    revocable: true
+  desktop:
+  - live_view: true
+  snapshots:
+  - keeps: files_only
+    deletable: true
+  terminal:
+  - reattach: true
+  pause_resume:
+  - keeps: files_only
+  idle_shutdown:
+  - custom_idle_time: true
+evidence:
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-container-size-ceiling.json
+  resources.kernel:
+    source: https://www.daytona.io/docs/en/isolation/
+    read: '2026-10-16'
+    quote: Isolated container with dedicated namespaces and enforced resource limits.
+  resources.default_size:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-09-30'
+    quote: Sandboxes have 1 vCPU, 1GB RAM, and 3GiB disk by default.
+  resources.sizes:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-09-30'
+    quote: Sandboxes have 1 vCPU, 1GB RAM, and 3GiB disk by default. Organizations get a maximum sandbox
+      resource limit of 4 vCPUs, 8GB RAM, and 10GB disk.
+  resources.regions:
+    source: https://www.daytona.io/docs/en/regions/
+    read: '2026-09-30'
+    quote: 'Every Daytona sandbox runs in a region: a geographic or logical grouping of compute infrastructure.
+      When creating a sandbox, you can target a specific region, and Daytona schedules the workload on
+      available capacity within that region.'
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/native-container-core.json
+  resources.max_lifetime_seconds:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-22'
+    quote: if not set, the sandbox has no TTL deadline
+  resources.paused_retention_seconds:
+    source: https://www.daytona.io/docs/en/persistence/
+    read: '2026-09-30'
+    quote: Sandboxes in stopped, paused, and archived states are retained until you delete them.
+  resources.extendable_lifetime:
+    tests:
+    - facts.extendable_lifetime
+    report: reports/native-container-core.json
+  resources.root:
+    tests:
+    - coverage.facts.root.sudo
+    report: reports/native-container-coverage.json
+  resources.arch:
+    tests:
+    - coverage.facts.arch.amd64
+    report: reports/native-container-coverage.json
+  resources.package_manager:
+    tests:
+    - coverage.facts.package_manager.apt
+    report: reports/native-container-coverage.json
+  resources.libc:
+    tests:
+    - coverage.facts.libc.glibc
+    report: reports/native-container-coverage.json
+  resources.disk_in_memory:
+    reports:
+    - tests:
+      - coverage.facts.disk_in_memory.false
+      report: reports/native-container-disk1.json
+    - tests:
+      - coverage.facts.disk_in_memory.false
+      report: reports/native-container-disk2.json
+    - tests:
+      - coverage.facts.disk_in_memory.false
+      report: reports/native-container-disk3.json
+  resources.max_run_seconds:
+    tests:
+    - coverage.facts.max_run
+    report: reports/native-container-coverage.json
+  resources.max_process_seconds:
+    tests:
+    - coverage.facts.max_process
+    report: reports/native-container-coverage.json
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-container-core.json
+  lifetime_timer.counts_paused_time:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-04'
+    quote: TTL runs as wall-clock time and destroys a sandbox in any state, including stopped or paused.
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-container-core.json
+  lifetime_timer.adjustable:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-11'
+    quote: Calling set_ttl after creation resets the deadline from the current moment.
+  lifetime_timer.step_seconds:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-11'
+    quote: Set ttl_minutes when creating a sandbox, or update it later. The value is in minutes
+  lifetime_timer.counts_from:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-11'
+    quote: TTL runs as wall-clock time from creation (or from the moment you last set it)
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.dockerfile
+    report: reports/native-container-core.json
+  gates.processes.0.cancel:
+    tests:
+    - processes.cancel.true
+    report: reports/native-container-core.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/native-container-core.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-container-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/native-container-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-container-core.json
+  gates.previews.0.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/native-container-coverage.json
+  gates.previews.0.loopback:
+    tests:
+    - coverage.previews.loopback
+    report: reports/native-container-coverage.json
+  gates.previews.0.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/native-container-coverage.json
+  gates.previews.0.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/native-container-coverage.json
+  gates.previews.1.access:
+    tests:
+    - previews.access.private
+    report: reports/native-container-core.json
+  gates.previews.1.credential:
+    tests:
+    - previews.credential.link
+    report: reports/native-container-core.json
+  gates.previews.1.revocable:
+    tests:
+    - previews.revocable.true
+    report: reports/native-container-core.json
+  gates.desktop.0.live_view:
+    tests:
+    - coverage.desktop.live_view
+    report: reports/native-container-coverage.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_only
+    report: reports/native-container-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/native-container-core.json
+  gates.terminal.0.reattach:
+    tests:
+    - coverage.terminal.reattach
+    report: reports/native-container-coverage.json
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_only
+    report: reports/native-container-core.json
+  gates.idle_shutdown.0.custom_idle_time:
+    tests:
+    - idle_shutdown.custom_idle_time.true
+    report: reports/native-container-idle.json
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: true
+  at_end:
+  - destroyed
+  adjustable: true
+  step_seconds: 60
+  counts_from: create

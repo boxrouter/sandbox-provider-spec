@@ -1,0 +1,11 @@
+{
+  "address_families": {
+    "ipv4_literal": "1.1.1.1",
+    "ipv6_literal": "2606:4700:4700::1111",
+    "port": 443,
+    "provenance": {
+      "source": "https://developers.cloudflare.com/1.1.1.1/ip-addresses/",
+      "scope": "non-BoxRouter-controlled public anycast"
+    }
+  }
+}

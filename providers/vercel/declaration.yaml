@@ -1,0 +1,313 @@
+spec: sandbox-provider-spec/0.1
+provider: vercel
+verified:
+  date: '2026-11-05'
+  sdks:
+    vercel-sandbox: 0.9.0
+resources:
+  kernel: dedicated
+  max_lifetime_seconds: 86400
+  long_running: unknown
+  sizes:
+  - cpu: 1
+    memory_mib: 2048
+  - cpu: 2
+    memory_mib: 4096
+  - cpu: 4
+    memory_mib: 8192
+  default_size:
+    cpu: 2
+    memory_mib: 4096
+  disk_mib: 61035
+  gpus: unknown
+  regions:
+  - vercel:arn1
+  - vercel:bom1
+  - vercel:cdg1
+  - vercel:cle1
+  - vercel:cpt1
+  - vercel:dub1
+  - vercel:fra1
+  - vercel:gru1
+  - vercel:hkg1
+  - vercel:hnd1
+  - vercel:iad1
+  - vercel:icn1
+  - vercel:kix1
+  - vercel:lhr1
+  - vercel:pdx1
+  - vercel:sfo1
+  - vercel:sin1
+  - vercel:syd1
+  - vercel:yul1
+  located_in:
+  - AU
+  - BR
+  - CA
+  - DE
+  - FR
+  - GB
+  - HK
+  - IE
+  - IN
+  - JP
+  - KR
+  - SE
+  - SG
+  - US
+  - ZA
+  max_gpus: unknown
+  extendable_lifetime: true
+  size_is_ceiling: true
+  default_user: ubuntu
+  paused_retention_seconds: unknown
+  arch:
+  - amd64
+  root:
+  - sudo
+  package_manager: apt
+  libc: glibc
+  max_process_seconds:
+    at_least: 600
+  max_run_seconds: unknown
+  disk_in_memory: false
+  needs:
+    max_lifetime_seconds:
+    - pro_plan
+  unmet_limits:
+    max_lifetime_seconds:
+      pro_plan: 2700
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: false
+  at_end:
+  - destroyed
+  - stopped
+  adjustable: true
+  step_seconds: 1
+  counts_from: unknown
+gates:
+  idle_shutdown: unsupported
+  pause_resume:
+  - keeps: files_only
+  previews:
+  - access: public
+    revocable: false
+    link_lifetime_seconds:
+      at_least: 300
+    max_ports:
+      at_least: 2
+    websocket: true
+    loopback: true
+    any_port: unknown
+    survives_pause: true
+  network_lockdown:
+  - policy: deny_all
+  snapshots:
+  - keeps: files_only
+    deletable: true
+    retention_seconds: unlimited
+    resizes_on_restore: unknown
+  processes:
+  - input: false
+    cancel: true
+    reattach: true
+  hidden_secrets:
+  - rotates: unknown
+    scrubs_responses: false
+    injection: sets_header
+    intercepts: injected_hosts
+    transparent: true
+  custom_images:
+  - source: provider_artifact
+  terminal:
+  - {}
+evidence:
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
+  resources.kernel:
+    source: https://vercel.com/docs/sandbox/concepts
+    read: '2026-09-30'
+    quote: Unlike Docker containers, each sandbox runs in its own Firecracker microVM with a dedicated
+      kernel.
+  resources.max_lifetime_seconds:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-09-30'
+    quote: The default timeout is 5 minutes. You can extend it programmatically up to 45 minutes on the
+      Hobby plan and up to 24 hours on Pro and Enterprise plans.
+  resources.sizes:
+    source: https://vercel.com/docs/sandbox/pricing
+    read: '2026-10-22'
+    quote: You can provision 1 or an even number of vCPUs between 2 and 32 depending on your plan. The
+      default is 2 vCPUs. ... Each vCPU includes 2 GB of memory.
+  resources.default_size:
+    source: https://vercel.com/docs/rest-api/sandboxes/create-a-named-sandbox-1
+    read: '2026-10-18'
+    quote: The default is 2 vCPUs. ... Each vCPU includes 2 GB of memory.
+  resources.disk_mib:
+    source: https://vercel.com/changelog/vercel-sandbox-64-gb-storage
+    read: '2026-09-30'
+    quote: Every Vercel Sandbox now includes 64 GB of storage, up from 32 GB.
+  resources.regions:
+    source: https://vercel.com/docs/sandbox/concepts/regions
+    read: '2026-09-30'
+    quote: Sandboxes run in a region that you choose when you create them.
+  resources.located_in:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-09-30'
+    quote: When no region was passed, this is the project's default sandbox region, or iad1 if the project
+      doesn't set one.
+  resources.extendable_lifetime:
+    tests:
+    - facts.extendable_lifetime
+    report: reports/native-default-core.json
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/native-default-core.json
+  resources.arch:
+    tests:
+    - coverage.facts.arch.amd64
+    report: reports/native-default-coverage.json
+  resources.root:
+    tests:
+    - coverage.facts.root.sudo
+    report: reports/native-default-coverage.json
+  resources.package_manager:
+    tests:
+    - coverage.facts.package_manager.apt
+    report: reports/native-default-coverage.json
+  resources.libc:
+    tests:
+    - coverage.facts.libc.glibc
+    report: reports/native-default-coverage.json
+  resources.max_process_seconds:
+    tests:
+    - coverage.facts.max_process
+    report: reports/native-default-coverage.json
+  resources.disk_in_memory:
+    tests:
+    - coverage.facts.disk_in_memory.false
+    report: reports/native-default-coverage.json
+  resources.needs.max_lifetime_seconds:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-09-30'
+    quote: The default timeout is 5 minutes. You can extend it programmatically up to 45 minutes on the
+      Hobby plan and up to 24 hours on Pro and Enterprise plans.
+  resources.unmet_limits.max_lifetime_seconds.pro_plan:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-09-30'
+    quote: The default timeout is 5 minutes. You can extend it programmatically up to 45 minutes on the
+      Hobby plan and up to 24 hours on Pro and Enterprise plans.
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.counts_paused_time:
+    source: https://vercel.com/docs/sandbox/concepts/persistent-sandboxes
+    read: '2026-10-04'
+    quote: When you stop a persistent sandbox, the SDK automatically snapshots the filesystem. When you
+      resume it, a new session boots from that snapshot with a fresh session timeout.
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    - lifetime_timer.at_end.stopped
+    report: reports/native-default-core.json
+  lifetime_timer.adjustable:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-10-11'
+    quote: extendTimeout() extends the live deadline but leaves timeout unchanged.
+  lifetime_timer.step_seconds:
+    source: https://vercel.com/docs/sandbox/sdk-reference
+    read: '2026-10-11'
+    quote: timeout number No Session timeout in milliseconds.
+  gates.idle_shutdown:
+    source: https://vercel.com/academy/vercel-sandbox/wrap-the-lifecycle
+    read: '2026-10-16'
+    quote: Prompt cleanup still matters because idle time consumes resources until that safeguard runs.
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_only
+    report: reports/native-default-core.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/native-default-core.json
+  gates.previews.0.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/native-default-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-default-core.json
+  gates.previews.0.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/native-default-coverage.json
+  gates.previews.0.loopback:
+    tests:
+    - coverage.previews.loopback
+    report: reports/native-default-coverage.json
+  gates.previews.0.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/native-default-coverage.json
+  gates.network_lockdown.0.policy:
+    tests:
+    - network_lockdown.deny_all
+    report: reports/native-default-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_only
+    report: reports/native-default-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/native-default-core.json
+  gates.snapshots.0.retention_seconds:
+    source: https://vercel.com/changelog/vercel-sandbox-snapshots-now-allow-custom-retention-periods
+    read: '2026-09-30'
+    quote: The expiration can be configured between 1 day to infinity.
+  gates.processes.0.input:
+    tests:
+    - processes.input.false
+    report: reports/native-default-core.json
+  gates.processes.0.cancel:
+    tests:
+    - processes.cancel.true
+    report: reports/native-default-core.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/native-default-core.json
+  gates.hidden_secrets.0.scrubs_responses:
+    tests:
+    - coverage.hidden_secrets.scrubs_responses.false
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.injection:
+    tests:
+    - coverage.hidden_secrets.injection.sets_header
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.intercepts:
+    tests:
+    - coverage.hidden_secrets.intercepts.injected_hosts
+    report: reports/native-default-coverage.json
+  gates.hidden_secrets.0.transparent:
+    tests:
+    - coverage.hidden_secrets.transparent.true
+    report: reports/native-default-coverage.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/adapter-provider-artifact.json
+  gates.terminal.0:
+    tests:
+    - terminal.interactive
+    report: reports/adapter-default-core.json

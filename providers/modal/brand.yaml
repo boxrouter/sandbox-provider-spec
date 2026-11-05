@@ -1,0 +1,5 @@
+# Brand: chart colour, logo and one-colour mark. All keys optional.
+order: 3
+color: '#BDF3CA'
+logo: brand/logo.svg
+mark: brand/mark.svg

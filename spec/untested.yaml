@@ -1,0 +1,66 @@
+# Rules in spec.md and declarations.md that no test can check, each with the reason.
+# A waiver is a decision, not a gap: it is reviewed like any other change, and replacing
+# one with a test is how coverage grows. A rule is either named by a test or listed here,
+# never both.
+spec: sandbox-provider-spec/0.1
+untested:
+  request/names-what-is-relied-on: >-
+    Advice to people writing requests. Nothing a provider, checker or matcher does
+    depends on it.
+  declaration/describes-the-provider: >-
+    Held by declaration/evidence and declaration/evidence-holds instead: every value rests
+    on tests of the provider's native API or SDK, directly or through an adapter or HTTP
+    binding, or on the provider's own documentation.
+  tools/configure-gates-at-creation: >-
+    Describes tools that create sandboxes for requests. This repository contains none.
+  tools/refuse-unnamed-gates: >-
+    Describes tools that create sandboxes for requests. This repository contains none.
+  tools/restore-matches-its-snapshot: >-
+    Describes tools that restore snapshots. This repository contains none.
+  tools/unanswered-needs: >-
+    Describes tools that hold provider accounts. The specification defines no account
+    check to test.
+  network_lockdown/enforced-outside: >-
+    Where a policy is enforced cannot be observed from inside the sandbox.
+    network_lockdown/root-cannot-lift checks what can be observed.
+  facts/kernel: >-
+    No test run inside a sandbox can establish the kernel boundary. The value rests on a
+    dated quote of the provider's documentation.
+  facts/regions: >-
+    Where a provider places a sandbox cannot be observed reliably from inside it. The
+    value rests on a dated quote of the provider's documentation.
+  facts/located-in: >-
+    Where a provider places a sandbox cannot be observed reliably from inside it. The
+    value rests on a dated quote of the provider's documentation.
+  declaration/limits-as-seen: >-
+    Held by declaration/evidence-holds instead: a limit cites the conformance test that
+    watched it enforced.
+  snapshots/retention: >-
+    Retention runs to days or weeks, longer than any conformance run waits. The value rests
+    on a dated quote of the provider's documentation.
+  facts/paused-retention: >-
+    Retention runs to days or weeks, longer than any conformance run waits. The value rests
+    on a dated quote of the provider's documentation.
+  declaration/located-in-only-where-stated: >-
+    Held by declaration/evidence instead: located_in cites the provider's documentation,
+    and nothing else can establish it.
+  facts/egress-ips: >-
+    Where a provider's outbound addresses come from over time cannot be established by a run.
+    The value rests on a dated quote of the provider's documentation.
+  facts/lifetime-timer-adjustable: >-
+    Whether a timer can be set again is a property of the provider's API. A run would have to
+    outlast a lifetime to show the new length takes effect. The value rests on a dated quote
+    of the provider's documentation.
+  facts/lifetime-timer-step: >-
+    A timer's unit shows only at the end of a lifetime, longer than any conformance run waits.
+    The value rests on a dated quote of the provider's documentation.
+  facts/lifetime-timer-min: >-
+    The shortest lifetime a provider accepts is stated by its documentation or API error, and
+    probing it would spend a sandbox per value. The value rests on a dated quote of either.
+  facts/lifetime-timer-after-resume: >-
+    The ending after a resume shows only at the end of a lifetime, longer than any conformance run
+    waits. The value rests on a dated quote of the provider's documentation or of a recorded
+    observation.
+  facts/lifetime-timer-counts-from: >-
+    The moment a timer starts is visible only at the end of a lifetime, longer than any
+    conformance run waits. The value rests on a dated quote of the provider's documentation.

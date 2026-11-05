@@ -1,0 +1,65 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.wildcards": "sha256:a11a59994f96d15be4f7518583faa9f4d4185fc5729cc18ca51ba3eeff05868e"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.53"
+  },
+  "finished_at": "2026-10-12T15:34:24.795239+00:00",
+  "provider": "e2b",
+  "revision": "ded5bf03ae8f3a48b4aea382a5516d31e8b733ca",
+  "run_id": "run-20261012T153422Z-481d",
+  "sdk_versions": {
+    "e2b": "2.51.0",
+    "e2b-code-interpreter": "2.10.0",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "network_lockdown.wildcards"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-12T15:34:22.659175+00:00",
+  "suite_digest": "sha256:68e491402bcd10f6804615a67aeb60710cd14ebf2831c1bdf4d0a5084b7e0dd4",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2136,
+      "id": "network_lockdown.wildcards",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "allow_wildcards",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/wildcards"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

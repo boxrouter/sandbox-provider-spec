@@ -1,0 +1,69 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+  },
+  "class": "container",
+  "clean": true,
+  "driver": {
+    "name": "DaytonaDriver",
+    "version": "0.24.312"
+  },
+  "finished_at": "2026-11-05T03:21:28.708782+00:00",
+  "implementation": "boxrouter_daytona",
+  "implementation_digest": "sha256:5d3b0354880c2412a545796e613cf81465bf71379dc748a96189e3f483cae66e",
+  "provider": "daytona",
+  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
+  "run_id": "spec-run-20261105T032120Z-a78c",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.312",
+    "boxrouter-core": "0.13.366",
+    "boxrouter-daytona": "0.5.275",
+    "daytona": "0.226.1"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-05T03:21:20.283859+00:00",
+  "suite_digest": "sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 8423,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu.max\": \"100000 100000\", \"/sys/fs/cgroup/init.scope/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/init.scope/memory.max\": \"max\", \"/sys/fs/cgroup/memory.max\": \"1073741824\"}, \"membership\": \"0::/init.scope\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

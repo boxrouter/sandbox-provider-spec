@@ -1,0 +1,33 @@
+retrieved_at: '2026-11-01'
+owner: Dedale AI, Corp.
+source_page: https://boat.dev
+assets:
+  logo.svg:
+    source: Boat's white primary logo, supplied by the project owner on 2026-11-01
+    role: Official white boat symbol for the dark site, without the wordmark
+    modifications: wordmark removed; the boat symbol is unchanged
+  mark.svg:
+    source: https://boat.dev/icon-dark.svg
+    role: Official one-colour white symbol for dark backgrounds
+    modifications: none
+terms:
+  source: https://boat.dev/terms
+  effective: '2026-10-12'
+  section: TOS-13
+  quote: >-
+    boat, Ascii, the sandbox website, software, APIs, CLI, documentation, design,
+    names, logos, marks, infrastructure, and related technology are owned by
+    Dedale or its licensors. These Terms do not transfer any Dedale intellectual
+    property to you.
+  reuse_permission: not_found
+  press_kit: not_found
+  adoption: project_owner_approved
+  adoption_date: '2026-11-01'
+  adoption_scope: >-
+    The project owner approved displaying the official logo and one-colour mark
+    on the homepage provider strip, provider catalog and pricing pages. Source
+    and terms remain recorded so the assets can be removed if requested.
+  permission_note: >-
+    Project-owner approval is not a supplier license grant. No explicit public
+    permission to reproduce or redistribute these files was found. TOS-13
+    reserves the supplier's intellectual property rights.

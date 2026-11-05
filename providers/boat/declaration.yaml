@@ -1,0 +1,47 @@
+spec: sandbox-provider-spec/0.1
+provider: boat
+verified:
+  date: '2026-11-05'
+  sdks:
+    boat-sdk: 1.13.0
+resources:
+  kernel: dedicated
+  sizes:
+  - cpu: 2
+    memory_mib: 4096
+  - cpu: 4
+    memory_mib: 8192
+  default_size:
+    cpu: 4
+    memory_mib: 8192
+  max_lifetime_seconds: 7200
+  gpus: unknown
+  disk_mib: unknown
+  regions: unknown
+  located_in: unknown
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  long_running: unknown
+  size_is_ceiling: true
+gates: {}
+evidence:
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
+  resources.kernel:
+    source: https://docs.boat.dev/machines
+    read: '2026-11-01'
+    quote: Each sandbox is a full Linux virtual machine with its own kernel.
+  resources.sizes:
+    source: https://docs.boat.dev/machines
+    read: '2026-11-05'
+    quote: '`small` | **$0.018** | 2 vCPU | 4 GB | 51 GB; `default` | **$0.036** | 4 vCPU | 8 GB | 51 GB'
+  resources.default_size:
+    source: https://docs.boat.dev/machines
+    read: '2026-11-01'
+    quote: Without `--type`, you get `default` (the medium size).
+  resources.max_lifetime_seconds:
+    source: https://docs.boat.dev/long-running-tasks/auto-stop
+    read: '2026-11-01'
+    quote: On the free trial, you cannot turn off auto-stop, and the TTL cannot be more than 2 hours.

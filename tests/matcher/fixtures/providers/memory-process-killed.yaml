@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: memory-process-killed
+verified: {date: 2026-09-29, sdks: {memory-sdk: 1.0.0}}
+resources:
+  on_memory_exhausted: process_killed
+gates: {}
+evidence: {}

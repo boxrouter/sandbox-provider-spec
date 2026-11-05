@@ -1,0 +1,3488 @@
+spec: sandbox-provider-spec/0.1
+tests:
+- id: guest_user.selectable
+  title: Commands, file writes and processes can select a named guest user.
+  rules:
+  - user-selection/commands
+  - user-selection/files-write
+  - user-selection/process-start
+  proves:
+  - gate: user_selection
+    knob: commands
+    value: true
+  - gate: user_selection
+    knob: files_write
+    value: true
+  - gate: user_selection
+    knob: process_start
+    value: true
+  steps:
+  - op: image.prepare
+    as: image
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM public.ecr.aws/docker/library/python:3.12-slim
+        RUN useradd --create-home --uid 10001 --shell /bin/bash runner
+  - op: create
+    as: box
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile}
+  - op: run
+    target: box
+    in:
+      bash_script: id -un
+      run_as: runner
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "runner\n"}
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-user-selection-file
+      data: Y29uZm9ybWFuY2UK
+      user: runner
+  - op: run
+    target: box
+    in:
+      bash_script: test "$(stat -c '%u' /tmp/sps-user-selection-file)" = "$(id -u runner)"
+    expect:
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: chmod 0600 /tmp/sps-user-selection-file && stat -c '%U %a' /tmp/sps-user-selection-file
+      run_as: runner
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "runner 600\n"}
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /tmp/sps-user-selection-file
+    expect:
+      equals:
+        data: {utf8: "conformance\n"}
+  - op: process.start
+    target: box
+    as: process
+    in:
+      bash_script: id -un > /tmp/sps-user-selection-process
+      run_as: runner
+  - op: process.wait
+    target: process
+    in:
+      timeout_ms: 30000
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /tmp/sps-user-selection-process
+    expect:
+      equals:
+        data: {utf8: "runner\n"}
+- id: coverage.facts.max_lifetime.active
+  title: A sandbox kept active survives the observed lifetime window.
+  rules:
+  - facts/max-lifetime
+  proves:
+  - fact: resources.max_lifetime_seconds
+    value:
+      at_least: $runner.max_lifetime_observed_seconds
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: $runner.max_lifetime_seconds
+  - op: fixture.coverage_active_lifetime
+    target: box
+    in:
+      wait_ms: $runner.max_lifetime_wait_ms
+    expect:
+      equals:
+        state: active
+        window_completed: true
+- id: baseline.no_metadata
+  title: Documented host metadata paths expose no cloud identity or credentials.
+  rules:
+  - baseline/no-metadata
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: no_metadata
+    expect:
+      equals:
+        host_metadata_hidden: true
+- id: baseline.files_write_binary
+  title: The file API writes any bytes that a command can read back.
+  rules:
+  - baseline/files
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-binary
+      data: AP8AgP5mAA==
+  - op: run
+    target: box
+    in:
+      bash_script: python3 -c 'print(open("/tmp/sps-binary","rb").read().hex())'
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: "00ff0080fe6600\n"
+- id: coverage.volumes.read_only
+  title: A read-only volume mount allows reads and blocks writes for every user.
+  rules:
+  - volumes/read-only
+  proves:
+  - gate: volumes
+    knob: read_only_mounts
+    value: true
+  steps:
+  - op: volume.create
+    in:
+      kind: filesystem
+    as: vol
+  - op: create
+    as: seed
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: false
+      requirements:
+        volumes:
+          kind: filesystem
+  - op: files.write
+    target: seed
+    in:
+      path: /sps-volume/seed
+      data: c2VlZA==
+  - op: destroy
+    target: seed
+  - op: create
+    as: box
+    in:
+      volumes:
+      - volume: $vol
+        path: /sps-volume
+        read_only: true
+      requirements:
+        volumes:
+          kind: filesystem
+          read_only_mounts: true
+  - op: run
+    target: box
+    in:
+      bash_script: cat /sps-volume/seed
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: "seed"
+  - op: run
+    target: box
+    in:
+      bash_script: if printf x > /sps-volume/default-write 2>/dev/null; then printf writable; else printf denied; fi
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: denied
+  - op: run.as_root
+    target: box
+    in:
+      bash_script: if printf x > /sps-volume/root-write 2>/dev/null; then printf writable; else printf denied; fi
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: denied
+- id: coverage.facts.arch.amd64
+  title: Observe arch.amd64 on the default image.
+  rules:
+  - facts/arch
+  proves:
+  - fact: resources.arch
+    value:
+    - amd64
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: arch
+    expect:
+      equals:
+        arch: amd64
+- id: coverage.facts.arch.arm64
+  title: Observe arch.arm64 on the default image.
+  rules:
+  - facts/arch
+  proves:
+  - fact: resources.arch
+    value:
+    - arm64
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: arch
+    expect:
+      equals:
+        arch: arm64
+- id: coverage.facts.root.by_default
+  title: Observe root.by_default on the default image.
+  rules:
+  - facts/root
+  proves:
+  - fact: resources.root
+    value:
+    - by_default
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: root
+      way: by_default
+    expect:
+      equals:
+        uid_zero: true
+- id: coverage.facts.root.sudo
+  title: Observe root.sudo on the default image.
+  rules:
+  - facts/root
+  proves:
+  - fact: resources.root
+    value:
+    - sudo
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: root
+      way: sudo
+    expect:
+      equals:
+        uid_zero: true
+- id: coverage.facts.root.per_command
+  title: Observe root.per_command on the default image.
+  rules:
+  - facts/root
+  proves:
+  - fact: resources.root
+    value:
+    - per_command
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: root
+      way: per_command
+    expect:
+      equals:
+        uid_zero: true
+- id: coverage.facts.kernel_features.fuse
+  title: Mount a FUSE filesystem from a root command.
+  rules:
+  - facts/kernel-fuse
+  proves:
+  - fact: resources.kernel_features
+    value:
+    - fuse
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_kernel_feature
+    target: box
+    in:
+      feature: fuse
+    expect:
+      equals:
+        works: true
+- id: coverage.facts.kernel_features.ebpf
+  title: Load a socket-filter eBPF program from a root command.
+  rules:
+  - facts/kernel-ebpf
+  proves:
+  - fact: resources.kernel_features
+    value:
+    - ebpf
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_kernel_feature
+    target: box
+    in:
+      feature: ebpf
+    expect:
+      equals:
+        works: true
+- id: coverage.facts.kernel_features.nested_cgroups
+  title: Create and configure a child cgroup from a root command.
+  rules:
+  - facts/kernel-nested-cgroups
+  proves:
+  - fact: resources.kernel_features
+    value:
+    - nested_cgroups
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_kernel_feature
+    target: box
+    in:
+      feature: nested_cgroups
+    expect:
+      equals:
+        works: true
+- id: coverage.facts.kernel_features.netfilter
+  title: Add and remove a netfilter rule for the sandbox's own traffic.
+  rules:
+  - facts/kernel-netfilter
+  proves:
+  - fact: resources.kernel_features
+    value:
+    - netfilter
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_kernel_feature
+    target: box
+    in:
+      feature: netfilter
+    expect:
+      equals:
+        works: true
+- id: coverage.facts.outbound_traffic.http
+  title: Reach a public plain-HTTP endpoint on port 80.
+  rules:
+  - facts/outbound-http
+  proves:
+  - fact: resources.outbound_traffic
+    value: [http]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_outbound_traffic
+    target: box
+    in:
+      traffic: http
+      url: $runner.outbound_http_url
+    expect:
+      equals:
+        reached: true
+- id: coverage.facts.outbound_traffic.any_tcp
+  title: Reach a public TCP endpoint on a non-HTTP, non-HTTPS port.
+  rules:
+  - facts/outbound-tcp
+  proves:
+  - fact: resources.outbound_traffic
+    value: [any_tcp]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_outbound_traffic
+    target: box
+    in:
+      traffic: any_tcp
+      host: $runner.outbound_tcp_echo.host
+      port: $runner.outbound_tcp_echo.port
+    expect:
+      equals:
+        reached: true
+- id: coverage.facts.outbound_traffic.udp
+  title: Reach a public UDP endpoint.
+  rules:
+  - facts/outbound-udp
+  proves:
+  - fact: resources.outbound_traffic
+    value: [udp]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_outbound_traffic
+    target: box
+    in:
+      traffic: udp
+      host: $runner.outbound_udp_echo.host
+      port: $runner.outbound_udp_echo.port
+    expect:
+      equals:
+        reached: true
+- id: coverage.facts.package_manager.apt
+  title: Observe package_manager.apt on the default image.
+  rules:
+  - facts/package-manager
+  proves:
+  - fact: resources.package_manager
+    value: apt
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: package_manager
+      manager: apt
+    expect:
+      equals:
+        installed: true
+- id: coverage.facts.package_manager.apk
+  title: Observe package_manager.apk on the default image.
+  rules:
+  - facts/package-manager
+  proves:
+  - fact: resources.package_manager
+    value: apk
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: package_manager
+      manager: apk
+    expect:
+      equals:
+        installed: true
+- id: coverage.facts.package_manager.dnf
+  title: Observe package_manager.dnf on the default image.
+  rules:
+  - facts/package-manager
+  proves:
+  - fact: resources.package_manager
+    value: dnf
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: package_manager
+      manager: dnf
+    expect:
+      equals:
+        installed: true
+- id: coverage.facts.package_manager.pacman
+  title: Observe package_manager.pacman on the default image.
+  rules:
+  - facts/package-manager
+  proves:
+  - fact: resources.package_manager
+    value: pacman
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: package_manager
+      manager: pacman
+    expect:
+      equals:
+        installed: true
+- id: coverage.facts.package_manager.none
+  title: Observe package_manager.none on the default image.
+  rules:
+  - facts/package-manager
+  proves:
+  - fact: resources.package_manager
+    value: none
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: package_manager
+      manager: none
+    expect:
+      equals:
+        installed: true
+- id: coverage.facts.libc.glibc
+  title: Observe libc.glibc on the default image.
+  rules:
+  - facts/libc
+  proves:
+  - fact: resources.libc
+    value: glibc
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: libc
+    expect:
+      equals:
+        libc: glibc
+- id: coverage.facts.libc.musl
+  title: Observe libc.musl on the default image.
+  rules:
+  - facts/libc
+  proves:
+  - fact: resources.libc
+    value: musl
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: libc
+    expect:
+      equals:
+        libc: musl
+- id: coverage.facts.on_memory_exhausted.process_killed
+  title: A process is killed while the sandbox stays running when memory is exhausted.
+  rules:
+  - facts/on-memory-exhausted
+  proves:
+  - fact: resources.on_memory_exhausted
+    value: process_killed
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      resources:
+        memory_min_mib: 512
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: on_memory_exhausted
+      memory_mib: 512
+    expect:
+      equals:
+        on_memory_exhausted: process_killed
+- id: coverage.facts.on_memory_exhausted.sandbox_ended
+  title: The sandbox ends when memory exhaustion kills the sandbox.
+  rules:
+  - facts/on-memory-exhausted
+  proves:
+  - fact: resources.on_memory_exhausted
+    value: sandbox_ended
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      resources:
+        memory_min_mib: 512
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: on_memory_exhausted
+      memory_mib: 512
+    expect:
+      equals:
+        on_memory_exhausted: sandbox_ended
+- id: coverage.facts.disk_in_memory.true
+  title: Observe disk_in_memory.true on the default image.
+  rules:
+  - facts/disk-in-memory
+  proves:
+  - fact: resources.disk_in_memory
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: disk_in_memory
+    expect:
+      record:
+      - stdout
+      equals:
+        disk_in_memory: true
+- id: coverage.facts.disk_in_memory.false
+  title: Observe disk_in_memory.false on the default image.
+  rules:
+  - facts/disk-in-memory
+  proves:
+  - fact: resources.disk_in_memory
+    value: false
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: disk_in_memory
+    expect:
+      record:
+      - stdout
+      equals:
+        disk_in_memory: false
+# The ceiling probe tries exact enforced cgroup bounds first; when they cannot
+# prove the ceiling (a dedicated VM's bound is its hardware, not a cgroup) it
+# measures use instead: an over-subscribed CPU burn must not exceed the request,
+# then a memory hog targeting twice the allocation must be killed or refused.
+# Both methods can prove false as well as true.
+- id: coverage.facts.size_is_ceiling.true
+  title: A declared size limits CPU and memory use.
+  rules:
+  - facts/size-is-ceiling
+  proves:
+  - fact: resources.size_is_ceiling
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      resources:
+        "<<": $runner.test_size
+        size_is_ceiling: true
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: size_is_ceiling
+      size: $runner.test_size_value
+    expect:
+      record: [ceiling_evidence]
+      equals:
+        size_is_ceiling: true
+- id: coverage.facts.size_is_ceiling.false
+  title: A declared size does not limit CPU or memory use.
+  rules:
+  - facts/size-is-ceiling
+  proves:
+  - fact: resources.size_is_ceiling
+    value: false
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      resources: $runner.test_size
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: size_is_ceiling
+      size: $runner.test_size_value
+    expect:
+      equals:
+        size_is_ceiling: false
+- id: coverage.facts.sizes.delivered
+  title: A sandbox created with a size larger than the provider's default has at least that CPU and
+    memory inside.
+  rules:
+  - facts/sizes
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      resources: $runner.larger_size
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: allocation
+      size: $runner.larger_size
+    expect:
+      record:
+      - observed_cpu
+      - observed_memory_mib
+      equals:
+        cpu_delivered: true
+        memory_delivered: true
+- id: coverage.facts.max_run
+  title: A foreground command completes after at least 600 seconds.
+  rules:
+  - facts/max-run
+  proves:
+  - fact: resources.max_run_seconds
+    value:
+      at_least: 600
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: run
+    target: box
+    in:
+      bash_script: python3 -c 'import time; started=time.monotonic(); time.sleep(600); print("sps-runtime-proof"
+        if time.monotonic()-started >= 600 else "too-short")'
+      timeout_ms: 0
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: 'sps-runtime-proof
+
+            '
+- id: coverage.facts.max_process
+  title: A background process completes after at least 600 seconds.
+  rules:
+  - facts/max-process
+  proves:
+  - fact: resources.max_process_seconds
+    value:
+      at_least: 600
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: process.start
+    target: box
+    in:
+      bash_script: python3 -c 'import time; from pathlib import Path; started=time.monotonic(); time.sleep(600);
+        Path("/tmp/sps-process-runtime-proof").write_text("600" if time.monotonic()-started >= 600 else
+        "short")'
+      timeout_ms: 0
+    as: process
+  - wait_ms: 600000
+  - op: process.wait
+    target: process
+    in:
+      timeout_ms: 60000
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /tmp/sps-process-runtime-proof
+    expect:
+      equals:
+        data:
+          utf8: '600'
+- id: coverage.docker.host
+  title: Run a networked container using host networking.
+  rules:
+  - docker/runs-containers
+  - docker/host
+  proves:
+  - gate: docker
+    knob: networking
+    value: host
+  steps:
+  - op: fixture.coverage_docker_create
+    as: box
+    in:
+      lifetime_seconds: 900
+      requirements:
+        docker:
+          networking: host
+  - op: fixture.coverage_docker
+    target: box
+    in:
+      networking: host
+      image: python:3.11-alpine
+      outbound_url: $runner.reachable_url
+    expect:
+      equals:
+        outbound: true
+        published_reachable: true
+        network_mode_matches: true
+- id: coverage.tcp_ports.none
+  title: Public TCP endpoints echo binary bytes through none transport.
+  rules:
+  - tcp_ports/reachable
+  - tcp_ports/tls-none
+  proves:
+  - gate: tcp_ports
+    knob: tls
+    value: none
+  - gate: tcp_ports
+    knob: max_tcp_ports
+    value:
+      at_least: 2
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        tcp_ports:
+          tls: none
+          ports:
+          - 7777
+          - 7778
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: tcp
+      ports:
+      - 7777
+      - 7778
+    as: server
+  - op: tcp.link
+    target: box
+    in:
+      port: 7777
+      tls: none
+    as: first
+  - op: probe.tcp
+    in:
+      endpoint: $first
+      tls: none
+    expect:
+      equals:
+        binary_echo: true
+  - op: tcp.link
+    target: box
+    in:
+      port: 7778
+      tls: none
+    as: second
+  - op: probe.tcp
+    in:
+      endpoint: $second
+      tls: none
+    expect:
+      equals:
+        binary_echo: true
+- id: coverage.desktop.control
+  title: Control a graphical desktop.
+  rules:
+  - desktop/control
+  proves:
+  - gate: desktop
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        desktop: {}
+  - op: fixture.coverage_desktop
+    target: box
+    expect:
+      equals:
+        screenshot_valid: true
+        pointer_received: true
+        keyboard_received: true
+- id: coverage.desktop.live_view
+  title: Control a graphical desktop and view it live.
+  rules:
+  - desktop/control
+  - desktop/live-view
+  proves:
+  - gate: desktop
+    value: true
+  - gate: desktop
+    knob: live_view
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        desktop:
+          live_view: true
+  - op: fixture.coverage_desktop
+    target: box
+    expect:
+      equals:
+        screenshot_valid: true
+        pointer_received: true
+        keyboard_received: true
+  - op: desktop.live_link
+    target: box
+    as: view
+  - op: probe.desktop_browser
+    in:
+      view: $view
+    expect:
+      equals:
+        desktop_visible: true
+- id: coverage.previews.websocket
+  title: A public preview supports websocket.
+  rules:
+  - previews/websocket
+  proves:
+  - gate: previews
+    knob: websocket
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 8765
+          websocket: true
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: websocket
+      ports:
+      - 8765
+      bind: 0.0.0.0
+  - op: preview.link
+    target: box
+    in:
+      port: 8765
+      access: public
+    as: link
+  - op: probe.websocket
+    in:
+      url: $link.url
+    expect:
+      equals:
+        binary_echo: true
+      eventually_ms: 0
+- id: coverage.previews.loopback
+  title: A public preview supports loopback.
+  rules:
+  - previews/loopback
+  proves:
+  - gate: previews
+    knob: loopback
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 8765
+          loopback: true
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: http
+      ports:
+      - 8765
+      bind: 127.0.0.1
+  - op: preview.link
+    target: box
+    in:
+      port: 8765
+      access: public
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview-proof
+      eventually_ms: 30000
+- id: coverage.previews.any_port
+  title: A public preview supports any_port.
+  rules:
+  - previews/any-port
+  proves:
+  - gate: previews
+    knob: any_port
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 8766
+          any_port: true
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: http
+      ports:
+      - 8765
+      bind: 0.0.0.0
+  - op: preview.link
+    target: box
+    in:
+      port: 8765
+      access: public
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview-proof
+      eventually_ms: 30000
+- id: coverage.previews.survives_pause
+  title: A public preview supports survives_pause.
+  rules:
+  - previews/survives-pause
+  proves:
+  - gate: previews
+    knob: survives_pause
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        previews:
+          access: public
+          ports:
+          - 8765
+          survives_pause: true
+        pause_resume: {}
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: http
+      ports:
+      - 8765
+      bind: 0.0.0.0
+  - op: preview.link
+    target: box
+    in:
+      port: 8765
+      access: public
+    as: link
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview-proof
+  - op: pause
+    target: box
+  - op: resume
+    target: box
+  - op: fixture.coverage_server
+    target: box
+    in:
+      protocol: http
+      ports:
+      - 8765
+      ensure_running: true
+  - op: probe.http
+    in:
+      url: $link.url
+    expect:
+      equals:
+        served: true
+        body:
+          utf8: sps-preview-proof
+      eventually_ms: 30000
+- id: coverage.previews.reserved_ports
+  title: Reserved ports refuse forwarding while common unreserved ports serve.
+  rules:
+  - previews/reserved-ports
+  proves:
+  - gate: previews
+    knob: reserved_ports
+    value: $runner.reserved_ports
+  steps:
+  - op: fixture.coverage_reserved_ports
+    in:
+      reserved: $runner.reserved_ports
+      common:
+      - 3000
+      - 5173
+      - 8000
+      - 8080
+    expect:
+      equals:
+        reserved_refused: true
+        common_served: true
+- id: coverage.terminal.reattach
+  title: A native terminal reattachment retains an exported variable.
+  rules:
+  - terminal/reattach
+  proves:
+  - gate: terminal
+    knob: reattach
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      requirements:
+        terminal:
+          reattach: true
+  - op: terminal.open
+    target: box
+    in:
+      columns: 100
+      rows: 24
+    as: terminal
+  - op: terminal.write
+    target: terminal
+    in:
+      data: ZXhwb3J0IFNQU19URU1JPXJldGFpbmVkCg==
+  - wait_ms: 1000
+  - op: terminal.disconnect
+    target: terminal
+  - op: terminal.reattach
+    target: terminal
+    as: attached
+  - op: terminal.write
+    target: attached
+    in:
+      data: cHJpbnRmICdzcHMtdGVybWluYWwtJXNcbicgIiRTUFNfVEVNSSI7IGV4aXQK
+  - op: terminal.output
+    target: attached
+    expect:
+      equals:
+        terminal:
+          utf8_contains: sps-terminal-retained
+      eventually_ms: 10000
+- id: coverage.custom_images.runs_entrypoint.true
+  title: Observe whether a prepared image's ENTRYPOINT or CMD runs.
+  rules:
+  - custom_images/runs-entrypoint
+  proves:
+  - gate: custom_images
+    knob: runs_entrypoint
+    value: true
+  steps:
+  - op: image.prepare
+    in: $runner.entrypoint_image
+    as: image
+  - op: create
+    as: box
+    in:
+      image: $image
+      lifetime_seconds: 300
+  - wait_ms: 2000
+  - op: files.exists
+    target: box
+    in:
+      path: $runner.entrypoint_marker
+    expect:
+      equals:
+        exists: true
+- id: coverage.custom_images.runs_entrypoint.false
+  title: Observe whether a prepared image's ENTRYPOINT or CMD runs.
+  rules:
+  - custom_images/runs-entrypoint
+  proves:
+  - gate: custom_images
+    knob: runs_entrypoint
+    value: false
+  steps:
+  - op: image.prepare
+    in: $runner.entrypoint_image
+    as: image
+  - op: create
+    as: box
+    in:
+      image: $image
+      lifetime_seconds: 300
+  - wait_ms: 2000
+  - op: files.exists
+    target: box
+    in:
+      path: $runner.entrypoint_marker
+    expect:
+      equals:
+        exists: false
+- id: coverage.network_lockdown.denylist.names
+  title: A denylist rejects listed HTTP and HTTPS destinations and permits an unlisted one.
+  rules:
+  - network_lockdown/denylist
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: denylist
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: denylist
+          deny: $runner.denylist_names_entries
+      lifetime_seconds: 600
+  - op: fixture.coverage_denylist
+    target: box
+    in:
+      blocked_urls: $runner.denylist_names_urls
+      allowed_urls: $runner.denylist_allowed_urls
+    expect:
+      equals:
+        listed_blocked: true
+        unlisted_allowed: true
+- id: coverage.network_lockdown.denylist.addresses
+  title: A denylist rejects listed HTTP and HTTPS destinations and permits an unlisted one.
+  rules:
+  - network_lockdown/denylist
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: denylist
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: denylist
+          deny: $runner.denylist_addresses_entries
+      lifetime_seconds: 600
+  - op: fixture.coverage_denylist
+    target: box
+    in:
+      blocked_urls: $runner.denylist_addresses_urls
+      allowed_urls: $runner.denylist_allowed_urls
+    expect:
+      equals:
+        listed_blocked: true
+        unlisted_allowed: true
+- id: coverage.network_lockdown.denylist.mixed
+  title: One denylist rejects listed names and addresses together.
+  rules:
+  - network_lockdown/denylist
+  - network_lockdown/entry-kinds
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: denylist
+  - gate: network_lockdown
+    knob: entry_kinds
+    value: [names, addresses]
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: denylist
+          deny: $runner.denylist_mixed_entries
+      lifetime_seconds: 600
+  - op: fixture.coverage_denylist
+    target: box
+    in:
+      blocked_urls: $runner.denylist_mixed_urls
+      allowed_urls: $runner.denylist_allowed_urls
+    expect:
+      equals:
+        listed_blocked: true
+        unlisted_allowed: true
+- id: coverage.network_lockdown.allowlist.mixed
+  title: One allowlist enforces listed names and addresses together.
+  rules:
+  - network_lockdown/allowlist
+  - network_lockdown/entry-kinds
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: allowlist
+  - gate: network_lockdown
+    knob: entry_kinds
+    value: [names, addresses]
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_mixed
+      lifetime_seconds: 600
+  - op: fixture.coverage_allowlist
+    target: box
+    in:
+      allowed_url: $runner.allowed_url
+      allowed_ip_url: $runner.allowed_ip_url
+      denied_url: $runner.denied_url
+    expect:
+      equals:
+        listed_name_allowed: true
+        listed_address_allowed: true
+        unlisted_denied: true
+- id: coverage.network_lockdown.allowlist.range
+  title: Native allowlist enforces an IPv4 range.
+  rules:
+  - network_lockdown/allowlist
+  - network_lockdown/entry-kinds
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: allowlist
+  - gate: network_lockdown
+    knob: entry_kinds
+    value: [addresses]
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow:
+          - $runner.allowed_ip_range
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.allowed_ip_url
+        reachable: true
+        recorder: none
+      - url: $runner.allowed_ip_range_url
+        reachable: true
+        recorder: none
+      - url: $runner.denied_url
+        reachable: false
+        recorder: absent
+    expect:
+      equals:
+        passed: true
+- id: coverage.network_lockdown.changeable.true
+  title: Observe native running-policy replacement without losing files or a heartbeat.
+  rules:
+  - network_lockdown/changeable
+  proves:
+  - gate: network_lockdown
+    knob: changeable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+          changeable: true
+      lifetime_seconds: 600
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      changeable: true
+      allowed_url: $runner.allowed_url
+      new_policy:
+        policy: allowlist
+        allow: []
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+- id: coverage.network_lockdown.changeable.false
+  title: Observe native running-policy replacement without losing files or a heartbeat.
+  rules:
+  - network_lockdown/changeable
+  proves:
+  - gate: network_lockdown
+    knob: changeable
+    value: false
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+          changeable: false
+      lifetime_seconds: 600
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      changeable: false
+      allowed_url: $runner.allowed_url
+      new_policy:
+        policy: allowlist
+        allow: []
+    expect:
+      equals:
+        policy_changed: false
+        source_preserved: true
+- id: coverage.network_lockdown.switchable.true
+  title: Observe switching a running sandbox to another locked policy without losing files or a heartbeat.
+  rules:
+  - network_lockdown/switchable
+  proves:
+  - gate: network_lockdown
+    knob: switchable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+          switchable: true
+          switches_to: [deny_all]
+      lifetime_seconds: 600
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: true
+      allowed_url: $runner.allowed_url
+      reachable_before: true
+      reachable_after: false
+      new_policy: {policy: deny_all}
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: true
+      allowed_url: $runner.allowed_url
+      reachable_before: false
+      reachable_after: true
+      new_policy:
+        policy: allowlist
+        allow: $runner.allowed_domains
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+- id: coverage.network_lockdown.policy_transition.denylist
+  title: Observe switching to and from a denylist offered by the same variant.
+  rules:
+  - network_lockdown/switchable
+  proves:
+  - gate: network_lockdown
+    knob: switchable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+          switchable: true
+          switches_to: [denylist]
+      lifetime_seconds: 600
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: true
+      allowed_url: $runner.allowed_url
+      reachable_before: true
+      reachable_after: false
+      new_policy:
+        policy: denylist
+        deny: $runner.allowed_domains
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: true
+      allowed_url: $runner.allowed_url
+      reachable_before: false
+      reachable_after: true
+      new_policy:
+        policy: allowlist
+        allow: $runner.allowed_domains
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+- id: coverage.network_lockdown.open
+  title: Recorder confirms open access before a switch to deny all.
+  rules:
+  - network_lockdown/open
+  proves:
+  - gate: network_lockdown
+    knob: policy
+    value: open
+  - gate: network_lockdown
+    knob: switchable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: open
+          switchable: true
+          switches_to: [deny_all]
+  - op: fixture.coverage_network_checks
+    target: box
+    in:
+      requests:
+      - url: $runner.allowed_url
+        reachable: true
+        recorder: required
+    expect:
+      equals:
+        passed: true
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: true
+      allowed_url: $runner.allowed_url
+      reachable_before: true
+      reachable_after: false
+      new_policy: {policy: deny_all}
+    expect:
+      equals:
+        policy_changed: true
+        source_preserved: true
+- id: coverage.network_lockdown.switchable.false
+  title: Observe a declared locked policy that cannot be switched without losing files or a heartbeat.
+  rules:
+  - network_lockdown/switchable
+  proves:
+  - gate: network_lockdown
+    knob: switchable
+    value: false
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.allowed_domains
+          switchable: false
+          switches_to: [deny_all]
+      lifetime_seconds: 600
+  - op: fixture.coverage_policy_change
+    target: box
+    in:
+      switchable: false
+      allowed_url: $runner.allowed_url
+      reachable_before: true
+      reachable_after: true
+      new_policy: {policy: deny_all}
+    expect:
+      equals:
+        policy_changed: false
+        source_preserved: true
+- id: coverage.network_lockdown.switchable.cuts_open_connections.true
+  title: Observe whether switching a policy ends an already-open refused connection within ten seconds.
+  rules:
+  - network_lockdown/switchable
+  proves:
+  - gate: network_lockdown
+    knob: switchable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.connection_harness_domains
+          switchable: true
+          switches_to: [deny_all]
+          cuts_open_connections: true
+      lifetime_seconds: 600
+  - op: fixture.coverage_open_connection
+    target: box
+    in:
+      harness: $runner.connection_harness
+    as: connection
+  - op: fixture.coverage_connection_update
+    target: box
+    as: connection_updated
+    in:
+      connection: $connection
+      new_policy:
+        policy: deny_all
+  - op: fixture.coverage_connection_closed
+    target: box
+    in:
+      connection: $connection_updated
+      window_seconds: 10
+    expect:
+      equals:
+        closed_within_window: true
+- id: coverage.network_lockdown.switchable.cuts_open_connections.false
+  title: Observe whether switching a policy ends an already-open refused connection within ten seconds.
+  rules:
+  - network_lockdown/switchable
+  proves:
+  - gate: network_lockdown
+    knob: switchable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: allowlist
+          allow: $runner.connection_harness_domains
+          switchable: true
+          switches_to: [deny_all]
+          cuts_open_connections: false
+      lifetime_seconds: 600
+  - op: fixture.coverage_open_connection
+    target: box
+    in:
+      harness: $runner.connection_harness
+    as: connection
+  - op: fixture.coverage_connection_update
+    target: box
+    as: connection_updated
+    in:
+      connection: $connection
+      new_policy:
+        policy: deny_all
+  - op: fixture.coverage_connection_closed
+    target: box
+    in:
+      connection: $connection_updated
+      window_seconds: 10
+    expect:
+      equals:
+        closed_within_window: false
+  - op: fixture.coverage_open_connection
+    target: box
+    in:
+      harness: $runner.connection_harness
+    expect:
+      error: true
+- id: coverage.hidden_secrets.rotates.true
+  title: Observe native hidden-secret rotates without recording its value.
+  rules:
+  - hidden_secrets/rotates
+  proves:
+  - gate: hidden_secrets
+    knob: rotates
+    value: true
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: rotates
+      value: true
+    expect:
+      equals:
+        rotates: true
+- id: coverage.hidden_secrets.rotates.false
+  title: Observe native hidden-secret rotates without recording its value.
+  rules:
+  - hidden_secrets/rotates
+  proves:
+  - gate: hidden_secrets
+    knob: rotates
+    value: false
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: rotates
+      value: false
+    expect:
+      equals:
+        rotates: false
+- id: coverage.hidden_secrets.scrubs_responses.true
+  title: Observe native hidden-secret scrubs_responses without recording its value.
+  rules:
+  - hidden_secrets/scrubs-responses
+  proves:
+  - gate: hidden_secrets
+    knob: scrubs_responses
+    value: true
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: scrubs_responses
+      value: true
+    expect:
+      equals:
+        scrubs_responses: true
+- id: coverage.hidden_secrets.scrubs_responses.false
+  title: Observe native hidden-secret scrubs_responses without recording its value.
+  rules:
+  - hidden_secrets/scrubs-responses
+  proves:
+  - gate: hidden_secrets
+    knob: scrubs_responses
+    value: false
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: scrubs_responses
+      value: false
+    expect:
+      equals:
+        scrubs_responses: false
+- id: coverage.hidden_secrets.injection.sets_header
+  title: Observe native hidden-secret injection without recording its value.
+  rules:
+  - hidden_secrets/injection
+  proves:
+  - gate: hidden_secrets
+    knob: injection
+    value: sets_header
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: injection
+      value: sets_header
+    expect:
+      equals:
+        injection: sets_header
+- id: coverage.hidden_secrets.intercepts.injected_hosts
+  title: Observe native hidden-secret intercepts without recording its value.
+  rules:
+  - hidden_secrets/intercepts
+  proves:
+  - gate: hidden_secrets
+    knob: intercepts
+    value: injected_hosts
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: intercepts
+      value: injected_hosts
+    expect:
+      equals:
+        intercepts: injected_hosts
+- id: coverage.hidden_secrets.intercepts.all_https
+  title: Observe native hidden-secret intercepts without recording its value.
+  rules:
+  - hidden_secrets/intercepts
+  proves:
+  - gate: hidden_secrets
+    knob: intercepts
+    value: all_https
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: intercepts
+      value: all_https
+    expect:
+      equals:
+        intercepts: all_https
+- id: coverage.hidden_secrets.max_inject_into
+  title: Every host listed for hidden-secret injection receives the secret.
+  rules:
+  - hidden_secrets/max-inject-into
+  proves:
+  - gate: hidden_secrets
+    knob: max_inject_into
+    value:
+      at_least: $runner.max_inject_into_count
+  steps:
+  - op: secret.create
+    in:
+      value: $runner.run_nonce
+    as: secret
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      secret: $secret
+      requirements:
+        hidden_secrets:
+          inject_into: $runner.max_inject_into_hosts
+  - op: fixture.coverage_secret_hosts
+    target: box
+    in:
+      value: $runner.run_nonce
+      hosts: $runner.max_inject_into_hosts
+      urls: $runner.max_inject_into_urls
+    expect:
+      equals:
+        every_host_received: true
+- id: coverage.hidden_secrets.wildcards
+  title: A hidden-secret wildcard injects into requests for a name under its domain.
+  rules:
+  - hidden_secrets/wildcards
+  proves:
+  - gate: hidden_secrets
+    knob: inject_wildcards
+    value: true
+  steps:
+  - op: secret.create
+    in:
+      value: sps-generated-test-secret
+    as: secret
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+      secret: $secret
+      requirements:
+        hidden_secrets:
+          inject_into: [$runner.hidden_secret_wildcard_host]
+  - op: fixture.coverage_secret_wildcard
+    target: box
+    in:
+      value: sps-generated-test-secret
+      host: $runner.hidden_secret_wildcard_host
+      urls: $runner.hidden_secret_wildcard_urls
+    expect:
+      equals:
+        every_wildcard_host_received: true
+- id: coverage.network_lockdown.max_deny
+  title: Every deny entry blocks its HTTP and HTTPS destination while an unlisted destination works.
+  rules:
+  - network_lockdown/max-deny
+  proves:
+  - gate: network_lockdown
+    knob: max_deny
+    value:
+      at_least: $runner.max_deny_count
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        network_lockdown:
+          policy: denylist
+          deny: $runner.max_deny_entries
+      lifetime_seconds: 600
+  - op: fixture.coverage_denylist
+    target: box
+    in:
+      blocked_urls: $runner.max_deny_urls
+      allowed_urls: $runner.denylist_allowed_urls
+    expect:
+      equals:
+        listed_blocked: true
+        unlisted_allowed: true
+- id: coverage.hidden_secrets.transparent.true
+  title: A proxy-ignoring client is checked after ordinary hidden-secret injection works.
+  rules:
+  - hidden_secrets/transparent
+  proves:
+  - gate: hidden_secrets
+    knob: transparent
+    value: true
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: transparent
+      value: true
+    expect:
+      equals:
+        transparent: true
+- id: coverage.hidden_secrets.transparent.false
+  title: A proxy-ignoring client is checked after ordinary hidden-secret injection works.
+  rules:
+  - hidden_secrets/transparent
+  proves:
+  - gate: hidden_secrets
+    knob: transparent
+    value: false
+  steps:
+  - op: fixture.coverage_secret
+    in:
+      probe: transparent
+      value: false
+    expect:
+      equals:
+        transparent: false
+
+- id: coverage.custom_images.build_context
+  title: Dockerfile COPY and ADD preserve supplied build-context bytes.
+  rules: [custom_images/build-context]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: build_context, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM public.ecr.aws/docker/library/python:3.12-slim
+        COPY nested/copied.txt /opt/sps-copy
+        ADD added.txt /opt/sps-add
+      context:
+        nested/copied.txt: sps-copy-context
+        added.txt: sps-add-context
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, build_context: true}
+      lifetime_seconds: 300
+    as: box
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-copy}
+    expect:
+      equals:
+        data: {utf8: sps-copy-context}
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-add}
+    expect:
+      equals:
+        data: {utf8: sps-add-context}
+- id: coverage.custom_images.prepare.registry
+  title: A prepared registry image boots a sandbox.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: 'true'
+    expect:
+      equals:
+        exit_code: 0
+- id: coverage.custom_images.private_oci
+  title: A prepared private registry image boots a sandbox with supplied registry credentials.
+  rules: [custom_images/private-oci, custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: private_oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: private_oci
+      image: $runner.private_oci_image
+      username: $runner.private_oci_username
+      password: $runner.private_oci_password
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: private_oci, prepared: true}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: cat /etc/sps-private-oci-marker
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8_contains: $runner.private_oci_marker
+- id: coverage.custom_images.prepare.image_config.env
+  title: A prepared registry image retains its environment configuration.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: image_config, value: [env]}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/grafana/grafana@sha256:408afb9726de5122b00a2576763a8a57a3c86d5b0eff5305bc994ceb3eb96c3f
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true, image_config: [env]}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printenv GF_PATHS_HOME
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "/usr/share/grafana\n"}
+- id: coverage.custom_images.prepare.image_config.workdir
+  title: A prepared registry image retains its working directory configuration.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: image_config, value: [workdir]}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/grafana/grafana@sha256:408afb9726de5122b00a2576763a8a57a3c86d5b0eff5305bc994ceb3eb96c3f
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true, image_config: [workdir]}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: pwd
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "/usr/share/grafana\n"}
+- id: coverage.custom_images.prepare.image_config.user
+  title: A prepared registry image retains its user configuration.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: image_config, value: [user]}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/grafana/grafana@sha256:408afb9726de5122b00a2576763a8a57a3c86d5b0eff5305bc994ceb3eb96c3f
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true, image_config: [user]}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: id -u
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "472\n"}
+- id: coverage.custom_images.prepare.dockerfile_context
+  title: A prepared Dockerfile image copies text and binary context bytes.
+  rules: [custom_images/prepared, custom_images/build-context]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: build_context, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM public.ecr.aws/docker/library/python:3.12-slim
+        COPY nested/copied.txt /opt/sps-copy
+        COPY binary.bin /opt/sps-binary
+      context:
+        nested/copied.txt: sps-copy-context
+        binary.bin: {base64: AP8AgP5mAA==}
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true, build_context: true}
+      lifetime_seconds: 300
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: sha256sum /opt/sps-copy /opt/sps-binary
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8: |
+            c54b18b26d3b516decb1dc6fc46c86a78dd2ec82148f80893f22d5a241b79d2e  /opt/sps-copy
+            f40721feb30df2bd31c6fc8fc852bc684932e80b660ad6d4c1f656736b55f3d9  /opt/sps-binary
+- id: coverage.custom_images.prepare.dockerfile_distro
+  title: A prepared Dockerfile on a named distribution base controls the sandbox environment.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM ubuntu:24.04
+        RUN printf sps-distro-prepared >/opt/sps-image-marker
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true}
+      lifetime_seconds: 300
+    as: box
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-image-marker}
+    expect:
+      equals:
+        data: {utf8: sps-distro-prepared}
+- id: coverage.custom_images.prepare.dockerfile_distro_context
+  title: A prepared Dockerfile on a named distribution base copies and unpacks build context.
+  rules: [custom_images/prepared, custom_images/build-context]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: build_context, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM ubuntu:24.04
+        COPY copied.txt /opt/sps-copy
+        COPY binary.bin /opt/sps-binary
+        ADD added.txt /opt/sps-added
+        ADD bundle.bin /opt/sps-bundle/
+      context:
+        copied.txt: sps-distro-context-copy
+        binary.bin: {base64: AAECAwQFBgcICQoLDA0ODw==}
+        added.txt: sps-distro-context-add
+        bundle.bin: {base64: H4sIAAAAAAAC/+3RQQ6CMBBA0R6FC6CMbeU8RLowxJa0Q8LxRdyRqCuMJv9tppl20eTHUDT0R7OnZtF6v87Fdq5n8XLy1jr32Is0rTWVN18wFe3y8pWckr579+n+T8Vn/1uXh5APOutO/c/Ove5v7aa/FRFTNfTfXRlL3V+L5lRfUtQwaz3FsbsMoTcAAAAAAAAAAAAAAAAAftsdQ6orDQAoAAA=}
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true, build_context: true}
+      lifetime_seconds: 300
+    as: box
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-copy}
+    expect:
+      equals:
+        data: {utf8: sps-distro-context-copy}
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-binary}
+    expect:
+      equals:
+        data: {b64: AAECAwQFBgcICQoLDA0ODw==}
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-added}
+    expect:
+      equals:
+        data: {utf8: sps-distro-context-add}
+  - op: files.read_bytes
+    target: box
+    in: {path: /opt/sps-bundle/nested/marker.txt}
+    expect:
+      equals:
+        data: {utf8: sps-distro-context-unpacked}
+- id: coverage.custom_images.prepare.size
+  title: A prepared registry image accepts and delivers the requested size.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+      resources: $runner.larger_size
+    as: image
+    expect:
+      equals:
+        resources:
+          one_of: [null, $runner.larger_size]
+  - op: create
+    in:
+      image: $image
+      resources: $runner.larger_size
+      requirements:
+        custom_images: {source: oci, prepared: true}
+      lifetime_seconds: 300
+    as: box
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: allocation
+      size: $runner.larger_size
+    expect:
+      equals:
+        cpu_delivered: true
+        memory_delivered: true
+- id: coverage.custom_images.prepared_size_without_request
+  title: A fixed-size prepared image supplies its size when create omits one.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+      resources: $runner.larger_size
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true}
+      lifetime_seconds: 300
+    as: box
+  - op: fixture.coverage_fact
+    target: box
+    in:
+      probe: allocation
+      size: $runner.larger_size
+    expect:
+      not_run_if:
+        cpu_delivered: false
+        memory_delivered: false
+      equals:
+        cpu_delivered: true
+        memory_delivered: true
+- id: coverage.custom_images.prepare.idempotent
+  title: Repeating image preparation returns the same artifact.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+    as: first
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+    as: second
+  - op: bindings.compare
+    in:
+      left: $first.key
+      right: $second.key
+    expect:
+      equals:
+        equal: true
+  - op: bindings.compare
+    in:
+      left: $first.identity
+      right: $second.identity
+    expect:
+      equals:
+        equal: true
+- id: coverage.custom_images.prepare.delete
+  title: A prepared image can be deleted and then observed absent.
+  rules: [custom_images/prepared]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: $runner.oci_image
+    as: image
+  - op: image.delete
+    target: image
+  - op: image.state
+    target: image
+    expect:
+      equals:
+        state: absent
+
+- id: fuse_mount.lifecycle
+  title: A remote FUSE mount supports default-user edits, checkpoint, fencing and resume.
+  rules:
+  - fuse_mount/lifecycle
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+    expect:
+      equals:
+        verified: true
+      record:
+      - stdout
+
+- id: fuse_mount.default_placement
+  title: A source-bound default native plan mounts with measured backend acknowledgement latency.
+  rules:
+  - fuse_mount/lifecycle
+  - fuse_mount/default-placement
+  proves: []
+  steps:
+  - op: fixture.fuse_mount
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      placement_mode: default
+    expect:
+      equals:
+        verified: true
+      record:
+      - fuse_mount_default
+
+- id: fuse_mount.provider_terminal_handover
+  title: A provider-terminal FUSE handover clears only orphaned delegations and preserves the requested access mode.
+  rules:
+  - fuse_mount/provider-terminal-handover
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: $runner.fuse_mount_access_mode
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_read
+  title: A read-only client remains readable after Cloud refuses a competing read handover.
+  rules:
+  - fuse_mount/provider-terminal-handover-read
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_read
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: read
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_shared
+  title: A shared writer is refused during handover and its successor reads acknowledged writes.
+  rules:
+  - fuse_mount/provider-terminal-handover-shared
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_shared
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: shared
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_130
+  title: A provider-terminal FUSE handover binds the captured public Core identity and preserves the requested access mode.
+  rules:
+  - fuse_mount/provider-terminal-handover-130
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_130
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: $runner.fuse_mount_access_mode
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_read_130
+  title: A read-only client remains readable after Cloud refuses a competing read handover with captured public Core identity.
+  rules:
+  - fuse_mount/provider-terminal-handover-read-130
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_read_130
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: read
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_shared_130
+  title: A shared writer is refused during handover and its successor reads acknowledged writes with captured public Core identity.
+  rules:
+  - fuse_mount/provider-terminal-handover-shared-130
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_shared_130
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: shared
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_branch_fork
+  title: A branch-mode provider-terminal handover verifies a fresh private fork from one acknowledged checkpoint.
+  rules:
+  - fuse_mount/provider-terminal-branch-fork
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_branch_fork
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: branch
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_env_132
+  title: A provider-terminal FUSE handover binds the actual environment route and prepared image handle.
+  rules:
+  - fuse_mount/provider-terminal-handover-env-132
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_env_132
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: write
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_read_env_132
+  title: A read-only FUSE handover binds the actual environment route and prepared image handle.
+  rules:
+  - fuse_mount/provider-terminal-handover-read-env-132
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_read_env_132
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: read
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_shared_env_132
+  title: A shared FUSE handover binds the actual environment route and prepared image handle.
+  rules:
+  - fuse_mount/provider-terminal-handover-shared-env-132
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_shared_env_132
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: shared
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_branch_fork_env_132
+  title: A branch-mode FUSE handover binds the actual environment route and prepared image handle.
+  rules:
+  - fuse_mount/provider-terminal-branch-fork-env-132
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_branch_fork_env_132
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: branch
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: http.buffered.bytes_and_exit_codes
+  title: Buffered output is byte-exact per stream and ordinary exit codes 124, 137 and 143 stay exit codes.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: bytes_and_exit_codes
+    expect:
+      equals:
+        verified: true
+
+- id: http.buffered.execution_term
+  title: An execution limit sends TERM at the limit and reports expiry only after termination settles.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: execution_term
+    expect:
+      equals:
+        verified: true
+
+- id: http.buffered.group_kill
+  title: The original process group keeps its KILL obligation five seconds after TERM when the leader exits on TERM.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: group_kill
+    expect:
+      equals:
+        verified: true
+
+- id: http.buffered.observation_versus_execution
+  title: Observation expiry leaves the command running and the execution limit still fires later.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: observation_versus_execution
+    expect:
+      equals:
+        verified: true
+
+- id: http.buffered.background_survives
+  title: Background work survives foreground completion and the foreground result does not wait for inherited pipes.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: background_survives
+    expect:
+      equals:
+        verified: true
+
+- id: http.buffered.output_limit
+  title: Output over the limit is a success with the exit status, each stream's exact first L bytes and per-stream truncated flags, with no replay and no early completion.
+  rules: []
+  non_normative: Diagnoses HTTP binding 0.3 buffered_commands_v1 command semantics; it adds no native capability or baseline requirement.
+  proves: []
+  steps:
+  - op: create
+    as: box
+  - op: http.buffered
+    target: box
+    in:
+      case: output_limit
+    expect:
+      equals:
+        verified: true
+
+- id: coverage.facts.outbound_ip_families.ipv4
+  title: A sandbox completes a TCP handshake to an IPv4 literal.
+  rules:
+  - facts/outbound-ip-families
+  proves:
+  - fact: resources.outbound_ip_families
+    value: [ipv4]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.address_families
+    target: box
+    in:
+      fixture: $runner.address_families
+    expect:
+      record: [stdout]
+      equals:
+        ipv4_native: true
+        ipv4_tuple: 1.1.1.1:443
+- id: coverage.facts.outbound_ip_families.ipv6
+  title: A sandbox completes a TCP handshake to an IPv6 literal.
+  rules:
+  - facts/outbound-ip-families
+  proves:
+  - fact: resources.outbound_ip_families
+    value: [ipv6]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.address_families
+    target: box
+    in:
+      fixture: $runner.address_families
+    expect:
+      record: [stdout]
+      equals:
+        ipv6_native: true
+        ipv6_tuple: '[2606:4700:4700::1111]:443'
+- id: coverage.facts.ipv4_destination_reach.native
+  title: A sandbox reaches an IPv4 literal through native IPv4.
+  rules:
+  - facts/outbound-ip-families
+  proves:
+  - fact: resources.ipv4_destination_reach
+    value: native
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.address_families
+    target: box
+    in:
+      fixture: $runner.address_families
+    expect:
+      record: [stdout]
+      equals:
+        ipv4_destination_reach: native
+- id: coverage.facts.guest_reserved_tcp_ports.8080
+  title: A provider-owned listener blocks the explicitly tested guest TCP bind candidate.
+  rules:
+  - facts/guest-reserved-tcp-ports
+  proves:
+  - fact: resources.guest_reserved_tcp_ports
+    value: [8080]
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.guest_reserved_tcp_ports
+    target: box
+    in:
+      fixture: $runner.guest_reserved_tcp_ports
+    expect:
+      record: [stdout]
+      equals:
+        guest_reserved_tcp_ports: [8080]
+- id: files.regular_write.usability.v1.exact_bytes
+  title: Regular-file writes round-trip exact empty, binary and shorter overwrite bytes.
+  rules:
+  - files/regular-write-exact-bytes
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: exact_bytes
+    expect:
+      record: [stdout]
+      equals:
+        case: exact_bytes
+        passed: true
+- id: files.regular_write.usability.v1.create_parents
+  title: Regular-file writes create nested parents the execution user can traverse.
+  rules:
+  - files/regular-write-parents
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: create_parents
+    expect:
+      record: [stdout]
+      equals:
+        case: create_parents
+        passed: true
+- id: files.regular_write.usability.v1.create_access
+  title: The execution user can read and write a newly created regular file.
+  rules:
+  - files/regular-write-create-access
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: create_access
+    expect:
+      record: [stdout]
+      equals:
+        case: create_access
+        passed: true
+- id: files.regular_write.usability.v1.overwrite_access
+  title: Overwriting ordinary 0600, 0640 and 0755 files keeps execution-user read and write access.
+  rules:
+  - files/regular-write-overwrite-access
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: overwrite_access
+    expect:
+      record: [stdout]
+      equals:
+        case: overwrite_access
+        passed: true
+- id: files.regular_write.usability.v1.authority
+  title: Unauthorized regular-file writes refuse without privilege widening.
+  rules:
+  - files/regular-write-authority
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: authority
+    expect:
+      record: [stdout]
+      equals:
+        case: authority
+        passed: true
+- id: files.regular_write.usability.v1.executable_effect
+  title: A 0755 overwrite records executable-bit effect against the packaged declaration.
+  rules:
+  - facts/files-write-executable-effect
+  proves:
+  - fact: resources.files_write_executable_effect
+    value: unverified
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: executable_effect
+      files_write_executable_effect: unverified
+    expect:
+      record: [stdout]
+      equals:
+        case: executable_effect
+        passed: true
+        files_write_executable_effect: unverified
+- id: files.regular_write.usability.v1.byte_bound
+  title: Inclusive 16 MiB writes succeed; excess and smaller limits refuse before dispatch.
+  rules:
+  - files/regular-write-byte-bound
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: byte_bound
+    expect:
+      record: [stdout]
+      equals:
+        case: byte_bound
+        passed: true
+- id: files.regular_write.usability.v1.outcome
+  title: File-write outcomes distinguish not-dispatched, confirmed and unknown without replay.
+  rules:
+  - files/regular-write-outcome
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: outcome
+    expect:
+      record: [stdout]
+      equals:
+        case: outcome
+        passed: true
+- id: files.regular_write.usability.v1.staging_cleanup
+  title: Confirmed staging is removed; uncertain staging retains identity.
+  rules:
+  - files/regular-write-staging-cleanup
+  proves: []
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.regular_write_usability
+    target: box
+    in:
+      case: staging_cleanup
+    expect:
+      record: [stdout]
+      equals:
+        case: staging_cleanup
+        passed: true
+- id: file_links.v1.credential.read
+  title: A read link carries its own credential and serves a client that sends only the link.
+  rules:
+  - file-links/own-credential
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  - &id001
+    gate: file_links
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: credential
+      operation: read
+    expect:
+      equals:
+        case: credential
+        passed: true
+- id: file_links.v1.credential.write
+  title: A write link carries its own credential and serves a client that sends only the link.
+  rules:
+  - file-links/own-credential
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  - *id001
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: credential
+      operation: write
+    expect:
+      equals:
+        case: credential
+        passed: true
+- id: file_links.v1.read_exact
+  title: A read link returns exactly the file's bytes, including an empty file.
+  rules:
+  - file-links/read-exact-bytes
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: read_exact
+    expect:
+      equals:
+        case: read_exact
+        passed: true
+- id: file_links.v1.write_exact
+  title: A write link leaves exactly the sent bytes, including an empty body and a shorter overwrite.
+  rules:
+  - file-links/write-exact-bytes
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: write_exact
+    expect:
+      equals:
+        case: write_exact
+        passed: true
+- id: file_links.v1.write_parents
+  title: A write link creates missing parent directories.
+  rules:
+  - file-links/write-parents
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: write_parents
+    expect:
+      equals:
+        case: write_parents
+        passed: true
+- id: file_links.v1.write_usable
+  title: The default user can read and write a file a write link created.
+  rules:
+  - file-links/write-usable
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: write_usable
+    expect:
+      equals:
+        case: write_usable
+        passed: true
+- id: file_links.v1.one_path.read
+  title: A read link is refused for any path but its own.
+  rules:
+  - file-links/one-path
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: one_path
+      operation: read
+    expect:
+      equals:
+        case: one_path
+        passed: true
+- id: file_links.v1.one_path.write
+  title: A write link is refused for any path but its own.
+  rules:
+  - file-links/one-path
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: one_path
+      operation: write
+    expect:
+      equals:
+        case: one_path
+        passed: true
+- id: file_links.v1.one_operation
+  title: A read link refuses a write and a write link refuses a read.
+  rules:
+  - file-links/one-operation
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: one_operation
+    expect:
+      equals:
+        case: one_operation
+        passed: true
+- id: file_links.v1.expiry.read
+  title: A read link requested for five seconds is refused fifteen seconds later.
+  rules:
+  - file-links/expiry
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: expiry
+      operation: read
+    expect:
+      equals:
+        case: expiry
+        passed: true
+- id: file_links.v1.expiry.write
+  title: A write link requested for five seconds is refused fifteen seconds later.
+  rules:
+  - file-links/expiry
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: expiry
+      operation: write
+    expect:
+      equals:
+        case: expiry
+        passed: true
+- id: file_links.v1.link_lifetime.read
+  title: A read link keeps working for the lifetime requested for it.
+  rules:
+  - file-links/link-lifetime
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  - gate: file_links
+    knob: link_lifetime_seconds
+    value:
+      at_least: $runner.link_lifetime_wait_seconds
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: fixture.file_links
+    target: box
+    in:
+      case: link_lifetime
+      operation: read
+    expect:
+      equals:
+        case: link_lifetime
+        passed: true
+- id: file_links.v1.link_lifetime.write
+  title: A write link keeps working for the lifetime requested for it.
+  rules:
+  - file-links/link-lifetime
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  - gate: file_links
+    knob: link_lifetime_seconds
+    value:
+      at_least: $runner.link_lifetime_wait_seconds
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: fixture.file_links
+    target: box
+    in:
+      case: link_lifetime
+      operation: write
+    expect:
+      equals:
+        case: link_lifetime
+        passed: true
+- id: file_links.v1.user_selection
+  title: A link issued for a named user writes a file that user owns and reads with that user's permissions.
+  rules:
+  - file-links/user-selection
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+    - write
+  - gate: file_links
+    knob: user_selection
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: user_selection
+    expect:
+      equals:
+        case: user_selection
+        passed: true
+- id: file_links.v1.revocable.read
+  title: Revoking a sandbox's links refuses two earlier read links while the sandbox keeps running.
+  rules:
+  - file-links/revocable
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - read
+  - gate: file_links
+    knob: revocable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: revocable
+      operation: read
+    expect:
+      equals:
+        case: revocable
+        passed: true
+- id: file_links.v1.revocable.write
+  title: Revoking a sandbox's links refuses two earlier write links while the sandbox keeps running.
+  rules:
+  - file-links/revocable
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  - gate: file_links
+    knob: revocable
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: revocable
+      operation: write
+    expect:
+      equals:
+        case: revocable
+        passed: true
+- id: file_links.v1.interrupted_write
+  title: An interrupted write leaves no foreign bytes, and a later complete write succeeds.
+  rules:
+  - file-links/interrupted-write
+  proves:
+  - gate: file_links
+    knob: operations
+    value:
+    - write
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_links
+    target: box
+    in:
+      case: interrupted_write
+    expect:
+      equals:
+        case: interrupted_write
+        passed: true
+- id: files.stream.v1.write.64mib
+  title: One streamed write moves a 64 MiB file into the sandbox intact.
+  rules:
+  - facts/file-stream-write
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      write:
+        at_least: 67108864
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: write
+      size: 67108864
+    expect:
+      equals:
+        operation: write
+        size: 67108864
+        passed: true
+- id: files.stream.v1.write.1gib
+  title: One streamed write moves a 1 GiB file into the sandbox intact.
+  rules:
+  - facts/file-stream-write
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      write:
+        at_least: 1073741824
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: write
+      size: 1073741824
+    expect:
+      equals:
+        operation: write
+        size: 1073741824
+        passed: true
+- id: files.stream.v1.write.5gib
+  title: One streamed write moves a 5 GiB file into the sandbox intact.
+  rules:
+  - facts/file-stream-write
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      write:
+        at_least: 5368709120
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: write
+      size: 5368709120
+    expect:
+      equals:
+        operation: write
+        size: 5368709120
+        passed: true
+- id: files.stream.v1.read.64mib
+  title: One streamed read moves a 64 MiB file out of the sandbox intact.
+  rules:
+  - facts/file-stream-read
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      read:
+        at_least: 67108864
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 300
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: read
+      size: 67108864
+    expect:
+      equals:
+        operation: read
+        size: 67108864
+        passed: true
+- id: files.stream.v1.read.1gib
+  title: One streamed read moves a 1 GiB file out of the sandbox intact.
+  rules:
+  - facts/file-stream-read
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      read:
+        at_least: 1073741824
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 600
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: read
+      size: 1073741824
+    expect:
+      equals:
+        operation: read
+        size: 1073741824
+        passed: true
+- id: files.stream.v1.read.5gib
+  title: One streamed read moves a 5 GiB file out of the sandbox intact.
+  rules:
+  - facts/file-stream-read
+  proves:
+  - fact: resources.file_stream_max_bytes
+    value:
+      read:
+        at_least: 5368709120
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: 900
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: read
+      size: 5368709120
+    expect:
+      equals:
+        operation: read
+        size: 5368709120
+        passed: true
