@@ -32,6 +32,8 @@ from sandbox_provider_spec.coverage_file_transfer import (
     http_send,
 )
 from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, NotRun, Observation
+from sandbox_provider_spec.report import report
+from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import read_suite, suite_path
 
 
@@ -377,6 +379,173 @@ def test_suite_rows_reach_the_runner_and_record_not_run_without_driver_hooks() -
     runner = FileTransferRunner(Bare(), {})
     results = runner.run(type(suite)(suite.digest, tuple(selected[:2]), suite.baseline_ids))
     assert [result["result"] for result in results] == ["not_run", "not_run"]
+
+
+@dataclass
+class RecordingSandbox(FakeSandbox):
+    """The same fake provider, plus a record of every create input it receives."""
+
+    creates: list[dict[str, object]] = field(default_factory=list)
+
+    def create(self, target: object, inputs: Inputs) -> Observation:
+        del target
+        self.creates.append(dict(inputs))
+        return {
+            "identity": "box",
+            "resource": self.own("sandbox", "box", lambda: {"result": "deleted"}),
+        }
+
+
+TRANSFER_LIFETIME_IDS = {
+    "file_links.v1.credential.read",
+    "file_links.v1.credential.write",
+    "file_links.v1.read_exact",
+    "file_links.v1.write_exact",
+    "file_links.v1.write_parents",
+    "file_links.v1.write_usable",
+    "file_links.v1.one_path.read",
+    "file_links.v1.one_path.write",
+    "file_links.v1.one_operation",
+    "file_links.v1.expiry.read",
+    "file_links.v1.expiry.write",
+    "file_links.v1.user_selection",
+    "file_links.v1.revocable.read",
+    "file_links.v1.revocable.write",
+    "file_links.v1.interrupted_write",
+    "files.stream.v1.write.1gib",
+    "files.stream.v1.read.1gib",
+}
+_LITERAL_BOUNDS = {
+    "file_links.v1.link_lifetime.read": 900,
+    "file_links.v1.link_lifetime.write": 900,
+    "files.stream.v1.write.64mib": 300,
+    "files.stream.v1.write.5gib": 900,
+    "files.stream.v1.read.64mib": 300,
+    "files.stream.v1.read.5gib": 900,
+}
+
+
+def _coverage_ids() -> tuple[Any, set[str]]:
+    suite = read_suite(suite_path().parent / "coverage.yaml")
+    referenced = {
+        test.id
+        for test in suite.tests
+        if any(
+            isinstance(step.get("in"), dict)
+            and step["in"].get("lifetime_seconds") == "$runner.file_transfer_lifetime_seconds"
+            for step in test.steps
+            if isinstance(step, dict)
+        )
+    }
+    return suite, referenced
+
+
+def _create_only(suite: Any, ids: set[str]) -> Any:
+    """Each named test reduced to its create step, for transport-contract checks."""
+    return type(suite)(
+        suite.digest,
+        tuple(
+            type(test)(
+                test.id,
+                test.title,
+                (next(step for step in test.steps if step.get("op") == "create"),),
+                test.proves,
+                test.rules,
+            )
+            for test in suite.tests
+            if test.id in ids
+        ),
+        suite.baseline_ids,
+    )
+
+
+def _run_creates(
+    suite: Any, ids: set[str], sandbox: RecordingSandbox, fixtures: dict[str, object]
+) -> list[dict[str, object]]:
+    runner = FileTransferRunner(sandbox, fixtures, send=sandbox.send, sleep=sandbox.sleep)
+    return runner.run(_create_only(suite, ids))
+
+
+def test_exactly_the_six_hundred_second_transfer_rows_reference_the_fixture() -> None:
+    suite, referenced = _coverage_ids()
+    assert referenced == TRANSFER_LIFETIME_IDS
+    tests = {test.id: test for test in suite.tests}
+    assert {
+        test_id: next(
+            step["in"]["lifetime_seconds"] for step in tests[test_id].steps if "in" in step
+        )
+        for test_id in _LITERAL_BOUNDS
+    } == _LITERAL_BOUNDS
+    for test_id in referenced:
+        test = tests[test_id]
+        assert len(test.steps) == 2 and test.steps[0]["op"] == "create"
+        assert test.steps[1]["op"].startswith("fixture.file_")
+        assert test.steps[1]["expect"]["equals"]["passed"] is True
+        assert test.proves
+    assert tests["file_links.v1.expiry.read"].steps[1]["in"] == {
+        "case": "expiry",
+        "operation": "read",
+    }
+    assert tests["file_links.v1.link_lifetime.read"].steps[1]["in"] == {
+        "case": "link_lifetime",
+        "operation": "read",
+    }
+
+
+def test_the_lifetime_defaults_to_600_and_an_override_reaches_create_unchanged() -> None:
+    suite, referenced = _coverage_ids()
+    for override, wanted in ((None, 600), (300, 300)):
+        fixtures: dict[str, object] = {"link_lifetime_wait_seconds": 600}
+        if override is not None:
+            fixtures["file_transfer_lifetime_seconds"] = override
+        sandbox = RecordingSandbox()
+        results = _run_creates(suite, referenced, sandbox, fixtures)
+        assert [row["result"] for row in results] == ["passed"] * len(referenced)
+        assert [create["lifetime_seconds"] for create in sandbox.creates] == [wanted] * len(
+            referenced
+        )
+
+
+@pytest.mark.parametrize("bad", [0, -1, True, 300.5, "300"])
+def test_an_invalid_lifetime_override_refuses_before_any_driver_call(bad: object) -> None:
+    sandbox = RecordingSandbox()
+    with pytest.raises(ValueError, match="positive integer"):
+        FileTransferRunner(sandbox, {"file_transfer_lifetime_seconds": bad})
+    assert sandbox.creates == []
+
+
+def test_the_override_does_not_reach_the_other_requested_bounds() -> None:
+    suite, _ = _coverage_ids()
+    sandbox = RecordingSandbox()
+    results = _run_creates(
+        suite,
+        {"file_links.v1.link_lifetime.read", "files.stream.v1.write.64mib"},
+        sandbox,
+        {"link_lifetime_wait_seconds": 600, "file_transfer_lifetime_seconds": 300},
+    )
+    assert [row["result"] for row in results] == ["passed", "passed"]
+    assert [create["lifetime_seconds"] for create in sandbox.creates] == [900, 300]
+
+
+def test_the_report_binds_definitions_not_the_selected_configuration() -> None:
+    suite, referenced = _coverage_ids()
+    selected = type(suite)(
+        suite.digest,
+        tuple(test for test in suite.tests if test.id in referenced),
+        suite.baseline_ids,
+    )
+    documents = []
+    for lifetime in (None, 300):
+        fixtures: dict[str, object] = {"link_lifetime_wait_seconds": 600}
+        if lifetime is not None:
+            fixtures["file_transfer_lifetime_seconds"] = lifetime
+        sandbox = RecordingSandbox()
+        results = _run_creates(suite, referenced, sandbox, fixtures)
+        documents.append(
+            report(sandbox, selected, results, spec_revision="0" * 40, started_at=now())
+        )
+    assert documents[0]["suite_digest"] == documents[1]["suite_digest"]
+    assert documents[0]["check_digests"] == documents[1]["check_digests"]
 
 
 @pytest.mark.integration

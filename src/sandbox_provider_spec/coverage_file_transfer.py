@@ -56,6 +56,9 @@ LIFETIME_MARGIN_SECONDS = 5
 #: An interrupted write is observed every few seconds until three observations agree.
 INTERRUPT_SETTLE_SECONDS = 3
 INTERRUPT_SETTLE_POLLS = 10
+#: Sandbox lifetime the file-link and 1 GiB stream checks request unless the run overrides
+#: `file_transfer_lifetime_seconds`; the other rows keep their own requested bounds.
+TRANSFER_LIFETIME_SECONDS = 600
 _HTTP_TIMEOUT_SECONDS = 600
 _OBSERVE = r"""
 import hashlib, json, os, pwd, sys
@@ -675,6 +678,11 @@ class FileTransferRunner(RegularWriteUsabilityRunner):
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         super().__init__(driver, fixtures)
+        lifetime = self.fixtures.setdefault(
+            "file_transfer_lifetime_seconds", TRANSFER_LIFETIME_SECONDS
+        )
+        if not isinstance(lifetime, int) or isinstance(lifetime, bool) or lifetime < 1:
+            raise ValueError("file_transfer_lifetime_seconds must be a positive integer")
         self.send, self.sleep = send, sleep
 
     def _test_operation(

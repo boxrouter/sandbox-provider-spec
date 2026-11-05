@@ -2951,7 +2951,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -2975,7 +2975,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -2998,7 +2998,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3020,7 +3020,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3042,7 +3042,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3064,7 +3064,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3086,7 +3086,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3109,7 +3109,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3133,7 +3133,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3155,7 +3155,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3178,7 +3178,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3259,7 +3259,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3284,7 +3284,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3310,7 +3310,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3333,7 +3333,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_links
     target: box
     in:
@@ -3379,7 +3379,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_stream
     target: box
     in:
@@ -3451,7 +3451,7 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 600
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
   - op: fixture.file_stream
     target: box
     in:

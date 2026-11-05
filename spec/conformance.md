@@ -244,6 +244,7 @@ Common fixture names are below. Supplementary denylist tests also need the
 | `max_allow_urls` | List of reachable controlled receiver URL strings, with exactly as many items as `max_allow_entries`, in the same order. Each receiver serves `GET /records/<namespace>`, and each URL's parsed hostname (`urllib.parse.urlsplit(url).hostname`) must equal its corresponding domain string exactly; parsing lowercases hostname letters, so use lowercase domain entries. The test exercises all entries from both unrestricted and restricted guests. |
 | `max_lifetime_seconds`, `max_lifetime_wait_ms` | Integer requested lifetime in seconds and integer observation wait in milliseconds (at least 1000). The requested lifetime must exceed the wait by more than 30 seconds. A passing continuous-lifetime observation proves only `{at_least: seconds waited}`, rounded down. Use a wait of at least 300000 milliseconds for an admissible declared lower bound. |
 | `link_lifetime_wait_seconds` | Positive preview observation window; use 300 to establish a 300-second lower bound. Sandbox, server and issued-link lifetimes are derived with setup margins. |
+| `file_transfer_lifetime_seconds` | Optional positive integer sandbox lifetime requested by the file-link cases that previously requested 600 seconds (not the `link_lifetime` cases) and the two 1 GiB stream checks; defaults to 600. The link-lifetime, 64 MiB and 5 GiB rows keep their own requested bounds. A value that is not a positive integer refuses the run before any provider call. |
 | `idle_activity_settings` | Native `idle_shutdown` settings for observing a long-running command across the configured idle interval. |
 | `expiry_options` | Native creation options with a 60-second resumable ending, for observing file survival after expiry. |
 | `idle_before_wait_ms`, `idle_after_wait_ms`, `idle_lifetime_seconds`, `idle_process_timeout_ms` | Bounds for observing the effective native idle interval. The first wait is shorter than that interval; the second is longer. Sandbox and process lifetimes exceed the whole observation so an ordinary deadline cannot look like idle shutdown. These are runner delays, not requested idle settings; they must bracket the interval the native creation uses. |
@@ -659,7 +660,12 @@ returns the file's bytes nor changes it.
 
 The 1 GiB and 5 GiB stream tests run only with the `file_stream_large: true` fixture and
 are otherwise `not_run`. A streamed size is proven only by a transfer of that size, so a
-declaration's `file_stream_max_bytes` never exceeds the largest passing test.
+declaration's `file_stream_max_bytes` never exceeds the largest passing test. The file-link
+cases that previously requested 600 seconds (excluding `link_lifetime`) and the two 1 GiB
+stream checks request their sandbox lifetime from the optional
+`file_transfer_lifetime_seconds` fixture (600 seconds unless supplied). The fixture changes
+the requested sandbox lifetime; byte and expiry assertions remain unchanged, and a timeout
+or failure stays a failure.
 
 ## Choosing a conformance path
 

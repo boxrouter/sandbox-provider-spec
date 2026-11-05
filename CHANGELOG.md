@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- The file-link cases that previously requested a 600-second sandbox lifetime (all `file_links.v1.*` except the two `link_lifetime` cases) and the two 1 GiB stream checks now request it through the optional `file_transfer_lifetime_seconds` fixture, which defaults to 600 and is forwarded unchanged to `create`; a value that is not a positive integer refuses the run before any provider call. The 17 tests whose create operand changed get new check digests, as do the other six transfer checks because a check digest also binds its check module's source; the previous coverage suite digest is preserved in the historical rule registry so committed reports stay evidence. Assertions, waits, proofs and every other requested bound are unchanged.
+
 - Refresh Boat's `size_is_ceiling` report and its sources from the accepted native run; declared values and shapes are unchanged.
 
 - Blaxel's `adapter-default-core` sources file records the shipped report's digest; the export had rewritten the report bytes after the sources were generated, so the pair failed Adapter Kit's trace binding. A regression test now checks every shipped report/sources pair.
