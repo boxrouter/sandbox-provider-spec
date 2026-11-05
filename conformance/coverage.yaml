@@ -1978,18 +1978,22 @@ tests:
         custom_images: {source: dockerfile, build_context: true}
       lifetime_seconds: 300
     as: box
-  - op: files.read_bytes
+  - op: run
     target: box
-    in: {path: /opt/sps-copy}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-copy
     expect:
       equals:
-        data: {utf8: sps-copy-context}
-  - op: files.read_bytes
+        exit_code: 0
+        stdout: {utf8: c3BzLWNvcHktY29udGV4dA==}
+  - op: run
     target: box
-    in: {path: /opt/sps-add}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-add
     expect:
       equals:
-        data: {utf8: sps-add-context}
+        exit_code: 0
+        stdout: {utf8: c3BzLWFkZC1jb250ZXh0}
 - id: coverage.custom_images.prepare.registry
   title: A prepared registry image boots a sandbox.
   rules: [custom_images/prepared]
@@ -2182,12 +2186,14 @@ tests:
         custom_images: {source: dockerfile, prepared: true}
       lifetime_seconds: 300
     as: box
-  - op: files.read_bytes
+  - op: run
     target: box
-    in: {path: /opt/sps-image-marker}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-image-marker
     expect:
       equals:
-        data: {utf8: sps-distro-prepared}
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1wcmVwYXJlZA==}
 - id: coverage.custom_images.prepare.dockerfile_distro_context
   title: A prepared Dockerfile on a named distribution base copies and unpacks build context.
   rules: [custom_images/prepared, custom_images/build-context]
@@ -2218,30 +2224,38 @@ tests:
         custom_images: {source: dockerfile, prepared: true, build_context: true}
       lifetime_seconds: 300
     as: box
-  - op: files.read_bytes
+  - op: run
     target: box
-    in: {path: /opt/sps-copy}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-copy
     expect:
       equals:
-        data: {utf8: sps-distro-context-copy}
-  - op: files.read_bytes
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LWNvcHk=}
+  - op: run
     target: box
-    in: {path: /opt/sps-binary}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-binary
     expect:
       equals:
-        data: {b64: AAECAwQFBgcICQoLDA0ODw==}
-  - op: files.read_bytes
+        exit_code: 0
+        stdout: {utf8: AAECAwQFBgcICQoLDA0ODw==}
+  - op: run
     target: box
-    in: {path: /opt/sps-added}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-added
     expect:
       equals:
-        data: {utf8: sps-distro-context-add}
-  - op: files.read_bytes
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LWFkZA==}
+  - op: run
     target: box
-    in: {path: /opt/sps-bundle/nested/marker.txt}
+    in:
+      bash_script: base64 -w0 -- /opt/sps-bundle/nested/marker.txt
     expect:
       equals:
-        data: {utf8: sps-distro-context-unpacked}
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LXVucGFja2Vk}
 - id: coverage.custom_images.prepare.size
   title: A prepared registry image accepts and delivers the requested size.
   rules: [custom_images/prepared]

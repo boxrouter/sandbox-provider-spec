@@ -9,6 +9,8 @@ import gzip
 import hashlib
 import io
 import json
+import shlex
+import subprocess
 import tarfile
 from collections.abc import Mapping
 from pathlib import Path
@@ -17,7 +19,7 @@ from typing import Any, cast
 import pytest
 import yaml
 
-from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, Observation
+from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, NotRun, Observation
 from sandbox_provider_spec.runner import Runner
 from sandbox_provider_spec.suite import Test as Scenario
 from sandbox_provider_spec.suite import read_suite, read_suite_at, suite_path
@@ -130,52 +132,54 @@ def test_custom_image_requirements_do_not_repeat_the_top_level_image() -> None:
                 )
 
 
-DISTRO_ROW = "coverage.custom_images.prepare.dockerfile_distro"
-DISTRO_DOCKERFILE = "FROM ubuntu:24.04\nRUN printf sps-distro-prepared >/opt/sps-image-marker\n"
-DISTRO_MARKER = "/opt/sps-image-marker"
-DISTRO_CONTENT = b"sps-distro-prepared"
-
-
-def test_prepared_distro_dockerfile_row_proves_only_source_and_prepared() -> None:
+def _coverage_row(identifier: str) -> dict[str, Any]:
     root = Path(__file__).resolve().parents[1] / "conformance"
     tests = yaml.safe_load((root / "coverage.yaml").read_text())["tests"]
-    test = next(t for t in tests if t["id"] == DISTRO_ROW)
-    assert test["proves"] == [
-        {"gate": "custom_images", "knob": "source", "value": "dockerfile"},
-        {"gate": "custom_images", "knob": "prepared", "value": True},
-    ]
-    prepare = next(step for step in test["steps"] if step.get("op") == "image.prepare")
-    given = prepare["in"]
-    assert set(given) == {"source", "dockerfile"}
-    instructions = [
-        line.split(None, 1)[0] for line in given["dockerfile"].strip().splitlines() if line.strip()
-    ]
-    assert instructions == ["FROM", "RUN"]
-    assert given["dockerfile"] == DISTRO_DOCKERFILE
-    create = next(step for step in test["steps"] if step.get("op") == "create")
-    assert create["in"]["requirements"] == {
-        "custom_images": {"source": "dockerfile", "prepared": True}
+    return next(t for t in tests if t["id"] == identifier)
+
+
+def _coverage_scenario(identifier: str) -> Scenario:
+    suite = read_suite(suite_path().with_name("coverage.yaml"))
+    return next(test for test in suite.tests if test.id == identifier)
+
+
+def _guest_base64(root: Path, script: str) -> Observation:
+    """Run the shipped guest command on a host root, translating only its path."""
+    parts = shlex.split(script)
+    if parts[:3] != ["base64", "-w0", "--"] or len(parts) != 4 or not parts[3].startswith("/"):
+        raise NativeFailure("guest_command_unimplemented")
+    command = shlex.join([*parts[:3], str(root / parts[3].lstrip("/"))])
+    completed = subprocess.run(["bash", "-c", command], capture_output=True, check=False)
+    return {
+        "exit_code": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
     }
-    assert create["in"]["lifetime_seconds"] <= 300
-    marker = next(step for step in test["steps"] if step.get("op") == "files.read_bytes")
-    assert marker["expect"]["equals"]["data"] == {"utf8": "sps-distro-prepared"}
 
 
-class DistroPreparedDriver(Driver):
-    """A faithful fake: the runner's own prepare -> create -> marker dispatch, no provider."""
+class GuestRootDriver(Driver):
+    """A faithful fake: prepare -> create -> guest run, and no native file route."""
 
-    def __init__(self, marker: bytes | None = DISTRO_CONTENT) -> None:
+    unobservable = {"files.read_bytes": "capability_unavailable"}
+
+    def __init__(self, root: Path) -> None:
         super().__init__()
-        self.marker = marker
+        self.root = root
         self.calls: list[str] = []
         self.prepare_inputs: dict[str, object] = {}
         self.create_inputs: dict[str, object] = {}
-        self.read_inputs: dict[str, object] = {}
+        self.run_inputs: list[dict[str, object]] = []
         self.prepared: dict[str, object] = {}
 
-    def image_prepare(self, target: object, inputs: Inputs) -> Observation:
-        del target
-        self.calls.append("image.prepare")
+    def place(self, guest_path: str, data: bytes) -> None:
+        target = self.root / guest_path.lstrip("/")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+
+    def remove(self, guest_path: str) -> None:
+        (self.root / guest_path.lstrip("/")).unlink(missing_ok=True)
+
+    def _prepared(self, inputs: Inputs) -> Observation:
         self.prepare_inputs = dict(inputs)
         self.prepared = {
             "resource": self.own("image", object(), lambda: {"result": "deleted"}),
@@ -193,42 +197,94 @@ class DistroPreparedDriver(Driver):
         self.own("sandbox", box, lambda: {"result": "deleted"})
         return box
 
-    def files_read_bytes(self, target: object, inputs: Inputs) -> Observation:
+    def run(self, target: object, inputs: Inputs) -> Observation:
         del target
-        self.calls.append("files.read_bytes")
-        self.read_inputs = dict(inputs)
-        if self.marker is None:
-            raise NativeFailure("files_read_failed")
-        return {"data": self.marker}
+        self.calls.append("run")
+        self.run_inputs.append(dict(inputs))
+        return _guest_base64(self.root, str(inputs["bash_script"]))
 
 
-def _distro_row() -> Scenario:
-    suite = read_suite(suite_path().with_name("coverage.yaml"))
-    return next(test for test in suite.tests if test.id == DISTRO_ROW)
+def test_the_image_byte_fakes_refuse_the_native_file_route(tmp_path: Path) -> None:
+    for driver in (DistroPreparedDriver(tmp_path), ImageContextDriver(tmp_path)):
+        with pytest.raises(NotRun, match="capability_unavailable"):
+            driver.call("files.read_bytes", None, {"path": "/opt/sps-copy"})
 
 
-def test_prepared_distro_row_dispatches_prepare_create_and_marker() -> None:
-    driver = DistroPreparedDriver()
-    outcome = Runner(driver).run_test(_distro_row())
+DISTRO_ROW = "coverage.custom_images.prepare.dockerfile_distro"
+DISTRO_DOCKERFILE = "FROM ubuntu:24.04\nRUN printf sps-distro-prepared >/opt/sps-image-marker\n"
+DISTRO_MARKER = "/opt/sps-image-marker"
+DISTRO_CONTENT = b"sps-distro-prepared"
+
+
+def test_prepared_distro_dockerfile_row_proves_only_source_and_prepared() -> None:
+    test = _coverage_row(DISTRO_ROW)
+    assert test["proves"] == [
+        {"gate": "custom_images", "knob": "source", "value": "dockerfile"},
+        {"gate": "custom_images", "knob": "prepared", "value": True},
+    ]
+    prepare = next(step for step in test["steps"] if step.get("op") == "image.prepare")
+    given = prepare["in"]
+    assert set(given) == {"source", "dockerfile"}
+    instructions = [
+        line.split(None, 1)[0] for line in given["dockerfile"].strip().splitlines() if line.strip()
+    ]
+    assert instructions == ["FROM", "RUN"]
+    assert given["dockerfile"] == DISTRO_DOCKERFILE
+    create = next(step for step in test["steps"] if step.get("op") == "create")
+    assert create["in"]["requirements"] == {
+        "custom_images": {"source": "dockerfile", "prepared": True}
+    }
+    assert create["in"]["lifetime_seconds"] <= 300
+    reads = [step for step in test["steps"] if step.get("op") == "run"]
+    assert [read["in"]["bash_script"] for read in reads] == [f"base64 -w0 -- {DISTRO_MARKER}"]
+    assert reads[0]["expect"] == {
+        "equals": {
+            "exit_code": 0,
+            "stdout": {"utf8": base64.b64encode(DISTRO_CONTENT).decode()},
+        }
+    }
+    assert not any(step.get("op") == "files.read_bytes" for step in test["steps"])
+
+
+class DistroPreparedDriver(GuestRootDriver):
+    """The distro row's RUN marker lands in the prepared image; no provider."""
+
+    def __init__(self, root: Path, marker: bytes | None = DISTRO_CONTENT) -> None:
+        super().__init__(root)
+        self.marker = marker
+
+    def image_prepare(self, target: object, inputs: Inputs) -> Observation:
+        del target
+        self.calls.append("image.prepare")
+        if self.marker is not None:
+            self.place(DISTRO_MARKER, self.marker)
+        return self._prepared(inputs)
+
+
+def test_prepared_distro_row_dispatches_prepare_create_and_marker(tmp_path: Path) -> None:
+    driver = DistroPreparedDriver(tmp_path)
+    outcome = Runner(driver).run_test(_coverage_scenario(DISTRO_ROW))
     assert outcome["result"] == "passed"
-    assert driver.calls == ["image.prepare", "create", "files.read_bytes"]
+    assert driver.calls == ["image.prepare", "create", "run"]
     assert driver.prepare_inputs == {"source": "dockerfile", "dockerfile": DISTRO_DOCKERFILE}
     assert driver.create_inputs["image"] is driver.prepared
     assert driver.create_inputs["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True}
     }
     assert driver.create_inputs["lifetime_seconds"] == 300
-    assert driver.read_inputs == {"path": DISTRO_MARKER}
+    assert driver.run_inputs == [{"bash_script": f"base64 -w0 -- {DISTRO_MARKER}"}]
     cleanup = cast(list[dict[str, object]], outcome["cleanup"])
     assert {item["kind"] for item in cleanup} == {"image", "sandbox"}
 
 
-@pytest.mark.parametrize(("marker", "result"), [(b"unexpected", "differs"), (None, "error")])
+@pytest.mark.parametrize("marker", [b"unexpected", None])
 def test_prepared_distro_row_fails_on_bad_or_missing_marker(
-    marker: bytes | None, result: str
+    tmp_path: Path, marker: bytes | None
 ) -> None:
-    outcome = Runner(DistroPreparedDriver(marker)).run_test(_distro_row())
-    assert outcome["result"] == result
+    outcome = Runner(DistroPreparedDriver(tmp_path, marker)).run_test(
+        _coverage_scenario(DISTRO_ROW)
+    )
+    assert outcome["result"] == "differs"
 
 
 DISTRO_CONTEXT_ROW = "coverage.custom_images.prepare.dockerfile_distro_context"
@@ -246,18 +302,13 @@ DISTRO_CONTEXT_TEXT = {
 DISTRO_CONTEXT_BINARY = bytes(range(16))
 DISTRO_CONTEXT_MARKER = b"sps-distro-context-unpacked"
 DISTRO_CONTEXT_MARKER_PATH = "/opt/sps-bundle/nested/marker.txt"
-DISTRO_CONTEXT_READS = (
-    "/opt/sps-copy",
-    "/opt/sps-binary",
-    "/opt/sps-added",
-    DISTRO_CONTEXT_MARKER_PATH,
-)
-
-
-def _distro_context_row() -> dict[str, Any]:
-    root = Path(__file__).resolve().parents[1] / "conformance"
-    tests = yaml.safe_load((root / "coverage.yaml").read_text())["tests"]
-    return next(t for t in tests if t["id"] == DISTRO_CONTEXT_ROW)
+DISTRO_CONTEXT_BYTES = {
+    "/opt/sps-copy": b"sps-distro-context-copy",
+    "/opt/sps-binary": DISTRO_CONTEXT_BINARY,
+    "/opt/sps-added": b"sps-distro-context-add",
+    DISTRO_CONTEXT_MARKER_PATH: DISTRO_CONTEXT_MARKER,
+}
+DISTRO_CONTEXT_READS = tuple(DISTRO_CONTEXT_BYTES)
 
 
 def _bundle_members(archive: bytes) -> dict[str, tarfile.TarInfo]:
@@ -266,7 +317,7 @@ def _bundle_members(archive: bytes) -> dict[str, tarfile.TarInfo]:
 
 
 def test_prepared_distro_context_row_proves_only_source_prepared_and_context() -> None:
-    test = _distro_context_row()
+    test = _coverage_row(DISTRO_CONTEXT_ROW)
     assert test["proves"] == [
         {"gate": "custom_images", "knob": "source", "value": "dockerfile"},
         {"gate": "custom_images", "knob": "prepared", "value": True},
@@ -299,29 +350,31 @@ def test_prepared_distro_context_row_proves_only_source_prepared_and_context() -
         "custom_images": {"source": "dockerfile", "prepared": True, "build_context": True}
     }
     assert create["in"]["lifetime_seconds"] <= 300
-    reads = [step for step in test["steps"] if step.get("op") == "files.read_bytes"]
-    assert [read["in"]["path"] for read in reads] == list(DISTRO_CONTEXT_READS)
-    assert reads[-1]["expect"]["equals"]["data"] == {"utf8": DISTRO_CONTEXT_MARKER.decode()}
+    reads = [step for step in test["steps"] if step.get("op") == "run"]
+    assert [read["in"]["bash_script"] for read in reads] == [
+        f"base64 -w0 -- {path}" for path in DISTRO_CONTEXT_READS
+    ]
+    for read, expected in zip(reads, DISTRO_CONTEXT_BYTES.values(), strict=True):
+        assert read["expect"] == {
+            "equals": {
+                "exit_code": 0,
+                "stdout": {"utf8": base64.b64encode(expected).decode()},
+            }
+        }
+    assert not any(step.get("op") == "files.read_bytes" for step in test["steps"])
 
 
-class DistroContextDriver(Driver):
+class ImageContextDriver(GuestRootDriver):
     """A faithful fake: applies the shipped Dockerfile to its context, no provider."""
 
-    def __init__(self, tamper: str | None = None, drop: str | None = None) -> None:
-        super().__init__()
+    def __init__(self, root: Path, tamper: str | None = None, drop: str | None = None) -> None:
+        super().__init__(root)
         self.tamper = tamper
-        self.drop = drop
-        self.calls: list[str] = []
-        self.prepare_inputs: dict[str, object] = {}
-        self.create_inputs: dict[str, object] = {}
-        self.read_inputs: list[dict[str, object]] = []
-        self.prepared: dict[str, object] = {}
-        self.files: dict[str, bytes] = {}
+        self.dropped = drop
 
     def image_prepare(self, target: object, inputs: Inputs) -> Observation:
         del target
         self.calls.append("image.prepare")
-        self.prepare_inputs = dict(inputs)
         context: dict[str, bytes] = {}
         given = cast(Mapping[str, object], inputs["context"])
         for name, content in given.items():
@@ -344,87 +397,187 @@ class DistroContextDriver(Driver):
                             if member.isfile():
                                 extracted = bundle.extractfile(member)
                                 assert extracted is not None
-                                self.files[destination + member.name] = extracted.read()
+                                self.place(destination + member.name, extracted.read())
                         continue
                 except tarfile.TarError:
                     pass
-            self.files[destination] = data
-        if self.drop is not None:
-            self.files.pop(self.drop, None)
-        self.prepared = {
-            "resource": self.own("image", object(), lambda: {"result": "deleted"}),
-            "key": "0" * 64,
-            "identity": "boxrouter-img-offline",
-            "resources": {},
-        }
-        return self.prepared
-
-    def create(self, target: object, inputs: Inputs) -> Observation:
-        del target
-        self.calls.append("create")
-        self.create_inputs = dict(inputs)
-        box = {"identity": "box"}
-        self.own("sandbox", box, lambda: {"result": "deleted"})
-        return box
-
-    def files_read_bytes(self, target: object, inputs: Inputs) -> Observation:
-        del target
-        self.calls.append("files.read_bytes")
-        self.read_inputs.append(dict(inputs))
-        path = str(inputs["path"])
-        if path not in self.files:
-            raise NativeFailure("files_read_failed")
-        return {"data": self.files[path]}
+            self.place(destination, data)
+        if self.dropped is not None:
+            self.remove(self.dropped)
+        return self._prepared(inputs)
 
 
-def _distro_context_scenario() -> Scenario:
-    suite = read_suite(suite_path().with_name("coverage.yaml"))
-    return next(test for test in suite.tests if test.id == DISTRO_CONTEXT_ROW)
-
-
-def test_prepared_distro_context_row_dispatches_prepare_create_and_reads() -> None:
-    driver = DistroContextDriver()
-    outcome = Runner(driver).run_test(_distro_context_scenario())
+def test_prepared_distro_context_row_dispatches_prepare_create_and_reads(
+    tmp_path: Path,
+) -> None:
+    driver = ImageContextDriver(tmp_path)
+    outcome = Runner(driver).run_test(_coverage_scenario(DISTRO_CONTEXT_ROW))
     assert outcome["result"] == "passed"
-    assert driver.calls == ["image.prepare", "create"] + ["files.read_bytes"] * len(
-        DISTRO_CONTEXT_READS
-    )
+    assert driver.calls == ["image.prepare", "create"] + ["run"] * len(DISTRO_CONTEXT_READS)
     assert driver.prepare_inputs == {
         "source": "dockerfile",
         "dockerfile": DISTRO_CONTEXT_DOCKERFILE,
-        "context": _distro_context_row()["steps"][0]["in"]["context"],
+        "context": _coverage_row(DISTRO_CONTEXT_ROW)["steps"][0]["in"]["context"],
     }
     assert driver.create_inputs["image"] is driver.prepared
     assert driver.create_inputs["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True, "build_context": True}
     }
     assert driver.create_inputs["lifetime_seconds"] == 300
-    assert [read["path"] for read in driver.read_inputs] == list(DISTRO_CONTEXT_READS)
+    assert [run["bash_script"] for run in driver.run_inputs] == [
+        f"base64 -w0 -- {path}" for path in DISTRO_CONTEXT_READS
+    ]
     cleanup = cast(list[dict[str, object]], outcome["cleanup"])
     assert {item["kind"] for item in cleanup} == {"image", "sandbox"}
 
 
-@pytest.mark.parametrize(
-    ("tamper", "result"),
-    [
-        ("copied.txt", "differs"),
-        ("binary.bin", "differs"),
-        ("added.txt", "differs"),
-        ("bundle.bin", "error"),
-    ],
-)
+@pytest.mark.parametrize("tamper", ["copied.txt", "binary.bin", "added.txt", "bundle.bin"])
 def test_prepared_distro_context_row_fails_on_bad_or_missing_bytes(
-    tamper: str, result: str
+    tmp_path: Path, tamper: str
 ) -> None:
-    outcome = Runner(DistroContextDriver(tamper)).run_test(_distro_context_scenario())
-    assert outcome["result"] == result
+    outcome = Runner(ImageContextDriver(tmp_path, tamper)).run_test(
+        _coverage_scenario(DISTRO_CONTEXT_ROW)
+    )
+    assert outcome["result"] == "differs"
 
 
 @pytest.mark.parametrize("drop", ["/opt/sps-added", DISTRO_CONTEXT_MARKER_PATH])
-def test_prepared_distro_context_row_fails_on_a_dropped_file(drop: str) -> None:
-    driver = DistroContextDriver(drop=drop)
-    outcome = Runner(driver).run_test(_distro_context_scenario())
-    assert outcome["result"] == "error"
+def test_prepared_distro_context_row_fails_on_a_dropped_file(tmp_path: Path, drop: str) -> None:
+    driver = ImageContextDriver(tmp_path, drop=drop)
+    outcome = Runner(driver).run_test(_coverage_scenario(DISTRO_CONTEXT_ROW))
+    assert outcome["result"] == "differs"
+
+
+BUILD_CONTEXT_ROW = "coverage.custom_images.build_context"
+BUILD_CONTEXT_DOCKERFILE = (
+    "FROM public.ecr.aws/docker/library/python:3.12-slim\n"
+    "COPY nested/copied.txt /opt/sps-copy\n"
+    "ADD added.txt /opt/sps-add\n"
+)
+BUILD_CONTEXT_TEXT = {
+    "nested/copied.txt": "sps-copy-context",
+    "added.txt": "sps-add-context",
+}
+BUILD_CONTEXT_BYTES = {
+    "/opt/sps-copy": b"sps-copy-context",
+    "/opt/sps-add": b"sps-add-context",
+}
+
+
+def test_build_context_row_proves_only_source_and_context() -> None:
+    test = _coverage_row(BUILD_CONTEXT_ROW)
+    assert test["rules"] == ["custom_images/build-context"]
+    assert test["proves"] == [
+        {"gate": "custom_images", "knob": "source", "value": "dockerfile"},
+        {"gate": "custom_images", "knob": "build_context", "value": True},
+    ]
+    prepare = next(step for step in test["steps"] if step.get("op") == "image.prepare")
+    given = prepare["in"]
+    assert set(given) == {"source", "dockerfile", "context"}
+    assert given["dockerfile"] == BUILD_CONTEXT_DOCKERFILE
+    instructions = [line.split(None, 1)[0] for line in given["dockerfile"].strip().splitlines()]
+    assert instructions == ["FROM", "COPY", "ADD"]
+    assert given["context"] == BUILD_CONTEXT_TEXT
+    create = next(step for step in test["steps"] if step.get("op") == "create")
+    assert create["in"]["requirements"] == {
+        "custom_images": {"source": "dockerfile", "build_context": True}
+    }
+    assert create["in"]["lifetime_seconds"] <= 300
+    reads = [step for step in test["steps"] if step.get("op") == "run"]
+    assert [read["in"]["bash_script"] for read in reads] == [
+        f"base64 -w0 -- {path}" for path in BUILD_CONTEXT_BYTES
+    ]
+    for read, expected in zip(reads, BUILD_CONTEXT_BYTES.values(), strict=True):
+        assert read["expect"] == {
+            "equals": {
+                "exit_code": 0,
+                "stdout": {"utf8": base64.b64encode(expected).decode()},
+            }
+        }
+    assert not any(step.get("op") == "files.read_bytes" for step in test["steps"])
+
+
+def test_build_context_row_dispatches_prepare_create_and_reads(tmp_path: Path) -> None:
+    driver = ImageContextDriver(tmp_path)
+    outcome = Runner(driver).run_test(_coverage_scenario(BUILD_CONTEXT_ROW))
+    assert outcome["result"] == "passed"
+    assert driver.calls == ["image.prepare", "create"] + ["run"] * len(BUILD_CONTEXT_BYTES)
+    assert driver.prepare_inputs == {
+        "source": "dockerfile",
+        "dockerfile": BUILD_CONTEXT_DOCKERFILE,
+        "context": BUILD_CONTEXT_TEXT,
+    }
+    assert driver.create_inputs["image"] is driver.prepared
+    assert driver.create_inputs["requirements"] == {
+        "custom_images": {"source": "dockerfile", "build_context": True}
+    }
+    assert driver.create_inputs["lifetime_seconds"] == 300
+    assert [run["bash_script"] for run in driver.run_inputs] == [
+        f"base64 -w0 -- {path}" for path in BUILD_CONTEXT_BYTES
+    ]
+    cleanup = cast(list[dict[str, object]], outcome["cleanup"])
+    assert {item["kind"] for item in cleanup} == {"image", "sandbox"}
+
+
+@pytest.mark.parametrize("tamper", ["nested/copied.txt", "added.txt"])
+def test_build_context_row_fails_on_tampered_context(tmp_path: Path, tamper: str) -> None:
+    outcome = Runner(ImageContextDriver(tmp_path, tamper)).run_test(
+        _coverage_scenario(BUILD_CONTEXT_ROW)
+    )
+    assert outcome["result"] == "differs"
+
+
+def test_build_context_row_fails_on_a_dropped_file(tmp_path: Path) -> None:
+    driver = ImageContextDriver(tmp_path, drop="/opt/sps-add")
+    outcome = Runner(driver).run_test(_coverage_scenario(BUILD_CONTEXT_ROW))
+    assert outcome["result"] == "differs"
+
+
+REPAIRED_IMAGE_READS: dict[str, dict[str, bytes]] = {
+    BUILD_CONTEXT_ROW: BUILD_CONTEXT_BYTES,
+    DISTRO_ROW: {DISTRO_MARKER: DISTRO_CONTENT},
+    DISTRO_CONTEXT_ROW: DISTRO_CONTEXT_BYTES,
+}
+
+
+def test_repaired_rows_change_only_their_read_steps() -> None:
+    """Each repaired row keeps prepare/create and reads the same bytes through run."""
+    for identifier, reads in REPAIRED_IMAGE_READS.items():
+        test = _coverage_row(identifier)
+        prepare, create, *read_steps = test["steps"]
+        assert prepare["op"] == "image.prepare" and create["op"] == "create"
+        assert len(read_steps) == len(reads)
+        for step, (path, expected) in zip(read_steps, reads.items(), strict=True):
+            assert step == {
+                "op": "run",
+                "target": "box",
+                "in": {"bash_script": f"base64 -w0 -- {path}"},
+                "expect": {
+                    "equals": {
+                        "exit_code": 0,
+                        "stdout": {"utf8": base64.b64encode(expected).decode()},
+                    }
+                },
+            }
+
+
+def test_shipped_base64_commands_run_verbatim_on_a_host_root(tmp_path: Path) -> None:
+    """The shipped commands run once the guest path is host-translated, bytes exact."""
+    for identifier, reads in REPAIRED_IMAGE_READS.items():
+        test = _coverage_row(identifier)
+        for index, (path, expected) in enumerate(reads.items()):
+            host = tmp_path / identifier / path.lstrip("/")
+            host.parent.mkdir(parents=True, exist_ok=True)
+            host.write_bytes(expected)
+            step = test["steps"][2 + index]
+            translated = step["in"]["bash_script"].replace(path, str(host))
+            completed = subprocess.run(["bash", "-c", translated], capture_output=True, check=False)
+            assert completed.returncode == 0
+            assert completed.stdout == base64.b64encode(expected)
+            assert completed.stdout.decode() == step["expect"]["equals"]["stdout"]["utf8"]
+            host.unlink()
+            missing = subprocess.run(["bash", "-c", translated], capture_output=True, check=False)
+            assert missing.returncode != 0
 
 
 def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
