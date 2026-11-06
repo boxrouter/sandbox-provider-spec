@@ -1,0 +1,198 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.image_config.env": "sha256:f34d6746a9247f833ee51621cf9f69aa45968d7038f2e63b9c6ebaf32ad207fd",
+    "coverage.custom_images.prepare.image_config.user": "sha256:76842b55377ba61e4ffb441f8967845a2685bd5cc01a06072361fd53685a1152",
+    "coverage.custom_images.prepare.image_config.workdir": "sha256:fb5843b60f5cae932429a55a34959279456731477ea6c6d93243347bf9d1c089",
+    "coverage.custom_images.prepare.registry": "sha256:0e1ee9b43196c9b2b049bedd3ccf9e62f6f1be206fa429fdd482b24413e131d6"
+  },
+  "class": "container",
+  "clean": true,
+  "driver": {
+    "name": "DaytonaDriver",
+    "version": "0.24.334"
+  },
+  "finished_at": "2026-11-06T11:53:11.447349+00:00",
+  "implementation": "boxrouter_daytona",
+  "implementation_digest": "sha256:40c6518cb6edcc7f1b092bd2b093a3851b206811b04d92f7774f4425cb4381bc",
+  "provider": "daytona",
+  "revision": "74689277348857d00cb8b3e71a3122b02ddc9605",
+  "run_id": "spec-run-20261106T115129Z-37ba",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.334",
+    "boxrouter-core": "0.13.377",
+    "boxrouter-daytona": "0.5.279",
+    "daytona": "0.226.1"
+  },
+  "selected_tests": [
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.image_config.env",
+    "coverage.custom_images.prepare.image_config.workdir",
+    "coverage.custom_images.prepare.image_config.user"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-06T11:51:29.591765+00:00",
+  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 33113,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 28578,
+      "id": "coverage.custom_images.prepare.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 20981,
+      "id": "coverage.custom_images.prepare.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19177,
+      "id": "coverage.custom_images.prepare.image_config.user",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "user"
+          ]
+        }
+      ],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    }
+  ]
+}

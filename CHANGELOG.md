@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Modal's `default` and `vm` classes declare `sizes` as ranges, so a fitting request is provisioned at the size it asked for rather than the next listed point, and declare `size_is_ceiling: true`, cited to fresh adapter runs. The upper bounds are unchanged: Modal documents no number, so each stays the largest size a run has created.
+
 - The file-link cases that previously requested a 600-second sandbox lifetime (all `file_links.v1.*` except the two `link_lifetime` cases) and the two 1 GiB stream checks now request it through the optional `file_transfer_lifetime_seconds` fixture, which defaults to 600 and is forwarded unchanged to `create`; a value that is not a positive integer refuses the run before any provider call. The 17 tests whose create operand changed get new check digests, as do the other six transfer checks because a check digest also binds its check module's source; the previous coverage suite digest is preserved in the historical rule registry so committed reports stay evidence. Assertions, waits, proofs and every other requested bound are unchanged.
 
 - Refresh Boat's `size_is_ceiling` report and its sources from the accepted native run; declared values and shapes are unchanged.

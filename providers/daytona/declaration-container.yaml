@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: daytona
 class: container
 verified:
-  date: '2026-11-05'
+  date: '2026-11-06'
   sdks:
     daytona: 0.226.1
 resources:
@@ -44,6 +44,8 @@ resources:
 gates:
   custom_images:
   - source: dockerfile
+  - source: oci
+    prepared: true
   processes:
   - cancel: true
     reattach: true
@@ -173,6 +175,14 @@ evidence:
     tests:
     - custom_images.dockerfile
     report: reports/native-container-core.json
+  gates.custom_images.1.source:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/adapter-container-custom-images-oci.json
+  gates.custom_images.1.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/adapter-container-custom-images-oci.json
   gates.processes.0.cancel:
     tests:
     - processes.cancel.true

@@ -2,17 +2,20 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: default
 verified:
-  date: '2026-10-29'
+  date: '2026-11-06'
   sdks:
     modal: 1.6.1
 resources:
   kernel: filtered
   max_lifetime_seconds: 86400
   sizes:
-  - cpu: 0.125
-    memory_mib: 128
-  - cpu: 4
-    memory_mib: 8192
+  - cpu:
+    - 0.125
+    - 4
+    memory_mib:
+    - 128
+    - 8192
+  size_is_ceiling: true
   default_size: unknown
   regions:
   - modal:us
@@ -99,8 +102,16 @@ evidence:
       of up to 24 hours to the Sandbox.create(...) function.
   resources.sizes:
     source: https://modal.com/docs/guide/resources
-    read: '2026-10-07'
-    quote: You can also guarantee access to more resources by requesting larger values.
+    read: '2026-11-06'
+    quote: Each Modal Function or Sandbox container has a default request of 0.125 CPU cores and 128 MiB
+      of memory. You can also guarantee access to more resources by requesting larger values, similarly
+      to Kubernetes. For both CPU and memory, a maximum is enforced at Function or Sandbox creation time
+      to ensure your containers can be scheduled for execution. Requests exceeding the maximum will be
+      rejected with an InvalidError.
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
   resources.regions:
     source: https://modal.com/docs/guide/region-selection
     read: '2026-10-04'

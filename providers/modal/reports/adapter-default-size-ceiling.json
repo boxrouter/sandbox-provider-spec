@@ -1,0 +1,107 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a",
+    "coverage.facts.sizes.delivered": "sha256:1df4708b22c503947450b78dc393eaee4fa9422ebd4421761fed031f95f519e7"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ModalDriver",
+    "version": "0.24.334"
+  },
+  "finished_at": "2026-11-06T11:49:11.020299+00:00",
+  "implementation": "boxrouter_modal",
+  "implementation_digest": "sha256:15598ccacfaf425f8036828a404bc3054f18e4bdf9bfea554b5aa8262354bb01",
+  "provider": "modal",
+  "revision": "a221ce8dfd207e95e527f53f57fe2bad779d3028",
+  "run_id": "modal-decl-default-20261106T114858Z",
+  "sdk_versions": {
+    "boxrouter-adapter-kit": "0.24.334",
+    "boxrouter-core": "0.13.377",
+    "boxrouter-modal": "0.4.226",
+    "modal": "1.6.1"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.sizes.delivered"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-06T11:49:04.862735+00:00",
+  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3779,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"1000000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"2000000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n6:memory:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n5:job:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n4:devices:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n3:cpuset:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n2:cpuacct:/ta-01M6RB1TQMW30JGKE30JD57RAV\\n1:cpu:/ta-01M6RB1TQMW30JGKE30JD57RAV\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2376,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            },
+            "observed_cpu": 4,
+            "observed_memory_mib": 8192
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
