@@ -83,7 +83,7 @@ lifetime_timer:
   at_end:
   - destroyed
   - stopped
-  adjustable: true
+  adjustable: false
   step_seconds: 1
   counts_from: unknown
 gates:

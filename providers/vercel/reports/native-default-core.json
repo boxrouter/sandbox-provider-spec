@@ -24,8 +24,8 @@
   },
   "finished_at": "2026-10-29T02:52:07.269911+00:00",
   "provider": "vercel",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-vercel-default-core-20261029T023004Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-9c1d649ac6618faccec2",
   "sdk_versions": {
     "vercel-sandbox": "0.9.0"
   },

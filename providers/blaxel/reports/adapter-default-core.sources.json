@@ -25189,7 +25189,7 @@
     "volumes.sharing.one_sandbox.object_store": []
   },
   "format": 1,
-  "report_sha256": "2f3cfd2c2ff79347c474bddbbd546200e4e4fb500b0da7b3f29f6000974ec752",
+  "report_sha256": "274dcd160b0230f77e1e3cfba9251b60ed93573e63434f3bc26e93df5be425af",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:b8ec96256eea72226cae32354acd4a81c96a189e756c914ea23bd8d69a2a2cfa",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",

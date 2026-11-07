@@ -87,6 +87,7 @@
         "counts_paused_time": {"$ref": "#/$defs/boolean_or_unknown"},
         "at_end": {"oneOf": [{"enum": ["paused", "stopped", "destroyed", "unknown"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["paused", "stopped", "destroyed"]}}]},
         "adjustable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "clearable": {"$ref": "#/$defs/boolean_or_unknown"},
         "step_seconds": {"oneOf": [{"type": "integer", "minimum": 1}, {"const": "unknown"}]},
         "counts_from": {"enum": ["create", "ready", "unknown"]},
         "min_seconds": {"oneOf": [{"type": "integer", "minimum": 1}, {"const": "unknown"}]},

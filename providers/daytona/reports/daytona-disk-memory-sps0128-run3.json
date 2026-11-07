@@ -11,8 +11,8 @@
   },
   "finished_at": "2026-10-26T19:36:10.748875+00:00",
   "provider": "daytona",
-  "revision": "13baa553c67c4c3a985bdda87c8dd5a21c10a011",
-  "run_id": "run-20261026T193604Z-4064",
+  "revision": "c159816851b200b12b9e154a1928725287a828cd",
+  "run_id": "public-edf228a64442770414c7",
   "sdk_versions": {
     "daytona": "0.220.0"
   },

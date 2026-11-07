@@ -30,6 +30,19 @@ PUBLISHED = {
 }
 
 
+def test_publication_receipts_use_a_stable_maintainer_identity() -> None:
+    assert RECEIPT == {
+        "approved_by": "maintainer",
+        "reference": "decision",
+        "content_sha256": "62458d2c1665b192bd6cad384007375365cf0dd979d99ba87263aa45f34bc8eb",
+    }
+    assert CLASS_RECEIPT == {
+        "approved_by": "maintainer",
+        "reference": "decision",
+        "content_sha256": "0df237dafd02417a4411c6ffcb29f5eb2701c3090f5e7874cd5bce826848556f",
+    }
+
+
 def provider(tmp_path: Path, name: str, **files: Any) -> Path:
     folder = tmp_path / "providers" / name
     folder.mkdir(parents=True)

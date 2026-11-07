@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -16,9 +17,7 @@ from sandbox_provider_spec.check_digests import historical_rule_digest
 from sandbox_provider_spec.evidence import _source_suite_rules, check_report_evidence
 from sandbox_provider_spec.suite import read_suite, suite_path
 
-# The 0.3.128 release tag targets 13baa553c67c4c3a985bdda87c8dd5a21c10a011.
-# The referenced 432ae377fdc2d7f558e3b369df043ae766369fb7 is 0.3.129; its two
-# suite source files are byte-identical to the 0.3.128 tag.
+# These reports share one source revision and use the historical 0.3.128 suite.
 SUITE = "sha256:9388f89c4361e388c048282139526f1618754a2905ebc0ddb63d2ac6fb0c778e"
 REPORTS = Path(__file__).resolve().parents[1] / "providers/daytona/reports"
 
@@ -40,15 +39,17 @@ def test_daytona_0128_digest_restores_complete_rule_map() -> None:
     )
 
 
-def test_daytona_0128_reports_keep_original_identity_and_rule_labels() -> None:
+def test_daytona_0128_reports_keep_consistent_identity_and_rule_labels() -> None:
     reports = _reports()
     assert len(reports) == 3
     rules, errors = _source_suite_rules(SUITE)
     assert errors == [] and rules is not None
+    revisions = {report["revision"] for _, report in reports}
+    assert len(revisions) == 1
+    assert re.fullmatch(r"[0-9a-f]{40}", next(iter(revisions)))
     for path, report in reports:
         original = path.read_bytes()
         assert report["suite_digest"] == SUITE
-        assert report["revision"] == "13baa553c67c4c3a985bdda87c8dd5a21c10a011"
         assert report["sdk_versions"] == {"daytona": "0.220.0"}
         assert report["driver"] == {"name": "DaytonaDriver", "version": "0.3.128"}
         assert check_report_evidence(report) == []

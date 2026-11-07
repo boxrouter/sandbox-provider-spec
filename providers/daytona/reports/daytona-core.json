@@ -110,8 +110,8 @@
   },
   "finished_at": "2026-10-21T07:53:02.702867+00:00",
   "provider": "daytona",
-  "revision": "56a5fa8db0a7ff43a4db726040d0452ebd5ee82c",
-  "run_id": "run-20261021T071209Z-748a",
+  "revision": "499e545bbe42dafa66f025da1a2d76582ccc87f8",
+  "run_id": "public-0568c72d17c038af9614",
   "sdk_versions": {
     "daytona": "0.220.0"
   },

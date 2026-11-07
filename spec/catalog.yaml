@@ -502,7 +502,7 @@ resource_descriptions:
   unmet_limits: "The ceiling that holds while a condition named under needs is not met: for a limited fact (max_lifetime_seconds or disk_mib) and one of its conditions, a positive integer in the fact's own unit, or unknown. It narrows what an account can be offered and never proves a request is supported."
 conflicts_may_name:
   resources: [gpus, regions, root, package_manager, libc, kernel_features]
-lifetime_timer: [enforced_by, counts_paused_time, at_end, adjustable, step_seconds, counts_from, min_seconds, after_resume]
+lifetime_timer: [enforced_by, counts_paused_time, at_end, adjustable, clearable, step_seconds, counts_from, min_seconds, after_resume]
 evidence:
   test_entry: {keys: [tests, report], tests_nonempty: true, report_prefix: reports/}
   quote_entry: {keys: [source, read, quote], quote_nonempty: true}
@@ -526,6 +526,7 @@ evidence:
     - resources.max_gpus
     - lifetime_timer.counts_paused_time
     - lifetime_timer.adjustable
+    - lifetime_timer.clearable
     - lifetime_timer.step_seconds
     - lifetime_timer.counts_from
     - lifetime_timer.min_seconds

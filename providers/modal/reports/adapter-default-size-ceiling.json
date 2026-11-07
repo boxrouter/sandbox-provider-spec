@@ -7,19 +7,14 @@
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ModalDriver",
-    "version": "0.24.334"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-06T11:49:11.020299+00:00",
-  "implementation": "boxrouter_modal",
-  "implementation_digest": "sha256:15598ccacfaf425f8036828a404bc3054f18e4bdf9bfea554b5aa8262354bb01",
   "provider": "modal",
-  "revision": "a221ce8dfd207e95e527f53f57fe2bad779d3028",
-  "run_id": "modal-decl-default-20261106T114858Z",
+  "revision": "25fd073a6f673243b44674813fa03a93d3a7eb4f",
+  "run_id": "public-10feb14287f9434fdc05",
   "sdk_versions": {
-    "boxrouter-adapter-kit": "0.24.334",
-    "boxrouter-core": "0.13.377",
-    "boxrouter-modal": "0.4.226",
     "modal": "1.6.1"
   },
   "selected_tests": [

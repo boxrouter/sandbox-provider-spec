@@ -5,20 +5,15 @@
   },
   "clean": true,
   "driver": {
-    "name": "BoatDriver",
-    "version": "0.24.312"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-05T10:44:08.196928+00:00",
-  "implementation": "boxrouter_boat",
-  "implementation_digest": "sha256:b8b7688f2455894ba0f31f6b8ae9f5e882947f079124d4245890d7a74fc8de64",
   "provider": "boat",
-  "revision": "30a1946b002d2b2351d5b5eb8e7f324f1b225187",
-  "run_id": "boat-a06-size-ceiling-20261105T104351Z",
+  "revision": "dddc8b82e40e466c31183dad87d0dbe3ecbe0ad8",
+  "run_id": "public-1fe19ae071ada5197907",
   "sdk_versions": {
-    "boat-sdk": "1.13.0",
-    "boxrouter-adapter-kit": "0.24.312",
-    "boxrouter-boat": "0.3.20",
-    "boxrouter-core": "0.13.368"
+    "boat-sdk": "1.13.0"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"

@@ -51,6 +51,10 @@ untested:
     Whether a timer can be set again is a property of the provider's API. A run would have to
     outlast a lifetime to show the new length takes effect. The value rests on a dated quote
     of the provider's documentation.
+  facts/lifetime-timer-clearable: >-
+    Whether a timer can be removed is a property of the provider's API, and showing the sandbox
+    outlives its former end would outlast any conformance run. The value rests on a dated quote
+    of the provider's documentation.
   facts/lifetime-timer-step: >-
     A timer's unit shows only at the end of a lifetime, longer than any conformance run waits.
     The value rests on a dated quote of the provider's documentation.

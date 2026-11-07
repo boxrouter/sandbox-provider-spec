@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sandbox-provider-spec"
-version = "0.3.170"
+version = "0.3.171"
 description = "The Sandbox Provider Specification: what a sandbox provider guarantees, how it declares it, and how conformance proves it"
 readme = "README.md"
 license = "Apache-2.0"

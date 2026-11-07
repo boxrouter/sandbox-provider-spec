@@ -5,20 +5,15 @@
   },
   "clean": true,
   "driver": {
-    "name": "BlaxelDriver",
-    "version": "0.24.312"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-05T03:22:16.725908+00:00",
-  "implementation": "boxrouter_blaxel",
-  "implementation_digest": "sha256:6616c448ab9d4ac1feac329734941f5c797db6bfa6ff1e46111c2fd1f5c72a4a",
   "provider": "blaxel",
-  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
-  "run_id": "spec-run-20261105T032206Z-5d78",
+  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
+  "run_id": "public-98fafb43fb0d0e135c79",
   "sdk_versions": {
-    "blaxel": "0.4.8",
-    "boxrouter-adapter-kit": "0.24.312",
-    "boxrouter-blaxel": "0.5.248",
-    "boxrouter-core": "0.13.366"
+    "blaxel": "0.4.8"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"

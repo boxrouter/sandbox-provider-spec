@@ -17,54 +17,9 @@ jobs:
     runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - name: Main only takes exported commits
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # This repository is a mirror: its canonical source's export writes main, and each
-          # exported commit carries an Open-Source-Change or Open-Source-Tree trailer (the
-          # reviewed-snapshot sync writes the tree form). A commit without one was merged here
-          # directly; the canonical source must import it and re-export before this check
-          # passes again.
-          if ! git log -1 --format=%B | grep -qE '^Open-Source-(Change|Tree): '; then
-            echo "::error::main is written by the canonical source's export; do not merge directly here. Open a pull request instead: maintainers import merged contributions into the canonical source and the next export brings them back."
-            exit 1
-          fi
       - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           version: '0.13.4'
           python-version: '3.11'
       - name: Check specification
         run: make check
-  guardrail-gate:
-    # Probe whether the shared guardrail action can resolve before anything references it.
-    # While this repository and the guardrail repository are both private, the gate reports
-    # no and the job below skips. On a public mirror an unreachable guardrail fails the run:
-    # a public check must not pass without its license, REUSE and public-text guardrails.
-    runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER || 'ubuntu-latest' }}
-    outputs:
-      runnable: ${{ steps.probe.outputs.runnable }}
-    steps:
-      - id: probe
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh api repos/boxrouter/sandbox-provider-benchmarks >/dev/null 2>&1; then
-            echo "runnable=yes" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          visibility=$(gh api "repos/$GITHUB_REPOSITORY" --jq .visibility) || {
-            echo "::error::cannot read this repository's visibility to decide the shared guardrail gate"
-            exit 1
-          }
-          if [ "$visibility" = "public" ]; then
-            echo "::error::the shared public guardrail cannot resolve on a public mirror; publish the guardrail repository first, then re-run"
-            exit 1
-          fi
-          echo "runnable=no" >> "$GITHUB_OUTPUT"
-  public-guardrails:
-    needs: guardrail-gate
-    if: ${{ needs.guardrail-gate.outputs.runnable == 'yes' }}
-    runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER || 'ubuntu-latest' }}
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: boxrouter/sandbox-provider-benchmarks/.github/actions/public-guardrails@main

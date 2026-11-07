@@ -26,8 +26,8 @@
   },
   "finished_at": "2026-10-29T00:13:57.770997+00:00",
   "provider": "e2b",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-e2b-default-core-20261028T235134Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-ad130bc25d8e8e3de0f9",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",

@@ -13,8 +13,8 @@
   },
   "finished_at": "2026-10-29T00:54:51.556645+00:00",
   "provider": "modal",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-modal-default-coverage-20261029T005341Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-98996782943d2c8fe356",
   "sdk_versions": {
     "modal": "1.6.1"
   },

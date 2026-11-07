@@ -1,10 +1,8 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-02
-  sdks: {boxd: 0.2.22}
-# Lifetime: fixtures request 900s and wait 300000ms. The test proves {at_least: 300};
-# write an exact max_lifetime_seconds as the admission cap (900), not the observed floor.
+  date: 2026-11-07
+  sdks: {boxd: 0.3.0}
 resources:
   kernel: dedicated
   sizes:
@@ -30,37 +28,40 @@ resources:
   max_run_seconds: unknown
   max_process_seconds: unknown
   long_running: unknown
+  extendable_lifetime: true
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end: [destroyed]
 gates:
   processes:
   - input: true
     cancel: true
-    reattach: false
+    reattach: true
   network_lockdown:
   - policy: allowlist
     entry_kinds: [names]
     allow_wildcards: true
     max_allow: {at_least: 32}
-  # Suspend-to-RAM keeps files and memory (proven live 2026-11-02), but every suite
-  # row citing keeps needs process.start, which boxd does not offer, so keeps stays
-  # unknown until a runnable row exists. Limits: any inbound connection (exec, SSH,
-  # HTTPS) wakes a suspended machine, and its platform delete timer counts suspended
-  # time — the adapter clears it at pause and re-arms it on resume.
+  # A new inbound connection wakes a suspended machine. The provider's delete timer
+  # counts suspended time, so pause and lifetime behavior remain separate guarantees.
   pause_resume:
   - keeps: files_and_memory
-  # boxd captures disk and memory, but CreateSnapshot returns pending and has no
-  # wait argument or native completion stream. A restore of that pending snapshot
-  # fails with failed_precondition instead of waiting. The snapshots gate is absent
-  # because the usable-on-return contract cannot be met without a client poll loop.
-  # Native snapshot APIs remain available outside the BoxRouter offer.
-  # A pending snapshot cannot be restored and has no native completion signal.
-# BoxRouter creates every boxd machine with `isolated=True`: a non-isolated machine
-# carries an in-VM credential that can create machines billed to the org.
+  # Snapshots remain undeclared until the provider exposes a completed snapshot that
+  # can be restored with the advertised behavior.
 x-boxd:
   isolated: true
-  # BoxRouter reads each machine's usage and cost from boxd's own GetVmUsage record,
-  # which stays readable after the machine is deleted and ends with complete=true.
   usage_records: boxd.machines.usage
 evidence:
+  resources.extendable_lifetime:
+    tests: [facts.extendable_lifetime]
+    report: reports/lifetime-extend.json
+  lifetime_timer.enforced_by:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-extend.json
+  lifetime_timer.at_end:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-extend.json
   gates.pause_resume.0:
     tests: [pause_resume.files_and_memory]
     report: reports/default.json
@@ -68,7 +69,7 @@ evidence:
     tests: [pause_resume.files_and_memory]
     report: reports/default.json
   gates.processes.0:
-    tests: [processes.input.true, processes.cancel.true, processes.reattach.false]
+    tests: [processes.input.true, processes.cancel.true, processes.reattach.true]
     report: reports/default.json
   gates.processes.0.input:
     tests: [processes.input.true]
@@ -77,7 +78,7 @@ evidence:
     tests: [processes.cancel.true]
     report: reports/default.json
   gates.processes.0.reattach:
-    tests: [processes.reattach.false]
+    tests: [processes.reattach.true]
     report: reports/default.json
   gates.network_lockdown.0.policy:
     tests:
@@ -96,11 +97,11 @@ evidence:
     - network_lockdown.max_allow
     report: reports/default.json
   x-boxd.usage_records:
-    source: boxd Python SDK 0.2.22 machines.usage() docstring; live read run=boxd-usage-20261102T1445Z
+    source: boxd Python SDK 0.2.22 machines.usage() docstring
     read: '2026-11-02'
     quote: "A deleted machine is found by its id or name in the usage history of org (default: your default org, or an API key's org), so this still answers after delete()."
   x-boxd.isolated:
-    source: boxd Python SDK 0.2.22 README; live probe run=boxd-usage-20261102 (egress, commands, files and metadata endpoint)
+    source: boxd Python SDK 0.2.22 README
     read: '2026-11-02'
     quote: 'An isolated machine has no automatic credential: Boxd() raises AuthenticationError there, so pass an API key.'
   resources.size_is_ceiling:
@@ -115,9 +116,9 @@ evidence:
       (100 GiB), identical on every machine. Not a usage figure: it does not grow
       as the disk fills. There is no "disk used" field on the API yet.
   resources.max_lifetime_seconds:
-    source: adapter conformance fixture (max_lifetime_seconds 900)
+    source: conformance fixture (max_lifetime_seconds 900)
     read: '2026-11-02'
-    quote: The adapter sends auto_destroy_timeout of the requested lifetime on every create; fixtures request 900 seconds.
+    quote: A create request with auto_destroy_timeout set to 900 seconds succeeds in the conformance fixture.
   resources.kernel:
     source: boxd Python SDK 0.2.22 README (Machines)
     read: '2026-11-02'
@@ -127,10 +128,10 @@ evidence:
     read: '2026-11-02'
     quote: 'There are four sizes: 1 vCPU/4G, 2/8G, 4/16G, 8/32G.'
   resources.regions:
-    source: boxd Python SDK 0.3.0 regions.list; native run boxd-regions-20261103t215800z-1e476a; https://pypi.org/project/boxd/0.3.0/
+    source: boxd Python SDK 0.3.0 regions.list; https://pypi.org/project/boxd/0.3.0/
     read: '2026-11-03'
     quote: 'ListRegions returned id=fra, name=Frankfurt and id=nyc, name=New York, both enabled. Explicit-region create, get, exec, list and delete succeeded in each region.'
   resources.located_in:
-    source: boxd Python SDK 0.3.0 regions.list; native run boxd-regions-20261103t215800z-1e476a; https://pypi.org/project/boxd/0.3.0/
+    source: boxd Python SDK 0.3.0 regions.list; https://pypi.org/project/boxd/0.3.0/
     read: '2026-11-03'
     quote: 'ListRegions returned id=fra, name=Frankfurt and id=nyc, name=New York.'

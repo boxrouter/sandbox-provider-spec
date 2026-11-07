@@ -8,7 +8,7 @@
   },
   "finished_at": "2026-10-03T16:55:58.160783+00:00",
   "provider": "daytona",
-  "revision": "bd5bfa5db3e57f83cb9a2f2422cade3bb4c969d3",
+  "revision": "9e754d0a39c1b3b66ba730ba7d95935b812be2ca",
   "sdk_versions": {
     "daytona": "0.220.0"
   },

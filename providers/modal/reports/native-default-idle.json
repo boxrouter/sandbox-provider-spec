@@ -11,8 +11,8 @@
   },
   "finished_at": "2026-10-29T04:21:48.641790+00:00",
   "provider": "modal",
-  "revision": "536753c6da9fdfd6f397f2284b4a83d29c661546",
-  "run_id": "sps-ev2-native-modal-default-idle-20261029T041943Z",
+  "revision": "f74e27451463bb603d7553f8a58f809dfdc65bb9",
+  "run_id": "public-93fe5c2ed5970bf6dd83",
   "sdk_versions": {
     "modal": "1.6.1"
   },

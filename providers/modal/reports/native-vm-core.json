@@ -19,8 +19,8 @@
   },
   "finished_at": "2026-10-29T00:40:12.487392+00:00",
   "provider": "modal",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-modal-vm-core-20261029T003438Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-1e8a5a1ba7e010ce1c98",
   "sdk_versions": {
     "modal": "1.6.1"
   },

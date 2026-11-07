@@ -1089,7 +1089,7 @@ def test_archived_pre_buffered_suite_still_recognizes_old_reports() -> None:
     assert not errors and rules is not None
     assert len(rules) == 99 and not any(name.startswith("http.buffered.") for name in rules)
     old = {
-        "revision": "f37dd87e2364515b1e8fb382825604bf42c5fdd7",
+        "revision": "a" * 40,
         "suite_digest": PRE_BUFFERED_SUITE,
         "selected_tests": ["baseline.run_output"],
         "tests": [{"id": "baseline.run_output", "rules": ["baseline/run"], "result": "passed"}],

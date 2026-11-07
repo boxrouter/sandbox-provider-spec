@@ -652,7 +652,7 @@ map in [catalog.yaml](catalog.yaml).
 | `disk_in_memory` | Files written to the sandbox's own filesystem take its memory rather than disk. | (with `memory_min_mib` and `disk_min_mib`) | unless it is `false`, the size chosen has memory for both together |
 | `on_memory_exhausted` | What the provider ends when a process allocates more memory than the sandbox has: the process (process_killed) or the sandbox (sandbox_ended). | `on_memory_exhausted` (one or a list) | it is one of them |
 | `paused_retention_seconds` | How long the provider keeps a paused or stopped sandbox before deleting it: a number, {at_least: N} or unlimited. | `paused_retention_seconds` | the declared value is at least that |
-| `lifetime_timer` | Whether the provider ends a sandbox when its lifetime runs out (`enforced_by: provider`; a provider without such a timer leaves the block out), whether paused time counts (`counts_paused_time`), and the state the sandbox ends in (`at_end`): `destroyed`, `stopped` or `paused`, or a list of those a caller chooses from at creation. Optional and compared: `min_seconds`, the shortest lifetime the provider accepts. Optional and never compared: `adjustable` (the timer of a sandbox that exists can be set to a new length), `step_seconds` (the timer's unit; a lifetime that is not a whole number of steps is rounded up to one) `counts_from` (`create`: the provider accepts the create; `ready`: the sandbox can run commands; or `unknown`) and `after_resume` (`same`, the default: a resumed sandbox ends as `at_end` says; `pauses`: the timer pauses a sandbox that has been paused and resumed, although it ends one that was not; or `unknown`). | `at_end`: `destroyed` or `paused`; `lifetime_seconds` | the provider ends the lifetime itself and its `at_end` offers that state; `lifetime_seconds` is at least `min_seconds` |
+| `lifetime_timer` | Whether the provider ends a sandbox when its lifetime runs out (`enforced_by: provider`; a provider without such a timer leaves the block out), whether paused time counts (`counts_paused_time`), and the state the sandbox ends in (`at_end`): `destroyed`, `stopped` or `paused`, or a list of those a caller chooses from at creation. Optional and compared: `min_seconds`, the shortest lifetime the provider accepts. Optional and never compared: `adjustable` (the timer of a sandbox that exists can be set to a new length), `clearable` (a timer that was set can be removed from a sandbox that exists, so it has no end of its own; `true`, `false` or `unknown`), `step_seconds` (the timer's unit; a lifetime that is not a whole number of steps is rounded up to one) `counts_from` (`create`: the provider accepts the create; `ready`: the sandbox can run commands; or `unknown`) and `after_resume` (`same`, the default: a resumed sandbox ends as `at_end` says; `pauses`: the timer pauses a sandbox that has been paused and resumed, although it ends one that was not; or `unknown`). | `at_end`: `destroyed` or `paused`; `lifetime_seconds` | the provider ends the lifetime itself and its `at_end` offers that state; `lifetime_seconds` is at least `min_seconds` |
 | `guest_reserved_tcp_ports` | A non-empty subset of TCP ports whose provider-owned listener was observed and blocked the exact tested guest bind tuple. Omitted ports, other families, scopes and times are not established; an empty table does not mean no ports are reserved. Omitted resource means unknown. |  | not compared |
 | `files_write_executable_effect` | What a regular-file write may do to executable bits: preserved keeps execute access on a 0755 overwrite, may_clear may drop it, unverified has no packaged claim. Writing a file does not guarantee it remains executable. Check or explicitly set executable permission before running it as a program. Omitted resource means unverified. The field is informative and never compared. |  | not compared |
 | `file_stream_max_bytes` | The largest file one streamed transfer through the provider's own API moves intact, for read (out of the sandbox) and write (into it): a number of bytes or {at_least: N}, each proven by a transfer of that size. Never unlimited; a direction left out is unknown. | `file_stream_bytes`: `{read: N, write: N}`, naming either or both | the declared value for each named direction is at least N |
@@ -696,7 +696,11 @@ variant's `conflicts` names each of those facts that differs there ([matching](m
 - With `size_is_ceiling: true`, a sandbox created with a declared size **MUST NOT** use more CPU time per second than the size's `cpu`, or more memory than its `memory_mib`. <!-- rule: facts/size-is-ceiling -->
 - A sandbox **MUST** be able to run continuously for `max_lifetime_seconds`. <!-- rule: facts/max-lifetime -->
 - With `extendable_lifetime: true`, the lifetime of a running sandbox **MUST** be able to <!-- rule: facts/extendable-lifetime -->
-  be lengthened.
+  be lengthened, and after a successful extension the provider **MUST** end the sandbox no later
+  than the new end (never at the old one). A client that renews a lifetime in steps, only ever moving
+  the end later, needs only this fact. A client that must also set an exact or shorter lifetime
+  needs `lifetime_timer.adjustable: true` as well. Where `extendable_lifetime` is not
+  `true`, the lifetime given at creation is fixed.
 - With `long_running: true`, a sandbox created to stay on **MUST** keep running while idle. <!-- rule: facts/long-running -->
 - A sandbox created in a declared region **MUST** run in that region. <!-- rule: facts/regions -->
 - A sandbox created without a region **MUST** run in one of the countries `located_in` lists. <!-- rule: facts/located-in -->
@@ -763,7 +767,15 @@ variant's `conflicts` names each of those facts that differs there ([matching](m
   lifetime runs out, leaving it in the state `at_end` declares, and count paused time only
   where `counts_paused_time` is `true`. `at_end` describes the sandbox as a program sees it
   afterwards, never a session inside the provider.
-- With `lifetime_timer` `adjustable: true`, a new length set on a running sandbox **MUST** end it at that length. <!-- rule: facts/lifetime-timer-adjustable -->
+- With `lifetime_timer` `adjustable: true`, a new length set on a running sandbox, longer or shorter, <!-- rule: facts/lifetime-timer-adjustable -->
+  **MUST** either be refused or end the sandbox no later than the new end: the moment of the set
+  plus the new length, or creation plus the new length where the provider counts from creation. A
+  shorter length that is accepted ends the sandbox early; a longer one lets it run until the new end
+  and never beyond `max_lifetime_seconds`. A provider that can only lengthen declares
+  `extendable_lifetime` without `adjustable`.
+- With `lifetime_timer` `clearable: true`, a sandbox whose timer is removed **MUST** no longer be ended <!-- rule: facts/lifetime-timer-clearable -->
+  by it. With `clearable` `false` or `unknown`, a client that needs a sandbox without an end must create it
+  without a lifetime, never rely on removing one.
 - With `lifetime_timer` `step_seconds`, the timer **MUST NOT** end a sandbox before its lifetime <!-- rule: facts/lifetime-timer-step -->
   rounded up to a whole number of steps.
 - With `lifetime_timer` `counts_from`, the timer **MUST NOT** end a sandbox before its lifetime <!-- rule: facts/lifetime-timer-counts-from -->

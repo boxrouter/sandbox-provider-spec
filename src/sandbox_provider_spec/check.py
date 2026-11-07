@@ -68,6 +68,7 @@ LIFETIME_TIMER_KEYS: Final = frozenset(
         "counts_paused_time",
         "at_end",
         "adjustable",
+        "clearable",
         "step_seconds",
         "counts_from",
         "min_seconds",
@@ -963,6 +964,9 @@ def _check_lifetime_timer(timer: Any, errors: list[str]) -> None:
     adjustable = timer.get("adjustable", "unknown")
     if not isinstance(adjustable, bool) and adjustable != "unknown":
         errors.append(f"{UNKNOWN_WORD}: lifetime_timer.adjustable")
+    clearable = timer.get("clearable", "unknown")
+    if not isinstance(clearable, bool) and clearable != "unknown":
+        errors.append(f"{UNKNOWN_WORD}: lifetime_timer.clearable")
     step = timer.get("step_seconds", "unknown")
     if step != "unknown" and (not isinstance(step, int) or isinstance(step, bool) or step < 1):
         errors.append(f"{UNKNOWN_WORD}: lifetime_timer.step_seconds")

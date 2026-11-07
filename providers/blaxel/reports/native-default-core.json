@@ -19,8 +19,8 @@
   },
   "finished_at": "2026-10-29T00:41:42.768045+00:00",
   "provider": "blaxel",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-blaxel-default-core-20261029T002519Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-6834a923443f8e0fe14a",
   "sdk_versions": {
     "blaxel": "0.4.8"
   },

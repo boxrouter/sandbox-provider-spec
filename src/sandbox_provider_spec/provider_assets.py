@@ -88,24 +88,24 @@ def publication_receipt(
     *,
     default_class: str | None = None,
 ) -> dict[str, str]:
-    """Encode an authorized founder decision bound to its exact scope and content.
+    """Encode an authorized maintainer decision bound to its exact scope and content.
 
     The identity schema preserves existing approval hashes. Computing a receipt never
     grants publication authority; the reference records the preceding authorization.
     """
     identity = {
-        "schema": "boxrouter.bench.publication-go/1",
+        "schema": "sandbox-provider-spec.publication-decision/1",
         "provider": provider,
         "class": execution_class,
         "approved": True,
         "reason": reason,
-        "approved_by": "founder",
+        "approved_by": "maintainer",
         "reference": reference,
         "default_class": default_class if execution_class is None else None,
     }
     content = json.dumps(identity, sort_keys=True, separators=(",", ":"), allow_nan=False)
     return {
-        "approved_by": "founder",
+        "approved_by": "maintainer",
         "reference": reference,
         "content_sha256": hashlib.sha256(content.encode()).hexdigest(),
     }

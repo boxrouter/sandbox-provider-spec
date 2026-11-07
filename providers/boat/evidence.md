@@ -9,16 +9,19 @@ left out until they are requested; `xlarge` also needs the $100 plan. Docs quote
 qualification. The lifetime ceiling is the free-trial limit (2 hours); paid plans allow 30 days
 ([auto-stop](https://docs.boat.dev/long-running-tasks/auto-stop)).
 
-## Lifetime timer: not yet declared
+## Lifetime timer and extension
 
 Boat's auto-stop (`ttlSeconds`) counts from creation and is not moved by commands, only by a
-running agent prompt, which the adapter never starts. In the smoke the record's `archiveAfter`
-equalled created + 90 s and the sandbox was gone (404, absent from the exact-label inventory) right
-after. That account has zero data retention, where a stop is a delete; on an account without it a
-stop keeps the disk for 14 days and is resumable, so the ending is `stopped`, not `destroyed`.
-Creating with `snapshots: false` is documented to erase the disk at stop; the smoke cannot separate
-that from the account setting. `lifetime_timer` therefore stays out of this declaration until a
-Kit-bound report proves its `at_end`.
+running agent prompt, which the adapter never starts. `facts.extendable_lifetime` and
+`lifetime_timer.at_end.destroyed` passed in the committed `lifetime-extend.json` and
+`lifetime-at-end.json` reports: a sandbox whose lifetime was extended from 300 to 420 seconds
+was still running after the original end, and an unextended control was gone after its end. On the
+account used, which has zero data retention, a stop is a delete. On an account without it a stop
+keeps the disk for 14 days and is resumable, so the ending there is `stopped`; the declaration
+records only the observed `destroyed`. One earlier run of the extension test timed out reading the
+control sandbox after its end and was rerun once; the committed report is the clean rerun. `adjustable`, `step_seconds`, `counts_from` and
+`min_seconds` stay unknown until a dated quote or report establishes them, and
+`counts_paused_time` is `unknown` because Boat has no pause.
 
 ## Left unknown
 

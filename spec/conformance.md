@@ -435,9 +435,14 @@ package uses its bundled reports even when its virtual environment is inside a G
 the enclosing project's Git index does not own those files. Build and distribution
 provenance establishes that packaged files came from
 committed source. The checker cannot authenticate an arbitrary copied directory without
-Git metadata. The report's `revision` records the clean source that ran for auditing, but
-it need not be a commit in the checkout that checks it. Preserve genuine report revisions
-and results when integrating evidence; do not rewrite them to satisfy the checker.
+Git metadata. In canonical source, the report's `revision` records the clean source that ran
+for auditing, but it need not be a commit in the checkout that checks it. Canonical reports
+remain unchanged. A derived public mirror may replace `revision` with a deterministic opaque
+fingerprint and replace `run_id`; it may also omit implementation-private fields and withhold
+private driver identity and package versions. It preserves the report result, timestamps, suite
+and check digests, and public provider SDK versions. A public revision fingerprint is a
+provenance marker, not a checkout reference. Preserve genuine revisions and results in canonical
+reports; do not rewrite those source files to satisfy the checker.
 
 ## Suite format and driver operations
 

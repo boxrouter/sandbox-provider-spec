@@ -2,9 +2,8 @@
 
 The Docker Engine reference uses a local installation and no provider account.
 The declaration describes only the `default` execution class and Docker SDK 7.2.0.
-All reports below bind to source revision
-`ebe55fe84c6c1e0cec2e01640a271ea25073536b` and were produced on Docker Engine running in
-Colima on macOS; the engine version was not recorded. Each report is `clean: true`: its
+All reports below bind to a single source revision and were produced on Docker Engine
+running in Colima on macOS; the engine version was not recorded. Each report is `clean: true`: its
 cleanup ledger shows every resource the run created released.
 
 ## Live evidence

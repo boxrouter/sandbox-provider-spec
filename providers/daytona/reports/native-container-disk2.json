@@ -11,8 +11,8 @@
   },
   "finished_at": "2026-10-29T01:35:48.168696+00:00",
   "provider": "daytona",
-  "revision": "2af90c16815d59addb31b3cf386ad2fceb4d1d88",
-  "run_id": "sps-native-daytona-container-disk2-20261029T013538Z",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-1d2783aff03392fc93dd",
   "sdk_versions": {
     "daytona": "0.226.1"
   },

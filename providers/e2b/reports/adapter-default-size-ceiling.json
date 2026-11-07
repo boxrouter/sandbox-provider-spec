@@ -5,19 +5,14 @@
   },
   "clean": true,
   "driver": {
-    "name": "E2BDriver",
-    "version": "0.24.312"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-05T03:20:40.581095+00:00",
-  "implementation": "boxrouter_e2b",
-  "implementation_digest": "sha256:3effbb8dedeed32ef33bf8ae4324899a75468f17c2a83bf4e59b06201258b667",
   "provider": "e2b",
-  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
-  "run_id": "spec-run-20261105T031957Z-8527",
+  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
+  "run_id": "public-d5bef715b37045bfb923",
   "sdk_versions": {
-    "boxrouter-adapter-kit": "0.24.312",
-    "boxrouter-core": "0.13.366",
-    "boxrouter-e2b": "0.4.268",
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3"
   },

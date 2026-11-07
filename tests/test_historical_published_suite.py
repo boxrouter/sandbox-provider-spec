@@ -10,14 +10,14 @@ import pytest
 
 from sandbox_provider_spec.evidence import _source_suite_rules, check_report_evidence
 
-# Exact 0.3.117 wheel from f37dd87e2364515b1e8fb382825604bf42c5fdd7:
+# The 0.3.117 wheel is identified by its artifact checksum:
 # 8e768bb8a82184268da69f7dda67418aefc1419f9e91f08d5d3e1011c9ab255e.
 PUBLISHED_SUITE = "sha256:588d4ce8064b70a6255afb37c6e4bce3f85e10c3562e516d54fa24d53359b030"
 
 
 def _report() -> dict[str, Any]:
     return {
-        "revision": "f37dd87e2364515b1e8fb382825604bf42c5fdd7",
+        "revision": "a" * 40,
         "suite_digest": PUBLISHED_SUITE,
         "selected_tests": ["baseline.run_output"],
         "tests": [
@@ -71,7 +71,7 @@ def test_published_0155_suites_keep_their_exact_rule_maps(
     encoded = json.dumps(rules, sort_keys=True, separators=(",", ":")).encode()
     assert hashlib.sha256(encoded).hexdigest() == rules_sha256
     report = _report()
-    report["revision"] = "e71d1fe59f02af77a7dae7dc88f08649bed34856"
+    report["revision"] = "b" * 40
     report["suite_digest"] = digest
     original = json.dumps(report, sort_keys=True)
     assert check_report_evidence(report) == []

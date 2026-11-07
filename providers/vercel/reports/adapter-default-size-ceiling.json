@@ -5,19 +5,14 @@
   },
   "clean": true,
   "driver": {
-    "name": "VercelDriver",
-    "version": "0.24.312"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-05T03:21:09.356724+00:00",
-  "implementation": "boxrouter_vercel",
-  "implementation_digest": "sha256:5a7cd7bc707f3e744d594839ee8259675c12726af110aeb7487bbb58780ba9e5",
   "provider": "vercel",
-  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
-  "run_id": "spec-run-20261105T032102Z-c122",
+  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
+  "run_id": "public-ea75681f63c17afadc6b",
   "sdk_versions": {
-    "boxrouter-adapter-kit": "0.24.312",
-    "boxrouter-core": "0.13.366",
-    "boxrouter-vercel": "0.5.231",
     "vercel-sandbox": "0.9.0"
   },
   "selected_tests": [

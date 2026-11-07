@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boat
 verified:
-  date: '2026-11-05'
+  date: '2026-11-07'
   sdks:
     boat-sdk: 1.13.0
 resources:
@@ -15,6 +15,7 @@ resources:
     cpu: 4
     memory_mib: 8192
   max_lifetime_seconds: 7200
+  extendable_lifetime: true
   gpus: unknown
   disk_mib: unknown
   regions: unknown
@@ -23,8 +24,21 @@ resources:
   max_run_seconds: unknown
   long_running: unknown
   size_is_ceiling: true
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end: [destroyed]
 gates: {}
 evidence:
+  resources.extendable_lifetime:
+    tests: [facts.extendable_lifetime]
+    report: reports/lifetime-extend.json
+  lifetime_timer.enforced_by:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-at-end.json
+  lifetime_timer.at_end:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-at-end.json
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true

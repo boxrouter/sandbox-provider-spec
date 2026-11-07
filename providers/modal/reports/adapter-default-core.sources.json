@@ -2210,7 +2210,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "f8c01ce56b2802f0d3a3f5754b62b0a5d8abe53f844380b097e6bf6548f225a9",
+  "report_sha256": "9c23425f3b01726a69413ca4df00ff3f26c39fed6d609828a703a2fa026badb3",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:b8ec96256eea72226cae32354acd4a81c96a189e756c914ea23bd8d69a2a2cfa",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",

@@ -10,8 +10,8 @@
   },
   "finished_at": "2026-10-12T15:34:24.795239+00:00",
   "provider": "e2b",
-  "revision": "ded5bf03ae8f3a48b4aea382a5516d31e8b733ca",
-  "run_id": "run-20261012T153422Z-481d",
+  "revision": "94a8093050ed22492176d305c12defca9679425a",
+  "run_id": "public-562736f6000345ef6e3c",
   "sdk_versions": {
     "e2b": "2.51.0",
     "e2b-code-interpreter": "2.10.0",

@@ -212,19 +212,14 @@ def test_public_runner_preserves_deadlines_and_reaps_the_process_group(tmp_path:
             assert term_witness["T"] - term_witness["S"] < 3.0 + probe.TERM_RESOLUTION_S
 
         group_start = len(backend.responses)
-        _diagnostic(probe.group_kill, backend, target, inputs, unproven)
+        group_proven = _diagnostic(probe.group_kill, backend, target, inputs, unproven)
         group_witness = json.loads(backend.responses[-1]["stdout"])
         assert group_witness["leader_alive"] is False and group_witness["child_alive"] is False
-        # A late local clock gap is inconclusive when a shared CI host has paused
-        # this timing-sensitive process for several seconds. Keep it visible as a
-        # quarantine instead of counting it as a passing timing observation.
-        kill_gap = probe.judge_kill_gap(group_witness["hb"] - group_witness["T"])
-        if kill_gap == "late":
-            pytest.xfail(
-                "keeper-quarantine 2026-11-04 1a7d75094 shared-runner scheduling makes "
-                "the process-group grace measurement inconclusive"
+        if group_proven:
+            assert probe.judge_kill_gap(group_witness["hb"] - group_witness["T"]) in (
+                None,
+                "ambiguous",
             )
-        assert kill_gap in (None, "ambiguous")
         assert backend.responses[group_start]["outcome"] == "completed"
 
         observation_start = len(backend.responses)

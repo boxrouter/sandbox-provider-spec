@@ -6,19 +6,14 @@
   "class": "container",
   "clean": true,
   "driver": {
-    "name": "DaytonaDriver",
-    "version": "0.24.312"
+    "name": "withheld",
+    "version": "withheld"
   },
   "finished_at": "2026-11-05T03:21:28.708782+00:00",
-  "implementation": "boxrouter_daytona",
-  "implementation_digest": "sha256:5d3b0354880c2412a545796e613cf81465bf71379dc748a96189e3f483cae66e",
   "provider": "daytona",
-  "revision": "1a7d750943ac0629aa03cd1511fea76f92397ae4",
-  "run_id": "spec-run-20261105T032120Z-a78c",
+  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
+  "run_id": "public-09198ff8a2e3ac2e77e7",
   "sdk_versions": {
-    "boxrouter-adapter-kit": "0.24.312",
-    "boxrouter-core": "0.13.366",
-    "boxrouter-daytona": "0.5.275",
     "daytona": "0.226.1"
   },
   "selected_tests": [

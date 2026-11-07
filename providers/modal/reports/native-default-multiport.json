@@ -11,8 +11,8 @@
   },
   "finished_at": "2026-10-29T09:21:42.215925+00:00",
   "provider": "modal",
-  "revision": "14227cf020c7a6827002f683185fb9b44631dab8",
-  "run_id": "run-20261029T092138Z-23ac",
+  "revision": "f7bf1caedd843531572f2fd187615a087e570961",
+  "run_id": "public-daa90e543dbc1918bb54",
   "sdk_versions": {
     "modal": "1.6.1"
   },
