@@ -49,6 +49,15 @@ The lifecycle guide's timeout example establishes units only. After live runs
 resume, a native run must measure timer resolution and emit a proof of the
 observed step before the declaration can claim it.
 
+A live check on 2026-10-28 observed the timer after a resume: a sandbox created
+with `lifecycle: {on_timeout: kill}`, paused, then resumed with
+`connect(timeout)` was paused, not killed, when that timeout ran out; the
+sandbox's reported lifecycle still read `kill`, and the older `/resume` call
+with `autoPause: false` behaved the same. A create that was never paused ends
+in a kill as declared, and the remaining running-time budget carried across the
+resume was honoured to within the 5 s poll. The declaration therefore claims
+`lifetime_timer.after_resume: pauses`.
+
 ## File links
 
 The `file_links` gate declares one variant that reads and writes. The

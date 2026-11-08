@@ -6,7 +6,7 @@ The declaration combines Boxd SDK documentation with the committed conformance r
 
 - `resources.kernel` and `resources.sizes` follow the Boxd Python SDK documentation. It describes full machines and four CPU/memory sizes.
 - `resources.default_size` follows the SDK's machine and disk-allocation documentation. The disk allocation is fixed at 100 GiB; the SDK does not expose a disk-used value.
-- `resources.max_lifetime_seconds` follows the conformance fixture, which requests a 900-second lifetime and checks the create-time `auto_destroy_timeout` value.
+- `resources.max_lifetime_seconds` is Boxd's bound on the platform delete timer a create carries (`delete_after`), ten years: a live create with 315360000 seconds succeeded and 315360001 was refused with `delete-after of 315360001s is too long (max 315360000s, ten years)` (2026-11-08). The earlier value of 900 was only the conformance fixture's request, not a limit.
 - `resources.regions` and `resources.located_in` follow the SDK's explicit region selection and region listing for Frankfurt and New York. The declaration uses the corresponding `boxd:eu-fra` and `boxd:us-nyc` identifiers.
 
 ## Lifetime and extension

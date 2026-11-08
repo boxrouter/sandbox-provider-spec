@@ -19,7 +19,7 @@ resources:
     memory_mib: 4096
     disk_mib: 102400
   size_is_ceiling: true
-  max_lifetime_seconds: 900
+  max_lifetime_seconds: 315360000
   gpus: unknown
   disk_mib: unknown
   regions: [boxd:eu-fra, boxd:us-nyc]
@@ -116,9 +116,9 @@ evidence:
       (100 GiB), identical on every machine. Not a usage figure: it does not grow
       as the disk fills. There is no "disk used" field on the API yet.
   resources.max_lifetime_seconds:
-    source: conformance fixture (max_lifetime_seconds 900)
-    read: '2026-11-02'
-    quote: A create request with auto_destroy_timeout set to 900 seconds succeeds in the conformance fixture.
+    source: boxd Python SDK 0.3.0 machines.create(delete_after=...) and a live create probe
+    read: '2026-11-08'
+    quote: 'delete_after=315360000 created a machine; delete_after=315360001 was refused: delete-after of 315360001s is too long (max 315360000s, ten years); use 0 for no timer.'
   resources.kernel:
     source: boxd Python SDK 0.2.22 README (Machines)
     read: '2026-11-02'

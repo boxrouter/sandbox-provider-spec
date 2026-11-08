@@ -197,6 +197,10 @@ evidence:
     quote: Max continuous runtime is the time a sandbox can run without being paused, not a cap on how
       long a sandbox can exist. Pausing and resuming resets it, and a paused sandbox is kept indefinitely
       with no time-to-live.
+  lifetime_timer.after_resume:
+    source: providers/e2b/evidence.md
+    read: '2026-10-28'
+    quote: a sandbox created with `lifecycle`{on_timeout}`kill`, paused, then resumed with `connect(timeout)` was paused, not killed, when that timeout ran out
   lifetime_timer.at_end:
     tests:
     - lifetime_timer.at_end.destroyed
@@ -324,4 +328,4 @@ lifetime_timer:
   adjustable: true
   step_seconds: unknown
   counts_from: unknown
-  after_resume: unknown
+  after_resume: pauses

@@ -5,6 +5,11 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- E2B declares `lifetime_timer.after_resume: pauses` again, restoring the
+  2026-10-28 live-check observation through the provider's own `evidence.md`
+  inside this package; the earlier citation pointed into a private repository
+  and was scrubbed.
+
 - Boat and boxd declare `extendable_lifetime: true` and a `lifetime_timer` (`enforced_by: provider`, `at_end: [destroyed]`, `counts_paused_time: unknown`), cited to fresh adapter-identity runs of `facts.extendable_lifetime` and `lifetime_timer.at_end.destroyed`. boxd's other evidence was rerun on the current adapter and Boxd SDK 0.3.0 (`verified.sdks` moves from 0.2.22), and its `processes` variant now declares `reattach: true` (`processes.reattach.true` passed; the previous false-reattach evidence no longer holds on the current adapter).
 
 - State the lifetime-extension contract. After a successful extension (`resources.extendable_lifetime: true`) the provider ends the sandbox no later than the new end, and with `lifetime_timer.adjustable: true` a set of any length is refused or does the same; the vocabulary says a client that only renews a lifetime needs `extendable_lifetime` alone, and one that sets an exact or shorter lifetime needs `adjustable` as well. Add the optional, never-compared `lifetime_timer.clearable` (`true`, `false` or `unknown`: a timer that was set can be removed from a sandbox that exists), with its rule `facts/lifetime-timer-clearable`. Vercel's `adjustable` becomes `false`: its SDK only lengthens a running sandbox's deadline (the same dated quote), so it declares `extendable_lifetime: true` alone; the new digest needs the paired adapter-pin adoption before Cloud serves it. Blaxel, Daytona (`default`) and E2B already declare `extendable_lifetime: true` and `adjustable: true` from passing reports and dated quotes; every other provider and class leaves them unknown until a report or quote shows them, and none declares `clearable`.
