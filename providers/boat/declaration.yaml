@@ -14,8 +14,14 @@ resources:
   default_size:
     cpu: 4
     memory_mib: 8192
-  max_lifetime_seconds: 7200
+  max_lifetime_seconds: 2592000
   extendable_lifetime: true
+  needs:
+    max_lifetime_seconds:
+    - paid_plan
+  unmet_limits:
+    max_lifetime_seconds:
+      paid_plan: 7200
   gpus: unknown
   disk_mib: unknown
   regions: unknown
@@ -56,6 +62,14 @@ evidence:
     read: '2026-11-01'
     quote: Without `--type`, you get `default` (the medium size).
   resources.max_lifetime_seconds:
+    source: https://docs.boat.dev/free-trial
+    read: '2026-11-08'
+    quote: 'Auto-stop | Required, 2 hours maximum | Up to 30 days, or off'
+  resources.needs.max_lifetime_seconds:
+    source: https://docs.boat.dev/long-running-tasks/auto-stop
+    read: '2026-11-01'
+    quote: On the free trial, you cannot turn off auto-stop, and the TTL cannot be more than 2 hours.
+  resources.unmet_limits.max_lifetime_seconds.paid_plan:
     source: https://docs.boat.dev/long-running-tasks/auto-stop
     read: '2026-11-01'
     quote: On the free trial, you cannot turn off auto-stop, and the TTL cannot be more than 2 hours.

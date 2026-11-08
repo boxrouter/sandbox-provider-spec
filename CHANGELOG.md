@@ -5,6 +5,13 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Boat's `max_lifetime_seconds` moves from the free-trial ceiling (7200) to the
+  documented paid-plan maximum (2592000, 30 days). The trial limit is now an
+  unmet account condition: `resources.needs.max_lifetime_seconds` names
+  `paid_plan`, and `resources.unmet_limits.max_lifetime_seconds.paid_plan`
+  keeps 7200 as the ceiling a trial account publishes. Both values cite Boat's
+  auto-stop documentation.
+
 - E2B declares `lifetime_timer.after_resume: pauses` again, restoring the
   2026-10-28 live-check observation through the provider's own `evidence.md`
   inside this package; the earlier citation pointed into a private repository

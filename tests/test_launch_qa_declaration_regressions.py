@@ -25,6 +25,26 @@ def test_boxd_regional_offer_matches_registry_countries_without_expanding_gates(
     assert "custom_images" not in declaration["gates"]
 
 
+def test_boxd_size_resolution_fills_the_fixed_disk_for_a_request_that_names_none() -> None:
+    """Boxd bills disk, and a quote needs the disk of the size the request resolves to.
+
+    The 100 GiB allocation is fixed on every machine, so the declaration publishes it on each
+    size and a request that names no disk resolves to a size that carries it.
+    """
+    declaration = load(ROOT / "providers/boxd/declaration.yaml")
+    sizes = declaration["resources"]["sizes"]
+    assert {size["disk_mib"] for size in sizes} == {102400}
+    assert declaration["resources"]["disk_mib"] == 102400
+    registry = Registry.from_documents(
+        load(ROOT / "spec/registries/regions.json"),
+        load(ROOT / "spec/registries/gpu-models.json"),
+    )
+    for size in sizes:
+        request = {"resources": {"cpu_min": size["cpu"], "memory_min_mib": size["memory_mib"]}}
+        result = match(request, [declaration], reports=[], registry=registry)
+        assert result["results"]["boxd"]["resources"]["size"] == size
+
+
 def _match_e2b(request: dict[str, Any]) -> MatchResult:
     provider = ROOT / "providers/e2b"
     registry = Registry.from_documents(
