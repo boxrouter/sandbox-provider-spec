@@ -8,12 +8,16 @@ resources:
   sizes:
   - cpu: 1
     memory_mib: 4096
+    disk_mib: 102400
   - cpu: 2
     memory_mib: 8192
+    disk_mib: 102400
   - cpu: 4
     memory_mib: 16384
+    disk_mib: 102400
   - cpu: 8
     memory_mib: 32768
+    disk_mib: 102400
   default_size:
     cpu: 1
     memory_mib: 4096
@@ -21,7 +25,7 @@ resources:
   size_is_ceiling: true
   max_lifetime_seconds: 315360000
   gpus: unknown
-  disk_mib: unknown
+  disk_mib: 102400
   regions: [boxd:eu-fra, boxd:us-nyc]
   located_in: [DE, US]
   paused_retention_seconds: unknown
@@ -112,6 +116,13 @@ evidence:
     read: '2026-11-02'
     quote: >-
       create() defaults to the smallest machine and the stock image.
+      The machine's fixed disk *allocation* — always the platform constant
+      (100 GiB), identical on every machine. Not a usage figure: it does not grow
+      as the disk fills. There is no "disk used" field on the API yet.
+  resources.disk_mib:
+    source: boxd Python SDK 0.2.22 README (Machines) and MachineResources.disk_bytes docstring
+    read: '2026-11-02'
+    quote: >-
       The machine's fixed disk *allocation* — always the platform constant
       (100 GiB), identical on every machine. Not a usage figure: it does not grow
       as the disk fills. There is no "disk used" field on the API yet.
