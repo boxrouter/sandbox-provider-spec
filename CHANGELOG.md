@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Add `matcher.coverage(catalog, declarations, reports, *, require_baseline=True)`: the `gate`, `gate.knob` and `resources.<ask>` entries at least one provider declares and, by default, proves with the matcher's baseline rule (`require_baseline=False` reads declarations only, as `declared_fit` does). `setting_backers(catalog)` maps each request setting to the entry it follows through its `only_with` rule. A consumer that exposes part of the vocabulary uses them to check that what it exposes is backed.
+
 - Boat's `max_lifetime_seconds` moves from the free-trial ceiling (7200) to the
   documented paid-plan maximum (2592000, 30 days). The trial limit is now an
   unmet account condition: `resources.needs.max_lifetime_seconds` names

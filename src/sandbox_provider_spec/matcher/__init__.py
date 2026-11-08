@@ -4,6 +4,7 @@
 
 from sandbox_provider_spec.matcher.catalog import GATES, RESOURCE_ASKS
 from sandbox_provider_spec.matcher.conditions import KnobGrant
+from sandbox_provider_spec.matcher.coverage import coverage, setting_backers
 from sandbox_provider_spec.matcher.declaration import (
     Declaration,
     GateDeclaration,
@@ -53,8 +54,10 @@ __all__ = [
     "Snapshot",
     "Variant",
     "build_declaration",
+    "coverage",
     "declared_fit",
     "match",
     "match_restore",
+    "setting_backers",
     "validate_request",
 ]

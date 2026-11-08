@@ -248,3 +248,5 @@ evidence:
     tests:
     - network_lockdown.allowlist.addresses
     report: reports/adapter-default-core.json
+
+# in-tree edit

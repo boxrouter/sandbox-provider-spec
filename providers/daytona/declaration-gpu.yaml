@@ -31,3 +31,5 @@ evidence:
     source: https://www.daytona.io/docs/en/regions/
     read: '2026-10-04'
     quote: Daytona selects the shared region a GPU workload runs in and ignores the region preference.
+
+# in-tree edit

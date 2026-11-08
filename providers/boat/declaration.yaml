@@ -73,3 +73,5 @@ evidence:
     source: https://docs.boat.dev/long-running-tasks/auto-stop
     read: '2026-11-01'
     quote: On the free trial, you cannot turn off auto-stop, and the TTL cannot be more than 2 hours.
+
+# in-tree edit
