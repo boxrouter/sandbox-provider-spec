@@ -26,7 +26,9 @@ of the [HTTP binding](../../spec/binding-http.md) needs no driver here: follow t
    declaration against its cited reports. Follow [Run conformance](run-conformance.md)
    for native-run prerequisites and cleanup.
 5. **Add brand and publication (optional).** `providers/<id>/brand.yaml` names a chart
-   colour, a logo and a one-colour mark (SVG, PNG or WebP files in the provider folder).
+   colour, a logo and a one-colour mark (SVG, PNG or WebP files in the provider folder), and
+   `launched: true` once the provider is offered in production; without it a consumer lists the
+   provider nowhere that names only launched providers, such as a legal roster.
    `providers/<id>/publication.yaml` sets `hidden`, `candidate` or `published` for the provider
    and each class; without it the provider is hidden. `providers/<id>/notes.yaml` holds the
    provider's own published sentences (facts, notes, price and in-development reasons). `make check`

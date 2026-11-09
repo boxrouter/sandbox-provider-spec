@@ -69,6 +69,20 @@ def test_shipped_providers_build_both_documents() -> None:
         assert declared["state"] in provider_assets.STATES
 
 
+def test_launched_is_shipped_only_when_declared(tmp_path: Path) -> None:
+    provider(tmp_path, "sixth", **{"brand.yaml": {"launched": True}})
+    provider(tmp_path, "seventh", **{"brand.yaml": {"order": 1}})
+    brands = provider_assets.build(tmp_path)["brand.json"]["providers"]
+    assert brands["sixth"] == {"launched": True}
+    assert "launched" not in brands["seventh"]
+
+
+def test_shipped_launch_state_leaves_out_boat_until_launch() -> None:
+    brands = provider_assets.build()["brand.json"]["providers"]
+    launched = {name for name, declared in brands.items() if declared.get("launched")}
+    assert launched == set(brands) - {"boat"}
+
+
 def test_missing_files_mean_hidden_and_no_brand(tmp_path: Path) -> None:
     provider(tmp_path, "sixth")
     documents = provider_assets.build(tmp_path)
@@ -109,6 +123,8 @@ def test_brand_embeds_the_named_assets(tmp_path: Path) -> None:
         {"logo": "missing.svg"},
         {"logo": "brand/logo.gif"},
         {"unknown": 1},
+        {"launched": False},
+        {"launched": "yes"},
     ],
 )
 def test_bad_brand_is_refused(tmp_path: Path, brand: dict[str, Any]) -> None:

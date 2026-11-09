@@ -15,10 +15,12 @@ Boat's auto-stop (`ttlSeconds`) counts from creation and is not moved by command
 running agent prompt, which the adapter never starts. `facts.extendable_lifetime` and
 `lifetime_timer.at_end.destroyed` passed in the committed `lifetime-extend.json` and
 `lifetime-at-end.json` reports: a sandbox whose lifetime was extended from 300 to 420 seconds
-was still running after the original end, and an unextended control was gone after its end. On the
-account used, which has zero data retention, a stop is a delete. On an account without it a stop
-keeps the disk for 14 days and is resumable, so the ending there is `stopped`; the declaration
-records only the observed `destroyed`. One earlier run of the extension test timed out reading the
+was still running after the original end, and an unextended control was gone after its end.
+`lifetime-at-end.json` was rerun on 2026-11-09 with adapter 0.3.48 and spec 0.3.174 on an account
+without zero data retention: the sandbox was again gone (not found) after its end. The adapter
+creates every sandbox with background snapshots off (`snapshots: false`), so the end erases the
+machine instead of keeping a resumable disk; the declaration records only the observed
+`destroyed`. One earlier run of the extension test timed out reading the
 control sandbox after its end and was rerun once; the committed report is the clean rerun. `adjustable`, `step_seconds`, `counts_from` and
 `min_seconds` stay unknown until a dated quote or report establishes them, and
 `counts_paused_time` is `unknown` because Boat has no pause.

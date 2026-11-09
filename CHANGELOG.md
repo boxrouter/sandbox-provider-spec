@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Rebuilt 0.3.177 without the Boxd terminal declaration and supersede 0.3.176. Cloud #4630 (`47d6d712d`) declared `gates.terminal` before its certifying reports existed, so the standalone check failed. The declaration, its evidence and the reports are deferred to 0.3.178.
+
+- Boat's `lifetime-at-end.json` report is rerun on the current adapter (0.3.48) and spec suite (0.3.174); `lifetime_timer.at_end.destroyed` passed again. The declaration is unchanged.
+
+- `brand.yaml` accepts `launched: true`, shipped in `brand.json`, for a provider BoxRouter offers in production. A provider without it is not launched, so a consumer that names only launched providers (a legal roster) leaves it out. Every provider except Boat declares it.
+
 - Remove a stray `# in-tree edit` comment that a test run had left at the end of every provider declaration (it changed each declaration's digest). Declarations are otherwise unchanged from 0.3.174. The 0.3.175 release carried the stray comments and is superseded by this one.
 
 - Add `matcher.coverage(catalog, declarations, reports, *, require_baseline=True)`: the `gate`, `gate.knob` and `resources.<ask>` entries at least one provider declares and, by default, proves with the matcher's baseline rule (`require_baseline=False` reads declarations only, as `declared_fit` does). `setting_backers(catalog)` maps each request setting to the entry it follows through its `only_with` rule. A consumer that exposes part of the vocabulary uses them to check that what it exposes is backed.
