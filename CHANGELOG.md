@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Boxd declares `gates.terminal` with `reattach: true`, with certifying `terminal.interactive` and `coverage.terminal.reattach` reports from the Boxd adapter against release 0.3.177 (`verified.date` 2026-11-09). This is the terminal declaration deferred from 0.3.177.
+
 - Rebuilt 0.3.177 without the Boxd terminal declaration and supersede 0.3.176. Cloud #4630 (`47d6d712d`) declared `gates.terminal` before its certifying reports existed, so the standalone check failed. The declaration, its evidence and the reports are deferred to 0.3.178.
 
 - Boat's `lifetime-at-end.json` report is rerun on the current adapter (0.3.48) and spec suite (0.3.174); `lifetime_timer.at_end.destroyed` passed again. The declaration is unchanged.

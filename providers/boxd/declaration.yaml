@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-07
+  date: 2026-11-09
   sdks: {boxd: 0.3.0}
 resources:
   kernel: dedicated
@@ -42,6 +42,10 @@ gates:
   - input: true
     cancel: true
     reattach: true
+  # A terminal is a pty under the guest supervisor (the same mechanism as processes), so a
+  # reconnect reaches the same shell and closing an observer never ends it.
+  terminal:
+  - reattach: true
   network_lockdown:
   - policy: allowlist
     entry_kinds: [names]
@@ -84,6 +88,12 @@ evidence:
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
     report: reports/default.json
+  gates.terminal.0:
+    tests: [terminal.interactive]
+    report: reports/adapter-terminal.json
+  gates.terminal.0.reattach:
+    tests: [coverage.terminal.reattach]
+    report: reports/adapter-terminal-coverage.json
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.allowlist.names

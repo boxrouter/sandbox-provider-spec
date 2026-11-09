@@ -2,6 +2,10 @@
 
 The declaration combines Boxd SDK documentation with the committed conformance reports in this directory. Values without supporting evidence remain `unknown`.
 
+## Gates
+
+- `gates.terminal` is a pty under the guest supervisor that also keeps processes (Boxd adapter 0.1.68): closing an observer never ends the shell and a reconnect from the identity finds it, so `reattach` is true. `reports/adapter-terminal.json` (`terminal.interactive`) and `reports/adapter-terminal-coverage.json` (`coverage.terminal.reattach`) are certifying runs of the adapter against the released 0.3.177 wheel; both passed.
+
 ## Resources
 
 - `resources.kernel` and `resources.sizes` follow the Boxd Python SDK documentation. It describes full machines and four CPU/memory sizes.

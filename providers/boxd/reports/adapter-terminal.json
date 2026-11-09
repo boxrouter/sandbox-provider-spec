@@ -1,0 +1,80 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "terminal.interactive": "sha256:ec126c4a74663e4cd15bfa4832b93738f34ffc1182954665285e33e9f902a92f"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-09T11:54:34.210254+00:00",
+  "provider": "boxd",
+  "revision": "79d6177c14e4a6eb4860c62a86c972e54c840989",
+  "run_id": "public-1bf713acffcd9f604c11",
+  "sdk_versions": {
+    "boxd": "0.3.0"
+  },
+  "selected_tests": [
+    "terminal.interactive"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-09T11:54:31.850043+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "terminal",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2359,
+      "id": "terminal.interactive",
+      "proves": [
+        {
+          "gate": "terminal",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "terminal/interactive"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.open",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "terminal.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "terminal": {
+              "actual": {
+                "length": 47,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "terminal.output",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
