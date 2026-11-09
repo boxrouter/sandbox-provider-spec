@@ -33,5 +33,3 @@ evidence:
     source: https://www.daytona.io/docs/en/persistence/
     read: '2026-10-04'
     quote: Sandboxes in stopped, paused, and archived states are retained until you delete them.
-
-# in-tree edit

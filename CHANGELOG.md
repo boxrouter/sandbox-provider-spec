@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Remove a stray `# in-tree edit` comment that a test run had left at the end of every provider declaration (it changed each declaration's digest). Declarations are otherwise unchanged from 0.3.174. The 0.3.175 release carried the stray comments and is superseded by this one.
+
 - Add `matcher.coverage(catalog, declarations, reports, *, require_baseline=True)`: the `gate`, `gate.knob` and `resources.<ask>` entries at least one provider declares and, by default, proves with the matcher's baseline rule (`require_baseline=False` reads declarations only, as `declared_fit` does). `setting_backers(catalog)` maps each request setting to the entry it follows through its `only_with` rule. A consumer that exposes part of the vocabulary uses them to check that what it exposes is backed.
 
 - Boat's `max_lifetime_seconds` moves from the free-trial ceiling (7200) to the

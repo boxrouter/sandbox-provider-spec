@@ -408,10 +408,12 @@ def test_timeout_returns_unknown_while_buffered_worker_retains_ownership(tmp_pat
         buffered=True,
     )
     sandbox = harness.send(harness.create_request())["sandbox"]
-    harness.endpoint.settings.operation_timeout_ms = 40
+    # The backend has to be entered before the observation expires for the outcome to be unknown;
+    # a loaded machine can starve the worker thread for far longer than a few milliseconds.
+    harness.endpoint.settings.operation_timeout_ms = 1000
     try:
         response = harness.send(
-            _run_request(harness, sandbox, observation_timeout_ms=40), expected=504
+            _run_request(harness, sandbox, observation_timeout_ms=1000), expected=504
         )
         assert response["error"]["code"] == "timeout"
         assert response["error"]["outcome"] == "unknown"

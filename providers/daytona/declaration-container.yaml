@@ -263,5 +263,3 @@ lifetime_timer:
   adjustable: true
   step_seconds: 60
   counts_from: create
-
-# in-tree edit

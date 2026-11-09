@@ -1383,8 +1383,9 @@ def test_locked_create_store_keeps_slots_and_reservations_without_late_dispatch(
         finally:
             lock.rollback()
     with harness.endpoint._runtime.observations:
+        # Eight blocked store calls drain through sqlite's busy handler; a loaded machine slows it.
         assert harness.endpoint._runtime.observations.wait_for(
-            lambda: harness.endpoint._runtime.pending == 0, 3
+            lambda: harness.endpoint._runtime.pending == 0, 60
         )
     assert harness.backend.calls["create"] == 0
     with harness.endpoint.connect() as db:

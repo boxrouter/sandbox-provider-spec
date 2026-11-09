@@ -146,5 +146,3 @@ evidence:
     source: boxd Python SDK 0.3.0 regions.list; https://pypi.org/project/boxd/0.3.0/
     read: '2026-11-03'
     quote: 'ListRegions returned id=fra, name=Frankfurt and id=nyc, name=New York.'
-
-# in-tree edit

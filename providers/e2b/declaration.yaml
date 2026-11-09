@@ -329,5 +329,3 @@ lifetime_timer:
   step_seconds: unknown
   counts_from: unknown
   after_resume: pauses
-
-# in-tree edit

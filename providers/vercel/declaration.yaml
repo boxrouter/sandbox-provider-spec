@@ -311,5 +311,3 @@ evidence:
     tests:
     - terminal.interactive
     report: reports/adapter-default-core.json
-
-# in-tree edit
