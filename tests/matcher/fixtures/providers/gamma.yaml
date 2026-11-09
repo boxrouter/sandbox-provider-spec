@@ -1,0 +1,33 @@
+spec: sandbox-provider-spec/0.1
+provider: gamma
+verified: {date: 2026-09-29, sdks: {gamma-sdk: 1.0.0}}
+resources:
+  max_lifetime_seconds: unlimited
+  sizes:
+    - {cpu: 2, memory_mib: 8192, disk_mib: 8192}
+    - {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  disk_mib: 8192
+  regions: [gamma:eu-west, gamma:global]
+  located_in: [US]
+  gpus: [amd:mi355x]
+  max_gpus: 2
+  kernel: shared
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: false
+  at_end: destroyed
+gates:
+  previews:
+    - {access: [public, private], credential: [link, header], revocable: true, link_lifetime_seconds: {at_least: 300}, max_ports: unknown}
+  network_lockdown:
+    - {policy: deny_all, conflicts: [previews.access=public, resources.regions]}
+    - {policy: allowlist, max_allow: 5}
+  idle_shutdown:
+    - {on_idle: stopped}
+  pause_resume:
+    - {keeps: files_only}
+  snapshots:
+    - {keeps: files_only, original_after: continues, deletable: true}
+  custom_images:
+    - {source: [oci, provider_artifact], prepared: false}
+evidence: {}

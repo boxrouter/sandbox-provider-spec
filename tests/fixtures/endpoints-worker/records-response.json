@@ -1,0 +1,16 @@
+{
+  "token": "v66-regression-test",
+  "records": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "headers": {
+        "host": "receiver.example",
+        "x-sps-probe": "v66-regression-test"
+      },
+      "body": "",
+      "body_base64": ""
+    }
+  ],
+  "connections": []
+}

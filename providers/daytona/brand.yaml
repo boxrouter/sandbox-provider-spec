@@ -1,0 +1,6 @@
+# Brand: chart colour, logo, one-colour mark and launch state. All keys optional.
+order: 2
+color: '#EEC159'
+logo: brand/logo.png
+mark: brand/mark.png
+launched: true

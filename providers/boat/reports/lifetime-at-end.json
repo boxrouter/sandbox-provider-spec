@@ -1,0 +1,74 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "lifetime_timer.at_end.destroyed": "sha256:c74763497fdc4d8cebb5c8860a11f353093b92be1a5ffc1d0b092f0298bfdadf"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-09T01:54:07.761922+00:00",
+  "provider": "boat",
+  "revision": "cc846c10aa15cb17699b57b79da3e3adb1f82c20",
+  "run_id": "public-626a48a93738bfbf5d82",
+  "sdk_versions": {
+    "boat-sdk": "1.13.0"
+  },
+  "selected_tests": [
+    "lifetime_timer.at_end.destroyed"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-09T01:48:50.397037+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 317363,
+      "id": "lifetime_timer.at_end.destroyed",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "destroyed"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/lifetime-timer"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

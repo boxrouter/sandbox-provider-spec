@@ -1,0 +1,3246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:http-binding:0.2",
+  "title": "Provider HTTP binding 0.2 and 0.3",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/CreateRequest"
+    },
+    {
+      "$ref": "#/$defs/CreateResult"
+    },
+    {
+      "$ref": "#/$defs/GetRequest"
+    },
+    {
+      "$ref": "#/$defs/GetResult"
+    },
+    {
+      "$ref": "#/$defs/ListRequest"
+    },
+    {
+      "$ref": "#/$defs/ListResult"
+    },
+    {
+      "$ref": "#/$defs/DestroyRequest"
+    },
+    {
+      "$ref": "#/$defs/DestroyResult"
+    },
+    {
+      "$ref": "#/$defs/RunRequest"
+    },
+    {
+      "$ref": "#/$defs/RunResult"
+    },
+    {
+      "$ref": "#/$defs/ReadRequest"
+    },
+    {
+      "$ref": "#/$defs/ReadResult"
+    },
+    {
+      "$ref": "#/$defs/WriteRequest"
+    },
+    {
+      "$ref": "#/$defs/WriteResult"
+    },
+    {
+      "$ref": "#/$defs/StartRequest"
+    },
+    {
+      "$ref": "#/$defs/StartResult"
+    },
+    {
+      "$ref": "#/$defs/OutputRequest"
+    },
+    {
+      "$ref": "#/$defs/OutputResult"
+    },
+    {
+      "$ref": "#/$defs/Discovery"
+    },
+    {
+      "$ref": "#/$defs/Error"
+    },
+    {
+      "$ref": "#/$defs/CreateRequest03"
+    },
+    {
+      "$ref": "#/$defs/CreateResult03"
+    },
+    {
+      "$ref": "#/$defs/GetResult03"
+    },
+    {
+      "$ref": "#/$defs/ListResult03"
+    }
+  ],
+  "$defs": {
+    "Identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+    },
+    "Path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^/[^\\u0000]*$(?![\\s\\S])"
+    },
+    "Environment": {
+      "type": "object",
+      "maxProperties": 256,
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$(?![\\s\\S])"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 65536,
+        "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+      }
+    },
+    "Base64": {
+      "type": "string",
+      "maxLength": 22369624,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$(?![\\s\\S])"
+    },
+    "Digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$(?![\\s\\S])"
+    },
+    "AllocationKey": {
+      "type": "string",
+      "pattern": "^[0-9]{10}:[a-f0-9]{32}$(?![\\s\\S])"
+    },
+    "SandboxIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_id",
+        "account_id",
+        "offering_id",
+        "sandbox_id",
+        "incarnation"
+      ],
+      "properties": {
+        "provider_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "offering_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "incarnation": {
+          "$ref": "#/$defs/Identifier"
+        }
+      }
+    },
+    "ProcessIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sandbox",
+        "process_id",
+        "incarnation"
+      ],
+      "properties": {
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "process_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "incarnation": {
+          "$ref": "#/$defs/Identifier"
+        }
+      }
+    },
+    "Limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_bytes",
+        "response_bytes",
+        "command_output_bytes",
+        "file_bytes",
+        "page_size",
+        "output_frames",
+        "observation_ms",
+        "process_buffer_bytes"
+      ],
+      "properties": {
+        "request_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 33554432
+        },
+        "response_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 67108864
+        },
+        "command_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "file_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "output_frames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "observation_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000
+        },
+        "process_buffer_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "buffered_command_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216,
+          "description": "Maximum decoded bytes retained and returned per stream for buffered_commands_v1."
+        },
+        "execution_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991,
+          "description": "Maximum independent execution_limit_ms for buffered_commands_v1."
+        }
+      }
+    },
+    "Offering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "offering_id",
+        "declaration_id",
+        "declaration"
+      ],
+      "properties": {
+        "offering_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "declaration_id": {
+          "$ref": "#/$defs/Identifier",
+          "description": "For 0.2 this is a selection token binding native declaration content, effective binding version, modes and admitted capacities; change it when any bound promise changes."
+        },
+        "declaration": {
+          "$ref": "urn:sandbox-provider-spec:0.1:declaration-schema"
+        }
+      }
+    },
+    "Discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "endpoint_origin",
+        "provider_id",
+        "account_id",
+        "server_revision",
+        "operations",
+        "limits",
+        "create_key_window_seconds",
+        "process_retention_seconds",
+        "process_addressability",
+        "core_modes",
+        "offerings"
+      ],
+      "properties": {
+        "binding": {
+          "enum": [
+            "sandbox-provider-http/0.1",
+            "sandbox-provider-http/0.2",
+            "sandbox-provider-http/0.3"
+          ]
+        },
+        "endpoint_origin": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^https://[^/?#@]+(?::[0-9]+)?$(?![\\s\\S])"
+        },
+        "provider_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "server_revision": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "operations": {
+          "const": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ]
+        },
+        "limits": {
+          "$ref": "#/$defs/Limits"
+        },
+        "create_key_window_seconds": {
+          "const": 86400
+        },
+        "process_retention_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 604800
+        },
+        "process_addressability": {
+          "const": "endpoint_lifetime"
+        },
+        "core_modes": {
+          "type": "array",
+          "items": {
+            "const": "buffered_commands_v1"
+          },
+          "uniqueItems": true,
+          "maxItems": 1
+        },
+        "offerings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Offering"
+          },
+          "maxItems": 100
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "binding": {
+                "const": "sandbox-provider-http/0.3"
+              }
+            },
+            "required": [
+              "binding"
+            ]
+          },
+          "then": {
+            "properties": {
+              "offerings": {
+                "minItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "offerings": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "binding": "sandbox-provider-http/0.1",
+          "endpoint_origin": "https://provider.example",
+          "provider_id": "example",
+          "account_id": "account-example",
+          "server_revision": "revision-example",
+          "operations": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ],
+          "limits": {
+            "request_bytes": 33554432,
+            "response_bytes": 33554432,
+            "command_output_bytes": 1048576,
+            "file_bytes": 16777216,
+            "page_size": 100,
+            "output_frames": 100,
+            "observation_ms": 30000,
+            "process_buffer_bytes": 1048576
+          },
+          "create_key_window_seconds": 86400,
+          "process_retention_seconds": 60,
+          "process_addressability": "endpoint_lifetime",
+          "core_modes": [],
+          "offerings": [
+            {
+              "offering_id": "container",
+              "declaration_id": "declaration-example",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          ]
+        },
+        {
+          "binding": "sandbox-provider-http/0.2",
+          "endpoint_origin": "https://provider.example",
+          "provider_id": "example",
+          "account_id": "account-example",
+          "server_revision": "revision-example",
+          "operations": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ],
+          "limits": {
+            "request_bytes": 33554432,
+            "response_bytes": 33554432,
+            "command_output_bytes": 1048576,
+            "file_bytes": 16777216,
+            "page_size": 100,
+            "output_frames": 100,
+            "observation_ms": 30000,
+            "process_buffer_bytes": 1048576
+          },
+          "create_key_window_seconds": 86400,
+          "process_retention_seconds": 60,
+          "process_addressability": "endpoint_lifetime",
+          "core_modes": [],
+          "offerings": [
+            {
+              "offering_id": "container",
+              "declaration_id": "selection-example-v2",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          ]
+        },
+        {
+          "binding": "sandbox-provider-http/0.2",
+          "endpoint_origin": "https://provider.example",
+          "provider_id": "example",
+          "account_id": "account-example",
+          "server_revision": "revision-example",
+          "operations": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ],
+          "limits": {
+            "request_bytes": 33554432,
+            "response_bytes": 67108864,
+            "command_output_bytes": 1048576,
+            "file_bytes": 16777216,
+            "page_size": 100,
+            "output_frames": 100,
+            "observation_ms": 30000,
+            "process_buffer_bytes": 1048576,
+            "buffered_command_output_bytes": 16777216,
+            "execution_ms": 900000
+          },
+          "create_key_window_seconds": 86400,
+          "process_retention_seconds": 60,
+          "process_addressability": "endpoint_lifetime",
+          "core_modes": [
+            "buffered_commands_v1"
+          ],
+          "offerings": [
+            {
+              "offering_id": "container",
+              "declaration_id": "selection-example-v2",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          ]
+        },
+        {
+          "binding": "sandbox-provider-http/0.3",
+          "endpoint_origin": "https://provider.example",
+          "provider_id": "example",
+          "account_id": "account-example",
+          "server_revision": "revision-example",
+          "operations": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ],
+          "limits": {
+            "request_bytes": 33554432,
+            "response_bytes": 67108864,
+            "command_output_bytes": 1048576,
+            "file_bytes": 16777216,
+            "page_size": 100,
+            "output_frames": 100,
+            "observation_ms": 30000,
+            "process_buffer_bytes": 1048576,
+            "buffered_command_output_bytes": 1024,
+            "execution_ms": 60000
+          },
+          "create_key_window_seconds": 86400,
+          "process_retention_seconds": 60,
+          "process_addressability": "endpoint_lifetime",
+          "core_modes": [
+            "buffered_commands_v1"
+          ],
+          "offerings": [
+            {
+              "offering_id": "container",
+              "declaration_id": "selection-example-v3",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          ]
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "binding": {
+                "const": "sandbox-provider-http/0.1"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "core_modes": {
+                "const": []
+              },
+              "limits": {
+                "properties": {
+                  "request_bytes": {
+                    "maximum": 33554432
+                  },
+                  "response_bytes": {
+                    "maximum": 33554432
+                  },
+                  "command_output_bytes": {
+                    "maximum": 16777216
+                  }
+                },
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "buffered_command_output_bytes"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "execution_ms"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "core_modes"
+            ],
+            "properties": {
+              "limits": {
+                "properties": {
+                  "request_bytes": {
+                    "maximum": 33554432
+                  },
+                  "response_bytes": {
+                    "maximum": 67108864
+                  },
+                  "command_output_bytes": {
+                    "maximum": 16777216
+                  }
+                }
+              },
+              "core_modes": {
+                "items": {
+                  "const": "buffered_commands_v1"
+                },
+                "uniqueItems": true,
+                "maxItems": 1
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "core_modes": {
+                      "contains": {
+                        "const": "buffered_commands_v1"
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "limits": {
+                      "required": [
+                        "buffered_command_output_bytes",
+                        "execution_ms"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "binding": {
+                "const": "sandbox-provider-http/0.3"
+              }
+            },
+            "required": [
+              "binding"
+            ]
+          },
+          "then": {
+            "properties": {
+              "core_modes": {
+                "contains": {
+                  "const": "buffered_commands_v1"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CreateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "allocation_key",
+        "offering_id",
+        "declaration_id",
+        "request",
+        "env"
+      ],
+      "properties": {
+        "operation": {
+          "const": "create"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "allocation_key": {
+          "$ref": "#/$defs/AllocationKey"
+        },
+        "offering_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "declaration_id": {
+          "$ref": "#/$defs/Identifier",
+          "description": "Selection token from current discovery. For a new 0.2 create it binds native declaration content, effective binding version, modes and admitted capacities."
+        },
+        "request": {
+          "$ref": "urn:sandbox-provider-spec:0.1:request-schema"
+        },
+        "env": {
+          "$ref": "#/$defs/Environment"
+        }
+      },
+      "examples": [
+        {
+          "operation": "create",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "offering_id": "container",
+          "declaration_id": "declaration-example",
+          "request": {},
+          "env": {}
+        }
+      ]
+    },
+    "CreateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "allocation_key",
+        "request_digest",
+        "key_expires_at",
+        "state",
+        "sandbox"
+      ],
+      "properties": {
+        "operation": {
+          "const": "create"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "allocation_key": {
+          "$ref": "#/$defs/AllocationKey"
+        },
+        "request_digest": {
+          "$ref": "#/$defs/Digest"
+        },
+        "key_expires_at": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9999999999
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "ready",
+            "unknown",
+            "unavailable"
+          ]
+        },
+        "sandbox": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SandboxIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "ready",
+                  "unavailable"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sandbox": {
+                "$ref": "#/$defs/SandboxIdentity"
+              }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "operation": "create",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+          "key_expires_at": 1792756800,
+          "state": "ready",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          }
+        }
+      ]
+    },
+    "GetRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox"
+      ],
+      "properties": {
+        "operation": {
+          "const": "get"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        }
+      },
+      "examples": [
+        {
+          "operation": "get",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          }
+        }
+      ]
+    },
+    "GetResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "state"
+      ],
+      "properties": {
+        "operation": {
+          "const": "get"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "paused",
+            "destroyed",
+            "absent",
+            "unknown"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "operation": "get",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "state": "active"
+        }
+      ]
+    },
+    "ListRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "offering_id",
+        "cursor",
+        "page_size"
+      ],
+      "properties": {
+        "operation": {
+          "const": "list"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "offering_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "examples": [
+        {
+          "operation": "list",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "offering_id": null,
+          "cursor": null,
+          "page_size": 10
+        }
+      ]
+    },
+    "InventoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sandbox",
+        "state"
+      ],
+      "properties": {
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "paused",
+            "destroyed",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "ListResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "items",
+        "next_cursor"
+      ],
+      "properties": {
+        "operation": {
+          "const": "list"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryItem"
+          },
+          "maxItems": 1000
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "operation": "list",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "items": [
+            {
+              "sandbox": {
+                "provider_id": "example",
+                "account_id": "account-example",
+                "offering_id": "container",
+                "sandbox_id": "sandbox-example",
+                "incarnation": "generation-1"
+              },
+              "state": "active"
+            }
+          ],
+          "next_cursor": null
+        }
+      ]
+    },
+    "DestroyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox"
+      ],
+      "properties": {
+        "operation": {
+          "const": "destroy"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        }
+      },
+      "examples": [
+        {
+          "operation": "destroy",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          }
+        }
+      ]
+    },
+    "DestroyResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "state"
+      ],
+      "properties": {
+        "operation": {
+          "const": "destroy"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "state": {
+          "enum": [
+            "accepted",
+            "destroyed",
+            "absent"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "operation": "destroy",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "state": "accepted"
+        }
+      ]
+    },
+    "RunRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "argv",
+        "cwd",
+        "env",
+        "observation_timeout_ms",
+        "encoding"
+      ],
+      "properties": {
+        "operation": {
+          "const": "run"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 65536,
+            "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+          },
+          "maxItems": 1024,
+          "minItems": 1,
+          "prefixItems": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 65536,
+              "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+            }
+          ]
+        },
+        "cwd": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "env": {
+          "$ref": "#/$defs/Environment"
+        },
+        "observation_timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000
+        },
+        "encoding": {
+          "enum": [
+            "utf8",
+            "base64"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Optional command semantics; accepted only when discovery binds this mode in 0.2."
+        },
+        "execution_limit_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "output_limit_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        }
+      },
+      "examples": [
+        {
+          "operation": "run",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "argv": [
+            "bash",
+            "-c",
+            "printf ready; printf diagnostic >&2"
+          ],
+          "cwd": "/tmp",
+          "env": {},
+          "observation_timeout_ms": 1000,
+          "encoding": "utf8"
+        },
+        {
+          "operation": "run",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "argv": [
+            "bash",
+            "-c",
+            "printf ready; printf diagnostic >&2"
+          ],
+          "cwd": "/tmp",
+          "env": {},
+          "observation_timeout_ms": 1000,
+          "encoding": "base64",
+          "mode": "buffered_commands_v1",
+          "execution_limit_ms": 30000,
+          "output_limit_bytes": 1048576
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "buffered_commands_v1"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "execution_limit_ms",
+              "output_limit_bytes"
+            ],
+            "properties": {
+              "encoding": {
+                "const": "base64"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "required": [
+                "mode"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "encoding": {
+                "const": "utf8"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "execution_limit_ms"
+                  ]
+                },
+                {
+                  "required": [
+                    "output_limit_bytes"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "RunResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "exit_code",
+        "output_complete"
+      ],
+      "properties": {
+        "operation": {
+          "const": "run"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "stdout": {
+          "type": "string",
+          "maxLength": 16777216
+        },
+        "stderr": {
+          "type": "string",
+          "maxLength": 16777216
+        },
+        "exit_code": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "output_complete": {
+          "const": true
+        },
+        "mode": {
+          "const": "buffered_commands_v1"
+        },
+        "encoding": {
+          "const": "base64"
+        },
+        "stdout_base64": {
+          "$ref": "#/$defs/Base64"
+        },
+        "stderr_base64": {
+          "$ref": "#/$defs/Base64"
+        },
+        "stdout_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        },
+        "stderr_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        },
+        "stdout_truncated": {
+          "type": "boolean"
+        },
+        "stderr_truncated": {
+          "type": "boolean"
+        }
+      },
+      "examples": [
+        {
+          "operation": "run",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "stdout": "ready",
+          "stderr": "diagnostic",
+          "exit_code": 0,
+          "output_complete": true
+        },
+        {
+          "operation": "run",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "exit_code": 0,
+          "output_complete": true,
+          "mode": "buffered_commands_v1",
+          "encoding": "base64",
+          "stdout_base64": "cmVhZHk=",
+          "stderr_base64": "ZGlhZ25vc3RpYw==",
+          "stdout_bytes": 5,
+          "stderr_bytes": 10,
+          "stdout_truncated": false,
+          "stderr_truncated": false
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "buffered_commands_v1"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "encoding",
+              "stdout_base64",
+              "stderr_base64",
+              "stdout_bytes",
+              "stderr_bytes",
+              "stdout_truncated",
+              "stderr_truncated"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "stdout"
+                  ]
+                },
+                {
+                  "required": [
+                    "stderr"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "required": [
+                "mode"
+              ]
+            }
+          },
+          "then": {
+            "required": [
+              "stdout",
+              "stderr"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "encoding"
+                  ]
+                },
+                {
+                  "required": [
+                    "stdout_base64"
+                  ]
+                },
+                {
+                  "required": [
+                    "stderr_base64"
+                  ]
+                },
+                {
+                  "required": [
+                    "stdout_bytes"
+                  ]
+                },
+                {
+                  "required": [
+                    "stderr_bytes"
+                  ]
+                },
+                {
+                  "required": [
+                    "stdout_truncated"
+                  ]
+                },
+                {
+                  "required": [
+                    "stderr_truncated"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ReadRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "path",
+        "limit_bytes"
+      ],
+      "properties": {
+        "operation": {
+          "const": "files.read_bytes"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "path": {
+          "$ref": "#/$defs/Path"
+        },
+        "limit_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        }
+      },
+      "examples": [
+        {
+          "operation": "files.read_bytes",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "path": "/tmp/artifact",
+          "limit_bytes": 10
+        }
+      ]
+    },
+    "ReadResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "data_base64",
+        "byte_count",
+        "complete"
+      ],
+      "properties": {
+        "operation": {
+          "const": "files.read_bytes"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "data_base64": {
+          "$ref": "#/$defs/Base64"
+        },
+        "byte_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        },
+        "complete": {
+          "const": true
+        }
+      },
+      "examples": [
+        {
+          "operation": "files.read_bytes",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "data_base64": "AP8=",
+          "byte_count": 2,
+          "complete": true
+        }
+      ]
+    },
+    "WriteRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "path",
+        "data_base64",
+        "byte_count"
+      ],
+      "properties": {
+        "operation": {
+          "const": "files.write"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "path": {
+          "$ref": "#/$defs/Path"
+        },
+        "data_base64": {
+          "$ref": "#/$defs/Base64"
+        },
+        "byte_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        }
+      },
+      "examples": [
+        {
+          "operation": "files.write",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "path": "/tmp/artifact",
+          "data_base64": "AP8=",
+          "byte_count": 2
+        }
+      ]
+    },
+    "WriteResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "written_bytes"
+      ],
+      "properties": {
+        "operation": {
+          "const": "files.write"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "written_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777216
+        }
+      },
+      "examples": [
+        {
+          "operation": "files.write",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "written_bytes": 2
+        }
+      ]
+    },
+    "StartRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "argv",
+        "cwd",
+        "env",
+        "observation_timeout_ms"
+      ],
+      "properties": {
+        "operation": {
+          "const": "process.start"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 65536,
+            "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+          },
+          "maxItems": 1024,
+          "minItems": 1,
+          "prefixItems": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 65536,
+              "pattern": "^[^\\u0000]*$(?![\\s\\S])"
+            }
+          ]
+        },
+        "cwd": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "env": {
+          "$ref": "#/$defs/Environment"
+        },
+        "observation_timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000
+        }
+      },
+      "examples": [
+        {
+          "operation": "process.start",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "argv": [
+            "bash",
+            "-c",
+            "printf ready; printf diagnostic >&2"
+          ],
+          "cwd": "/tmp",
+          "env": {},
+          "observation_timeout_ms": 1000
+        }
+      ]
+    },
+    "StartResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "process"
+      ],
+      "properties": {
+        "operation": {
+          "const": "process.start"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "process": {
+          "$ref": "#/$defs/ProcessIdentity"
+        }
+      },
+      "examples": [
+        {
+          "operation": "process.start",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "process": {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "process_id": "process-example",
+            "incarnation": "process-generation-1"
+          }
+        }
+      ]
+    },
+    "Frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "stream",
+        "text"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "stream": {
+          "enum": [
+            "stdout",
+            "stderr"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 16777216,
+          "minLength": 1
+        }
+      }
+    },
+    "OutputRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "process",
+        "cursor",
+        "max_frames",
+        "observation_timeout_ms",
+        "limit_bytes"
+      ],
+      "properties": {
+        "operation": {
+          "const": "process.output"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "process": {
+          "$ref": "#/$defs/ProcessIdentity"
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "max_frames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "observation_timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000
+        },
+        "limit_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        }
+      },
+      "examples": [
+        {
+          "operation": "process.output",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "process": {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "process_id": "process-example",
+            "incarnation": "process-generation-1"
+          },
+          "cursor": 0,
+          "max_frames": 10,
+          "observation_timeout_ms": 1000,
+          "limit_bytes": 65536
+        }
+      ]
+    },
+    "OutputResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "process",
+        "frames",
+        "first_available_cursor",
+        "next_cursor",
+        "gap",
+        "stdout_eof",
+        "stderr_eof",
+        "execution_state",
+        "exit_code",
+        "observation_end"
+      ],
+      "properties": {
+        "operation": {
+          "const": "process.output"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "process": {
+          "$ref": "#/$defs/ProcessIdentity"
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Frame"
+          },
+          "maxItems": 1000
+        },
+        "first_available_cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "next_cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "gap": {
+          "type": "boolean"
+        },
+        "stdout_eof": {
+          "type": "boolean"
+        },
+        "stderr_eof": {
+          "type": "boolean"
+        },
+        "execution_state": {
+          "enum": [
+            "running",
+            "exited",
+            "unknown"
+          ]
+        },
+        "exit_code": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_end": {
+          "enum": [
+            "page",
+            "wait_timeout",
+            "stream_end",
+            "process_exit",
+            "unavailable"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "execution_state": {
+                "const": "exited"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "type": "integer",
+                "minimum": -2147483648,
+                "maximum": 2147483647
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "exit_code": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_end": {
+                "const": "process_exit"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "execution_state": {
+                "const": "exited"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_end": {
+                "const": "stream_end"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "properties": {
+                  "stdout_eof": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "stderr_eof": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_end": {
+                "const": "unavailable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "execution_state": {
+                "const": "unknown"
+              },
+              "stdout_eof": {
+                "const": false
+              },
+              "stderr_eof": {
+                "const": false
+              }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "operation": "process.output",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "process": {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "process_id": "process-example",
+            "incarnation": "process-generation-1"
+          },
+          "frames": [
+            {
+              "sequence": 0,
+              "stream": "stdout",
+              "text": "ready"
+            }
+          ],
+          "first_available_cursor": 0,
+          "next_cursor": 1,
+          "gap": false,
+          "stdout_eof": false,
+          "stderr_eof": false,
+          "execution_state": "running",
+          "exit_code": null,
+          "observation_end": "page"
+        }
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "error"
+      ],
+      "properties": {
+        "operation": {
+          "enum": [
+            "create",
+            "get",
+            "list",
+            "destroy",
+            "run",
+            "files.read_bytes",
+            "files.write",
+            "process.start",
+            "process.output"
+          ]
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "account_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Failure"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "invalid_request",
+                      "unauthenticated",
+                      "forbidden",
+                      "unsupported_mode",
+                      "conflict",
+                      "expired_key"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "properties": {
+                  "outcome": {
+                    "const": "not_dispatched"
+                  },
+                  "exit_code": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "error": {
+                "properties": {
+                  "exit_code": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "operation": {
+                "const": "run"
+              },
+              "error": {
+                "properties": {
+                  "outcome": {
+                    "const": "completed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "operation": "run",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "error": {
+            "code": "timeout",
+            "outcome": "unknown",
+            "message": "Observation ended before completion was established",
+            "exit_code": null
+          }
+        }
+      ]
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "outcome",
+        "message",
+        "exit_code"
+      ],
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "unauthenticated",
+            "forbidden",
+            "unsupported_mode",
+            "conflict",
+            "expired_key",
+            "limit_exceeded",
+            "timeout",
+            "provider_error",
+            "output_unavailable"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "not_dispatched",
+            "failed",
+            "unknown",
+            "completed"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "description": "Sanitized diagnostic, never credentials or command/file content."
+        },
+        "exit_code": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Labels": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 63,
+        "pattern": "^[^\\u0000]+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 255,
+        "pattern": "^[^\\u0000]*$"
+      },
+      "description": "Caller-supplied or observed public labels; labels never grant capabilities. There are at most 32 entries; UTF-8 keys are at most 63 bytes and values at most 255 bytes, with NUL forbidden. The ASCII-escaped serialized map is bounded to 64 KiB. Provider-internal ownership, identity and grant metadata is separate and is never returned as labels."
+    },
+    "LifetimeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ready_at",
+        "ends_at"
+      ],
+      "properties": {
+        "ready_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "(?:Z|\\+00:00)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ends_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "(?:Z|\\+00:00)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "AdmissionRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fuse_mount": {"type": "object"},
+        "idle_shutdown": {"type": "object"},
+        "pause_resume": {"type": "object"},
+        "previews": {"type": "object"},
+        "network_lockdown": {"type": "object"},
+        "hidden_secrets": {"type": "object"},
+        "snapshots": {"type": "object"},
+        "volumes": {"type": "object"},
+        "custom_images": {"type": "object"},
+        "user_selection": {"type": "object"},
+        "processes": {"type": "object"},
+        "terminal": {"type": "object"},
+        "docker": {"type": "object"},
+        "tcp_ports": {"type": "object"},
+        "desktop": {"type": "object"}
+      },
+      "patternProperties": {
+        "^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {"type": "object"}
+      }
+    },
+    "SelectedSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "cpu": {"type": "number", "exclusiveMinimum": 0},
+        "memory_mib": {"type": "integer", "minimum": 1},
+        "disk_mib": {"type": "integer", "minimum": 1}
+      }
+    },
+    "SelectedGpu": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "count"],
+      "properties": {
+        "model": {"type": "string", "minLength": 1},
+        "count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "SelectedResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "size": {"$ref": "#/$defs/SelectedSize"},
+        "region": {
+          "anyOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        },
+        "gpu": {"$ref": "#/$defs/SelectedGpu"},
+        "root": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["by_default", "sudo", "per_command"]}
+        },
+        "arch": {"enum": ["amd64", "arm64"]},
+        "egress_ips": {"enum": ["published_ranges", "dedicated"]},
+        "kernel_features": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["fuse", "ebpf", "nested_cgroups", "netfilter"]}
+        },
+        "outbound_traffic": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["http", "any_tcp", "udp"]}
+        }
+      }
+    },
+    "AdmissionSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "core_modes",
+        "limits",
+        "process_retention_seconds",
+        "process_addressability",
+        "offering"
+      ],
+      "properties": {
+        "binding": {
+          "const": "sandbox-provider-http/0.3"
+        },
+        "core_modes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "limits": {
+          "$ref": "#/$defs/Limits"
+        },
+        "process_retention_seconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "process_addressability": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "offering": {
+          "$ref": "#/$defs/Offering"
+        }
+      }
+    },
+    "Admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection",
+        "requirements",
+        "resources",
+        "lifetime_seconds",
+        "at_end"
+      ],
+      "properties": {
+        "selection": {
+          "$ref": "#/$defs/AdmissionSelection"
+        },
+        "requirements": {
+          "$ref": "#/$defs/AdmissionRequirements"
+        },
+        "resources": {
+          "$ref": "#/$defs/SelectedResources"
+        },
+        "lifetime_seconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "at_end": {
+          "anyOf": [
+            {
+              "enum": [
+                "destroyed",
+                "paused"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CreateRequest03": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "allocation_key",
+        "offering_id",
+        "declaration_id",
+        "request",
+        "env",
+        "labels"
+      ],
+      "properties": {
+        "operation": {
+          "const": "create"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "allocation_key": {
+          "$ref": "#/$defs/AllocationKey"
+        },
+        "offering_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "declaration_id": {
+          "$ref": "#/$defs/Identifier",
+          "description": "Selection token from current discovery. For a new 0.2 create it binds native declaration content, effective binding version, modes and admitted capacities."
+        },
+        "request": {
+          "$ref": "urn:sandbox-provider-spec:0.1:request-schema"
+        },
+        "env": {
+          "$ref": "#/$defs/Environment"
+        },
+        "labels": {
+          "$ref": "#/$defs/Labels",
+          "description": "Labels are observations only and never grants."
+        }
+      },
+      "examples": [
+        {
+          "operation": "create",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "offering_id": "container",
+          "declaration_id": "selection-example-v3",
+          "request": {},
+          "env": {},
+          "labels": {
+            "purpose": "example"
+          }
+        }
+      ]
+    },
+    "CreateResult03": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "allocation_key",
+        "request_digest",
+        "key_expires_at",
+        "state",
+        "sandbox",
+        "admission",
+        "labels",
+        "lifetime"
+      ],
+      "properties": {
+        "operation": {
+          "const": "create"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "allocation_key": {
+          "$ref": "#/$defs/AllocationKey"
+        },
+        "request_digest": {
+          "$ref": "#/$defs/Digest"
+        },
+        "key_expires_at": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9999999999
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "ready",
+            "unknown",
+            "unavailable"
+          ]
+        },
+        "sandbox": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SandboxIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "admission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Admission"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Labels"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetime": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LifetimeObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "ready",
+                  "unavailable"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sandbox": {
+                "$ref": "#/$defs/SandboxIdentity"
+              }
+            }
+          }
+        }
+      ],
+      "examples": [
+        {
+          "operation": "create",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+          "key_expires_at": 1792756800,
+          "state": "ready",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "admission": {
+            "selection": {
+              "binding": "sandbox-provider-http/0.3",
+              "core_modes": [
+                "buffered_commands_v1"
+              ],
+              "limits": {
+                "request_bytes": 33554432,
+                "response_bytes": 33554432,
+                "command_output_bytes": 1048576,
+                "file_bytes": 16777216,
+                "page_size": 100,
+                "output_frames": 100,
+                "observation_ms": 30000,
+                "process_buffer_bytes": 1048576,
+                "buffered_command_output_bytes": 1024,
+                "execution_ms": 60000
+              },
+              "process_retention_seconds": 60,
+              "process_addressability": "endpoint_lifetime",
+              "offering": {
+                "offering_id": "container",
+                "declaration_id": "selection-example-v3",
+                "declaration": {
+                  "spec": "sandbox-provider-spec/0.1",
+                  "provider": "example",
+                  "class": "container",
+                  "verified": {
+                    "date": "2026-10-22",
+                    "sdks": {
+                      "example": "1.0"
+                    }
+                  },
+                  "resources": {},
+                  "gates": {},
+                  "evidence": {}
+                }
+              }
+            },
+            "requirements": {},
+            "resources": {},
+            "lifetime_seconds": 300,
+            "at_end": "destroyed"
+          },
+          "labels": {
+            "purpose": "example"
+          },
+          "lifetime": {
+            "ready_at": "2026-10-22T12:00:00Z",
+            "ends_at": "2026-10-22T12:05:00Z"
+          }
+        }
+      ]
+    },
+    "GetResult03": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "sandbox",
+        "state",
+        "admission",
+        "labels",
+        "lifetime"
+      ],
+      "properties": {
+        "operation": {
+          "const": "get"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "paused",
+            "destroyed",
+            "absent",
+            "unknown"
+          ]
+        },
+        "admission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Admission"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Labels"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetime": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LifetimeObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "operation": "get",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "state": "active",
+          "admission": {
+            "selection": {
+              "binding": "sandbox-provider-http/0.3",
+              "core_modes": [
+                "buffered_commands_v1"
+              ],
+              "limits": {
+                "request_bytes": 33554432,
+                "response_bytes": 33554432,
+                "command_output_bytes": 1048576,
+                "file_bytes": 16777216,
+                "page_size": 100,
+                "output_frames": 100,
+                "observation_ms": 30000,
+                "process_buffer_bytes": 1048576,
+                "buffered_command_output_bytes": 1024,
+                "execution_ms": 60000
+              },
+              "process_retention_seconds": 60,
+              "process_addressability": "endpoint_lifetime",
+              "offering": {
+                "offering_id": "container",
+                "declaration_id": "selection-example-v3",
+                "declaration": {
+                  "spec": "sandbox-provider-spec/0.1",
+                  "provider": "example",
+                  "class": "container",
+                  "verified": {
+                    "date": "2026-10-22",
+                    "sdks": {
+                      "example": "1.0"
+                    }
+                  },
+                  "resources": {},
+                  "gates": {},
+                  "evidence": {}
+                }
+              }
+            },
+            "requirements": {},
+            "resources": {},
+            "lifetime_seconds": 300,
+            "at_end": "destroyed"
+          },
+          "labels": {
+            "purpose": "example"
+          },
+          "lifetime": {
+            "ready_at": "2026-10-22T12:00:00Z",
+            "ends_at": "2026-10-22T12:05:00Z"
+          }
+        }
+      ]
+    },
+    "InventoryItem03": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sandbox",
+        "state",
+        "labels",
+        "lifetime"
+      ],
+      "properties": {
+        "sandbox": {
+          "$ref": "#/$defs/SandboxIdentity"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "paused",
+            "destroyed",
+            "unknown"
+          ]
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Labels"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetime": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LifetimeObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "state": "active",
+          "labels": {
+            "purpose": "example"
+          },
+          "lifetime": {
+            "ready_at": "2026-10-22T12:00:00Z",
+            "ends_at": "2026-10-22T12:05:00Z"
+          }
+        }
+      ]
+    },
+    "ListResult03": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "request_id",
+        "account_id",
+        "items",
+        "next_cursor"
+      ],
+      "properties": {
+        "operation": {
+          "const": "list"
+        },
+        "request_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "account_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryItem03"
+          },
+          "maxItems": 1000
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "examples": [
+        {
+          "operation": "list",
+          "request_id": "request-example",
+          "account_id": "account-example",
+          "items": [
+            {
+              "sandbox": {
+                "provider_id": "example",
+                "account_id": "account-example",
+                "offering_id": "container",
+                "sandbox_id": "sandbox-example",
+                "incarnation": "generation-1"
+              },
+              "state": "active",
+              "labels": {
+                "purpose": "example"
+              },
+              "lifetime": {
+                "ready_at": "2026-10-22T12:00:00Z",
+                "ends_at": "2026-10-22T12:05:00Z"
+              }
+            }
+          ],
+          "next_cursor": null
+        }
+      ]
+    }
+  },
+  "x-operations": {
+    "create": {
+      "path": "/sps/v1/create",
+      "request": "CreateRequest",
+      "result": "CreateResult",
+      "rules": [
+        "baseline/lifecycle"
+      ]
+    },
+    "get": {
+      "path": "/sps/v1/get",
+      "request": "GetRequest",
+      "result": "GetResult",
+      "rules": [
+        "baseline/lifecycle"
+      ]
+    },
+    "list": {
+      "path": "/sps/v1/list",
+      "request": "ListRequest",
+      "result": "ListResult",
+      "rules": [
+        "baseline/lifecycle"
+      ]
+    },
+    "destroy": {
+      "path": "/sps/v1/destroy",
+      "request": "DestroyRequest",
+      "result": "DestroyResult",
+      "rules": [
+        "baseline/lifecycle"
+      ]
+    },
+    "run": {
+      "path": "/sps/v1/run",
+      "request": "RunRequest",
+      "result": "RunResult",
+      "rules": [
+        "baseline/run"
+      ]
+    },
+    "files.read_bytes": {
+      "path": "/sps/v1/files.read_bytes",
+      "request": "ReadRequest",
+      "result": "ReadResult",
+      "rules": [
+        "baseline/files"
+      ]
+    },
+    "files.write": {
+      "path": "/sps/v1/files.write",
+      "request": "WriteRequest",
+      "result": "WriteResult",
+      "rules": [
+        "baseline/files"
+      ]
+    },
+    "process.start": {
+      "path": "/sps/v1/process.start",
+      "request": "StartRequest",
+      "result": "StartResult",
+      "rules": [
+        "baseline/process-output"
+      ]
+    },
+    "process.output": {
+      "path": "/sps/v1/process.output",
+      "request": "OutputRequest",
+      "result": "OutputResult",
+      "rules": [
+        "baseline/process-output"
+      ]
+    }
+  },
+  "x-rule-source": "spec.md#5-baseline",
+  "x-binding-rules": [
+    "B1-transport",
+    "B2-identity",
+    "B3-create-key",
+    "B4-outcomes",
+    "B5-limits",
+    "B6-process-output",
+    "B7-core-mapping"
+  ],
+  "x-binding-versions": {
+    "sandbox-provider-http/0.2": {
+      "create": {
+        "request": "CreateRequest",
+        "result": "CreateResult"
+      },
+      "get": {
+        "request": "GetRequest",
+        "result": "GetResult"
+      },
+      "list": {
+        "request": "ListRequest",
+        "result": "ListResult"
+      },
+      "destroy": {
+        "request": "DestroyRequest",
+        "result": "DestroyResult"
+      },
+      "run": {
+        "request": "RunRequest",
+        "result": "RunResult"
+      },
+      "files.read_bytes": {
+        "request": "ReadRequest",
+        "result": "ReadResult"
+      },
+      "files.write": {
+        "request": "WriteRequest",
+        "result": "WriteResult"
+      },
+      "process.start": {
+        "request": "StartRequest",
+        "result": "StartResult"
+      },
+      "process.output": {
+        "request": "OutputRequest",
+        "result": "OutputResult"
+      }
+    },
+    "sandbox-provider-http/0.3": {
+      "create": {
+        "request": "CreateRequest03",
+        "result": "CreateResult03"
+      },
+      "get": {
+        "request": "GetRequest",
+        "result": "GetResult03"
+      },
+      "list": {
+        "request": "ListRequest",
+        "result": "ListResult03"
+      },
+      "destroy": {
+        "request": "DestroyRequest",
+        "result": "DestroyResult"
+      },
+      "run": {
+        "request": "RunRequest",
+        "result": "RunResult"
+      },
+      "files.read_bytes": {
+        "request": "ReadRequest",
+        "result": "ReadResult"
+      },
+      "files.write": {
+        "request": "WriteRequest",
+        "result": "WriteResult"
+      },
+      "process.start": {
+        "request": "StartRequest",
+        "result": "StartResult"
+      },
+      "process.output": {
+        "request": "OutputRequest",
+        "result": "OutputResult"
+      }
+    }
+  }
+}

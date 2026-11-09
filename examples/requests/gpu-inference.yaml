@@ -1,0 +1,8 @@
+# A batch inference job that needs one H100 and must stay in the European Union.
+requirements:
+  custom_images: {prepared: true}
+image: vllm/vllm-openai:latest
+resources:
+  gpu_model: nvidia:h100
+  gpu_count: 1
+  region: EU

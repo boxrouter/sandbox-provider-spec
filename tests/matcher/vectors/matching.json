@@ -1,0 +1,6468 @@
+{
+  "cases": [
+    {
+      "id": "outbound-traffic-fits-when-all-are-offered",
+      "provider": "outbound-traffic-all",
+      "request": {
+        "resources": {
+          "outbound_traffic": [
+            "http",
+            "any_tcp"
+          ]
+        }
+      },
+      "rules": [
+        "matching/all-of"
+      ],
+      "expect": {
+        "eligible": [
+          "outbound-traffic-all"
+        ],
+        "chosen": "outbound-traffic-all",
+        "results": {
+          "outbound-traffic-all": {
+            "eligible": true,
+            "resources": {
+              "outbound_traffic": [
+                "http",
+                "any_tcp"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "outbound-traffic-left-out-does-not-fit",
+      "provider": "outbound-traffic-partial",
+      "request": {
+        "resources": {
+          "outbound_traffic": [
+            "any_tcp"
+          ]
+        }
+      },
+      "rules": [
+        "matching/all-of"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "outbound-traffic-partial": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "kernel-features-fit-when-all-are-offered",
+      "provider": "kernel-features-all",
+      "request": {
+        "resources": {
+          "kernel_features": [
+            "fuse",
+            "nested_cgroups"
+          ]
+        }
+      },
+      "rules": [
+        "matching/all-of"
+      ],
+      "expect": {
+        "eligible": [
+          "kernel-features-all"
+        ],
+        "chosen": "kernel-features-all",
+        "results": {
+          "kernel-features-all": {
+            "eligible": true,
+            "resources": {
+              "kernel_features": [
+                "fuse",
+                "nested_cgroups"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "kernel-features-do-not-fit-when-one-is-missing",
+      "providers": [
+        "kernel-features-all",
+        "kernel-features-partial"
+      ],
+      "request": {
+        "resources": {
+          "kernel_features": [
+            "fuse",
+            "nested_cgroups"
+          ]
+        }
+      },
+      "rules": [
+        "matching/all-of"
+      ],
+      "expect": {
+        "eligible": [
+          "kernel-features-all"
+        ],
+        "chosen": "kernel-features-all",
+        "results": {
+          "kernel-features-all": {
+            "eligible": true,
+            "resources": {
+              "kernel_features": [
+                "fuse",
+                "nested_cgroups"
+              ]
+            }
+          },
+          "kernel-features-partial": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "kernel-features-left-out-do-not-fit",
+      "provider": "epsilon",
+      "request": {
+        "resources": {
+          "kernel_features": [
+            "fuse"
+          ]
+        }
+      },
+      "rules": [
+        "matching/all-of",
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "baseline-passed",
+      "provider": "alpha",
+      "request": {},
+      "rules": [
+        "matching/four-checks",
+        "matching/baseline-passed"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "newest-baseline-report-fails",
+      "provider": "alpha",
+      "baseline": "latest_failure",
+      "baseline_provider": "alpha",
+      "request": {},
+      "rules": [
+        "matching/baseline-passed"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "baseline_failed"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "equal-newest-baselines-refuse-pass-first",
+      "provider": "alpha",
+      "baseline": "tied_failure",
+      "baseline_provider": "alpha",
+      "request": {},
+      "rules": [
+        "matching/baseline-passed"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "baseline_failed"
+            ]
+          }
+        }
+      },
+      "reverse_reports": false
+    },
+    {
+      "id": "equal-newest-baselines-refuse-failure-first",
+      "provider": "alpha",
+      "baseline": "tied_failure",
+      "baseline_provider": "alpha",
+      "request": {},
+      "rules": [
+        "matching/baseline-passed"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "baseline_failed"
+            ]
+          }
+        }
+      },
+      "reverse_reports": true
+    },
+    {
+      "id": "unknown-does-not-satisfy-a-named-value",
+      "provider": "unknown",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "any-includes-an-unknown-value",
+      "provider": "unknown",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "any",
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/any"
+      ],
+      "expect": {
+        "eligible": [
+          "unknown-answer"
+        ],
+        "chosen": "unknown-answer",
+        "results": {
+          "unknown-answer": {
+            "eligible": true,
+            "grants": {
+              "previews.access": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-limit-allows-one-port",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              8080
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [
+          "beta"
+        ],
+        "chosen": "beta",
+        "results": {
+          "beta": {
+            "eligible": true,
+            "variants": {
+              "previews": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-limit-rejects-a-second-port",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              8080,
+              8081
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unlimited-number-and-first-fitting-variant",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "any",
+            "link_lifetime_seconds": 8000,
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/numbers",
+        "matching/first-variant"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "previews": 1
+            },
+            "grants": {
+              "previews.link_lifetime_seconds": [
+                8000
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "number-floor-fits-at-its-floor",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "private",
+            "credential": "header",
+            "link_lifetime_seconds": 300,
+            "ports": [
+              443
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "grants": {
+              "previews.link_lifetime_seconds": [
+                300
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "number-floor-is-unknown-above-it",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "private",
+            "link_lifetime_seconds": 301,
+            "ports": [
+              443
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/numbers",
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "gamma": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "credential-is-compared-only-on-private-variants",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "public",
+              "private"
+            ],
+            "credential": "header",
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/credential-with-access-list"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "previews": 0
+            },
+            "grants": {
+              "previews.access": [
+                "public"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "first-fitting-variant-is-kept",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/first-variant"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "previews": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "earlier-gate-yields-to-avoid-a-conflict",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "public",
+              "private"
+            ],
+            "ports": [
+              80
+            ]
+          },
+          "network_lockdown": {
+            "policy": "deny_all"
+          }
+        }
+      },
+      "rules": [
+        "matching/earlier-gate-gives-way"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "previews": 1,
+              "network_lockdown": 0
+            },
+            "grants": {
+              "previews.access": [
+                "private"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "request-list-grants-all-values-from-the-chosen-variant",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "private",
+              "public"
+            ],
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/grant"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "grants": {
+              "previews.access": [
+                "private",
+                "public"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "value-conflict-narrows-a-grant",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "public",
+              "private"
+            ],
+            "ports": [
+              80
+            ]
+          },
+          "network_lockdown": {
+            "policy": "deny_all"
+          }
+        }
+      },
+      "rules": [
+        "matching/conflict-narrows"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "grants": {
+              "previews.access": [
+                "private"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "conflict-against-unknown-fires",
+      "provider": "unknown",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "any",
+            "ports": [
+              80
+            ]
+          },
+          "network_lockdown": {
+            "policy": "deny_all"
+          }
+        }
+      },
+      "rules": [
+        "matching/conflict-against-unknown"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "gpu-resource-conflict-fires",
+      "provider": "alpha",
+      "met_needs": [
+        "plan.gpu"
+      ],
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all"
+          }
+        },
+        "resources": {
+          "gpu_count": 1
+        }
+      },
+      "rules": [
+        "matching/resource-conflict"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "snapshot-conflict-binds-restores-need",
+      "provider": "alpha",
+      "met_needs": [
+        "plan.memory"
+      ],
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "restores_need": {
+          "requirements": {
+            "pause_resume": {
+              "keeps": "files_and_memory"
+            }
+          }
+        }
+      },
+      "rules": [
+        "matching/snapshot-conflicts-bind-restores",
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "restores-need-is-matched",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "restores_need": {
+          "requirements": {
+            "pause_resume": {
+              "keeps": "files_only"
+            }
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "restores-need-larger-than-source-size-does-not-fit",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "resources": {
+          "memory_min_mib": 2048
+        },
+        "restores_need": {
+          "resources": {
+            "memory_min_mib": 4096
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "restores-need-equal-to-source-size-fits",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "resources": {
+          "memory_min_mib": 2048
+        },
+        "restores_need": {
+          "resources": {
+            "memory_min_mib": 2048
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "snapshots": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "restores-need-smaller-than-source-size-fits",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "resources": {
+          "memory_min_mib": 2048
+        },
+        "restores_need": {
+          "resources": {
+            "memory_min_mib": 1024
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "snapshots": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "restores-need-size-is-unknown-without-source-size",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_only",
+            "original_after": "continues"
+          }
+        },
+        "restores_need": {
+          "resources": {
+            "memory_min_mib": 4096
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "resizing-snapshot-variant-allows-larger-restore-size",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "keeps": "files_and_memory",
+            "original_after": "continues"
+          }
+        },
+        "resources": {
+          "memory_min_mib": 2048
+        },
+        "restores_need": {
+          "resources": {
+            "memory_min_mib": 4096
+          }
+        }
+      },
+      "rules": [
+        "matching/restores-need"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "snapshots": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unrecognised-conflict-makes-variant-unusable",
+      "provider": "invalid-conflict",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": "stopped"
+          }
+        }
+      },
+      "rules": [
+        "matching/unrecognised-conflict"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "invalid-conflict": {
+            "eligible": false,
+            "failure_reasons": [
+              "variant_unusable"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "wildcard-requires-explicit-allowance",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "*.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/wildcards"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "first-declared-fitting-size-wins",
+      "provider": "gamma",
+      "request": {
+        "resources": {
+          "cpu_min": 2,
+          "memory_min_mib": 4096
+        }
+      },
+      "rules": [
+        "matching/first-size"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 8192
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "size-ceiling-fits-a-declared-ceiling",
+      "provider": "global-disk",
+      "request": {
+        "resources": {
+          "cpu_min": 2,
+          "memory_min_mib": 4096,
+          "size_is_ceiling": true
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "global-disk"
+        ],
+        "chosen": "global-disk",
+        "results": {
+          "global-disk": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "size-ceiling-unknown-does-not-fit",
+      "provider": "gamma",
+      "request": {
+        "resources": {
+          "cpu_min": 2,
+          "memory_min_mib": 4096,
+          "size_is_ceiling": true
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "gamma": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "size-ceiling-false-does-not-fit",
+      "provider": "beta",
+      "request": {
+        "resources": {
+          "cpu_min": 2,
+          "memory_min_mib": 4096,
+          "size_is_ceiling": true
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "area-pins-first-region-wholly-inside-it",
+      "provider": "gamma",
+      "request": {
+        "resources": {
+          "region": "EU"
+        }
+      },
+      "rules": [
+        "matching/regions"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "resources": {
+              "region": "gamma:eu-west"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "located-in-satisfies-country-without-a-pin",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "region": "US"
+        }
+      },
+      "rules": [
+        "matching/regions"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "resources": {
+              "region": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "area-rejects-a-region-with-countries-outside-it",
+      "provider": "beta",
+      "request": {
+        "resources": {
+          "region": "EU"
+        }
+      },
+      "rules": [
+        "matching/regions"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "located-in-never-pins-a-provider-region",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "region": "beta:us-west"
+        }
+      },
+      "rules": [
+        "matching/located-in-never-pins"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "gpu-count-alone-accepts-any-model",
+      "provider": "alpha",
+      "met_needs": [
+        "plan.gpu"
+      ],
+      "request": {
+        "resources": {
+          "gpu_count": 2
+        }
+      },
+      "rules": [
+        "matching/gpu-count-any-model"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "resources": {
+              "gpu.model": "nvidia:t4",
+              "gpu.count": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "region-resource-conflict-fires-for-a-pinned-region",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all"
+          }
+        },
+        "resources": {
+          "region": "gamma:eu-west"
+        }
+      },
+      "rules": [
+        "matching/resource-conflict"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "gamma": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "at-end-requires-provider-enforcement",
+      "provider": "alpha",
+      "request": {
+        "at_end": "destroyed"
+      },
+      "rules": [
+        "matching/at-end"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "at-end-is-unknown-without-a-provider-timer",
+      "provider": "unknown",
+      "request": {
+        "at_end": "destroyed"
+      },
+      "rules": [
+        "matching/at-end"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "oci-image-fits-oci-source",
+      "provider": "alpha",
+      "request": {
+        "image": "debian:stable"
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "private-oci-fits",
+      "provider": "iota",
+      "request": {
+        "image": {
+          "private_oci": "ghcr.io/example/app:1"
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [
+          "iota"
+        ],
+        "chosen": "iota",
+        "results": {
+          "iota": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "private-oci-does-not-fit-public-only",
+      "provider": "kappa",
+      "request": {
+        "image": {
+          "private_oci": "ghcr.io/example/app:1"
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "kappa": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "provider-artifact-pins-to-named-provider",
+      "providers": [
+        "alpha",
+        "beta"
+      ],
+      "request": {
+        "image": {
+          "provider_artifact": "golden",
+          "provider": "beta"
+        }
+      },
+      "rules": [
+        "matching/image",
+        "matching/provider-artifact-pins"
+      ],
+      "expect": {
+        "eligible": [
+          "beta"
+        ],
+        "chosen": "beta",
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "image_provider_mismatch"
+            ]
+          },
+          "beta": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "extension-requirement-pins-provider",
+      "providers": [
+        "alpha",
+        "beta"
+      ],
+      "request": {
+        "requirements": {
+          "x-alpha": {
+            "exclusive": true
+          }
+        }
+      },
+      "rules": [
+        "matching/extensions-pin"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true
+          },
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "extra_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "extension-does-not-satisfy-a-spec-gate",
+      "provider": "extension-only",
+      "request": {
+        "requirements": {
+          "pause_resume": {
+            "keeps": "files_only"
+          },
+          "x-extension-only": {
+            "pause_resume": {
+              "keeps": "files_only"
+            }
+          }
+        }
+      },
+      "rules": [
+        "matching/extensions-never-satisfy-gates"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "extension-only": {
+            "eligible": false,
+            "failure_reasons": [
+              "gate_not_listed"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unrecognised-at-end-is-refused-before-matching",
+      "provider": "alpha",
+      "request": {
+        "at_end": "stopped"
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "idle-time-is-an-integer",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": "stopped",
+            "custom_idle_time": true,
+            "idle_seconds": 1.5
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "wrong_type"
+      }
+    },
+    {
+      "id": "duplicate-accepted-knob-values-are-refused",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "public",
+              "public"
+            ],
+            "ports": [
+              80
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "duplicate-secret-destinations-are-refused",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "api.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com",
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "empty-volume-mounts-are-refused",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "volumes": {
+            "kind": "filesystem",
+            "mounts": []
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "wrong_type"
+      }
+    },
+    {
+      "id": "provider-artifact-needs-a-valid-provider-name",
+      "provider": "alpha",
+      "request": {
+        "image": {
+          "provider_artifact": "golden",
+          "provider": "Acme"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "wrong_type"
+      }
+    },
+    {
+      "id": "resource-choice-lists-cannot-repeat-values",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "gpu_model": [
+            "nvidia:t4",
+            "nvidia:t4"
+          ]
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "process-controls-match-positive-answers",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "processes": {
+            "input": true,
+            "cancel": true,
+            "reattach": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "processes": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "process-control-does-not-match-an-explicit-no",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "processes": {
+            "input": false
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "terminal-gate-matches-by-presence",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "terminal": {}
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "terminal": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "snapshot-retention-floor-fits-a-smaller-request",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "original_after": "continues",
+            "retention_seconds": 3600
+          }
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "grants": {
+              "snapshots.retention_seconds": [
+                3600
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "snapshot-retention-floor-does-not-prove-a-higher-request",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "snapshots": {
+            "original_after": "continues",
+            "retention_seconds": 7201
+          }
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "paused-retention-floor-fits-a-smaller-request",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "paused_retention_seconds": 1800.5
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "paused-retention-floor-does-not-prove-a-higher-request",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "paused_retention_seconds": 3601
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "default-user-is-not-a-request-resource",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "default_user": "app"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "default-cwd-is-not-a-request-resource",
+      "provider": "alpha",
+      "request": {
+        "resources": {
+          "default_cwd": "/workspace"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "unknown-declaration-key-makes-variant-unusable",
+      "provider": "unknown-key",
+      "request": {
+        "requirements": {
+          "pause_resume": {
+            "keeps": "files_only"
+          }
+        }
+      },
+      "rules": [
+        "declaration/unknown-words-reported"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-key": {
+            "eligible": false,
+            "failure_reasons": [
+              "variant_unusable"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "global-disk-capacity-is-in-the-selected-size",
+      "provider": "global-disk",
+      "request": {
+        "resources": {
+          "cpu_min": 2,
+          "disk_min_mib": 1024
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "global-disk"
+        ],
+        "chosen": "global-disk",
+        "results": {
+          "global-disk": {
+            "eligible": true,
+            "resources": {
+              "size.disk_mib": 8192
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "reserved-port-does-not-fit-that-variant",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              3000,
+              22
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/reserved-ports"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "reserved-port-fits-a-variant-that-does-not-reserve-it",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": [
+              "public",
+              "private"
+            ],
+            "ports": [
+              22
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/reserved-ports",
+        "matching/first-variant"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "previews": 1
+            },
+            "grants": {
+              "previews.access": [
+                "private"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unreserved-ports-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              3000,
+              8080
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/reserved-ports"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "previews": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-in-memory-size-holds-memory-and-disk",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "memory_min_mib": 2048,
+          "disk_min_mib": 2048
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory",
+        "matching/first-size"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 4096,
+              "size.disk_mib": 8192
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-in-memory-passes-over-a-size-too-small-for-both",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "memory_min_mib": 2048,
+          "disk_min_mib": 4096
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory",
+        "matching/first-size"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 6144,
+              "size.disk_mib": 4096
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-in-memory-is-not-compared-for-a-disk-only-ask",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "disk_min_mib": 8192
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 4096,
+              "size.disk_mib": 8192
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-in-memory-no-size-holds-both",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "memory_min_mib": 30000,
+          "disk_min_mib": 4096
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-apart-from-memory-is-not-added-to-it",
+      "providers": [
+        "delta",
+        "epsilon"
+      ],
+      "request": {
+        "resources": {
+          "memory_min_mib": 4096,
+          "disk_min_mib": 8192
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory"
+      ],
+      "expect": {
+        "eligible": [
+          "delta",
+          "epsilon"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 12288
+            }
+          },
+          "epsilon": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 4096
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "root-fits-a-declaration-that-lists-the-way",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": "sudo"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "root": [
+                "sudo"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "root-does-not-fit-an-empty-list",
+      "provider": "epsilon",
+      "request": {
+        "resources": {
+          "root": [
+            "sudo",
+            "per_command"
+          ]
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "root-does-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "root": "sudo"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "arch-fits-a-declared-architecture",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "arch": "arm64"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "arch": "arm64"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "arch-list-provisions-the-default-it-accepts",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "arch": [
+            "arm64",
+            "amd64"
+          ]
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "arch": "amd64"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "arch-does-not-fit-an-undeclared-architecture",
+      "provider": "epsilon",
+      "request": {
+        "resources": {
+          "arch": "amd64"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "arch-does-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "arch": "amd64"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "package-manager-list-fits-either",
+      "providers": [
+        "delta",
+        "epsilon"
+      ],
+      "request": {
+        "resources": {
+          "package_manager": [
+            "apk",
+            "apt"
+          ]
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta",
+          "epsilon"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true
+          },
+          "epsilon": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "package-manager-does-not-fit-another",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "package_manager": "dnf"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "package-manager-does-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "package_manager": "apt"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "libc-fits-only-the-declared-library",
+      "providers": [
+        "delta",
+        "epsilon"
+      ],
+      "request": {
+        "resources": {
+          "libc": "musl"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "epsilon"
+        ],
+        "chosen": "epsilon",
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          },
+          "epsilon": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "libc-does-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "libc": "glibc"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "memory-exhaustion-fits-declared-value",
+      "provider": "memory-process-killed",
+      "request": {
+        "resources": {
+          "on_memory_exhausted": "process_killed"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "memory-process-killed"
+        ],
+        "chosen": "memory-process-killed",
+        "results": {
+          "memory-process-killed": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "memory-exhaustion-mismatch",
+      "provider": "memory-sandbox-ended",
+      "request": {
+        "resources": {
+          "on_memory_exhausted": "process_killed"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "memory-sandbox-ended": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "memory-exhaustion-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "on_memory_exhausted": "process_killed"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "run-seconds-fit-up-to-the-maximum",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "run_seconds": 3600
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "run-seconds-above-the-maximum-do-not-fit",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "run_seconds": 3601
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "run-seconds-fit-an-unlimited-maximum",
+      "provider": "epsilon",
+      "request": {
+        "resources": {
+          "run_seconds": 86400
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "epsilon"
+        ],
+        "chosen": "epsilon",
+        "results": {
+          "epsilon": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "run-seconds-do-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "run_seconds": 60
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "process-seconds-fit-a-floor",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "process_seconds": 600
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "process-seconds-above-a-floor-are-unknown",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "process_seconds": 601
+        }
+      },
+      "rules": [
+        "matching/numbers",
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "process-seconds-above-the-maximum-do-not-fit",
+      "provider": "epsilon",
+      "request": {
+        "resources": {
+          "process_seconds": 61
+        }
+      },
+      "rules": [
+        "matching/numbers"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "process-seconds-do-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "process_seconds": 60
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "root-false-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": false
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "resource_value"
+      }
+    },
+    {
+      "id": "run-seconds-are-whole-seconds",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "run_seconds": 1.5
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "wrong_type"
+      }
+    },
+    {
+      "id": "process-seconds-zero-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "process_seconds": 0
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "resource_value"
+      }
+    },
+    {
+      "id": "unrecognised-arch-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "arch": "sparc"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "package-manager-listed-twice-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "package_manager": [
+            "apt",
+            "apt"
+          ]
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "max-run-seconds-is-not-a-request-resource",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "max_run_seconds": 60
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "disk-in-memory-is-not-a-request-resource",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "disk_in_memory": true
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "tcp-ports-within-max-tcp-ports-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "any",
+            "ports": [
+              5432,
+              6379
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "tcp_ports": 0
+            },
+            "grants": {
+              "tcp_ports.tls": [
+                "none"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "tcp-ports-beyond-max-tcp-ports-do-not-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "none",
+            "ports": [
+              5432,
+              6379,
+              27017
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-tcp-port-limit-admits-one-port",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "terminated",
+            "ports": [
+              5432
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "unknown-tcp-port-limit-rejects-a-second-port",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "any",
+            "ports": [
+              5432,
+              6379
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inject-into-within-max-inject-into-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "a.example.com",
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "inject-into-beyond-max-inject-into-does-not-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "a.example.com",
+              "b.example.com",
+              "c.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-inject-into-limit-admits-one-host",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "a.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [
+          "epsilon"
+        ],
+        "chosen": "epsilon",
+        "results": {
+          "epsilon": {
+            "eligible": true,
+            "variants": {
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-inject-into-limit-rejects-a-second-host",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "a.example.com",
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "workload-identity-fits-a-variant-offering-it",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "workload_identity": {
+            "delivery": "environment",
+            "custom_audience": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "workload-identity-delivery-does-not-fit-another",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "workload_identity": {
+            "delivery": "environment"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "unsupported-workload-identity-does-not-fit",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "workload_identity": {
+            "delivery": "injected"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "tcp-ports-tls-is-compared",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "terminated",
+            "ports": [
+              5432
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "tcp-ports-without-ports-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "none"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "tcp-ports-with-no-ports-listed-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "none",
+            "ports": []
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "tcp-port-listed-twice-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "tls": "none",
+            "ports": [
+              5432,
+              5432
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "new-gate-knobs-match-declared-answers",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "websocket": true,
+            "any_port": true,
+            "ports": [
+              3000
+            ]
+          },
+          "terminal": {
+            "reattach": true
+          },
+          "docker": {
+            "networking": "bridge"
+          },
+          "ssh": {
+            "credential": "token"
+          },
+          "desktop": {
+            "live_view": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "docker-networking-host-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "docker": {
+            "networking": "host"
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "docker": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "conditional-knobless-variant-unmet-does-not-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "processes": {}
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": ["gate_unavailable"]
+          }
+        }
+      }
+    },
+    {
+      "id": "unsupported-pause-resume-does-not-fit",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "pause_resume": {}
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "gate_unsupported"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "conditional-knobless-variant-met-fits",
+      "provider": "delta",
+      "met_needs": ["sandbox_kvm"],
+      "request": {
+        "requirements": {
+          "processes": {}
+        }
+      },
+      "rules": ["matching/four-checks"],
+      "expect": {
+        "eligible": ["delta"],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {"processes": 0}
+          }
+        }
+      }
+    },
+    {
+      "id": "unsupported-nested-virtualization-does-not-fit",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "nested_virtualization": {}
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "private-network-fits-a-variant-offering-it",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "private_network": {}
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "private-network-ip-version-does-not-fit-another",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "private_network": {
+            "ip_version": "ipv6"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "unsupported-private-network-does-not-fit",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "private_network": {}
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "runs-entrypoint-fits-the-declared-answer",
+      "provider": "delta",
+      "request": {
+        "image": "debian:stable",
+        "requirements": {
+          "custom_images": {
+            "runs_entrypoint": false
+          }
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            },
+            "grants": {
+              "custom_images.runs_entrypoint": [
+                false
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "image-config-fits-when-every-value-is-offered",
+      "provider": "custom-image-all",
+      "request": {
+        "image": "python:3.12-slim",
+        "requirements": {
+          "custom_images": {
+            "image_config": [
+              "env",
+              "workdir"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [
+          "custom-image-all"
+        ],
+        "chosen": "custom-image-all",
+        "results": {
+          "custom-image-all": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            },
+            "grants": {
+              "custom_images.image_config": [
+                "env",
+                "workdir"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "image-config-env-and-workdir-fit-when-proven-separately",
+      "provider": "custom-image-env-workdir",
+      "request": {
+        "image": "docker.io/grafana/grafana@sha256:408afb9726de5122b00a2576763a8a57a3c86d5b0eff5305bc994ceb3eb96c3f",
+        "requirements": {
+          "custom_images": {
+            "prepared": true,
+            "image_config": [
+              "env",
+              "workdir"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [
+          "custom-image-env-workdir"
+        ],
+        "chosen": "custom-image-env-workdir",
+        "results": {
+          "custom-image-env-workdir": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            },
+            "grants": {
+              "custom_images.image_config": [
+                "env",
+                "workdir"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "image-config-needs-every-value",
+      "provider": "custom-image-env",
+      "request": {
+        "image": "python:3.12-slim",
+        "requirements": {
+          "custom_images": {
+            "image_config": [
+              "env",
+              "user"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "custom-image-env": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "image-config-unknown-does-not-fit",
+      "provider": "custom-image-source",
+      "request": {
+        "image": "python:3.12-slim",
+        "requirements": {
+          "custom_images": {
+            "image_config": [
+              "env",
+              "workdir"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/image"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "custom-image-source": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "denylist-fits-a-variant-offering-it-and-max-allow-does-not-count-it",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "a.example.com",
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            },
+            "grants": {
+              "network_lockdown.policy": [
+                "denylist"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "max-allow-still-limits-an-allowlist",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com",
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "allowlist-mixed-fits-a-variant-taking-both-kinds",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "api.example.com",
+              "10.0.0.0/8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "matching/allowlist-entry-kinds"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "allowlist-mixed-does-not-fit-names-only",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "api.example.com",
+              "10.0.0.0/8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "matching/allowlist-entry-kinds"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "allowlist-entry-kinds-unknown-does-not-fit",
+      "provider": "gamma",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "api.example.com",
+              "10.0.0.0/8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "matching/allowlist-entry-kinds"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "gamma": {
+            "eligible": false
+          }
+        }
+      }
+    },
+    {
+      "id": "address-denylist-fits-the-variant-that-offers-it",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.0/24"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/first-variant"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "denylist-mixed-fits-a-variant-taking-both-kinds",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "api.example.com",
+              "10.0.0.0/8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "denylist-names-do-not-fit-addresses-only",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "evil.example.org",
+              "10.0.0.0/8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "denylist-does-not-fit-an-allowlist-only-variant",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "x.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "changeable-policy-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "switchable-fits-a-variant-offering-every-policy",
+      "provider": "zeta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "pypi.org"
+            ],
+            "switchable": true,
+            "switches_to": [
+              "deny_all"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [
+          "zeta"
+        ],
+        "chosen": "zeta",
+        "results": {
+          "zeta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "open-start-fits-a-switchable-variant-offering-open",
+      "provider": "open",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "open",
+            "switchable": true,
+            "switches_to": [
+              "allowlist",
+              "deny_all"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [
+          "open"
+        ],
+        "chosen": "open",
+        "results": {
+          "open": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "open-start-needs-open-in-the-variant",
+      "provider": "zeta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "open",
+            "switchable": true,
+            "switches_to": [
+              "allowlist",
+              "deny_all"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "zeta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "open-without-switchable-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "open"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "switchable-needs-every-policy-in-one-variant",
+      "provider": "zeta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "pypi.org"
+            ],
+            "switchable": true,
+            "switches_to": [
+              "denylist"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "zeta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "switchable-unknown-does-not-fit",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "pypi.org"
+            ],
+            "switchable": true,
+            "switches_to": [
+              "deny_all"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "switchable-target-policy-conflict-fires",
+      "provider": "switch-conflict",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "ports": [
+              80
+            ]
+          },
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "pypi.org"
+            ],
+            "switchable": true,
+            "switches_to": [
+              "deny_all"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/conflict-narrows",
+        "network_lockdown/switchable"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "switch-conflict": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "switches-to-without-switchable-is-refused",
+      "provider": "zeta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all",
+            "switches_to": [
+              "allowlist"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "experimental-sdk-unmet-does-not-fit",
+      "provider": "experimental-sdk",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "experimental-sdk": {
+            "eligible": false,
+            "failure_reasons": [
+              "gate_unavailable"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "experimental-sdk-met-fits",
+      "provider": "experimental-sdk",
+      "met_needs": [
+        "experimental_sdk"
+      ],
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "experimental-sdk"
+        ],
+        "chosen": "experimental-sdk",
+        "results": {
+          "experimental-sdk": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "deny-with-an-allowlist-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "deny": [
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "allow-with-a-denylist-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "allow": [
+              "a.example.com"
+            ],
+            "deny": [
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "deny-with-deny-all-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all",
+            "deny": [
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "denylist-without-deny-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "empty-denylist-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": []
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "wildcard-in-deny-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "*.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "deny-entry-with-a-port-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "evil.example.org:80"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "deny-entry-listed-twice-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.7",
+              "203.0.113.7"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "policy-list-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": [
+              "allowlist",
+              "denylist"
+            ],
+            "allow": [
+              "a.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "one_value"
+      }
+    },
+    {
+      "id": "secret-host-named-by-the-denylist-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "api.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "secret-host-not-named-by-the-denylist-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "other.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0,
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "secret-host-with-an-address-denylist-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.7"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0,
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "secret-host-with-deny-all-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all"
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "secret-host-with-an-address-allowlist-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "203.0.113.7"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "secret-knobs-fit-and-grant-what-the-variant-offers",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ],
+            "rotates": true,
+            "transparent": true,
+            "injection": "sets_header",
+            "intercepts": [
+              "injected_hosts",
+              "all_https"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/grant"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "grants": {
+              "hidden_secrets.intercepts": [
+                "injected_hosts"
+              ],
+              "hidden_secrets.transparent": [
+                true
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "transparent-secret-knob-is-compared",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ],
+            "transparent": false
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "response-scrubbing-is-compared",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ],
+            "scrubs_responses": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "placeholder-injection-does-not-fit-a-header-variant",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ],
+            "injection": "replaces_placeholder"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "body-field-injection-does-not-fit-a-header-variant",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ],
+            "injection": "adds_body_field"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "wildcard-inject-into-needs-inject-wildcards",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "*.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "wildcard-inject-into-fits-inject-wildcards",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "hidden_secrets": {
+            "inject_into": [
+              "*.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "wildcard-inject-into-needs-a-covering-allowlist-wildcard",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "api.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "*.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "wildcard-inject-into-fits-parent-allowlist-wildcard",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "*.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "*.sub.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "alpha"
+        ],
+        "chosen": "alpha",
+        "results": {
+          "alpha": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 1,
+              "hidden_secrets": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "egress-ips-fit-one-offered",
+      "providers": [
+        "delta",
+        "epsilon"
+      ],
+      "request": {
+        "resources": {
+          "egress_ips": "dedicated"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "epsilon"
+        ],
+        "chosen": "epsilon",
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          },
+          "epsilon": {
+            "eligible": true
+          }
+        }
+      }
+    },
+    {
+      "id": "egress-ips-list-fits-either-and-names-the-one-chosen",
+      "providers": [
+        "delta",
+        "epsilon"
+      ],
+      "request": {
+        "resources": {
+          "egress_ips": [
+            "dedicated",
+            "published_ranges"
+          ]
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta",
+          "epsilon"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "egress_ips": "published_ranges"
+            }
+          },
+          "epsilon": {
+            "eligible": true,
+            "resources": {
+              "egress_ips": "dedicated"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "egress-ips-do-not-fit-unknown",
+      "provider": "unknown",
+      "request": {
+        "resources": {
+          "egress_ips": "published_ranges"
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "unknown-answer": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unrecognised-egress-ips-are-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "egress_ips": "static"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "unknown-disk-in-memory-is-the-cautious-case",
+      "provider": "gamma",
+      "request": {
+        "resources": {
+          "memory_min_mib": 8192,
+          "disk_min_mib": 4096
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory",
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "gamma": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-disk-in-memory-fits-a-size-with-memory-for-both",
+      "provider": "gamma",
+      "request": {
+        "resources": {
+          "memory_min_mib": 4096,
+          "disk_min_mib": 4096
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma"
+        ],
+        "chosen": "gamma",
+        "results": {
+          "gamma": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 8192
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "disk-in-memory-true-does-not-compare-disk",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "memory_min_mib": 1024,
+          "disk_min_mib": 20000
+        }
+      },
+      "rules": [
+        "matching/disk-in-memory"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "size.memory_mib": 21024
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "root-list-grants-every-way-the-declaration-lists",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": [
+            "by_default",
+            "per_command",
+            "sudo"
+          ]
+        }
+      },
+      "rules": [
+        "matching/grant"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "resources": {
+              "root": [
+                "sudo",
+                "per_command"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "root-does-not-fit-a-way-not-listed",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": "by_default"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "root-true-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": true
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "wrong_type"
+      }
+    },
+    {
+      "id": "old-root-word-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "root": "default_user"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "old-arch-word-is-refused",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "arch": "x86_64"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "rotating-egress-is-no-longer-a-word",
+      "provider": "delta",
+      "request": {
+        "resources": {
+          "egress_ips": "rotating"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "egress-ips-do-not-fit-an-empty-list",
+      "provider": "beta",
+      "request": {
+        "resources": {
+          "egress_ips": "dedicated"
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "beta": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "system-facts-with-an-image-are-refused",
+      "provider": "delta",
+      "request": {
+        "image": "debian:stable",
+        "resources": {
+          "libc": "musl"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "root-with-an-image-is-refused",
+      "provider": "delta",
+      "request": {
+        "image": "debian:stable",
+        "resources": {
+          "root": "sudo"
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "resource-conflict-fires-when-the-request-names-the-fact",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "desktop": {}
+        },
+        "resources": {
+          "package_manager": "apt"
+        }
+      },
+      "rules": [
+        "matching/resource-conflict"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "conflict"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "resource-conflict-does-not-fire-when-the-fact-is-not-named",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "desktop": {}
+        },
+        "resources": {
+          "arch": "amd64"
+        }
+      },
+      "rules": [
+        "matching/resource-conflict"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "desktop": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "max-deny-limits-a-denylist",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "a.example.com",
+              "b.example.com",
+              "c.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-max-deny-admits-one-entry",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.7"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [
+          "epsilon"
+        ],
+        "chosen": "epsilon",
+        "results": {
+          "epsilon": {
+            "eligible": true,
+            "variants": {
+              "network_lockdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-max-deny-rejects-a-second-entry",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.7",
+              "203.0.113.8"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-limit"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "limit_exceeded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "changeable-with-deny-all-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all",
+            "changeable": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "secret-host-under-a-denied-name-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "auto-wake-with-on-idle-destroyed-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": "destroyed",
+            "auto_wake": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "auto-wake-with-only-destroyed-listed-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": [
+              "destroyed"
+            ],
+            "auto_wake": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "auto-wake-without-on-idle-is-compared",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "auto_wake": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "idle_shutdown": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "auto-wake-is-unknown-where-the-variant-leaves-it-out",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": [
+              "paused",
+              "destroyed"
+            ],
+            "auto_wake": true
+          }
+        }
+      },
+      "rules": [
+        "matching/unknown-is-no"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "epsilon": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "survives-pause-without-a-way-to-pause-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "previews": {
+            "access": "public",
+            "survives_pause": false,
+            "ports": [
+              3000
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "survives-pause-with-idle-shutdown-is-compared",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "idle_shutdown": {
+            "on_idle": "paused"
+          },
+          "previews": {
+            "access": "public",
+            "survives_pause": false,
+            "ports": [
+              3000
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "idle_shutdown": 0,
+              "previews": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ssh-credential-needs-no-access",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "ssh": {
+            "credential": "token"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "tcp-ports-without-tls-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "tcp_ports": {
+            "ports": [
+              5432
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "knob_not_named"
+      }
+    },
+    {
+      "id": "runs-entrypoint-does-not-fit-a-variant-that-skips-it",
+      "provider": "delta",
+      "request": {
+        "image": "debian:stable",
+        "requirements": {
+          "custom_images": {
+            "runs_entrypoint": true
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "delta": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "custom-images-without-an-image-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "custom_images": {
+            "runs_entrypoint": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "source-under-requirements-is-refused",
+      "provider": "delta",
+      "request": {
+        "image": "debian:stable",
+        "requirements": {
+          "custom_images": {
+            "source": "oci"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "build-context-fits",
+      "provider": "delta",
+      "request": {
+        "image": {
+          "dockerfile": "FROM alpine\nCOPY a /a"
+        },
+        "requirements": {
+          "custom_images": {
+            "build_context": true
+          }
+        }
+      },
+      "rules": [
+        "custom_images/build-context"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 1
+            },
+            "grants": {
+              "custom_images.build_context": [
+                true
+              ]
+            }
+          }
+        },
+        "chosen": "delta"
+      }
+    },
+    {
+      "id": "build-context-unknown-does-not-fit",
+      "provider": "alpha",
+      "request": {
+        "image": {
+          "dockerfile": "FROM alpine\nCOPY a /a"
+        },
+        "requirements": {
+          "custom_images": {
+            "build_context": true
+          }
+        }
+      },
+      "rules": [
+        "custom_images/build-context"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "build-context-without-dockerfile-is-refused",
+      "provider": "delta",
+      "request": {
+        "image": "alpine:3",
+        "requirements": {
+          "custom_images": {
+            "build_context": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
+      "id": "read-only-mounts-fit-a-variant-offering-them",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "volumes": {
+            "kind": "filesystem",
+            "read_only_mounts": true,
+            "mounts": [
+              {
+                "provider": "delta",
+                "volume": "weights",
+                "path": "/data",
+                "read_only": true
+              }
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [
+          "delta"
+        ],
+        "chosen": "delta",
+        "results": {
+          "delta": {
+            "eligible": true,
+            "variants": {
+              "volumes": 0
+            },
+            "grants": {
+              "volumes.read_only_mounts": [
+                true
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "read-only-mounts-do-not-fit-a-variant-without-them",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "volumes": {
+            "kind": "filesystem",
+            "read_only_mounts": true,
+            "mounts": [
+              {
+                "provider": "alpha",
+                "volume": "weights",
+                "path": "/data",
+                "read_only": true
+              }
+            ]
+          }
+        }
+      },
+      "rules": [
+        "matching/four-checks"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "alpha": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "domain-traffic-list-grants-what-the-variant-offers",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "domain_traffic": [
+              "tls",
+              "https"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "domain-traffic-does-not-fit-another-value",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "a.example.com"
+            ],
+            "domain_traffic": "all"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "domain-traffic-is-unknown-where-a-variant-leaves-it-out",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "ads.example.com"
+            ],
+            "domain_traffic": "https"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "domain-traffic-with-deny-all-is-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "deny_all",
+            "domain_traffic": "https"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "changeable-policy-that-keeps-connections-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": true,
+            "cuts_open_connections": false
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "cut-connections-do-not-fit-a-variant-that-keeps-them",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": true,
+            "cuts_open_connections": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "cut-connections-are-unknown-where-a-variant-leaves-them-out",
+      "provider": "epsilon",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "deny": [
+              "203.0.113.7"
+            ],
+            "changeable": true,
+            "cuts_open_connections": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "cut-connections-without-changeable-are-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "cuts_open_connections": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "cut-connections-with-changeable-false-are-refused",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "changeable": false,
+            "cuts_open_connections": false
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "cut-connections-switchable-policy-fits",
+      "provider": "delta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "allow": [
+              "a.example.com"
+            ],
+            "switchable": true,
+            "switches_to": [
+              "denylist"
+            ],
+            "cuts_open_connections": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "live-resize-fits-a-variant-offering-it",
+      "provider": "live-resize",
+      "request": {
+        "requirements": {
+          "live_resize": {
+            "shrinks": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "live-resize-shrinks-does-not-fit-a-grow-only-variant",
+      "provider": "live-resize-grow-only",
+      "request": {
+        "requirements": {
+          "live_resize": {
+            "shrinks": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "waitlisted-http-rules-are-rejected-before-matching",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "http_rules": true,
+            "allow": [
+              {
+                "hosts": [
+                  "api.github.com"
+                ],
+                "methods": [
+                  "GET"
+                ],
+                "paths": [
+                  "/repos/**"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "waitlisted-http-rules-are-rejected-before-matching-for-any-provider",
+      "provider": "beta",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "http_rules": true,
+            "allow": [
+              {
+                "hosts": [
+                  "api.github.com"
+                ],
+                "methods": [
+                  "GET"
+                ],
+                "paths": [
+                  "/repos/**"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "waitlisted-http-rules-are-rejected-with-denylist-too",
+      "provider": "deny-rules",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "denylist",
+            "http_rules": true,
+            "deny": [
+              {
+                "hosts": [
+                  "api.github.com"
+                ],
+                "methods": [
+                  "POST"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "egress-proxy-fits-a-variant-offering-it",
+      "provider": "egress-proxy-socks5",
+      "request": {
+        "requirements": {
+          "egress_proxy": {
+            "protocol": "socks5",
+            "traffic": "any_tcp",
+            "transparent": true,
+            "fails_closed": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "egress-proxy-protocol-does-not-fit-another",
+      "provider": "egress-proxy-http-variable",
+      "request": {
+        "requirements": {
+          "egress_proxy": {
+            "protocol": "socks5",
+            "traffic": "http"
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "egress-proxy-transparent-does-not-fit-a-proxy-variable-variant",
+      "provider": "egress-proxy-http-variable",
+      "request": {
+        "requirements": {
+          "egress_proxy": {
+            "protocol": "http",
+            "traffic": "http",
+            "transparent": true
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "deny-wins-fits-a-variant-offering-it",
+      "provider": "deny-wins",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "deny_wins": true,
+            "allow": [
+              "*.github.com"
+            ],
+            "deny": [
+              "gist.github.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "deny-wins-does-not-fit-an-allow-wins-variant",
+      "provider": "allow-wins",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "deny_wins": true,
+            "allow": [
+              "*.github.com"
+            ],
+            "deny": [
+              "gist.github.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "deny-entry-kinds-limit-an-allowlist-deny-list",
+      "provider": "deny-entry-kinds",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "deny_wins": true,
+            "allow": [
+              "api.example.com"
+            ],
+            "deny": [
+              "203.0.113.0/24"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "max-deny-still-limits-an-allowlist-deny-list-with-deny-wins",
+      "provider": "deny-wins-max-deny",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "deny_wins": true,
+            "allow": [
+              "api.example.com"
+            ],
+            "deny": [
+              "a.example.com",
+              "b.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "deny-wins-does-not-let-hidden-secrets-reach-a-denied-host",
+      "provider": "alpha",
+      "request": {
+        "requirements": {
+          "network_lockdown": {
+            "policy": "allowlist",
+            "deny_wins": true,
+            "allow": [
+              "*.example.com"
+            ],
+            "deny": [
+              "api.example.com"
+            ]
+          },
+          "hidden_secrets": {
+            "inject_into": [
+              "api.example.com"
+            ]
+          }
+        }
+      },
+      "rules": [
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "unrecognised_word"
+      }
+    },
+    {
+      "id": "omitted-image-prepared-defaults-to-false",
+      "provider": "prepared-default",
+      "request": {
+        "image": "python:3.12-slim"
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [
+          "prepared-default"
+        ],
+        "results": {
+          "prepared-default": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            },
+            "grants": {
+              "custom_images.prepared": [
+                false
+              ]
+            }
+          }
+        },
+        "chosen": "prepared-default"
+      }
+    },
+    {
+      "id": "explicit-prepared-true-skips-omitted-default",
+      "provider": "prepared-default",
+      "request": {
+        "image": "python:3.12-slim",
+        "requirements": {
+          "custom_images": {
+            "prepared": true
+          }
+        }
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [
+          "prepared-default"
+        ],
+        "results": {
+          "prepared-default": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 1
+            },
+            "grants": {
+              "custom_images.prepared": [
+                true
+              ]
+            }
+          }
+        },
+        "chosen": "prepared-default"
+      }
+    },
+    {
+      "id": "prepared-image-is-opt-in",
+      "provider": "prepared-images",
+      "request": {
+        "image": "python:3.12-slim"
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [
+          "prepared-images"
+        ],
+        "results": {
+          "prepared-images": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 1
+            },
+            "grants": {
+              "custom_images.prepared": [
+                false
+              ]
+            }
+          }
+        },
+        "chosen": "prepared-images"
+      }
+    },
+    {
+      "id": "prepared-image-fits-when-requested",
+      "provider": "prepared-images",
+      "request": {
+        "image": "python:3.12-slim",
+        "requirements": {
+          "custom_images": {
+            "prepared": true
+          }
+        }
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [
+          "prepared-images"
+        ],
+        "results": {
+          "prepared-images": {
+            "eligible": true,
+            "variants": {
+              "custom_images": 0
+            },
+            "grants": {
+              "custom_images.prepared": [
+                true
+              ]
+            }
+          }
+        },
+        "chosen": "prepared-images"
+      }
+    },
+    {
+      "id": "prepared-only-image-does-not-match-an-implicit-direct-request",
+      "provider": "prepared-only",
+      "request": {
+        "image": "python:3.12-slim"
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "prepared-only": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unknown-image-preparation-does-not-match-an-implicit-direct-request",
+      "provider": "prepared-unknown",
+      "request": {
+        "image": "python:3.12-slim"
+      },
+      "rules": [
+        "matching/image",
+        "matching/image-prepared"
+      ],
+      "expect": {
+        "eligible": [],
+        "results": {
+          "prepared-unknown": {
+            "eligible": false,
+            "failure_reasons": [
+              "knob_unknown"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

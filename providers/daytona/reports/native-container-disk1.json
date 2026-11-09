@@ -1,0 +1,64 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.disk_in_memory.false": "sha256:13efabc6b89b2a29c5206a12204088ad0af4c2008eebc3840abf116be8a9a59d"
+  },
+  "class": "container",
+  "clean": true,
+  "driver": {
+    "name": "DaytonaDriver",
+    "version": "0.3.141"
+  },
+  "finished_at": "2026-10-29T01:35:37.598360+00:00",
+  "provider": "daytona",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-e6995fa5ec77d8a53267",
+  "sdk_versions": {
+    "daytona": "0.226.1"
+  },
+  "selected_tests": [
+    "coverage.facts.disk_in_memory.false"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T01:35:28.007019+00:00",
+  "suite_digest": "sha256:864b6f5253d02d6656d54d1dfd10bd9747d655df02626f448d6db48159f94a37",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 9590,
+      "id": "coverage.facts.disk_in_memory.false",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": true
+            },
+            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 0, \"memory_during_bytes\": 0, \"memory_after_bytes\": 0}\n"
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+spec: sandbox-provider-spec/0.1
+provider: modal
+class: vm
+verified:
+  date: '2026-11-06'
+  sdks:
+    modal: 1.6.1
+resources:
+  kernel: dedicated
+  disk_mib: 524288
+  gpus: []
+  max_lifetime_seconds: 86400
+  sizes:
+  - cpu:
+    - 0.125
+    - 16
+    memory_mib:
+    - 128
+    - 32768
+  size_is_ceiling: true
+  default_size: unknown
+  regions:
+  - modal:us
+  - modal:us-east
+  - modal:us-central
+  - modal:us-south
+  - modal:us-west
+  - modal:eu
+  - modal:eu-west
+  - modal:eu-north
+  - modal:eu-south
+  - modal:ap
+  - modal:ap-northeast
+  - modal:ap-southeast
+  - modal:ap-south
+  - modal:ap-melbourne
+  - modal:jp
+  - modal:au
+  - modal:uk
+  - modal:ca
+  - modal:me
+  - modal:sa
+  - modal:af
+  - modal:mx
+  default_user: root
+  default_cwd: /
+gates:
+  previews:
+  - access: public
+    revocable: false
+    link_lifetime_seconds:
+      at_least: 300
+    max_ports:
+      at_least: 2
+  snapshots:
+  - keeps: files_only
+  tcp_ports:
+  - tls: none
+  processes:
+  - input: true
+  terminal:
+  - {}
+evidence:
+  resources.kernel:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-03'
+    quote: VMs run the Sandbox in a virtual machine with its own Linux kernel.
+  resources.disk_mib:
+    source: https://modal.com/docs/guide/sandbox-resources
+    read: '2026-10-03'
+    quote: On the VM runtime, the root filesystem is a fixed 512 GiB.
+  resources.gpus:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-03'
+    quote: GPU Sandboxes are only supported with `runtime="gvisor"`.
+  resources.max_lifetime_seconds:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-04'
+    quote: Sandboxes have a default maximum lifetime of 5 minutes. You can change this by passing a timeout
+      of up to 24 hours to the Sandbox.create(...) function.
+  resources.sizes:
+    source: https://modal.com/docs/guide/resources
+    read: '2026-11-06'
+    quote: Each Modal Function or Sandbox container has a default request of 0.125 CPU cores and 128 MiB
+      of memory. You can also guarantee access to more resources by requesting larger values, similarly
+      to Kubernetes. For both CPU and memory, a maximum is enforced at Function or Sandbox creation time
+      to ensure your containers can be scheduled for execution. Requests exceeding the maximum will be
+      rejected with an InvalidError.
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-vm-size-ceiling.json
+  resources.regions:
+    source: https://modal.com/docs/guide/region-selection
+    read: '2026-10-04'
+    quote: '"us"; "us-east"; "us-central"; "us-south"; "us-west"; "eu"; "eu-west"; "eu-north"; "eu-south";
+      "ap"; "ap-northeast"; "ap-southeast"; "ap-south"; "ap-melbourne"; "jp"; "au"; "uk"; "ca"; "me";
+      "sa"; "af"; "mx"'
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/native-vm-core.json
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/native-vm-core.json
+  resources.default_size:
+    source: https://modal.com/docs/guide/sandbox-resources
+    read: '2026-10-18'
+    quote: Sandboxes can burst beyond their CPU and memory requests when additional resources are available
+      on the underlying host. Your request guarantees a minimum level of resources, but when spare capacity
+      exists, your Sandbox can use more.
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-vm-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/native-vm-core.json
+  gates.previews.0.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/native-vm-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-vm-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_only
+    report: reports/native-vm-core.json
+  gates.tcp_ports.0.tls:
+    source: https://modal.com/docs/guide/tunnels
+    read: '2026-10-05'
+    quote: 'In this case, we have support for unencrypted tunnels: `with modal.forward(8000, unencrypted=True)`.'
+  gates.processes.0.input:
+    tests:
+    - processes.input.true
+    report: reports/native-vm-core.json
+  gates.terminal.0:
+    tests:
+    - terminal.interactive
+    report: reports/native-vm-core.json

@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: extension-only
+verified: {date: 2026-09-29, sdks: {extension-sdk: 1.0.0}}
+resources: {}
+gates: {}
+x-extension-only: {pause_resume: {keeps: files_only}}
+evidence: {}

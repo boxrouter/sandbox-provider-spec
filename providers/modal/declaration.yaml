@@ -1,0 +1,250 @@
+spec: sandbox-provider-spec/0.1
+provider: modal
+class: default
+verified:
+  date: '2026-11-06'
+  sdks:
+    modal: 1.6.1
+resources:
+  kernel: filtered
+  max_lifetime_seconds: 86400
+  sizes:
+  - cpu:
+    - 0.125
+    - 4
+    memory_mib:
+    - 128
+    - 8192
+  size_is_ceiling: true
+  default_size: unknown
+  regions:
+  - modal:us
+  - modal:us-east
+  - modal:us-central
+  - modal:us-south
+  - modal:us-west
+  - modal:eu
+  - modal:eu-west
+  - modal:eu-north
+  - modal:eu-south
+  - modal:ap
+  - modal:ap-northeast
+  - modal:ap-southeast
+  - modal:ap-south
+  - modal:ap-melbourne
+  - modal:jp
+  - modal:au
+  - modal:uk
+  - modal:ca
+  - modal:me
+  - modal:sa
+  - modal:af
+  - modal:mx
+  default_user: root
+  default_cwd: /
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end:
+  - destroyed
+  adjustable: false
+  step_seconds: 1
+  counts_from: create
+gates:
+  idle_shutdown:
+  - custom_idle_time: true
+  previews:
+  - access: public
+    revocable: false
+    link_lifetime_seconds:
+      at_least: 300
+    max_ports:
+      at_least: 2
+  snapshots:
+  - original_after: continues
+    keeps: files_only
+    deletable: true
+  custom_images:
+  - source: oci
+    prepared: true
+    image_config:
+    - env
+    - workdir
+  - source: dockerfile
+    prepared: true
+  - prepared: true
+  tcp_ports:
+  - tls: none
+  processes:
+  - input: true
+  terminal:
+  - {}
+  network_lockdown:
+  - policy: allowlist
+    entry_kinds:
+    - names
+    allow_wildcards: true
+    max_allow:
+      at_least: 32
+  - policy: allowlist
+    entry_kinds:
+    - addresses
+evidence:
+  resources.kernel:
+    source: https://modal.com/docs/sdk/py/releases
+    read: '2026-10-03'
+    quote: To force continued use of the gVisor runtime, set `runtime="gvisor"`. This is the current default
+      behavior, but the default may change in the future.
+  resources.max_lifetime_seconds:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-04'
+    quote: Sandboxes have a default maximum lifetime of 5 minutes. You can change this by passing a timeout
+      of up to 24 hours to the Sandbox.create(...) function.
+  resources.sizes:
+    source: https://modal.com/docs/guide/resources
+    read: '2026-11-06'
+    quote: Each Modal Function or Sandbox container has a default request of 0.125 CPU cores and 128 MiB
+      of memory. You can also guarantee access to more resources by requesting larger values, similarly
+      to Kubernetes. For both CPU and memory, a maximum is enforced at Function or Sandbox creation time
+      to ensure your containers can be scheduled for execution. Requests exceeding the maximum will be
+      rejected with an InvalidError.
+  resources.size_is_ceiling:
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/adapter-default-size-ceiling.json
+  resources.regions:
+    source: https://modal.com/docs/guide/region-selection
+    read: '2026-10-04'
+    quote: '"us"; "us-east"; "us-central"; "us-south"; "us-west"; "eu"; "eu-west"; "eu-north"; "eu-south";
+      "ap"; "ap-northeast"; "ap-southeast"; "ap-south"; "ap-melbourne"; "jp"; "au"; "uk"; "ca"; "me";
+      "sa"; "af"; "mx"'
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/native-default-core.json
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/native-default-core.json
+  resources.default_size:
+    source: https://modal.com/docs/guide/sandbox-resources
+    read: '2026-10-18'
+    quote: Sandboxes can burst beyond their CPU and memory requests when additional resources are available
+      on the underlying host. Your request guarantees a minimum level of resources, but when spare capacity
+      exists, your Sandbox can use more.
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/native-default-core.json
+  lifetime_timer.adjustable:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-11'
+    quote: You can change this by passing a `timeout` of up to 24 hours to the `Sandbox.create(...)` function.
+  lifetime_timer.step_seconds:
+    source: https://modal.com/docs/sdk/py/latest/Sandbox
+    read: '2026-10-11'
+    quote: Maximum lifetime of the sandbox in seconds.
+  lifetime_timer.counts_from:
+    source: https://modal.com/docs/guide/sandboxes
+    read: '2026-10-11'
+    quote: This is the initial state immediately after calling `Sandbox.create`.
+  gates.idle_shutdown.0.custom_idle_time:
+    tests:
+    - idle_shutdown.custom_idle_time.true
+    report: reports/native-default-idle.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/native-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/native-default-core.json
+  gates.previews.0.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/native-default-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/native-default-multiport.json
+  gates.snapshots.0.original_after:
+    tests:
+    - snapshots.original_after.continues
+    report: reports/native-default-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_only
+    report: reports/native-default-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/native-default-core.json
+  gates.custom_images.0.source:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/native-default-coverage.json
+  gates.custom_images.0.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/native-default-coverage.json
+  gates.custom_images.0.image_config:
+    reports:
+    - tests:
+      - coverage.custom_images.prepare.image_config.env
+      report: reports/native-default-coverage.json
+    - tests:
+      - coverage.custom_images.prepare.image_config.workdir
+      report: reports/native-default-coverage.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.dockerfile
+    report: reports/native-default-core.json
+  gates.custom_images.1.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/native-default-coverage.json
+  gates.tcp_ports.0.tls:
+    source: https://modal.com/docs/guide/tunnels
+    read: '2026-10-05'
+    quote: 'In this case, we have support for unencrypted tunnels: `with modal.forward(8000, unencrypted=True)`.'
+  gates.processes.0.input:
+    tests:
+    - processes.input.true
+    report: reports/native-default-core.json
+  gates.terminal.0:
+    tests:
+    - terminal.interactive
+    report: reports/native-default-core.json
+  gates.custom_images.2.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/native-default-coverage.json
+  gates.network_lockdown.0.policy:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/adapter-default-core.json
+  gates.network_lockdown.0.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/adapter-default-core.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/adapter-default-core.json
+  gates.network_lockdown.0.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/adapter-default-core.json
+  gates.network_lockdown.1.policy:
+    tests:
+    - network_lockdown.allowlist.addresses
+    report: reports/adapter-default-core.json
+  gates.network_lockdown.1.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.addresses
+    report: reports/adapter-default-core.json

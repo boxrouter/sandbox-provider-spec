@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:conformance:address-families-fixture",
+  "title": "Explicit address-family conformance fixture",
+  "description": "Example inputs for literal TCP controls; this public anycast endpoint is not controlled by BoxRouter. No endpoint or NAT64 prefix is selected unless explicitly supplied.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["address_families"],
+  "properties": {
+    "address_families": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ipv4_literal", "ipv6_literal", "port", "provenance"],
+      "properties": {
+        "ipv4_literal": {"const": "1.1.1.1"},
+        "ipv6_literal": {"const": "2606:4700:4700::1111"},
+        "port": {"const": 443},
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "scope"],
+          "properties": {
+            "source": {"const": "https://developers.cloudflare.com/1.1.1.1/ip-addresses/"},
+            "scope": {"const": "non-BoxRouter-controlled public anycast"}
+          }
+        },
+        "nat64_prefix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["prefix", "provenance"],
+          "properties": {
+            "prefix": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f:]+/(32|40|48|56|64|96)$",
+              "description": "An explicitly supplied RFC 6052 IPv6 prefix; no default is selected."
+            },
+            "provenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["source", "scope"],
+              "properties": {
+                "source": {"type": "string", "format": "uri"},
+                "scope": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

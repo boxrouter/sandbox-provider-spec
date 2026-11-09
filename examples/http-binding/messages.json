@@ -1,0 +1,2179 @@
+{
+  "valid": [
+    {
+      "type": "Discovery",
+      "value": {
+        "binding": "sandbox-provider-http/0.1",
+        "endpoint_origin": "https://provider.example",
+        "provider_id": "example",
+        "account_id": "account-example",
+        "server_revision": "revision-example",
+        "operations": [
+          "create",
+          "get",
+          "list",
+          "destroy",
+          "run",
+          "files.read_bytes",
+          "files.write",
+          "process.start",
+          "process.output"
+        ],
+        "limits": {
+          "request_bytes": 33554432,
+          "response_bytes": 33554432,
+          "command_output_bytes": 1048576,
+          "file_bytes": 16777216,
+          "page_size": 100,
+          "output_frames": 100,
+          "observation_ms": 30000,
+          "process_buffer_bytes": 1048576
+        },
+        "create_key_window_seconds": 86400,
+        "process_retention_seconds": 60,
+        "process_addressability": "endpoint_lifetime",
+        "core_modes": [],
+        "offerings": [
+          {
+            "offering_id": "container",
+            "declaration_id": "declaration-example",
+            "declaration": {
+              "spec": "sandbox-provider-spec/0.1",
+              "provider": "example",
+              "class": "container",
+              "verified": {
+                "date": "2026-10-22",
+                "sdks": {
+                  "example": "1.0"
+                }
+              },
+              "resources": {},
+              "gates": {},
+              "evidence": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Discovery",
+      "value": {
+        "binding": "sandbox-provider-http/0.2",
+        "endpoint_origin": "https://provider.example",
+        "provider_id": "example",
+        "account_id": "account-example",
+        "server_revision": "revision-example",
+        "operations": [
+          "create",
+          "get",
+          "list",
+          "destroy",
+          "run",
+          "files.read_bytes",
+          "files.write",
+          "process.start",
+          "process.output"
+        ],
+        "limits": {
+          "request_bytes": 33554432,
+          "response_bytes": 33554432,
+          "command_output_bytes": 1048576,
+          "file_bytes": 16777216,
+          "page_size": 100,
+          "output_frames": 100,
+          "observation_ms": 30000,
+          "process_buffer_bytes": 1048576
+        },
+        "create_key_window_seconds": 86400,
+        "process_retention_seconds": 60,
+        "process_addressability": "endpoint_lifetime",
+        "core_modes": [],
+        "offerings": [
+          {
+            "offering_id": "container",
+            "declaration_id": "selection-example-v2",
+            "declaration": {
+              "spec": "sandbox-provider-spec/0.1",
+              "provider": "example",
+              "class": "container",
+              "verified": {
+                "date": "2026-10-22",
+                "sdks": {
+                  "example": "1.0"
+                }
+              },
+              "resources": {},
+              "gates": {},
+              "evidence": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Discovery",
+      "value": {
+        "binding": "sandbox-provider-http/0.2",
+        "endpoint_origin": "https://provider.example",
+        "provider_id": "example",
+        "account_id": "account-example",
+        "server_revision": "revision-example",
+        "operations": [
+          "create",
+          "get",
+          "list",
+          "destroy",
+          "run",
+          "files.read_bytes",
+          "files.write",
+          "process.start",
+          "process.output"
+        ],
+        "limits": {
+          "request_bytes": 33554432,
+          "response_bytes": 67108864,
+          "command_output_bytes": 1048576,
+          "file_bytes": 16777216,
+          "page_size": 100,
+          "output_frames": 100,
+          "observation_ms": 30000,
+          "process_buffer_bytes": 1048576,
+          "buffered_command_output_bytes": 16777216,
+          "execution_ms": 900000
+        },
+        "create_key_window_seconds": 86400,
+        "process_retention_seconds": 60,
+        "process_addressability": "endpoint_lifetime",
+        "core_modes": [
+          "buffered_commands_v1"
+        ],
+        "offerings": [
+          {
+            "offering_id": "container",
+            "declaration_id": "selection-example-v2",
+            "declaration": {
+              "spec": "sandbox-provider-spec/0.1",
+              "provider": "example",
+              "class": "container",
+              "verified": {
+                "date": "2026-10-22",
+                "sdks": {
+                  "example": "1.0"
+                }
+              },
+              "resources": {},
+              "gates": {},
+              "evidence": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Discovery",
+      "value": {
+        "binding": "sandbox-provider-http/0.3",
+        "endpoint_origin": "https://provider.example",
+        "provider_id": "example",
+        "account_id": "account-example",
+        "server_revision": "revision-example",
+        "operations": [
+          "create",
+          "get",
+          "list",
+          "destroy",
+          "run",
+          "files.read_bytes",
+          "files.write",
+          "process.start",
+          "process.output"
+        ],
+        "limits": {
+          "request_bytes": 33554432,
+          "response_bytes": 67108864,
+          "command_output_bytes": 1048576,
+          "file_bytes": 16777216,
+          "page_size": 100,
+          "output_frames": 100,
+          "observation_ms": 30000,
+          "process_buffer_bytes": 1048576,
+          "buffered_command_output_bytes": 1024,
+          "execution_ms": 60000
+        },
+        "create_key_window_seconds": 86400,
+        "process_retention_seconds": 60,
+        "process_addressability": "endpoint_lifetime",
+        "core_modes": [
+          "buffered_commands_v1"
+        ],
+        "offerings": [
+          {
+            "offering_id": "container",
+            "declaration_id": "selection-example-v3",
+            "declaration": {
+              "spec": "sandbox-provider-spec/0.1",
+              "provider": "example",
+              "class": "container",
+              "verified": {
+                "date": "2026-10-22",
+                "sdks": {
+                  "example": "1.0"
+                }
+              },
+              "resources": {},
+              "gates": {},
+              "evidence": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "CreateRequest",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "declaration-example",
+        "request": {},
+        "env": {}
+      }
+    },
+    {
+      "type": "CreateResult",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+        "key_expires_at": 1792756800,
+        "state": "ready",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "GetRequest",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "GetResult",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active"
+      }
+    },
+    {
+      "type": "ListRequest",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "offering_id": null,
+        "cursor": null,
+        "page_size": 10
+      }
+    },
+    {
+      "type": "ListResult",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "items": [
+          {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "state": "active"
+          }
+        ],
+        "next_cursor": null
+      }
+    },
+    {
+      "type": "DestroyRequest",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "DestroyResult",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "accepted"
+      }
+    },
+    {
+      "type": "RunRequest",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "utf8"
+      }
+    },
+    {
+      "type": "RunRequest",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "base64",
+        "mode": "buffered_commands_v1",
+        "execution_limit_ms": 30000,
+        "output_limit_bytes": 1048576
+      }
+    },
+    {
+      "type": "RunResult",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "stdout": "ready",
+        "stderr": "diagnostic",
+        "exit_code": 0,
+        "output_complete": true
+      }
+    },
+    {
+      "type": "RunResult",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "exit_code": 0,
+        "output_complete": true,
+        "mode": "buffered_commands_v1",
+        "encoding": "base64",
+        "stdout_base64": "cmVhZHk=",
+        "stderr_base64": "ZGlhZ25vc3RpYw==",
+        "stdout_bytes": 5,
+        "stderr_bytes": 10,
+        "stdout_truncated": false,
+        "stderr_truncated": false
+      }
+    },
+    {
+      "type": "ReadRequest",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "limit_bytes": 10
+      }
+    },
+    {
+      "type": "ReadResult",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "complete": true
+      }
+    },
+    {
+      "type": "WriteRequest",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "data_base64": "AP8=",
+        "byte_count": 2
+      }
+    },
+    {
+      "type": "WriteResult",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "written_bytes": 2
+      }
+    },
+    {
+      "type": "StartRequest",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000
+      }
+    },
+    {
+      "type": "StartResult",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        }
+      }
+    },
+    {
+      "type": "OutputRequest",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "cursor": 0,
+        "max_frames": 10,
+        "observation_timeout_ms": 1000,
+        "limit_bytes": 65536
+      }
+    },
+    {
+      "type": "OutputResult",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "frames": [
+          {
+            "sequence": 0,
+            "stream": "stdout",
+            "text": "ready"
+          }
+        ],
+        "first_available_cursor": 0,
+        "next_cursor": 1,
+        "gap": false,
+        "stdout_eof": false,
+        "stderr_eof": false,
+        "execution_state": "running",
+        "exit_code": null,
+        "observation_end": "page"
+      }
+    },
+    {
+      "type": "Error",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "timeout",
+          "outcome": "unknown",
+          "message": "Observation ended before completion was established",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "CreateRequest03",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "selection-example-v3",
+        "request": {},
+        "env": {},
+        "labels": {
+          "purpose": "example"
+        }
+      }
+    },
+    {
+      "type": "CreateResult03",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+        "key_expires_at": 1792756800,
+        "state": "ready",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "admission": {
+          "selection": {
+            "binding": "sandbox-provider-http/0.3",
+            "core_modes": [
+              "buffered_commands_v1"
+            ],
+            "limits": {
+              "request_bytes": 33554432,
+              "response_bytes": 33554432,
+              "command_output_bytes": 1048576,
+              "file_bytes": 16777216,
+              "page_size": 100,
+              "output_frames": 100,
+              "observation_ms": 30000,
+              "process_buffer_bytes": 1048576,
+              "buffered_command_output_bytes": 1024,
+              "execution_ms": 60000
+            },
+            "process_retention_seconds": 60,
+            "process_addressability": "endpoint_lifetime",
+            "offering": {
+              "offering_id": "container",
+              "declaration_id": "selection-example-v3",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          },
+          "requirements": {},
+          "resources": {},
+          "lifetime_seconds": 300,
+          "at_end": "destroyed"
+        },
+        "labels": {
+          "purpose": "example"
+        },
+        "lifetime": {
+          "ready_at": "2026-10-22T12:00:00Z",
+          "ends_at": "2026-10-22T12:05:00Z"
+        }
+      }
+    },
+    {
+      "type": "GetResult03",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active",
+        "admission": {
+          "selection": {
+            "binding": "sandbox-provider-http/0.3",
+            "core_modes": [
+              "buffered_commands_v1"
+            ],
+            "limits": {
+              "request_bytes": 33554432,
+              "response_bytes": 33554432,
+              "command_output_bytes": 1048576,
+              "file_bytes": 16777216,
+              "page_size": 100,
+              "output_frames": 100,
+              "observation_ms": 30000,
+              "process_buffer_bytes": 1048576,
+              "buffered_command_output_bytes": 1024,
+              "execution_ms": 60000
+            },
+            "process_retention_seconds": 60,
+            "process_addressability": "endpoint_lifetime",
+            "offering": {
+              "offering_id": "container",
+              "declaration_id": "selection-example-v3",
+              "declaration": {
+                "spec": "sandbox-provider-spec/0.1",
+                "provider": "example",
+                "class": "container",
+                "verified": {
+                  "date": "2026-10-22",
+                  "sdks": {
+                    "example": "1.0"
+                  }
+                },
+                "resources": {},
+                "gates": {},
+                "evidence": {}
+              }
+            }
+          },
+          "requirements": {},
+          "resources": {},
+          "lifetime_seconds": 300,
+          "at_end": "destroyed"
+        },
+        "labels": {
+          "purpose": "example"
+        },
+        "lifetime": {
+          "ready_at": "2026-10-22T12:00:00Z",
+          "ends_at": "2026-10-22T12:05:00Z"
+        }
+      }
+    },
+    {
+      "type": "InventoryItem03",
+      "value": {
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active",
+        "labels": {
+          "purpose": "example"
+        },
+        "lifetime": {
+          "ready_at": "2026-10-22T12:00:00Z",
+          "ends_at": "2026-10-22T12:05:00Z"
+        }
+      }
+    },
+    {
+      "type": "ListResult03",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "items": [
+          {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "state": "active",
+            "labels": {
+              "purpose": "example"
+            },
+            "lifetime": {
+              "ready_at": "2026-10-22T12:00:00Z",
+              "ends_at": "2026-10-22T12:05:00Z"
+            }
+          }
+        ],
+        "next_cursor": null
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "type": "CreateRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "declaration-example",
+        "request": {},
+        "env": {}
+      }
+    },
+    {
+      "type": "CreateRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": 7,
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "declaration-example",
+        "request": {},
+        "env": {}
+      }
+    },
+    {
+      "type": "CreateRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "declaration-example",
+        "request": {},
+        "env": {},
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "CreateResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+        "key_expires_at": 1792756800,
+        "state": "ready",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "CreateResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": 7,
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+        "key_expires_at": 1792756800,
+        "state": "ready",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "CreateResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "request_digest": "sha256:0227a788b0ab218fd7a7754ff4ab0204892674a1e952b3180c0d544198bbba45",
+        "key_expires_at": 1792756800,
+        "state": "ready",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "CreateRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "allocation_key": "1792670400:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "offering_id": "container",
+        "declaration_id": "declaration-example",
+        "request": {},
+        "env": {},
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "create",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "GetRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "GetRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "GetRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "GetResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active"
+      }
+    },
+    {
+      "type": "GetResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active"
+      }
+    },
+    {
+      "type": "GetResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "active",
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "GetRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "get",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "ListRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "offering_id": null,
+        "cursor": null,
+        "page_size": 10
+      }
+    },
+    {
+      "type": "ListRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": 7,
+        "offering_id": null,
+        "cursor": null,
+        "page_size": 10
+      }
+    },
+    {
+      "type": "ListRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "offering_id": null,
+        "cursor": null,
+        "page_size": 10,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "ListResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "items": [
+          {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "state": "active"
+          }
+        ],
+        "next_cursor": null
+      }
+    },
+    {
+      "type": "ListResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": 7,
+        "items": [
+          {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "state": "active"
+          }
+        ],
+        "next_cursor": null
+      }
+    },
+    {
+      "type": "ListResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "items": [
+          {
+            "sandbox": {
+              "provider_id": "example",
+              "account_id": "account-example",
+              "offering_id": "container",
+              "sandbox_id": "sandbox-example",
+              "incarnation": "generation-1"
+            },
+            "state": "active"
+          }
+        ],
+        "next_cursor": null,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "ListRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "offering_id": null,
+        "cursor": null,
+        "page_size": 10,
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "list",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "DestroyRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "DestroyRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        }
+      }
+    },
+    {
+      "type": "DestroyRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "DestroyResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "accepted"
+      }
+    },
+    {
+      "type": "DestroyResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "accepted"
+      }
+    },
+    {
+      "type": "DestroyResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "state": "accepted",
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "DestroyRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "destroy",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "RunRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "utf8"
+      }
+    },
+    {
+      "type": "RunRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "utf8"
+      }
+    },
+    {
+      "type": "RunRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "utf8",
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "RunResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "stdout": "ready",
+        "stderr": "diagnostic",
+        "exit_code": 0,
+        "output_complete": true
+      }
+    },
+    {
+      "type": "RunResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "stdout": "ready",
+        "stderr": "diagnostic",
+        "exit_code": 0,
+        "output_complete": true
+      }
+    },
+    {
+      "type": "RunResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "stdout": "ready",
+        "stderr": "diagnostic",
+        "exit_code": 0,
+        "output_complete": true,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "RunRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "encoding": "utf8",
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "run",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "ReadRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "limit_bytes": 10
+      }
+    },
+    {
+      "type": "ReadRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "limit_bytes": 10
+      }
+    },
+    {
+      "type": "ReadRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "limit_bytes": 10,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "ReadResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "complete": true
+      }
+    },
+    {
+      "type": "ReadResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "complete": true
+      }
+    },
+    {
+      "type": "ReadResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "complete": true,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "ReadRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "limit_bytes": 10,
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "files.read_bytes",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "WriteRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "data_base64": "AP8=",
+        "byte_count": 2
+      }
+    },
+    {
+      "type": "WriteRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "data_base64": "AP8=",
+        "byte_count": 2
+      }
+    },
+    {
+      "type": "WriteRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "WriteResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "written_bytes": 2
+      }
+    },
+    {
+      "type": "WriteResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "written_bytes": 2
+      }
+    },
+    {
+      "type": "WriteResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "written_bytes": 2,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "WriteRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "path": "/tmp/artifact",
+        "data_base64": "AP8=",
+        "byte_count": 2,
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "files.write",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "StartRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000
+      }
+    },
+    {
+      "type": "StartRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": 7,
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000
+      }
+    },
+    {
+      "type": "StartRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "StartResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        }
+      }
+    },
+    {
+      "type": "StartResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": 7,
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        }
+      }
+    },
+    {
+      "type": "StartResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "StartRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "sandbox": {
+          "provider_id": "example",
+          "account_id": "account-example",
+          "offering_id": "container",
+          "sandbox_id": "sandbox-example",
+          "incarnation": "generation-1"
+        },
+        "argv": [
+          "bash",
+          "-c",
+          "printf ready; printf diagnostic >&2"
+        ],
+        "cwd": "/tmp",
+        "env": {},
+        "observation_timeout_ms": 1000,
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "process.start",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    },
+    {
+      "type": "OutputRequest",
+      "reason": "missing_account",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "cursor": 0,
+        "max_frames": 10,
+        "observation_timeout_ms": 1000,
+        "limit_bytes": 65536
+      }
+    },
+    {
+      "type": "OutputRequest",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": 7,
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "cursor": 0,
+        "max_frames": 10,
+        "observation_timeout_ms": 1000,
+        "limit_bytes": 65536
+      }
+    },
+    {
+      "type": "OutputRequest",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "cursor": 0,
+        "max_frames": 10,
+        "observation_timeout_ms": 1000,
+        "limit_bytes": 65536,
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "OutputResult",
+      "reason": "missing_account",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "frames": [
+          {
+            "sequence": 0,
+            "stream": "stdout",
+            "text": "ready"
+          }
+        ],
+        "first_available_cursor": 0,
+        "next_cursor": 1,
+        "gap": false,
+        "stdout_eof": false,
+        "stderr_eof": false,
+        "execution_state": "running",
+        "exit_code": null,
+        "observation_end": "page"
+      }
+    },
+    {
+      "type": "OutputResult",
+      "reason": "wrong_account_type",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": 7,
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "frames": [
+          {
+            "sequence": 0,
+            "stream": "stdout",
+            "text": "ready"
+          }
+        ],
+        "first_available_cursor": 0,
+        "next_cursor": 1,
+        "gap": false,
+        "stdout_eof": false,
+        "stderr_eof": false,
+        "execution_state": "running",
+        "exit_code": null,
+        "observation_end": "page"
+      }
+    },
+    {
+      "type": "OutputResult",
+      "reason": "unknown_required_field",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "frames": [
+          {
+            "sequence": 0,
+            "stream": "stdout",
+            "text": "ready"
+          }
+        ],
+        "first_available_cursor": 0,
+        "next_cursor": 1,
+        "gap": false,
+        "stdout_eof": false,
+        "stderr_eof": false,
+        "execution_state": "running",
+        "exit_code": null,
+        "observation_end": "page",
+        "future_required_semantics": true
+      }
+    },
+    {
+      "type": "OutputRequest",
+      "reason": "unsupported_mode",
+      "value": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "process": {
+          "sandbox": {
+            "provider_id": "example",
+            "account_id": "account-example",
+            "offering_id": "container",
+            "sandbox_id": "sandbox-example",
+            "incarnation": "generation-1"
+          },
+          "process_id": "process-example",
+          "incarnation": "process-generation-1"
+        },
+        "cursor": 0,
+        "max_frames": 10,
+        "observation_timeout_ms": 1000,
+        "limit_bytes": 65536,
+        "required_mode": "undefined-mode"
+      },
+      "rejection": {
+        "operation": "process.output",
+        "request_id": "request-example",
+        "account_id": "account-example",
+        "error": {
+          "code": "unsupported_mode",
+          "outcome": "not_dispatched",
+          "message": "Mode is not bound",
+          "exit_code": null
+        }
+      }
+    }
+  ]
+}

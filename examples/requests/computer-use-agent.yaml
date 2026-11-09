@@ -1,0 +1,7 @@
+# A computer-use agent that drives a graphical desktop, with a live view a person can watch,
+# and keeps a terminal it can reattach to.
+requirements:
+  desktop: {live_view: true}
+  terminal: {reattach: true}
+resources:
+  memory_min_mib: 4096

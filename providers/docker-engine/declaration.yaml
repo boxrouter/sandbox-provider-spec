@@ -1,0 +1,68 @@
+spec: sandbox-provider-spec/0.1
+provider: docker-engine
+verified:
+  date: '2026-10-29'
+  sdks:
+    docker: 7.2.0
+resources:
+  kernel: shared
+  long_running: unknown
+  sizes: unknown
+  disk_mib: unknown
+  gpus: unknown
+  max_gpus: unknown
+  regions: unknown
+  located_in: unknown
+  extendable_lifetime: unknown
+  default_user: root
+  default_cwd: /
+gates:
+  processes:
+    - {cancel: false, reattach: false}
+  pause_resume:
+    - {keeps: files_only}
+    - {keeps: files_and_memory}
+  snapshots:
+    - {keeps: files_only, deletable: true}
+  volumes:
+    - {kind: filesystem, sharing: many_writers}
+  custom_images:
+    - {source: dockerfile}
+evidence:
+  resources.kernel:
+    source: https://docs.docker.com/build/building/multi-platform/
+    read: 2026-09-30
+    quote: Containers share the host kernel
+  resources.default_user:
+    tests: [facts.default_user]
+    report: reports/native-default-core.json
+  resources.default_cwd:
+    tests: [facts.default_cwd]
+    report: reports/native-default-core.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.false]
+    report: reports/native-default-core.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.false]
+    report: reports/native-default-core.json
+  gates.pause_resume.0.keeps:
+    tests: [pause_resume.files_only]
+    report: reports/native-default-core.json
+  gates.pause_resume.1.keeps:
+    tests: [pause_resume.files_and_memory]
+    report: reports/native-default-core.json
+  gates.snapshots.0.keeps:
+    tests: [snapshots.keeps.files_only]
+    report: reports/native-default-core.json
+  gates.snapshots.0.deletable:
+    tests: [snapshots.deletable.true]
+    report: reports/native-default-core.json
+  gates.volumes.0.kind:
+    tests: [volumes.kind.filesystem]
+    report: reports/native-default-core.json
+  gates.volumes.0.sharing:
+    tests: [volumes.sharing.many_writers]
+    report: reports/native-default-core.json
+  gates.custom_images.0.source:
+    tests: [custom_images.dockerfile]
+    report: reports/native-default-core.json

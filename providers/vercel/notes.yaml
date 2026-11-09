@@ -1,0 +1,4 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.open_source: Proprietary service; its SDK, CLI and images are open source (vercel/sandbox, Apache-2.0).
+fact.snapshots: Vercel snapshots capture a running sandbox's filesystem and stop the session. Multiple
+  sandboxes can start from one snapshot; memory is not preserved.

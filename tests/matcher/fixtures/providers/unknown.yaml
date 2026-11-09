@@ -1,0 +1,10 @@
+spec: sandbox-provider-spec/0.1
+provider: unknown-answer
+verified: {date: 2026-09-29, sdks: {unknown-sdk: 1.0.0}}
+resources: {}
+gates:
+  previews:
+    - {access: unknown, max_ports: unknown}
+  network_lockdown:
+    - {policy: deny_all, conflicts: [previews.access=public]}
+evidence: {}

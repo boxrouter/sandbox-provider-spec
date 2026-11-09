@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "distribution_name": "sandbox-provider-spec",
+  "version_from_tag": true,
+  "license": "Apache-2.0",
+  "artifacts": [
+    {
+      "kind": "wheel",
+      "glob": "sandbox_provider_spec-*.whl",
+      "min": 1,
+      "max": 1
+    }
+  ],
+  "members": {
+    "wheel": [
+      "sandbox_provider_spec-*.dist-info/METADATA",
+      "sandbox_provider_spec-*.dist-info/RECORD",
+      "sandbox_provider_spec-*.dist-info/WHEEL",
+      "sandbox_provider_spec-*.dist-info/entry_points.txt",
+      "sandbox_provider_spec-*.dist-info/licenses/LICENSE",
+      "sandbox_provider_spec-*.dist-info/licenses/NOTICE"
+    ]
+  },
+  "required_license_files": [
+    "*LICENSE",
+    "*NOTICE"
+  ],
+  "public_text_disallow": [
+    {
+      "members": [
+        "**"
+      ],
+      "phrases": [
+        "account_tier",
+        "--account-tier"
+      ]
+    }
+  ]
+}

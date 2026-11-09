@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: deny-wins
+verified: {date: 2026-10-02, sdks: {fixture-sdk: "1.0.0"}}
+resources: {}
+gates:
+  network_lockdown:
+    - {policy: allowlist, deny_wins: true, entry_kinds: [names], deny_entry_kinds: [names], allow_wildcards: true, max_deny: 5}
+evidence: {}

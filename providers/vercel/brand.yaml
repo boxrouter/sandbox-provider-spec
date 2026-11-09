@@ -1,0 +1,6 @@
+# Brand: chart colour, logo, one-colour mark and launch state. All keys optional.
+order: 4
+color: '#A560EB'
+logo: brand/logo.png
+mark: brand/mark.png
+launched: true

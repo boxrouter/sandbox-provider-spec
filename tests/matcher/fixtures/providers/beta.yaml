@@ -1,0 +1,31 @@
+spec: sandbox-provider-spec/0.1
+provider: beta
+verified: {date: 2026-09-29, sdks: {beta-sdk: 3.0.0}}
+resources:
+  max_lifetime_seconds: 1800
+  sizes: [{cpu: 2, memory_mib: 4096, disk_mib: 2048}]
+  disk_mib: 2048
+  regions: [beta:us-west]
+  located_in: [US]
+  kernel: dedicated
+  long_running: false
+  size_is_ceiling: false
+  extendable_lifetime: false
+  gpus: []
+  egress_ips: []
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: true
+  at_end: destroyed
+gates:
+  pause_resume: unsupported
+  previews:
+    - {access: public, revocable: false, max_ports: unknown}
+  network_lockdown:
+    - {policy: allowlist, entry_kinds: [names], max_allow: 5}
+  hidden_secrets: unsupported
+  snapshots: unsupported
+  volumes: unsupported
+  custom_images:
+    - {source: [oci, provider_artifact], prepared: false}
+evidence: {}

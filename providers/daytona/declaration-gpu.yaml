@@ -1,0 +1,33 @@
+spec: sandbox-provider-spec/0.1
+provider: daytona
+class: gpu
+verified:
+  date: '2026-10-21'
+  sdks:
+    daytona: 0.220.0
+resources:
+  kernel: shared
+  max_lifetime_seconds: unlimited
+  sizes: unknown
+  gpus: unknown
+  max_gpus: 8
+  regions: []
+gates: {}
+evidence:
+  resources.kernel:
+    source: https://www.daytona.io/docs/en/isolation/
+    read: '2026-10-04'
+    quote: 'Isolated container with exclusive GPU allocation: assigned GPU devices belong to one sandbox
+      at a time and are never shared.'
+  resources.max_lifetime_seconds:
+    source: https://www.daytona.io/docs/en/sandboxes/
+    read: '2026-10-04'
+    quote: if not set, the sandbox has no TTL deadline
+  resources.max_gpus:
+    source: https://www.daytona.io/docs/en/gpu-sandboxes/
+    read: '2026-10-22'
+    quote: A GPU sandbox has up to 8 GPU units.
+  resources.regions:
+    source: https://www.daytona.io/docs/en/regions/
+    read: '2026-10-04'
+    quote: Daytona selects the shared region a GPU workload runs in and ignores the region preference.

@@ -1,0 +1,5 @@
+# An agent that calls one model API. The provider adds the API key to outgoing requests, so
+# code in the sandbox (and anything it is tricked into running) can never read the key.
+requirements:
+  hidden_secrets: {inject_into: [api.openai.com]}
+  network_lockdown: {policy: allowlist, allow: [api.openai.com]}

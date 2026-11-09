@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: custom-image-source
+verified: {date: 2026-10-02, sdks: {example-sdk: "1.0.0"}}
+resources: {}
+gates:
+  custom_images:
+    - {source: [oci], prepared: false}
+evidence: {}

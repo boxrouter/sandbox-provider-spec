@@ -1,0 +1,94 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.desktop.live_view": "sha256:d15f791a1b09ba128d675e981e2af65937dbadfb02a0b6dc6bfd147f86b6de0a"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.53"
+  },
+  "finished_at": "2026-10-12T15:45:42.165901+00:00",
+  "provider": "e2b",
+  "revision": "94a8093050ed22492176d305c12defca9679425a",
+  "run_id": "public-a61e3bc9995febc4e534",
+  "sdk_versions": {
+    "e2b": "2.51.0",
+    "e2b-code-interpreter": "2.10.0",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "coverage.desktop.live_view"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-12T15:45:27.241539+00:00",
+  "suite_digest": "sha256:0e4bd34089375b796bdff1888aff17103137d1cbc786d264f15ec8ffcc54a870",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 14924,
+      "id": "coverage.desktop.live_view",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        },
+        {
+          "gate": "desktop",
+          "knob": "live_view",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "desktop/control",
+        "desktop/live-view"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "keyboard_received": {
+              "matches": true
+            },
+            "pointer_received": {
+              "matches": true
+            },
+            "screenshot_valid": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_desktop",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "desktop.live_link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "desktop_visible": {
+              "matches": true
+            }
+          },
+          "operation": "probe.desktop_browser",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

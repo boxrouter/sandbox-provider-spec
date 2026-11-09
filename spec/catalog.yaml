@@ -1,0 +1,599 @@
+# The Sandbox Provider Specification catalog: the vocabulary spec/vocabulary.md defines, in machine-readable form.
+# catalog.json is the same document as JSON; `make check` fails when they differ.
+spec: sandbox-provider-spec/0.1
+gate_order:
+  - fuse_mount
+  - idle_shutdown
+  - pause_resume
+  - previews
+  - network_lockdown
+  - hidden_secrets
+  - snapshots
+  - volumes
+  - custom_images
+  - user_selection
+  - processes
+  - terminal
+  - docker
+  - tcp_ports
+  - desktop
+  - file_links
+policy:
+  values: [deny_all, allowlist, denylist, open]
+  exactly_one: true
+  any: false
+must_be_named:
+  - {gate: previews, knob: access, any: true}
+  - {gate: network_lockdown, knob: policy, any: false}
+  - {gate: snapshots, knob: original_after, any: true}
+  - {gate: volumes, knob: kind, any: true}
+  - {gate: tcp_ports, knob: tls, any: true}
+gates:
+  fuse_mount:
+    description: "Mount a remote userspace filesystem through the sandbox's command and file operations."
+    knobs: {}
+    settings: {}
+    limits: []
+  idle_shutdown:
+    description: "Stop a sandbox automatically after it has been inactive for a period."
+    knobs:
+      on_idle:
+        description: "The state the sandbox enters after being idle."
+        kind: pick
+        values: [paused, stopped, destroyed]
+        must_be_named: false
+      custom_idle_time:
+        description: "Allow the request to choose the inactivity period before shutdown."
+        kind: yes_no
+        must_be_named: false
+      auto_wake:
+        description: "Allow a preview request to wake a paused or stopped sandbox."
+        kind: yes_no
+        must_be_named: false
+        only_when: {knob: on_idle, in: [paused, stopped]}
+    settings:
+      idle_seconds:
+        kind: integer
+        required: false
+        only_with: {knob: custom_idle_time, equals: true}
+    limits: []
+  pause_resume:
+    description: "Pause a sandbox and resume it later."
+    knobs:
+      keeps:
+        description: "Whether files alone or files and running process memory survive a pause."
+        kind: pick
+        values: [files_only, files_and_memory]
+        must_be_named: false
+    settings: {}
+    limits: []
+  previews:
+    description: "Provide a URL that reaches a port in the sandbox."
+    knobs:
+      access:
+        description: "Who can open the preview URL."
+        kind: pick
+        values: [public, private]
+        must_be_named: true
+        any: true
+      credential:
+        description: "How a private preview carries its credential."
+        kind: pick
+        values: [link, header]
+        must_be_named: false
+        only_when: {knob: access, includes: private}
+      revocable:
+        description: "Whether one preview link can be revoked while the sandbox runs."
+        kind: yes_no
+        must_be_named: false
+      link_lifetime_seconds:
+        description: "The minimum time a preview link remains usable while the sandbox runs."
+        kind: number
+        must_be_named: false
+      websocket:
+        description: "Whether WebSocket connections to the URL reach the sandbox port."
+        kind: yes_no
+        must_be_named: false
+      loopback:
+        description: "Whether the URL reaches a server listening only on 127.0.0.1."
+        kind: yes_no
+        must_be_named: false
+      any_port:
+        description: "Whether the provider can give a URL for a port not listed at sandbox creation."
+        kind: yes_no
+        must_be_named: false
+      survives_pause:
+        description: "Whether a preview URL continues to reach the sandbox after it resumes."
+        kind: yes_no
+        must_be_named: false
+    settings:
+      ports:
+        kind: list
+        required: true
+        item: {kind: integer, minimum: 1, maximum: 65535}
+        distinct: true
+    limits: [max_ports, reserved_ports]
+  network_lockdown:
+    description: "Limit which outbound connections a sandbox can make."
+    knobs:
+      policy:
+        description: "The starting rule for outbound connections: block all, allow or deny listed destinations, or leave them open."
+        kind: pick
+        values: [deny_all, allowlist, denylist, open]
+        must_be_named: true
+        exactly_one: true
+        any: false
+      changeable:
+        description: "Whether the policy entries can change while the sandbox runs."
+        kind: yes_no
+        must_be_named: false
+        only_when: {knob: policy, in: [allowlist, denylist]}
+      switchable:
+        description: "Whether the sandbox can switch to another policy offered by the same variant."
+        kind: yes_no
+        must_be_named: false
+    settings:
+      allow:
+        kind: list
+        item: {kind: string}
+        required_for: [allowlist]
+        forbidden_with: [deny_all, denylist, open]
+        distinct: true
+      deny:
+        kind: list
+        item: {kind: string}
+        required_for: [denylist]
+        forbidden_with: [deny_all, allowlist, open]
+        distinct: true
+        wildcards: false
+      switches_to:
+        kind: list
+        values: [deny_all, allowlist, denylist, open]
+        distinct: true
+    limits: [max_allow, max_deny, allow_wildcards, entry_kinds]
+  hidden_secrets:
+    description: "Add credentials to outgoing requests without exposing their values to sandbox code."
+    knobs:
+      rotates:
+        description: "Whether later requests can use a changed secret value without creating a new sandbox."
+        kind: yes_no
+        must_be_named: false
+      scrubs_responses:
+        description: "Whether secret values are removed from responses before sandbox code reads them."
+        kind: yes_no
+        must_be_named: false
+      injection:
+        description: "How the secret is added to a request."
+        kind: pick
+        values: [sets_header]
+        must_be_named: false
+      header_templates:
+        description: "Whether the provider can use request-supplied header templates for the secret."
+        kind: yes_no
+        must_be_named: false
+      intercepts:
+        description: "Which HTTPS connections the provider terminates to add the secret."
+        kind: pick
+        values: [injected_hosts, all_https]
+        must_be_named: false
+      transparent:
+        description: "Whether the secret reaches requests from clients that ignore proxy settings."
+        kind: yes_no
+        must_be_named: false
+    settings:
+      inject_into:
+        kind: list
+        required: true
+        item: {kind: hostname}
+        distinct: true
+        wildcards: true
+      headers:
+        kind: list
+        required: false
+        item:
+          kind: object
+          required: [name]
+          properties:
+            name: {kind: nonempty_string}
+            prefix: {kind: string}
+            suffix: {kind: string}
+          additional_properties: false
+    limits: [max_inject_into, inject_wildcards]
+  snapshots:
+    description: "Save sandbox state so it can be restored as a new sandbox on the same provider."
+    knobs:
+      keeps:
+        description: "Whether a restored sandbox has files alone or files and process memory."
+        kind: pick
+        values: [files_only, files_and_memory]
+        must_be_named: false
+      original_after:
+        description: "What happens to the original sandbox after its state is saved."
+        kind: pick
+        values: [continues, briefly_paused, terminated]
+        must_be_named: true
+        any: true
+      deletable:
+        description: "Whether the snapshot can be deleted through the provider's API."
+        kind: yes_no
+        must_be_named: false
+      retention_seconds:
+        description: "The minimum time the snapshot remains restorable unless deleted."
+        kind: number
+        must_be_named: false
+    settings: {}
+    limits: []
+    declaration_only:
+      resizes_on_restore:
+        kind: yes_no
+  volumes:
+    description: "Mount storage that persists after the sandboxes using it are destroyed."
+    knobs:
+      sharing:
+        description: "Whether one sandbox or several sandboxes can mount and write to the volume at once."
+        kind: pick
+        values: [one_sandbox, many_writers]
+        must_be_named: false
+      read_only_mounts:
+        description: "Whether a mount can reject all writes while allowing reads."
+        kind: yes_no
+        must_be_named: false
+      kind:
+        description: "Whether file locks behave as they do on a local disk."
+        kind: pick
+        values: [filesystem, object_store]
+        must_be_named: true
+        any: true
+    settings:
+      mounts:
+        kind: list
+        required: true
+        item:
+          kind: object
+          required: [provider, volume, path]
+          properties:
+            provider: {kind: provider_name}
+            volume: {kind: nonempty_string}
+            path: {kind: absolute_path}
+            read_only: {kind: boolean}
+          additional_properties: false
+        distinct_by: [provider, volume, path]
+    limits: [max_mounts]
+  custom_images:
+    description: "Start a sandbox from an environment supplied in the request."
+    request_field: image
+    knobs:
+      source:
+        description: "The kind of image source used to start the sandbox."
+        kind: pick
+        values: [oci, private_oci, dockerfile, provider_artifact]
+        must_be_named: false
+      prepared:
+        description: "Whether the provider prepares the image source before sandbox creation."
+        kind: yes_no
+        must_be_named: false
+      runs_entrypoint:
+        description: "Whether the image's entrypoint runs when the sandbox starts."
+        kind: yes_no
+        must_be_named: false
+      image_config:
+        description: "Which image environment, working-directory, or user settings apply to commands."
+        kind: all_of
+        values: [env, workdir, user]
+        must_be_named: false
+      build_context:
+        description: "Whether Dockerfile COPY and ADD can read files supplied while the image is built."
+        kind: yes_no
+        must_be_named: false
+        only_when: {knob: source, equals: dockerfile}
+    settings:
+      image:
+        kind: [string, object]
+        required: true
+    limits: []
+  processes:
+    description: "Control a background process beyond reading its output."
+    knobs:
+      input:
+        description: "Whether input can be written to a running process's standard input."
+        kind: yes_no
+        must_be_named: false
+      cancel:
+        description: "Whether a running process can be stopped while keeping its sandbox."
+        kind: yes_no
+        must_be_named: false
+      reattach:
+        description: "Whether a lost connection can be reattached to a running process."
+        kind: yes_no
+        must_be_named: false
+    settings: {}
+    limits: []
+  user_selection:
+    description: "Select the operating-system user for commands, new files, and background processes."
+    knobs:
+      commands:
+        description: "Whether a command can run as the requested named user."
+        kind: yes_no
+        must_be_named: false
+      files_write:
+        description: "Whether a new file written through the file API is owned by the requested user."
+        kind: yes_no
+        must_be_named: false
+      process_start:
+        description: "Whether a background process can start as the requested named user."
+        kind: yes_no
+        must_be_named: false
+    settings: {}
+    limits: []
+  terminal:
+    description: "Provide an interactive shell connected to a pseudo-terminal in the sandbox."
+    knobs:
+      reattach:
+        description: "Whether a lost connection can reattach to the same terminal and shell."
+        kind: yes_no
+        must_be_named: false
+    settings: {}
+    limits: []
+  docker:
+    description: "Provide a Docker Engine in the sandbox for pulling images and running containers."
+    knobs:
+      networking:
+        description: "Whether containers share the sandbox's network."
+        kind: pick
+        values: [host]
+        must_be_named: false
+    settings: {}
+    limits: []
+  tcp_ports:
+    description: "Forward internet TCP connections to ports in the sandbox."
+    knobs:
+      tls:
+        description: "Whether connections use plain TCP with bytes passed through unchanged."
+        kind: pick
+        values: [none]
+        must_be_named: true
+        any: true
+    settings:
+      ports:
+        kind: list
+        required: true
+        item: {kind: integer, minimum: 1, maximum: 65535}
+        distinct: true
+    limits: [max_tcp_ports]
+  desktop:
+    description: "Provide a graphical desktop that a program can view and control."
+    knobs:
+      live_view:
+        description: "Whether the SDK can provide a credential-bearing URL for viewing the desktop live."
+        kind: yes_no
+        must_be_named: false
+    settings: {}
+    limits: []
+  file_links:
+    description: Issue a link scoped to one sandbox file path for direct HTTPS transfer.
+    knobs:
+      operations:
+        description: File operations that the link permits.
+        kind: all_of
+        values: [read, write]
+        must_be_named: false
+      user_selection:
+        description: Whether a caller may choose the sandbox user for the transfer.
+        kind: yes_no
+        must_be_named: false
+      link_lifetime_seconds:
+        description: How long the file link remains usable.
+        kind: number
+        must_be_named: false
+      revocable:
+        description: Whether the file link can be revoked before it expires.
+        kind: yes_no
+        must_be_named: false
+    settings: {}
+    limits: []
+limits:
+  max_ports: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  max_allow: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  max_mounts: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  max_tcp_ports: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  max_inject_into: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  allow_wildcards: {kinds: [yes_no, unknown], left_out: unknown}
+  inject_wildcards: {kinds: [yes_no, unknown], left_out: unknown}
+  max_deny: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+  reserved_ports: {kinds: [port_list], left_out: none_reserved}
+  entry_kinds: {kinds: [entry_kind_list], values: [names, addresses], left_out: unknown}
+  max_gpus: {kinds: [number, at_least, unlimited, unknown], left_out: unknown, unknown_fits: 1}
+resources:
+  cpu_min: {kind: number, greater_than: 0}
+  memory_min_mib: {kind: integer, minimum: 1}
+  on_memory_exhausted: {kind: pick, values: [process_killed, sandbox_ended], list: true}
+  disk_min_mib: {kind: integer, minimum: 1}
+  extendable_lifetime: {kind: yes_no}
+  region:
+    description: A region, area, or country where the sandbox can run.
+    kind: string
+    list: false
+    registry: [region, area, country]
+    unknown_identifier: no_match
+  gpu_count: {kind: integer, minimum: 1}
+  gpu_model: {kind: pick, list: true, registry: gpus, unknown_identifier: no_match}
+  kernel: {kind: pick, values: [shared, filtered, dedicated], list: true}
+  kernel_features: {kind: all_of, values: [fuse, ebpf, nested_cgroups, netfilter]}
+  outbound_traffic: {kind: all_of, values: [http, any_tcp, udp]}
+  outbound_ip_families: {kind: all_of, values: [ipv4, ipv6]}
+  long_running: {kind: yes_no}
+  size_is_ceiling: {kind: yes_no}
+  paused_retention_seconds: {kind: number, greater_than: 0}
+  root: {kind: pick, values: [by_default, sudo, per_command], list: true}
+  arch: {kind: pick, values: [amd64, arm64], list: true}
+  package_manager: {kind: pick, values: [apt, apk, dnf, pacman, none], list: true}
+  libc: {kind: pick, values: [glibc, musl], list: true}
+  run_seconds: {kind: integer, minimum: 1}
+  process_seconds: {kind: integer, minimum: 1}
+  egress_ips: {kind: pick, values: [published_ranges, dedicated], list: true}
+  file_stream_bytes: {kind: per_operation, fields: [read, write], minimum: 1}
+declaration_resources:
+  kernel: {values: [shared, filtered, dedicated]}
+  kernel_features: {kind: list, values: [fuse, ebpf, nested_cgroups, netfilter]}
+  outbound_traffic: {kind: list, values: [http, any_tcp, udp]}
+  outbound_ip_families: {kind: list, values: [ipv4, ipv6]}
+  ipv4_destination_reach: {values: [native, nat64, none]}
+  long_running: {kind: yes_no}
+  max_lifetime_seconds: {kinds: [number, at_least, unlimited], floor: {at_least: 300}}
+  sizes: {}
+  default_size: {}
+  size_is_ceiling: {kind: yes_no}
+  disk_mib: {}
+  on_memory_exhausted: {values: [process_killed, sandbox_ended]}
+  regions: {registry: regions, unknown_identifier: no_match}
+  located_in: {registry: countries, unknown_identifier: no_match}
+  gpus: {registry: gpus, unknown_identifier: no_match}
+  max_gpus: {kinds: [number, at_least, unlimited, unknown]}
+  extendable_lifetime: {kind: yes_no}
+  default_user: {kind: string}
+  default_cwd: {kind: absolute_path}
+  paused_retention_seconds: {kinds: [number, at_least, unlimited, unknown]}
+  root: {kind: list, values: [by_default, sudo, per_command]}
+  arch: {kind: list, values: [amd64, arm64], nonempty: true}
+  package_manager: {values: [apt, apk, dnf, pacman, none]}
+  libc: {values: [glibc, musl]}
+  max_run_seconds: {kinds: [number, at_least, unlimited, unknown]}
+  max_process_seconds: {kinds: [number, at_least, unlimited, unknown]}
+  disk_in_memory: {kind: yes_no}
+  egress_ips: {kind: list, values: [published_ranges, dedicated]}
+  guest_reserved_tcp_ports: {kind: list, item: {kind: integer, minimum: 1, maximum: 65535}, nonempty: true, left_out: unknown}
+  files_write_executable_effect: {values: [preserved, may_clear, unverified]}
+  file_stream_max_bytes: {kind: per_operation, fields: [read, write], kinds: [number, at_least, unknown]}
+  needs: {}
+  unmet_limits: {}
+resource_descriptions:
+  kernel: "What sits between the code and the host's kernel: shared (an ordinary container), filtered (a layer such as gVisor intercepts system calls) or dedicated (a virtual machine or microVM with its own kernel)."
+  kernel_features: "Kernel facilities code in the sandbox can use, as root: mount a FUSE file system (fuse), load an eBPF program (ebpf), create a child cgroup and limit its memory (nested_cgroups), or add netfilter rules that act on the sandbox's own traffic (netfilter). An empty list means none."
+  outbound_traffic: "Outbound traffic beyond HTTPS that a sandbox created without network_lockdown can send: plain HTTP to port 80 (http); TCP to any public address and port (any_tcp); UDP to any public address and port (udp). A declaration lists what it offers; [] means HTTPS only."
+  outbound_ip_families: "Address families from which a sandbox can open a socket and complete a TCP handshake to a public literal address of the same family: ipv4 or ipv6. An omitted declaration is unknown."
+  ipv4_destination_reach: "How an IPv4 literal destination is reached: native after an IPv4 handshake, or nat64 after an IPv6 translated-literal handshake and definite native IPv4 absence. none is reserved; this fact is informative and a failed probe remains unknown."
+  long_running: "A sandbox is not stopped for being idle or unattended; this is separate from how long it may live (max_lifetime_seconds)."
+  max_lifetime_seconds: "The longest a sandbox may run continuously: at least 300, as a number, {at_least: N} or unlimited. Never written unknown; left out, it is unknown."
+  sizes: "The CPU, memory and disk the provider allocates. Most providers tie CPU and memory together, so sizes are combinations."
+  default_size: "The allocation a create receives when the caller names no size and the driver omits a native size setting. It is a concrete {cpu, memory_mib} shape, with optional disk_mib, or unknown. Leave it out or use unknown when that path has not been established."
+  size_is_ceiling: "A sandbox created with a declared size cannot use more CPU time or memory than that size, however many processes it runs."
+  disk_mib: "The CPU, memory and disk the provider allocates. Most providers tie CPU and memory together, so sizes are combinations."
+  on_memory_exhausted: "What the provider ends when a process allocates more memory than the sandbox has: the process (process_killed) or the sandbox (sandbox_ended)."
+  regions: "The regions a request can pin, and the countries a sandbox may run in when none is pinned."
+  located_in: "The regions a request can pin, and the countries a sandbox may run in when none is pinned."
+  gpus: "The GPU models offered, and how many one sandbox may have."
+  max_gpus: "The GPU models offered, and how many one sandbox may have."
+  extendable_lifetime: "The lifetime of a running sandbox can be lengthened."
+  default_user: "The user a command runs as, and the directory it runs in, when the sandbox was created without an image and the command names neither. A written default_cwd is an absolute sandbox path; leave it out when unknown, rather than writing unknown."
+  default_cwd: "The user a command runs as, and the directory it runs in, when the sandbox was created without an image and the command names neither. A written default_cwd is an absolute sandbox path; leave it out when unknown, rather than writing unknown."
+  paused_retention_seconds: "How long the provider keeps a paused or stopped sandbox before deleting it: a number, {at_least: N} or unlimited."
+  root: "How a command in a sandbox created without an image gets root: by_default (commands run as root), sudo (the default user has passwordless sudo), per_command (the SDK runs a command as root when asked). An empty list means no way."
+  arch: "The processor architectures a sandbox can run on, as OCI names them: amd64, arm64. The first is the default."
+  package_manager: "In a sandbox created without an image: the system package manager (apt, apk, dnf, pacman or none); and the C library (glibc or musl), which decides which prebuilt binaries run."
+  libc: "In a sandbox created without an image: the system package manager (apt, apk, dnf, pacman or none); and the C library (glibc or musl), which decides which prebuilt binaries run."
+  max_run_seconds: "The longest a command a program runs and waits for may take: a number, {at_least: N} or unlimited."
+  max_process_seconds: "The longest a background process may run before the provider stops it, in the same forms."
+  disk_in_memory: "Files written to the sandbox's own filesystem take its memory rather than disk."
+  egress_ips: "Where a sandbox's outbound connections can come from, for a destination that allows addresses: published_ranges (within ranges the sandbox provider itself publishes for this) or dedicated (addresses reserved to the account). A list of what the provider offers; [] means neither."
+  guest_reserved_tcp_ports: "A non-empty subset of TCP ports whose provider-owned listener was observed and blocked the exact tested guest bind tuple. Omitted ports, other families, scopes and times are not established; an empty table does not mean no ports are reserved. Omitted resource means unknown."
+  files_write_executable_effect: "What a regular-file write may do to executable bits: preserved keeps execute access on a 0755 overwrite, may_clear may drop it, unverified has no packaged claim. Writing a file does not guarantee it remains executable. Check or explicitly set executable permission before running it as a program. Omitted resource means unverified. The field is informative and never compared."
+  file_stream_max_bytes: "The largest file one streamed transfer through the provider's own API moves intact, for read (out of the sandbox) and write (into it): a number of bytes or {at_least: N}, each proven by a transfer of that size. Never unlimited; a direction left out is unknown."
+  needs: "Restrictions a provider plan applies to outbound traffic."
+  unmet_limits: "The ceiling that holds while a condition named under needs is not met: for a limited fact (max_lifetime_seconds or disk_mib) and one of its conditions, a positive integer in the fact's own unit, or unknown. It narrows what an account can be offered and never proves a request is supported."
+conflicts_may_name:
+  resources: [gpus, regions, root, package_manager, libc, kernel_features]
+lifetime_timer: [enforced_by, counts_paused_time, at_end, adjustable, clearable, step_seconds, counts_from, min_seconds, after_resume]
+evidence:
+  test_entry: {keys: [tests, report], tests_nonempty: true, report_prefix: reports/}
+  quote_entry: {keys: [source, read, quote], quote_nonempty: true}
+  paths_use_zero_based_variant_indexes: true
+  # Documentation exceptions: waived or non-observable facts/retention, account conditions,
+  # non-exercisable plan limits, unsupported gates and provider extensions.
+  quotable_paths:
+    - resources.kernel
+    - resources.sizes
+    - resources.default_size
+    - resources.disk_mib
+    - resources.regions
+    - resources.located_in
+    - resources.gpus
+    - resources.outbound_traffic
+    - resources.paused_retention_seconds
+    - resources.max_lifetime_seconds
+    - resources.max_run_seconds
+    - resources.max_process_seconds
+    - resources.egress_ips
+    - resources.max_gpus
+    - lifetime_timer.counts_paused_time
+    - lifetime_timer.adjustable
+    - lifetime_timer.clearable
+    - lifetime_timer.step_seconds
+    - lifetime_timer.counts_from
+    - lifetime_timer.min_seconds
+    - lifetime_timer.after_resume
+    - resources.needs.*
+    - resources.unmet_limits.*.*
+    - gates.*
+    - gates.tcp_ports.*.tls
+    - gates.*.*.needs.*
+    - gates.*.*.conflicts
+    - gates.snapshots.*.retention_seconds
+    - x-*.*
+request_keys:
+  - lifetime_seconds
+  - at_end
+  - requirements
+  - resources
+  - image
+  - restores_need
+image:
+  omitted: provider_environment
+  string: oci
+  objects: [dockerfile, private_oci, provider_artifact]
+  provider_artifact_names_provider: true
+restores_need_keys: [requirements, resources, lifetime_seconds]
+# A request's at_end fits a lifetime_timer whose at_end offers the same state.
+at_end: [destroyed, paused]
+registry_policy:
+  additions_are_patch_compatible: true
+  unknown_identifier: does_not_match
+  countries_null: not_yet_known
+rejected_before_matching:
+  - a missing must-be-named knob
+  - an empty list
+  - allow with anything but an allowlist, or deny with anything but a denylist
+  - an allowlist or a denylist with nothing in it
+  - duplicate ports, allowlist or denylist entries
+  - an allow or deny entry that is neither a host name nor an IPv4 address or range, or has a port, path or IPv6 address
+  - a wildcard in deny
+  - previews or tcp_ports with no ports
+  - file_stream_bytes naming neither read nor write
+  - credential on previews when private is not among the accepted access values
+  - idle_seconds without custom_idle_time
+  - changeable with deny_all or open
+  - open without switchable
+  - switchable without switches_to, or switches_to without switchable
+  - switches_to naming the request's own policy
+  - auto_wake with on_idle naming only destroyed
+  - survives_pause in a request that names neither pause_resume nor idle_shutdown
+  - source under requirements, or custom_images under requirements without an image
+  - read_only on a mount unless read_only_mounts is true
+  - volumes.mounts repeats a mount
+  - root, package_manager or libc together with an image
+  - idle_shutdown together with long_running
+  - idle_seconds that is not a positive integer
+  - "at_end: paused without pause_resume"
+  - a resource set to false or zero
+  - a non-positive CPU, memory, disk or GPU request
+  - non-boolean long_running or extendable_lifetime
+  - hidden_secrets without inject_into
+  - an inject_into host an allowlist does not list or cover by name, a denylist lists or covers by name, or with deny_all; a wildcard host needs the same or a parent wildcard allowlist, and a denylist must not block any name under it
+  - volumes without mounts
+  - mounts, an image or an extension that pins different providers
+  - "\"any\" on a knob that need not be named"
+  - '"any" inside a list'
+  - a restores_need whose request does not name snapshots
+  - any word the spec does not define
+declaration_top_level: [spec, provider, class, verified, resources, lifetime_timer, evidence, gates]
+variant_keys: [conflicts, needs]
+baseline_result: [passed, differs, unsupported, not_run, error]

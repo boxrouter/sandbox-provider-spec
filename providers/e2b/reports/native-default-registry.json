@@ -1,0 +1,80 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.registry": "sha256:0e1ee9b43196c9b2b049bedd3ccf9e62f6f1be206fa429fdd482b24413e131d6"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.141"
+  },
+  "finished_at": "2026-10-29T04:23:28.078513+00:00",
+  "provider": "e2b",
+  "revision": "f74e27451463bb603d7553f8a58f809dfdc65bb9",
+  "run_id": "public-5d728e8a0da0fd6be561",
+  "sdk_versions": {
+    "e2b": "2.59.0",
+    "e2b-code-interpreter": "2.11.3",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "coverage.custom_images.prepare.registry"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T04:23:15.761193+00:00",
+  "suite_digest": "sha256:be5235980bcefad1d9d0bca6cf8bdee687c85810b9b8c7e7636101665827ab0f",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "template",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 12316,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

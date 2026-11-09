@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: live-resize
+verified: {date: 2026-10-02, sdks: {live-resize-sdk: "1.0.0"}}
+resources: {}
+gates:
+  live_resize:
+    - {shrinks: true}
+evidence: {}

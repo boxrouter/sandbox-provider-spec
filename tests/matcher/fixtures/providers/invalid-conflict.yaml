@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: invalid-conflict
+verified: {date: 2026-09-29, sdks: {invalid-sdk: 1.0.0}}
+resources: {}
+gates:
+  idle_shutdown:
+    - {on_idle: stopped, conflicts: [previews.not_a_knob=public]}
+evidence: {}

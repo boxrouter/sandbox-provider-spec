@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: unknown-key
+verified: {date: 2026-09-30, sdks: {fixture: "1"}}
+resources: {}
+gates:
+  pause_resume:
+    - {keeps: files_only, made_up: true}
+evidence: {}

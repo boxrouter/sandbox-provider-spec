@@ -1,0 +1,97 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.previews.reserved_ports": "sha256:bfa21e8c02b01b9161132fab8d5741ac1be7860863f6268b3f23b4b3b73361ac"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.53"
+  },
+  "finished_at": "2026-10-12T15:33:35.868376+00:00",
+  "provider": "e2b",
+  "revision": "94a8093050ed22492176d305c12defca9679425a",
+  "run_id": "public-9051e12577c94e3db13c",
+  "sdk_versions": {
+    "e2b": "2.51.0",
+    "e2b-code-interpreter": "2.10.0",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "coverage.previews.reserved_ports"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-12T15:33:24.055364+00:00",
+  "suite_digest": "sha256:0e4bd34089375b796bdff1888aff17103137d1cbc786d264f15ec8ffcc54a870",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11813,
+      "id": "coverage.previews.reserved_ports",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "reserved_ports",
+          "value": [
+            49983
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/reserved-ports"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "common_served": {
+              "matches": true
+            },
+            "reserved_refused": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_reserved_ports",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

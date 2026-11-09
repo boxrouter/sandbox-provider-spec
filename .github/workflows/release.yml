@@ -1,0 +1,63 @@
+# Exported with this package to its public repository. Release only a tagged milestone.
+name: Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ${{ vars.RELEASE_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          version: '0.13.4'
+          python-version: '3.11'
+      - name: Check tag against package version
+        run: |
+          declared=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          test "v$declared" = "$GITHUB_REF_NAME" || {
+            echo "pyproject.toml declares $declared, not $GITHUB_REF_NAME" >&2
+            exit 1
+          }
+      - name: Check specification
+        run: make check
+      - name: Build standalone wheel
+        run: |
+          uv build --no-sources --wheel --out-dir dist
+          set -- dist/*.whl
+          test "$#" -eq 1 && test -f "$1"
+      - name: Record the wheel's source
+        # Certifying conformance runs (Adapter Kit spec_run) verify the installed wheel against
+        # this file: the version, the asset, its SHA-256 and the commit it was built from.
+        run: |
+          set -- dist/*.whl
+          python3 - "$1" > dist/SOURCE.json <<'PY'
+          import hashlib, json, os, sys
+          wheel = sys.argv[1]
+          print(json.dumps({
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "tag": os.environ["GITHUB_REF_NAME"],
+              "source_commit": os.environ["GITHUB_SHA"],
+              "version": os.path.basename(wheel).split("-")[1],
+              "asset": os.path.basename(wheel),
+              "asset_sha256": hashlib.sha256(open(wheel, "rb").read()).hexdigest(),
+          }, indent=2))
+          PY
+      - name: Attest package distributions
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: dist/*
+      - name: Publish tagged wheel
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd dist && sha256sum -- *.whl SOURCE.json > SHA256SUMS)
+          gh release create "$GITHUB_REF_NAME" dist/*.whl dist/SOURCE.json dist/SHA256SUMS \
+            --verify-tag --title "$GITHUB_REF_NAME" --generate-notes

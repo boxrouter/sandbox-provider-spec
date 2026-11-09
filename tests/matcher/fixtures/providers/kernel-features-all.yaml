@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: kernel-features-all
+verified: {date: 2026-10-02, sdks: {synthetic-sdk: 1.0.0}}
+resources:
+  kernel_features: [fuse, ebpf, nested_cgroups, netfilter]
+gates: {}
+evidence: {}

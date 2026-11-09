@@ -1,0 +1,102 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a",
+    "coverage.facts.sizes.delivered": "sha256:1df4708b22c503947450b78dc393eaee4fa9422ebd4421761fed031f95f519e7"
+  },
+  "class": "vm",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-06T11:50:17.717417+00:00",
+  "provider": "modal",
+  "revision": "25fd073a6f673243b44674813fa03a93d3a7eb4f",
+  "run_id": "public-31f08cbe3abcfe28579d",
+  "sdk_versions": {
+    "modal": "1.6.1"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.sizes.delivered"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-06T11:49:58.978909+00:00",
+  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 14669,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.03, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0075, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4068,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            },
+            "observed_cpu": 16,
+            "observed_memory_mib": 32103
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

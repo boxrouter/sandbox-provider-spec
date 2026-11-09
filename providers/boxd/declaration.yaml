@@ -1,0 +1,158 @@
+spec: sandbox-provider-spec/0.1
+provider: boxd
+verified:
+  date: 2026-11-09
+  sdks: {boxd: 0.3.0}
+resources:
+  kernel: dedicated
+  sizes:
+  - cpu: 1
+    memory_mib: 4096
+    disk_mib: 102400
+  - cpu: 2
+    memory_mib: 8192
+    disk_mib: 102400
+  - cpu: 4
+    memory_mib: 16384
+    disk_mib: 102400
+  - cpu: 8
+    memory_mib: 32768
+    disk_mib: 102400
+  default_size:
+    cpu: 1
+    memory_mib: 4096
+    disk_mib: 102400
+  size_is_ceiling: true
+  max_lifetime_seconds: 315360000
+  gpus: unknown
+  disk_mib: 102400
+  regions: [boxd:eu-fra, boxd:us-nyc]
+  located_in: [DE, US]
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  long_running: unknown
+  extendable_lifetime: true
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end: [destroyed]
+gates:
+  processes:
+  - input: true
+    cancel: true
+    reattach: true
+  # A terminal is a pty under the guest supervisor (the same mechanism as processes), so a
+  # reconnect reaches the same shell and closing an observer never ends it.
+  terminal:
+  - reattach: true
+  network_lockdown:
+  - policy: allowlist
+    entry_kinds: [names]
+    allow_wildcards: true
+    max_allow: {at_least: 32}
+  # A new inbound connection wakes a suspended machine. The provider's delete timer
+  # counts suspended time, so pause and lifetime behavior remain separate guarantees.
+  pause_resume:
+  - keeps: files_and_memory
+  # Snapshots remain undeclared until the provider exposes a completed snapshot that
+  # can be restored with the advertised behavior.
+x-boxd:
+  isolated: true
+  usage_records: boxd.machines.usage
+evidence:
+  resources.extendable_lifetime:
+    tests: [facts.extendable_lifetime]
+    report: reports/lifetime-extend.json
+  lifetime_timer.enforced_by:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-extend.json
+  lifetime_timer.at_end:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/lifetime-extend.json
+  gates.pause_resume.0:
+    tests: [pause_resume.files_and_memory]
+    report: reports/default.json
+  gates.pause_resume.0.keeps:
+    tests: [pause_resume.files_and_memory]
+    report: reports/default.json
+  gates.processes.0:
+    tests: [processes.input.true, processes.cancel.true, processes.reattach.true]
+    report: reports/default.json
+  gates.processes.0.input:
+    tests: [processes.input.true]
+    report: reports/default.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.true]
+    report: reports/default.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/default.json
+  gates.terminal.0:
+    tests: [terminal.interactive]
+    report: reports/adapter-terminal.json
+  gates.terminal.0.reattach:
+    tests: [coverage.terminal.reattach]
+    report: reports/adapter-terminal-coverage.json
+  gates.network_lockdown.0.policy:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/default.json
+  gates.network_lockdown.0.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/default.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/default.json
+  gates.network_lockdown.0.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/default.json
+  x-boxd.usage_records:
+    source: boxd Python SDK 0.2.22 machines.usage() docstring
+    read: '2026-11-02'
+    quote: "A deleted machine is found by its id or name in the usage history of org (default: your default org, or an API key's org), so this still answers after delete()."
+  x-boxd.isolated:
+    source: boxd Python SDK 0.2.22 README
+    read: '2026-11-02'
+    quote: 'An isolated machine has no automatic credential: Boxd() raises AuthenticationError there, so pass an API key.'
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/adapter-default-size-ceiling.json
+  resources.default_size:
+    source: boxd Python SDK 0.2.22 README (Machines) and MachineResources.disk_bytes docstring
+    read: '2026-11-02'
+    quote: >-
+      create() defaults to the smallest machine and the stock image.
+      The machine's fixed disk *allocation* — always the platform constant
+      (100 GiB), identical on every machine. Not a usage figure: it does not grow
+      as the disk fills. There is no "disk used" field on the API yet.
+  resources.disk_mib:
+    source: boxd Python SDK 0.2.22 README (Machines) and MachineResources.disk_bytes docstring
+    read: '2026-11-02'
+    quote: >-
+      The machine's fixed disk *allocation* — always the platform constant
+      (100 GiB), identical on every machine. Not a usage figure: it does not grow
+      as the disk fills. There is no "disk used" field on the API yet.
+  resources.max_lifetime_seconds:
+    source: boxd Python SDK 0.3.0 machines.create(delete_after=...) and a live create probe
+    read: '2026-11-08'
+    quote: 'delete_after=315360000 created a machine; delete_after=315360001 was refused: delete-after of 315360001s is too long (max 315360000s, ten years); use 0 for no timer.'
+  resources.kernel:
+    source: boxd Python SDK 0.2.22 README (Machines)
+    read: '2026-11-02'
+    quote: Create machines, run commands in them, and manage everything around them.
+  resources.sizes:
+    source: boxd Python SDK 0.2.22 README (Sizing)
+    read: '2026-11-02'
+    quote: 'There are four sizes: 1 vCPU/4G, 2/8G, 4/16G, 8/32G.'
+  resources.regions:
+    source: boxd Python SDK 0.3.0 regions.list; https://pypi.org/project/boxd/0.3.0/
+    read: '2026-11-03'
+    quote: 'ListRegions returned id=fra, name=Frankfurt and id=nyc, name=New York, both enabled. Explicit-region create, get, exec, list and delete succeeded in each region.'
+  resources.located_in:
+    source: boxd Python SDK 0.3.0 regions.list; https://pypi.org/project/boxd/0.3.0/
+    read: '2026-11-03'
+    quote: 'ListRegions returned id=fra, name=Frankfurt and id=nyc, name=New York.'

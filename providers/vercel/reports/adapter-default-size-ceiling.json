@@ -1,0 +1,63 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-05T03:21:09.356724+00:00",
+  "provider": "vercel",
+  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
+  "run_id": "public-ea75681f63c17afadc6b",
+  "sdk_versions": {
+    "vercel-sandbox": "0.9.0"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-05T03:21:02.086658+00:00",
+  "suite_digest": "sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 7267,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.941, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.98525, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 2147483648}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

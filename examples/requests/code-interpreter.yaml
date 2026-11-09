@@ -1,0 +1,8 @@
+# Runs untrusted, model-written code for a few minutes. It needs its own kernel and no
+# network at all, and it sends input to a running interpreter process.
+lifetime_seconds: 600
+requirements:
+  network_lockdown: {policy: deny_all}
+  processes: {input: true, cancel: true}
+resources:
+  kernel: dedicated

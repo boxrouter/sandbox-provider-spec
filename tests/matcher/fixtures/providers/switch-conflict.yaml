@@ -1,0 +1,10 @@
+spec: sandbox-provider-spec/0.1
+provider: switch-conflict
+verified: {date: 2026-10-02, sdks: {fixture: "1.0"}}
+resources: {}
+gates:
+  previews:
+    - {access: public, max_ports: 1, conflicts: [network_lockdown.policy=deny_all]}
+  network_lockdown:
+    - {policy: [allowlist, deny_all], switchable: true, entry_kinds: [names], max_allow: 1}
+evidence: {}

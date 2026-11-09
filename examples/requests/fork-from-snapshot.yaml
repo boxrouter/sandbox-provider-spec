@@ -1,0 +1,6 @@
+# An evaluation harness that prepares one sandbox, snapshots it with its memory, and starts
+# many copies from the snapshot. Each copy needs only an hour.
+requirements:
+  snapshots: {keeps: files_and_memory, original_after: any}
+restores_need:
+  lifetime_seconds: 3600

@@ -1,0 +1,14 @@
+name = "sps-endpoints-worker"
+main = "index.ts"
+compatibility_date = "2026-10-07"
+
+# Set OBSERVER_TOKENS as a secret containing a JSON array of allowed tokens.
+# For example: wrangler secret put OBSERVER_TOKENS
+
+[[durable_objects.bindings]]
+name = "RECORDER"
+class_name = "Recorder"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Recorder"]

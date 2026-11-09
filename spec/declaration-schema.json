@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:0.1:declaration-schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "provider", "verified", "resources", "gates", "evidence"],
+  "allOf": [
+    {
+      "if": {
+        "required": ["resources"],
+        "properties": {
+          "resources": {
+            "required": ["outbound_traffic"],
+            "properties": {"outbound_traffic": {"type": "array", "minItems": 1}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "properties": {
+              "resources.outbound_traffic": {"not": {"required": ["source"]}}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "spec": {"const": "sandbox-provider-spec/0.1"},
+    "provider": {"$ref": "#/$defs/provider_name"},
+    "class": {"$ref": "#/$defs/provider_name"},
+    "verified": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "sdks"],
+      "properties": {
+        "date": {"type": "string", "format": "date"},
+        "sdks": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1}}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kernel": {"$ref": "#/$defs/kernel"},
+        "kernel_features": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["fuse", "ebpf", "nested_cgroups", "netfilter"]}}]},
+        "outbound_traffic": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["http", "any_tcp", "udp"]}}]},
+        "outbound_ip_families": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["ipv4", "ipv6"]}}]},
+        "ipv4_destination_reach": {"enum": ["native", "nat64", "none", "unknown"]},
+        "guest_reserved_tcp_ports": {"oneOf": [{"const": "unknown"}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 65535}}]},
+        "files_write_executable_effect": {"enum": ["preserved", "may_clear", "unverified"]},
+        "file_stream_max_bytes": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"read": {"$ref": "#/$defs/bytes_or_unknown"}, "write": {"$ref": "#/$defs/bytes_or_unknown"}}},
+        "long_running": {"$ref": "#/$defs/boolean_or_unknown"},
+        "size_is_ceiling": {"$ref": "#/$defs/boolean_or_unknown"},
+        "max_lifetime_seconds": {"oneOf": [{"$ref": "#/$defs/positive_number"}, {"$ref": "#/$defs/at_least"}, {"enum": ["unlimited", "unknown"]}]},
+        "sizes": {"oneOf": [{"const": "unknown"}, {"type": "array", "items": {"$ref": "#/$defs/size"}}]},
+        "default_size": {"$ref": "#/$defs/default_size"},
+        "disk_mib": {"$ref": "#/$defs/number_or_unknown"},
+        "regions": {"$ref": "#/$defs/string_list_or_unknown"},
+        "located_in": {"$ref": "#/$defs/string_list_or_unknown"},
+        "gpus": {"$ref": "#/$defs/string_list_or_unknown"},
+        "max_gpus": {"$ref": "#/$defs/number_or_unknown"},
+        "extendable_lifetime": {"$ref": "#/$defs/boolean_or_unknown"},
+        "default_user": {"type": "string", "minLength": 1},
+        "default_cwd": {"type": "string", "minLength": 1, "pattern": "^/"},
+        "paused_retention_seconds": {"$ref": "#/$defs/number_or_unknown"},
+        "root": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["by_default", "sudo", "per_command"]}}]},
+        "arch": {"oneOf": [{"const": "unknown"}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["amd64", "arm64"]}}]},
+        "package_manager": {"enum": ["apt", "apk", "dnf", "pacman", "none", "unknown"]},
+        "libc": {"enum": ["glibc", "musl", "unknown"]},
+        "on_memory_exhausted": {"enum": ["process_killed", "sandbox_ended", "unknown"]},
+        "max_run_seconds": {"$ref": "#/$defs/number_or_unknown"},
+        "max_process_seconds": {"$ref": "#/$defs/number_or_unknown"},
+        "disk_in_memory": {"$ref": "#/$defs/boolean_or_unknown"},
+        "egress_ips": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["published_ranges", "dedicated"]}}]},
+        "needs": {"$ref": "#/$defs/needs"},
+        "unmet_limits": {"$ref": "#/$defs/unmet_limits"}
+      }
+    },
+    "lifetime_timer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforced_by", "counts_paused_time", "at_end"],
+      "properties": {
+        "enforced_by": {"const": "provider"},
+        "counts_paused_time": {"$ref": "#/$defs/boolean_or_unknown"},
+        "at_end": {"oneOf": [{"enum": ["paused", "stopped", "destroyed", "unknown"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["paused", "stopped", "destroyed"]}}]},
+        "adjustable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "clearable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "step_seconds": {"oneOf": [{"type": "integer", "minimum": 1}, {"const": "unknown"}]},
+        "counts_from": {"enum": ["create", "ready", "unknown"]},
+        "min_seconds": {"oneOf": [{"type": "integer", "minimum": 1}, {"const": "unknown"}]},
+        "after_resume": {"enum": ["same", "pauses", "unknown"]}
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fuse_mount": {"$ref": "#/$defs/gate"},
+        "idle_shutdown": {"$ref": "#/$defs/gate"},
+        "pause_resume": {"$ref": "#/$defs/gate"},
+        "previews": {"$ref": "#/$defs/gate"},
+        "network_lockdown": {"$ref": "#/$defs/gate"},
+        "hidden_secrets": {"$ref": "#/$defs/gate"},
+        "snapshots": {"$ref": "#/$defs/gate"},
+        "volumes": {"$ref": "#/$defs/gate"},
+        "custom_images": {"$ref": "#/$defs/gate"},
+        "processes": {"$ref": "#/$defs/gate"},
+        "user_selection": {"$ref": "#/$defs/gate"},
+        "terminal": {"$ref": "#/$defs/gate"},
+        "docker": {"$ref": "#/$defs/gate"},
+        "tcp_ports": {"$ref": "#/$defs/gate"},
+        "desktop": {"$ref": "#/$defs/gate"},
+        "file_links": {"$ref": "#/$defs/gate"}
+      }
+    },
+    "evidence": {"type": "object", "additionalProperties": {"$ref": "#/$defs/evidence_entry"}}
+  },
+  "patternProperties": {"^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {"type": "object"}},
+  "$defs": {
+    "provider_name": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "positive_number": {"type": "number", "exclusiveMinimum": 0},
+    "number_or_unknown": {"oneOf": [{"$ref": "#/$defs/positive_number"}, {"$ref": "#/$defs/at_least"}, {"enum": ["unlimited", "unknown"]}]},
+    "bytes_or_unknown": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "object", "additionalProperties": false, "required": ["at_least"], "properties": {"at_least": {"type": "integer", "minimum": 1}}}, {"const": "unknown"}]},
+    "at_least": {"type": "object", "additionalProperties": false, "required": ["at_least"], "properties": {"at_least": {"$ref": "#/$defs/positive_number"}}},
+    "boolean_or_unknown": {"oneOf": [{"type": "boolean"}, {"const": "unknown"}]},
+    "string_list_or_unknown": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}]},
+    "kernel": {"enum": ["shared", "filtered", "dedicated", "unknown"]},
+    "size_value": {"oneOf": [{"$ref": "#/$defs/positive_number"}, {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/positive_number"}}]},
+    "size": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {"$ref": "#/$defs/size_value"},
+        "memory_mib": {"$ref": "#/$defs/size_value"},
+        "disk_mib": {"$ref": "#/$defs/size_value"}
+      }
+    },
+    "default_size": {
+      "oneOf": [
+        {"const": "unknown"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cpu", "memory_mib"],
+          "properties": {
+            "cpu": {"$ref": "#/$defs/positive_number"},
+            "memory_mib": {"type": "integer", "minimum": 1},
+            "disk_mib": {"type": "integer", "minimum": 1}
+          }
+        }
+      ]
+    },
+    "unmet_limits": {"type": "object", "additionalProperties": {"type": "object", "minProperties": 1, "additionalProperties": {"oneOf": [{"type": "integer", "minimum": 1}, {"const": "unknown"}]}}},
+    "needs": {"type": "object", "additionalProperties": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}},
+    "limit": {"$ref": "#/$defs/number_or_unknown"},
+    "knob_value": {
+      "oneOf": [
+        {"type": ["string", "boolean", "number"]},
+        {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": ["string", "boolean", "number"]}},
+        {"$ref": "#/$defs/at_least"}
+      ]
+    },
+    "policy_value": {
+      "oneOf": [
+        {"enum": ["deny_all", "allowlist", "denylist", "open", "unknown"]},
+        {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["deny_all", "allowlist", "denylist", "open"]}}
+      ]
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "on_idle": {"$ref": "#/$defs/knob_value"},
+        "keeps": {"$ref": "#/$defs/knob_value"},
+        "custom_idle_time": {"$ref": "#/$defs/boolean_or_unknown"},
+        "auto_wake": {"$ref": "#/$defs/boolean_or_unknown"},
+        "access": {"$ref": "#/$defs/knob_value"},
+        "credential": {"$ref": "#/$defs/knob_value"},
+        "revocable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "link_lifetime_seconds": {"$ref": "#/$defs/number_or_unknown"},
+        "websocket": {"$ref": "#/$defs/boolean_or_unknown"},
+        "loopback": {"$ref": "#/$defs/boolean_or_unknown"},
+        "any_port": {"$ref": "#/$defs/boolean_or_unknown"},
+        "survives_pause": {"$ref": "#/$defs/boolean_or_unknown"},
+        "reserved_ports": {"type": "array", "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 65535}},
+        "policy": {"$ref": "#/$defs/policy_value"},
+        "changeable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "switchable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "rotates": {"$ref": "#/$defs/boolean_or_unknown"},
+        "scrubs_responses": {"$ref": "#/$defs/boolean_or_unknown"},
+        "header_templates": {"$ref": "#/$defs/boolean_or_unknown"},
+        "transparent": {"$ref": "#/$defs/boolean_or_unknown"},
+        "injection": {"$ref": "#/$defs/knob_value"},
+        "intercepts": {"$ref": "#/$defs/knob_value"},
+        "original_after": {"$ref": "#/$defs/knob_value"},
+        "deletable": {"$ref": "#/$defs/boolean_or_unknown"},
+        "retention_seconds": {"$ref": "#/$defs/number_or_unknown"},
+        "sharing": {"$ref": "#/$defs/knob_value"},
+        "read_only_mounts": {"$ref": "#/$defs/boolean_or_unknown"},
+        "kind": {"$ref": "#/$defs/knob_value"},
+        "source": {"$ref": "#/$defs/knob_value"},
+        "prepared": {"$ref": "#/$defs/boolean_or_unknown"},
+        "runs_entrypoint": {"$ref": "#/$defs/boolean_or_unknown"},
+        "build_context": {"$ref": "#/$defs/boolean_or_unknown"},
+        "image_config": {"$ref": "#/$defs/knob_value"},
+        "networking": {"$ref": "#/$defs/knob_value"},
+        "tls": {"$ref": "#/$defs/knob_value"},
+        "live_view": {"$ref": "#/$defs/boolean_or_unknown"},
+        "operations": {"$ref": "#/$defs/knob_value"},
+        "user_selection": {"$ref": "#/$defs/boolean_or_unknown"},
+        "max_ports": {"$ref": "#/$defs/limit"},
+        "max_allow": {"$ref": "#/$defs/limit"},
+        "max_deny": {"$ref": "#/$defs/limit"},
+        "allow_wildcards": {"$ref": "#/$defs/boolean_or_unknown"},
+        "inject_wildcards": {"$ref": "#/$defs/boolean_or_unknown"},
+        "entry_kinds": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["names", "addresses"]}}]},
+        "max_mounts": {"$ref": "#/$defs/limit"},
+        "max_tcp_ports": {"$ref": "#/$defs/limit"},
+        "max_inject_into": {"$ref": "#/$defs/limit"},
+        "idle_seconds": {"$ref": "#/$defs/positive_number"},
+        "ports": {"type": "array", "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 65535}},
+        "allow": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "deny": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "inject_into": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "mounts": {"type": "array", "uniqueItems": true, "items": {"type": "object"}},
+        "image": {"type": ["string", "object"]},
+        "resizes_on_restore": {"$ref": "#/$defs/boolean_or_unknown"},
+        "input": {"$ref": "#/$defs/boolean_or_unknown"},
+        "cancel": {"$ref": "#/$defs/boolean_or_unknown"},
+        "reattach": {"$ref": "#/$defs/boolean_or_unknown"},
+        "commands": {"$ref": "#/$defs/boolean_or_unknown"},
+        "files_write": {"$ref": "#/$defs/boolean_or_unknown"},
+        "process_start": {"$ref": "#/$defs/boolean_or_unknown"},
+        "needs": {"$ref": "#/$defs/needs"},
+        "conflicts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["policy"],
+            "properties": {"policy": {"anyOf": [{"const": "open"}, {"type": "array", "contains": {"const": "open"}}]}}
+          },
+          "then": {"required": ["switchable"], "properties": {"switchable": {"const": true}}}
+        }
+      ]
+    },
+    "gate": {"oneOf": [{"const": "unsupported"}, {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/variant"}}]},
+    "evidence_entry": {
+      "oneOf": [
+        {"$ref": "#/$defs/report_evidence"},
+        {"type": "object", "additionalProperties": false, "required": ["reports"], "properties": {"reports": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/report_evidence"}}}},
+        {"type": "object", "additionalProperties": false, "required": ["source", "read", "quote"], "properties": {"source": {"type": "string", "format": "uri"}, "read": {"type": "string", "format": "date"}, "quote": {"type": "string", "minLength": 1, "maxLength": 1000}}}
+      ]
+    },
+    "report_evidence": {"type": "object", "additionalProperties": false, "required": ["tests", "report"], "properties": {"tests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}, "report": {"type": "string", "pattern": "^reports/[^/]+\\.json$"}}}
+  }
+}

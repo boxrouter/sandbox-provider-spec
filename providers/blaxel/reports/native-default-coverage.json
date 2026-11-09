@@ -1,0 +1,236 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.hidden_secrets.injection.sets_header": "sha256:88f216a69114d5f407bea17fadf743600201b7460863eea3610b306b16d2717f",
+    "coverage.hidden_secrets.intercepts.all_https": "sha256:1e0779e85c046df6f0bec89bb066c822f1df30ff32a14da8f5f33cf21fb26d4b",
+    "coverage.hidden_secrets.scrubs_responses.false": "sha256:689f85643777c7761eac694e7b2b434bf293b7cdd91a4aa37ecd778cb74540f7",
+    "coverage.hidden_secrets.transparent.false": "sha256:2359c981ddb83ab0baf32d6089b1ed894c444d4248651bada9baf02846bed75b"
+  },
+  "clean": true,
+  "driver": {
+    "name": "BlaxelDriver",
+    "version": "0.3.141"
+  },
+  "finished_at": "2026-10-29T00:48:22.822815+00:00",
+  "provider": "blaxel",
+  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
+  "run_id": "public-68f7d2c18c25c02c6849",
+  "sdk_versions": {
+    "blaxel": "0.4.8"
+  },
+  "selected_tests": [
+    "coverage.hidden_secrets.scrubs_responses.false",
+    "coverage.hidden_secrets.injection.sets_header",
+    "coverage.hidden_secrets.intercepts.all_https",
+    "coverage.hidden_secrets.transparent.false"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T00:47:20.523447+00:00",
+  "suite_digest": "sha256:864b6f5253d02d6656d54d1dfd10bd9747d655df02626f448d6db48159f94a37",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret_value",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 11158,
+      "id": "coverage.hidden_secrets.scrubs_responses.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "scrubs_responses": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret_value",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 10604,
+      "id": "coverage.hidden_secrets.injection.sets_header",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "sets_header"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "injection": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret_value",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 17944,
+      "id": "coverage.hidden_secrets.intercepts.all_https",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "all_https"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "intercepts": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "secret_value",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 22589,
+      "id": "coverage.hidden_secrets.transparent.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "transparent": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_secret",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

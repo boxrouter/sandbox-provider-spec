@@ -1,0 +1,14 @@
+Sandbox Provider Specification
+Copyright 2026 BoxRouter, Inc.
+
+BoxRouter maintains this specification and its source.
+
+Licensed under the Apache License, Version 2.0 (LICENSE). The licence covers
+everything in this repository: the specification text, the catalog and schemas,
+the registries, the provider declarations and their evidence, the conformance
+tests and the tools.
+
+Provider declarations describe SDKs, APIs and documentation owned by their
+providers. They cite those sources by link, date and SDK version and quote only
+short passages, which remain the property of their owners. Provider names
+identify the systems described and imply no endorsement.

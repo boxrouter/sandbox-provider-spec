@@ -1,0 +1,8 @@
+spec: sandbox-provider-spec/0.1
+provider: zeta
+verified: {date: 2026-10-02, sdks: {zeta-sdk: 1.0.0}}
+resources: {}
+gates:
+  network_lockdown:
+    - {policy: [allowlist, deny_all], switchable: true, entry_kinds: [names]}
+evidence: {}

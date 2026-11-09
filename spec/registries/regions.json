@@ -1,0 +1,739 @@
+{
+  "areas": {
+    "EU": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IT",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://european-union.europa.eu/principles-countries-history/eu-countries_en"
+    },
+    "EEA": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://eur-lex.europa.eu/EN/legal-content/glossary/european-economic-area-eea.html"
+    }
+  },
+  "regions": {
+    "blaxel:us-pdx-1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://docs.blaxel.ai/Infrastructure/Regions"
+    },
+    "blaxel:us-was-1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://docs.blaxel.ai/Infrastructure/Regions"
+    },
+    "blaxel:eu-lon-1": {
+      "countries": [
+        "GB"
+      ],
+      "source": "https://docs.blaxel.ai/Infrastructure/Regions"
+    },
+    "blaxel:eu-fra-1": {
+      "countries": [
+        "DE"
+      ],
+      "source": "https://docs.blaxel.ai/Infrastructure/Regions"
+    },
+    "blaxel:auto": {
+      "countries": null,
+      "source": "https://docs.blaxel.ai/Infrastructure/Regions"
+    },
+    "daytona:us": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://www.daytona.io/docs/en/regions"
+    },
+    "daytona:eu": {
+      "countries": null,
+      "source": "https://www.daytona.io/docs/en/regions"
+    },
+    "e2b:us": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://docs.e2b.dev/faq/egress-ip-ranges"
+    },
+    "modal:us": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:us-east": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:us-central": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:us-south": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:us-west": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:eu": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:eu-west": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:eu-north": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:eu-south": {
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ap": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ap-northeast": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ap-southeast": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ap-south": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ap-melbourne": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:jp": {
+      "countries": [
+        "JP"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:au": {
+      "countries": [
+        "AU"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:uk": {
+      "countries": [
+        "GB"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:ca": {
+      "countries": [
+        "CA"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:me": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:sa": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:af": {
+      "countries": null,
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "modal:mx": {
+      "countries": [
+        "MX"
+      ],
+      "source": "https://modal.com/docs/guide/region-selection"
+    },
+    "vercel:arn1": {
+      "countries": [
+        "SE"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:bom1": {
+      "countries": [
+        "IN"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:cdg1": {
+      "countries": [
+        "FR"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:cle1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:cpt1": {
+      "countries": [
+        "ZA"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:dub1": {
+      "countries": [
+        "IE"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:dxb1": {
+      "countries": [
+        "AE"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:fra1": {
+      "countries": [
+        "DE"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:gru1": {
+      "countries": [
+        "BR"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:hkg1": {
+      "countries": [
+        "HK"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:hnd1": {
+      "countries": [
+        "JP"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:iad1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:icn1": {
+      "countries": [
+        "KR"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:kix1": {
+      "countries": [
+        "JP"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:lhr1": {
+      "countries": [
+        "GB"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:pdx1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:sfo1": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:sin1": {
+      "countries": [
+        "SG"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:syd1": {
+      "countries": [
+        "AU"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "vercel:yul1": {
+      "countries": [
+        "CA"
+      ],
+      "source": "https://vercel.com/docs/sandbox/concepts/regions"
+    },
+    "e2b:us-west-2": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://docs.e2b.dev/faq/egress-ip-ranges"
+    },
+    "boxd:eu-fra": {
+      "countries": [
+        "DE"
+      ],
+      "source": "https://pypi.org/project/boxd/0.3.0/"
+    },
+    "boxd:us-nyc": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://pypi.org/project/boxd/0.3.0/"
+    }
+  },
+  "countries_source": "https://www.iso.org/iso-3166-country-codes.html",
+  "countries": [
+    "AD",
+    "AE",
+    "AF",
+    "AG",
+    "AI",
+    "AL",
+    "AM",
+    "AO",
+    "AQ",
+    "AR",
+    "AS",
+    "AT",
+    "AU",
+    "AW",
+    "AX",
+    "AZ",
+    "BA",
+    "BB",
+    "BD",
+    "BE",
+    "BF",
+    "BG",
+    "BH",
+    "BI",
+    "BJ",
+    "BL",
+    "BM",
+    "BN",
+    "BO",
+    "BQ",
+    "BR",
+    "BS",
+    "BT",
+    "BV",
+    "BW",
+    "BY",
+    "BZ",
+    "CA",
+    "CC",
+    "CD",
+    "CF",
+    "CG",
+    "CH",
+    "CI",
+    "CK",
+    "CL",
+    "CM",
+    "CN",
+    "CO",
+    "CR",
+    "CU",
+    "CV",
+    "CW",
+    "CX",
+    "CY",
+    "CZ",
+    "DE",
+    "DJ",
+    "DK",
+    "DM",
+    "DO",
+    "DZ",
+    "EC",
+    "EE",
+    "EG",
+    "EH",
+    "ER",
+    "ES",
+    "ET",
+    "FI",
+    "FJ",
+    "FK",
+    "FM",
+    "FO",
+    "FR",
+    "GA",
+    "GB",
+    "GD",
+    "GE",
+    "GF",
+    "GG",
+    "GH",
+    "GI",
+    "GL",
+    "GM",
+    "GN",
+    "GP",
+    "GQ",
+    "GR",
+    "GS",
+    "GT",
+    "GU",
+    "GW",
+    "GY",
+    "HK",
+    "HM",
+    "HN",
+    "HR",
+    "HT",
+    "HU",
+    "ID",
+    "IE",
+    "IL",
+    "IM",
+    "IN",
+    "IO",
+    "IQ",
+    "IR",
+    "IS",
+    "IT",
+    "JE",
+    "JM",
+    "JO",
+    "JP",
+    "KE",
+    "KG",
+    "KH",
+    "KI",
+    "KM",
+    "KN",
+    "KP",
+    "KR",
+    "KW",
+    "KY",
+    "KZ",
+    "LA",
+    "LB",
+    "LC",
+    "LI",
+    "LK",
+    "LR",
+    "LS",
+    "LT",
+    "LU",
+    "LV",
+    "LY",
+    "MA",
+    "MC",
+    "MD",
+    "ME",
+    "MF",
+    "MG",
+    "MH",
+    "MK",
+    "ML",
+    "MM",
+    "MN",
+    "MO",
+    "MP",
+    "MQ",
+    "MR",
+    "MS",
+    "MT",
+    "MU",
+    "MV",
+    "MW",
+    "MX",
+    "MY",
+    "MZ",
+    "NA",
+    "NC",
+    "NE",
+    "NF",
+    "NG",
+    "NI",
+    "NL",
+    "NO",
+    "NP",
+    "NR",
+    "NU",
+    "NZ",
+    "OM",
+    "PA",
+    "PE",
+    "PF",
+    "PG",
+    "PH",
+    "PK",
+    "PL",
+    "PM",
+    "PN",
+    "PR",
+    "PS",
+    "PT",
+    "PW",
+    "PY",
+    "QA",
+    "RE",
+    "RO",
+    "RS",
+    "RU",
+    "RW",
+    "SA",
+    "SB",
+    "SC",
+    "SD",
+    "SE",
+    "SG",
+    "SH",
+    "SI",
+    "SJ",
+    "SK",
+    "SL",
+    "SM",
+    "SN",
+    "SO",
+    "SR",
+    "SS",
+    "ST",
+    "SV",
+    "SX",
+    "SY",
+    "SZ",
+    "TC",
+    "TD",
+    "TF",
+    "TG",
+    "TH",
+    "TJ",
+    "TK",
+    "TL",
+    "TM",
+    "TN",
+    "TO",
+    "TR",
+    "TT",
+    "TV",
+    "TW",
+    "TZ",
+    "UA",
+    "UG",
+    "UM",
+    "US",
+    "UY",
+    "UZ",
+    "VA",
+    "VC",
+    "VE",
+    "VG",
+    "VI",
+    "VN",
+    "VU",
+    "WF",
+    "WS",
+    "YE",
+    "YT",
+    "ZA",
+    "ZM",
+    "ZW"
+  ]
+}

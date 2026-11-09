@@ -1,0 +1,43 @@
+retrieved_at: '2026-11-02'
+owner: Azin Tech Operating Company B.V. (boxd)
+source_page: https://boxd.sh
+assets:
+  logo.svg:
+    source: https://boxd.sh/favicon.svg
+    role: Official boxd symbol, one colour for dark backgrounds
+    modifications: none
+  mark.svg:
+    source: https://boxd.sh/favicon.svg
+    role: Official one-colour boxd symbol, for use as a mask
+    modifications: none
+notes:
+  single_colour: >-
+    boxd publishes only this one-colour (#f4f4f5) symbol: it is the favicon of
+    both boxd.sh and docs.boxd.sh and the symbol inside the official
+    logo-with-text lockup served from boxd's own documentation CDN. No
+    dark-on-light variant, wordmark-only file or other colour version exists
+    in boxd's public materials, so the logo and mark are the same official
+    file. The GitHub organisation avatar (github.com/boxd-sh) is a black
+    rendering of the same symbol, published only as a JPEG.
+  colour_choice: >-
+    #DF6A5F is the muted red accent boxd uses across boxd.sh (its mascot
+    illustration and UI fills); the symbol itself is near-white and boxd's
+    palette is otherwise neutral zinc greys.
+terms:
+  source: https://boxd.sh/terms
+  effective: '2026-09-18'
+  section: '7.3'
+  quote: >-
+    As between Boxd and Customer, Boxd owns and retains all right, title and
+    interest in and to the Services, including all underlying software,
+    infrastructure and technology, and all related intellectual property
+    rights. Nothing in these Terms transfers any such rights to Customer.
+  reuse_permission: not_found
+  press_kit: not_found
+  adoption: pending
+  permission_note: >-
+    No explicit public permission to reproduce or redistribute these files was
+    found on boxd.sh, docs.boxd.sh, the terms of service or any press/brand
+    page (none exists). boxd's partnership over Slack Connect is not a logo
+    license. This pull request stays open until boxd gives written approval to
+    display its logo and mark, or publishes reuse terms.

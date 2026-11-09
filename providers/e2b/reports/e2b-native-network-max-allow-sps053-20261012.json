@@ -1,0 +1,67 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.max_allow": "sha256:09082696d0fa5f23435adde70c2a8bf2524dbd10bbc3e86dc64da2e9d1721052"
+  },
+  "clean": true,
+  "driver": {
+    "name": "E2BDriver",
+    "version": "0.3.53"
+  },
+  "finished_at": "2026-10-12T15:34:20.073409+00:00",
+  "provider": "e2b",
+  "revision": "94a8093050ed22492176d305c12defca9679425a",
+  "run_id": "public-47a4449bb7c2e8fa765e",
+  "sdk_versions": {
+    "e2b": "2.51.0",
+    "e2b-code-interpreter": "2.10.0",
+    "e2b-desktop": "2.6.0"
+  },
+  "selected_tests": [
+    "network_lockdown.max_allow"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-12T15:34:01.367940+00:00",
+  "suite_digest": "sha256:68e491402bcd10f6804615a67aeb60710cd14ebf2831c1bdf4d0a5084b7e0dd4",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 18705,
+      "id": "network_lockdown.max_allow",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "max_allow",
+          "value": {
+            "at_least": 32
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/max-allow"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

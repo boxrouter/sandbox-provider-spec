@@ -1,0 +1,3410 @@
+{
+  "baseline": "unsupported",
+  "clean": true,
+  "driver": {
+    "name": "DockerDriver",
+    "version": "0.2.0rc1"
+  },
+  "finished_at": "2026-10-03T12:56:10.848104+00:00",
+  "provider": "docker-engine",
+  "revision": "184060228c393ca48b3a1640c86bf69d33487987",
+  "sdk_versions": {
+    "docker": "7.2.0"
+  },
+  "selected_tests": [
+    "baseline.create_env",
+    "baseline.get",
+    "baseline.list",
+    "baseline.destroy",
+    "baseline.run_output",
+    "baseline.run_exit_code",
+    "baseline.run_separate_streams",
+    "baseline.run_cwd",
+    "baseline.run_env",
+    "baseline.files_write",
+    "baseline.files_read",
+    "baseline.process_stream",
+    "baseline.environment_bash",
+    "baseline.environment_python3",
+    "baseline.outbound_network",
+    "coverage.facts.max_lifetime.active",
+    "baseline.no_metadata",
+    "baseline.files_write_binary",
+    "coverage.volumes.read_only",
+    "coverage.facts.arch.amd64",
+    "coverage.facts.arch.arm64",
+    "coverage.facts.root.by_default",
+    "coverage.facts.root.sudo",
+    "coverage.facts.root.per_command",
+    "coverage.facts.kernel_features.fuse",
+    "coverage.facts.kernel_features.ebpf",
+    "coverage.facts.kernel_features.nested_cgroups",
+    "coverage.facts.kernel_features.netfilter",
+    "coverage.facts.outbound_traffic.http",
+    "coverage.facts.outbound_traffic.any_tcp",
+    "coverage.facts.outbound_traffic.udp",
+    "coverage.facts.package_manager.apt",
+    "coverage.facts.package_manager.apk",
+    "coverage.facts.package_manager.dnf",
+    "coverage.facts.package_manager.pacman",
+    "coverage.facts.package_manager.none",
+    "coverage.facts.libc.glibc",
+    "coverage.facts.libc.musl",
+    "coverage.facts.on_memory_exhausted.process_killed",
+    "coverage.facts.on_memory_exhausted.sandbox_ended",
+    "coverage.facts.disk_in_memory.true",
+    "coverage.facts.disk_in_memory.false",
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.size_is_ceiling.false",
+    "coverage.facts.max_run",
+    "coverage.facts.max_process",
+    "coverage.docker.bridge",
+    "coverage.docker.host",
+    "coverage.nested_virtualization.kvm",
+    "coverage.ssh.key",
+    "coverage.ssh.token",
+    "coverage.ssh.password",
+    "coverage.tcp_ports.none",
+    "coverage.tcp_ports.terminated",
+    "coverage.private_network.reach",
+    "coverage.private_network.private",
+    "coverage.private_network.ip_version.ipv4",
+    "coverage.private_network.ip_version.ipv6",
+    "coverage.desktop.control",
+    "coverage.desktop.live_view",
+    "coverage.previews.websocket",
+    "coverage.previews.loopback",
+    "coverage.previews.any_port",
+    "coverage.previews.survives_pause",
+    "coverage.previews.reserved_ports",
+    "coverage.terminal.reattach",
+    "coverage.custom_images.private_oci",
+    "coverage.custom_images.runs_entrypoint.true",
+    "coverage.custom_images.runs_entrypoint.false",
+    "coverage.custom_images.build_context.true",
+    "coverage.custom_images.image_config.env",
+    "coverage.custom_images.image_config.workdir",
+    "coverage.custom_images.image_config.user",
+    "coverage.network_lockdown.denylist.names",
+    "coverage.network_lockdown.denylist.addresses",
+    "coverage.network_lockdown.allowlist.mixed",
+    "coverage.network_lockdown.deny_wins",
+    "coverage.network_lockdown.http_rules",
+    "coverage.network_lockdown.http_rules.deny",
+    "coverage.network_lockdown.allowlist.range",
+    "coverage.network_lockdown.changeable.true",
+    "coverage.network_lockdown.changeable.false",
+    "coverage.network_lockdown.switchable.true",
+    "coverage.network_lockdown.policy_transition.denylist",
+    "coverage.network_lockdown.open",
+    "coverage.network_lockdown.switchable.false",
+    "coverage.hidden_secrets.rotates.true",
+    "coverage.hidden_secrets.rotates.false",
+    "coverage.hidden_secrets.scrubs_responses.true",
+    "coverage.hidden_secrets.scrubs_responses.false",
+    "coverage.hidden_secrets.injection.sets_header",
+    "coverage.hidden_secrets.injection.sets_header_replaces",
+    "coverage.hidden_secrets.injection.replaces_placeholder",
+    "coverage.hidden_secrets.injection.adds_body_field",
+    "coverage.hidden_secrets.intercepts.injected_hosts",
+    "coverage.hidden_secrets.intercepts.all_https",
+    "coverage.hidden_secrets.max_inject_into",
+    "coverage.hidden_secrets.wildcards",
+    "coverage.network_lockdown.max_deny",
+    "coverage.hidden_secrets.transparent.true",
+    "coverage.hidden_secrets.transparent.false",
+    "coverage.network_lockdown.cuts_open_connections.true",
+    "coverage.network_lockdown.cuts_open_connections.false",
+    "coverage.network_lockdown.domain_traffic.https",
+    "coverage.network_lockdown.domain_traffic.http_and_https",
+    "coverage.network_lockdown.domain_traffic.tls",
+    "coverage.network_lockdown.domain_traffic.all",
+    "coverage.live_resize.grows",
+    "coverage.egress_proxy.routes",
+    "coverage.egress_proxy.any_tcp",
+    "coverage.egress_proxy.transparent",
+    "coverage.egress_proxy.fails_closed",
+    "coverage.workload_identity.environment",
+    "coverage.workload_identity.injected",
+    "coverage.workload_identity.custom_audience",
+    "coverage.live_resize.shrinks"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-03T12:55:03.942792+00:00",
+  "suite_digest": "sha256:3cb1c7abe920d0ef3286b1694a67540798a36a58c13bca93272dae0b4c704e27",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 269,
+      "id": "baseline.create_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "cHJlc2VudA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 133,
+      "id": "baseline.get",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 134,
+      "id": "baseline.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 125,
+      "id": "baseline.destroy",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 165,
+      "id": "baseline.run_output",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "b3V0",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 153,
+      "id": "baseline.run_exit_code",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 151,
+      "id": "baseline.run_separate_streams",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stderr": {
+              "actual": {
+                "b64": "ZXJyCg==",
+                "truncated": false
+              },
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "b3V0Cg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 158,
+      "id": "baseline.run_cwd",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "L3RtcAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 151,
+      "id": "baseline.run_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "Y29tbWFuZA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 163,
+      "id": "baseline.files_write",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVsbG8=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 155,
+      "id": "baseline.files_read",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AP9maWxl",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 15225,
+      "id": "baseline.process_stream",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/process-output"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 14,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 167,
+      "id": "baseline.environment_bash",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/bin/bash\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 168,
+      "id": "baseline.environment_python3",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/local/bin/python3\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 457,
+      "id": "baseline.outbound_network",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/outbound-network"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.max_lifetime.active",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/max-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 149,
+      "id": "baseline.no_metadata",
+      "proves": [],
+      "reason": "Docker exec has no native guest command deadline",
+      "result": "unsupported",
+      "rules": [
+        "baseline/no-metadata"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "Docker exec has no native guest command deadline",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 191,
+      "id": "baseline.files_write_binary",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "MDBmZjAwODBmZTY2MDAK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        },
+        {
+          "kind": "volume",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 302,
+      "id": "coverage.volumes.read_only",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "read_only_mounts",
+          "value": true
+        }
+      ],
+      "reason": "stdout",
+      "result": "differs",
+      "rules": [
+        "volumes/read-only"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "volume.create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "c2VlZA==",
+                "truncated": false
+              },
+              "matches": false
+            }
+          },
+          "operation": "run",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.arch.amd64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "amd64"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.arch.arm64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "arm64"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.root.by_default",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "by_default"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.root.sudo",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "sudo"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.root.per_command",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "per_command"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.kernel_features.fuse",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "fuse"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/kernel-fuse"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.kernel_features.ebpf",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "ebpf"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/kernel-ebpf"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.kernel_features.nested_cgroups",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "nested_cgroups"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/kernel-nested-cgroups"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.kernel_features.netfilter",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "netfilter"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/kernel-netfilter"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.http",
+      "proves": [
+        {
+          "fact": "resources.outbound_traffic",
+          "value": [
+            "http"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/outbound-http"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.any_tcp",
+      "proves": [
+        {
+          "fact": "resources.outbound_traffic",
+          "value": [
+            "any_tcp"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/outbound-tcp"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.udp",
+      "proves": [
+        {
+          "fact": "resources.outbound_traffic",
+          "value": [
+            "udp"
+          ]
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/outbound-udp"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.package_manager.apt",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apt"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.package_manager.apk",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apk"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.package_manager.dnf",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "dnf"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.package_manager.pacman",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "pacman"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.package_manager.none",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "none"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.libc.glibc",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "glibc"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.libc.musl",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "musl"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.on_memory_exhausted.process_killed",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "process_killed"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "sandbox_ended"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.disk_in_memory.true",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.disk_in_memory.false",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.size_is_ceiling.false",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": false
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.max_run",
+      "proves": [
+        {
+          "fact": "resources.max_run_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/max-run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.max_process",
+      "proves": [
+        {
+          "fact": "resources.max_process_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "facts/max-process"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19175,
+      "id": "coverage.docker.bridge",
+      "proves": [
+        {
+          "gate": "docker",
+          "knob": "networking",
+          "value": "bridge"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "docker/runs-containers",
+        "docker/bridge"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_docker_create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 22848,
+      "id": "coverage.docker.host",
+      "proves": [
+        {
+          "gate": "docker",
+          "knob": "networking",
+          "value": "host"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "docker/runs-containers",
+        "docker/host"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_docker_create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.nested_virtualization.kvm",
+      "proves": [
+        {
+          "gate": "nested_virtualization",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "nested_virtualization/kvm"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.ssh.key",
+      "proves": [
+        {
+          "gate": "ssh",
+          "knob": "credential",
+          "value": "key"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "ssh/standard-client",
+        "ssh/credential"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.ssh.token",
+      "proves": [
+        {
+          "gate": "ssh",
+          "knob": "credential",
+          "value": "token"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "ssh/standard-client",
+        "ssh/credential"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.ssh.password",
+      "proves": [
+        {
+          "gate": "ssh",
+          "knob": "credential",
+          "value": "password"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "ssh/standard-client",
+        "ssh/credential"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.tcp_ports.none",
+      "proves": [
+        {
+          "gate": "tcp_ports",
+          "knob": "tls",
+          "value": "none"
+        },
+        {
+          "gate": "tcp_ports",
+          "knob": "max_tcp_ports",
+          "value": {
+            "at_least": 2
+          }
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "tcp_ports/reachable",
+        "tcp_ports/tls-none"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.tcp_ports.terminated",
+      "proves": [
+        {
+          "gate": "tcp_ports",
+          "knob": "tls",
+          "value": "terminated"
+        },
+        {
+          "gate": "tcp_ports",
+          "knob": "max_tcp_ports",
+          "value": {
+            "at_least": 2
+          }
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "tcp_ports/reachable",
+        "tcp_ports/tls-terminated"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.private_network.reach",
+      "proves": [
+        {
+          "gate": "private_network",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "private_network/reach"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.private_network.private",
+      "proves": [
+        {
+          "gate": "private_network",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "private_network/private"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.private_network.ip_version.ipv4",
+      "proves": [
+        {
+          "gate": "private_network",
+          "knob": "ip_version",
+          "value": "ipv4"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "private_network/reach",
+        "private_network/ip-version"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.private_network.ip_version.ipv6",
+      "proves": [
+        {
+          "gate": "private_network",
+          "knob": "ip_version",
+          "value": "ipv6"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "private_network/reach",
+        "private_network/ip-version"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.desktop.control",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "desktop/control"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.desktop.live_view",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        },
+        {
+          "gate": "desktop",
+          "knob": "live_view",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "desktop/control",
+        "desktop/live-view"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.websocket",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "websocket",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "previews/websocket"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.loopback",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "loopback",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "previews/loopback"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.any_port",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "any_port",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "previews/any-port"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.survives_pause",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "survives_pause",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "previews/survives-pause"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.reserved_ports",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "previews/reserved-ports"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.terminal.reattach",
+      "proves": [
+        {
+          "gate": "terminal",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "terminal/reattach"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.private_oci",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "private_oci"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/private-oci"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 916,
+      "id": "coverage.custom_images.runs_entrypoint.true",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "runs_entrypoint",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "custom_images/runs-entrypoint"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 901,
+      "id": "coverage.custom_images.runs_entrypoint.false",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "runs_entrypoint",
+          "value": false
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "custom_images/runs-entrypoint"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 581,
+      "id": "coverage.custom_images.build_context.true",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "build_context",
+          "value": true
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "custom_images/build-context"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1345,
+      "id": "coverage.custom_images.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/image-env"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "ZnJvbS1pbWFnZQ==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1381,
+      "id": "coverage.custom_images.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/image-workdir"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "L3Nwcy13b3JrZGlyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "build_images",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1337,
+      "id": "coverage.custom_images.image_config.user",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "user"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/image-user"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "c3BzdXNlcgo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.names",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.addresses",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.mixed",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names",
+            "addresses"
+          ]
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.deny_wins",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "deny_wins",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/deny-wins"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.http_rules",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "http_rules",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/http-rules"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.http_rules.deny",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "denylist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "http_rules",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/http-rules"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.range",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "addresses"
+          ]
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.changeable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.changeable.false",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": false
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.policy_transition.denylist",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.open",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "open"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/open"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.false",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": false
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.rotates.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": true
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.rotates.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": false
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.scrubs_responses.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": true
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.scrubs_responses.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": false
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.injection.sets_header",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "sets_header"
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.injection.sets_header_replaces",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "sets_header"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret_header",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.injection.replaces_placeholder",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "replaces_placeholder"
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.injection.adds_body_field",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "adds_body_field"
+        }
+      ],
+      "reason": "Docker Engine has no native container lifetime timer",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret_body",
+          "reason": "Docker Engine has no native container lifetime timer",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.intercepts.injected_hosts",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "injected_hosts"
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.intercepts.all_https",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "all_https"
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.max_inject_into",
+      "proves": [],
+      "reason": "proof_fixture_not_public",
+      "result": "not_run",
+      "rules": [
+        "hidden_secrets/max-inject-into"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "proof_fixture_not_public",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.wildcards",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "inject_wildcards",
+          "value": true
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/wildcards"
+      ],
+      "steps": [
+        {
+          "operation": "secret.create",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.max_deny",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/max-deny"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.transparent.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": true
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.transparent.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": false
+        }
+      ],
+      "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "Standalone Docker Engine has no hidden HTTP credential injection",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.cuts_open_connections.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "cuts_open_connections",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/cuts-open-connections"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.cuts_open_connections.false",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "cuts_open_connections",
+          "value": false
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/cuts-open-connections"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.domain_traffic.https",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "domain_traffic",
+          "value": "https"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/domain-traffic"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_harness_health",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.domain_traffic.http_and_https",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "domain_traffic",
+          "value": "http_and_https"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/domain-traffic"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_harness_health",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.domain_traffic.tls",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "domain_traffic",
+          "value": "tls"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/domain-traffic"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_harness_health",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.domain_traffic.all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "domain_traffic",
+          "value": "all"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/domain-traffic"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_harness_health",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.live_resize.grows",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "live_resize/grows"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.egress_proxy.routes",
+      "proves": [
+        {
+          "gate": "egress_proxy",
+          "knob": "traffic",
+          "value": "http"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "egress_proxy/routes"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_egress_proxy",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.egress_proxy.any_tcp",
+      "proves": [
+        {
+          "gate": "egress_proxy",
+          "knob": "traffic",
+          "value": "any_tcp"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "egress_proxy/any-tcp"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_egress_proxy",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.egress_proxy.transparent",
+      "proves": [
+        {
+          "gate": "egress_proxy",
+          "knob": "traffic",
+          "value": "http"
+        },
+        {
+          "gate": "egress_proxy",
+          "knob": "transparent",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "egress_proxy/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_egress_proxy",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.egress_proxy.fails_closed",
+      "proves": [
+        {
+          "gate": "egress_proxy",
+          "knob": "fails_closed",
+          "value": true
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "egress_proxy/fails-closed"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_egress_proxy",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.workload_identity.environment",
+      "proves": [
+        {
+          "gate": "workload_identity",
+          "knob": "delivery",
+          "value": "environment"
+        }
+      ],
+      "reason": "Docker Engine issues no workload identity token",
+      "result": "unsupported",
+      "rules": [
+        "workload_identity/token",
+        "workload_identity/environment"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_identity_token",
+          "reason": "Docker Engine issues no workload identity token",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.workload_identity.injected",
+      "proves": [
+        {
+          "gate": "workload_identity",
+          "knob": "delivery",
+          "value": "injected"
+        }
+      ],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "workload_identity/token",
+        "workload_identity/injected"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_identity_token",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.workload_identity.custom_audience",
+      "proves": [
+        {
+          "gate": "workload_identity",
+          "knob": "custom_audience",
+          "value": true
+        }
+      ],
+      "reason": "workload_identity_delivery_unmapped",
+      "result": "not_run",
+      "rules": [
+        "workload_identity/token",
+        "workload_identity/custom-audience"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_identity_token",
+          "reason": "workload_identity_delivery_unmapped",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.live_resize.shrinks",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "live_resize/shrinks"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    }
+  ]
+}

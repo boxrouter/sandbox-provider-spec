@@ -1,0 +1,93 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "idle_shutdown.custom_idle_time.true": "sha256:a8ca31ba009147e021a3d6c10f607079bdae8898cc6285c93cecfdc84105d316"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ModalDriver",
+    "version": "0.3.141"
+  },
+  "finished_at": "2026-10-29T04:21:48.641790+00:00",
+  "provider": "modal",
+  "revision": "f74e27451463bb603d7553f8a58f809dfdc65bb9",
+  "run_id": "public-93fe5c2ed5970bf6dd83",
+  "sdk_versions": {
+    "modal": "1.6.1"
+  },
+  "selected_tests": [
+    "idle_shutdown.custom_idle_time.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-10-29T04:19:46.841111+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "application_session",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 121800,
+      "id": "idle_shutdown.custom_idle_time.true",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "custom_idle_time",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "idle_shutdown/custom-idle-time"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "length": 9,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

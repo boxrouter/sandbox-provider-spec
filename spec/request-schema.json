@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sandbox-provider-spec:0.1:request-schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "lifetime_seconds": {"type": "integer", "minimum": 1},
+    "at_end": {"enum": ["destroyed", "paused"]},
+    "requirements": {"$ref": "#/$defs/requirements"},
+    "resources": {"$ref": "#/$defs/resources"},
+    "image": {"$ref": "#/$defs/image"},
+    "restores_need": {"$ref": "#/$defs/restores_need"}
+  },
+  "allOf": [
+    {"if": {"required": ["requirements"], "properties": {"requirements": {"required": ["custom_images"], "properties": {"custom_images": {"required": ["build_context"]}}}}}, "then": {"required": ["image"], "properties": {"image": {"type": "object", "required": ["dockerfile"]}}}},
+    {"if": {"required": ["requirements"], "properties": {"requirements": {"required": ["custom_images"]}}}, "then": {"required": ["image"]}},
+    {"if": {"required": ["image"]}, "then": {"properties": {"resources": {"not": {"anyOf": [{"required": ["root"]}, {"required": ["package_manager"]}, {"required": ["libc"]}]}}}}}
+  ],
+  "$defs": {
+    "pick": {
+      "oneOf": [
+        {"type": "string", "enum": ["any", "files_only", "files_and_memory", "paused", "stopped", "destroyed", "continues", "briefly_paused", "public", "private", "link", "header", "deny_all", "allowlist", "one_sandbox", "many_writers", "filesystem", "object_store", "oci", "private_oci", "dockerfile", "provider_artifact", "shared", "filtered", "dedicated", "host", "key", "token", "password", "none", "python", "javascript", "typescript", "r", "java", "bash", "amd64", "arm64", "apt", "apk", "dnf", "pacman", "glibc", "musl", "denylist", "open", "sets_header", "injected_hosts", "all_https", "published_ranges", "by_default", "sudo", "per_command"]},
+        {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+      ]
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fuse_mount": {"type": "object", "additionalProperties": false},
+        "idle_shutdown": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "on_idle": {"oneOf": [{"enum": ["paused", "stopped", "destroyed"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["paused", "stopped", "destroyed"]}}]},
+            "custom_idle_time": {"type": "boolean"},
+            "auto_wake": {"type": "boolean"},
+            "idle_seconds": {"type": "integer", "minimum": 1}
+          },
+          "allOf": [
+            {"if": {"required": ["idle_seconds"]}, "then": {"properties": {"custom_idle_time": {"const": true}}}},
+            {"if": {"required": ["on_idle"], "properties": {"on_idle": {"enum": ["destroyed", ["destroyed"]]}}}, "then": {"not": {"required": ["auto_wake"]}}}
+          ]
+        },
+        "pause_resume": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"keeps": {"oneOf": [{"enum": ["files_only", "files_and_memory"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["files_only", "files_and_memory"]}}]}}
+        },
+        "previews": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["access", "ports"],
+          "properties": {
+            "access": {
+              "oneOf": [
+                {"enum": ["any", "public", "private"]},
+                {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["public", "private"]}}
+              ]
+            },
+            "credential": {"oneOf": [{"enum": ["link", "header"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["link", "header"]}}]},
+            "revocable": {"type": "boolean"},
+            "link_lifetime_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "websocket": {"type": "boolean"},
+            "loopback": {"type": "boolean"},
+            "any_port": {"type": "boolean"},
+            "survives_pause": {"type": "boolean"},
+            "ports": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 65535}}
+          }
+        },
+        "network_lockdown": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["policy"],
+          "properties": {
+            "policy": {"enum": ["deny_all", "allowlist", "denylist", "open"]},
+            "changeable": {"type": "boolean"},
+            "switchable": {"type": "boolean"},
+            "switches_to": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["deny_all", "allowlist", "denylist", "open"]}},
+            "allow": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "deny": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^[^*]*$"}}
+          },
+          "allOf": [
+            {"if": {"properties": {"policy": {"const": "deny_all"}}, "required": ["policy"]}, "then": {"not": {"anyOf": [{"required": ["allow"]}, {"required": ["deny"]}]}}},
+            {"if": {"properties": {"policy": {"const": "allowlist"}}, "required": ["policy"]}, "then": {"required": ["allow"], "not": {"required": ["deny"]}}},
+            {"if": {"properties": {"policy": {"const": "denylist"}}, "required": ["policy"]}, "then": {"required": ["deny"], "not": {"required": ["allow"]}}},
+            {"if": {"properties": {"policy": {"const": "open"}}, "required": ["policy"]}, "then": {"required": ["switchable"], "properties": {"switchable": {"const": true}}, "not": {"anyOf": [{"required": ["allow"]}, {"required": ["deny"]}]}}},
+            {"if": {"properties": {"switches_to": {"contains": {"const": "open"}}}, "required": ["switches_to"]}, "then": {"required": ["switchable"], "properties": {"switchable": {"const": true}}}},
+            {"if": {"required": ["changeable"]}, "then": {"properties": {"policy": {"enum": ["allowlist", "denylist"]}}}},
+            {"if": {"properties": {"switchable": {"const": true}}, "required": ["switchable"]}, "then": {"required": ["switches_to"]}},
+            {"if": {"required": ["switches_to"]}, "then": {"required": ["switchable"]}}
+          ]
+        },
+        "hidden_secrets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["inject_into"],
+          "properties": {
+            "rotates": {"type": "boolean"},
+            "scrubs_responses": {"type": "boolean"},
+            "transparent": {"type": "boolean"},
+            "injection": {"oneOf": [{"enum": ["sets_header"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["sets_header"]}}]},
+            "intercepts": {"oneOf": [{"enum": ["injected_hosts", "all_https"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["injected_hosts", "all_https"]}}]},
+            "header_templates": {"type": "boolean"},
+            "headers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name"],
+                "properties": {
+                  "name": {"type": "string", "minLength": 1, "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"},
+                  "prefix": {"type": "string"},
+                  "suffix": {"type": "string"}
+                }
+              }
+            },
+            "inject_into": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/hostname"}}
+          }
+        },
+        "snapshots": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["original_after"],
+          "properties": {
+            "keeps": {"oneOf": [{"enum": ["files_only", "files_and_memory"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["files_only", "files_and_memory"]}}]},
+            "original_after": {"oneOf": [{"enum": ["any", "continues", "briefly_paused", "terminated"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["continues", "briefly_paused", "terminated"]}}]},
+            "deletable": {"type": "boolean"},
+            "retention_seconds": {"type": "number", "exclusiveMinimum": 0}
+          }
+        },
+        "volumes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "mounts"],
+          "properties": {
+            "sharing": {"oneOf": [{"enum": ["one_sandbox", "many_writers"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["one_sandbox", "many_writers"]}}]},
+            "read_only_mounts": {"type": "boolean"},
+            "kind": {"oneOf": [{"enum": ["any", "filesystem", "object_store"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["filesystem", "object_store"]}}]},
+            "mounts": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["provider", "volume", "path"],
+                "properties": {
+                  "provider": {"$ref": "#/$defs/provider_name"},
+                  "volume": {"type": "string", "minLength": 1},
+                  "path": {"type": "string", "pattern": "^/[^\\u0000]*$"},
+                  "read_only": {"type": "boolean"}
+                }
+              }
+            }
+          }
+        },
+        "custom_images": {"type": "object", "additionalProperties": false, "properties": {"prepared": {"type": "boolean"}, "runs_entrypoint": {"type": "boolean"}, "image_config": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["env", "workdir", "user"]}}, "build_context": {"type": "boolean"}}},
+        "user_selection": {"type": "object", "additionalProperties": false, "properties": {"commands": {"type": "boolean"}, "files_write": {"type": "boolean"}, "process_start": {"type": "boolean"}}},
+        "processes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "input": {"type": "boolean"},
+            "cancel": {"type": "boolean"},
+            "reattach": {"type": "boolean"}
+          }
+        },
+        "terminal": {"type": "object", "additionalProperties": false, "properties": {"reattach": {"type": "boolean"}}},
+        "docker": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "networking": {"oneOf": [{"enum": ["host"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["host"]}}]}
+          }
+        },
+        "tcp_ports": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tls", "ports"],
+          "properties": {
+            "tls": {"oneOf": [{"enum": ["any", "none"]}, {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["none"]}}]},
+            "ports": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 65535}}
+          }
+        },
+        "desktop": {"type": "object", "additionalProperties": false, "properties": {"live_view": {"type": "boolean"}}},
+        "file_links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["read", "write"]}},
+            "user_selection": {"type": "boolean"},
+            "link_lifetime_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "revocable": {"type": "boolean"}
+          }
+        }
+      },
+      "patternProperties": {"^x-[a-z0-9]+(?:-[a-z0-9]+)*$": {"type": "object"}},
+      "if": {"required": ["previews"], "properties": {"previews": {"required": ["survives_pause"]}}},
+      "then": {"anyOf": [{"required": ["pause_resume"]}, {"required": ["idle_shutdown"]}]}
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu_min": {"type": "number", "exclusiveMinimum": 0},
+        "memory_min_mib": {"type": "integer", "minimum": 1},
+        "disk_min_mib": {"type": "integer", "minimum": 1},
+        "extendable_lifetime": {"type": "boolean"},
+        "region": {"type": "string", "minLength": 1},
+        "gpu_count": {"type": "integer", "minimum": 1},
+        "gpu_model": {
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          ]
+        },
+        "kernel": {
+          "oneOf": [
+            {"enum": ["shared", "filtered", "dedicated"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["shared", "filtered", "dedicated"]}}
+          ]
+        },
+        "kernel_features": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["fuse", "ebpf", "nested_cgroups", "netfilter"]}},
+        "outbound_traffic": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["http", "any_tcp", "udp"]}},
+        "outbound_ip_families": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["ipv4", "ipv6"]}},
+        "long_running": {"type": "boolean"},
+        "size_is_ceiling": {"type": "boolean"},
+        "paused_retention_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "root": {
+          "oneOf": [
+            {"enum": ["by_default", "sudo", "per_command"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["by_default", "sudo", "per_command"]}}
+          ]
+        },
+        "arch": {
+          "oneOf": [
+            {"enum": ["amd64", "arm64"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["amd64", "arm64"]}}
+          ]
+        },
+        "package_manager": {
+          "oneOf": [
+            {"enum": ["apt", "apk", "dnf", "pacman", "none"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["apt", "apk", "dnf", "pacman", "none"]}}
+          ]
+        },
+        "libc": {
+          "oneOf": [
+            {"enum": ["glibc", "musl"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["glibc", "musl"]}}
+          ]
+        },
+        "on_memory_exhausted": {
+          "oneOf": [
+            {"enum": ["process_killed", "sandbox_ended"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["process_killed", "sandbox_ended"]}}
+          ]
+        },
+        "run_seconds": {"type": "integer", "minimum": 1},
+        "process_seconds": {"type": "integer", "minimum": 1},
+        "egress_ips": {
+          "oneOf": [
+            {"enum": ["published_ranges", "dedicated"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["published_ranges", "dedicated"]}}
+          ]
+        },
+        "file_stream_bytes": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"read": {"type": "integer", "minimum": 1}, "write": {"type": "integer", "minimum": 1}}}
+      }
+    },
+    "image": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "object", "additionalProperties": false, "required": ["dockerfile"], "properties": {"dockerfile": {"type": "string", "minLength": 1}}},
+        {"type": "object", "additionalProperties": false, "required": ["private_oci"], "properties": {"private_oci": {"type": "string", "minLength": 1}}},
+        {"type": "object", "additionalProperties": false, "required": ["provider_artifact", "provider"], "properties": {"provider_artifact": {"type": "string", "minLength": 1}, "provider": {"$ref": "#/$defs/provider_name"}}}
+      ]
+    },
+    "restores_need": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lifetime_seconds": {"type": "integer", "minimum": 1},
+        "requirements": {"$ref": "#/$defs/requirements"},
+        "resources": {"$ref": "#/$defs/resources"}
+      }
+    },
+    "hostname": {"type": "string", "oneOf": [{"pattern": "^(?=.{1,253}(?![\\s\\S]))(?![0-9.]+(?![\\s\\S]))[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?![\\s\\S])"}, {"pattern": "^(?=.{3,255}(?![\\s\\S]))\\*\\.(?![0-9.]+(?![\\s\\S]))[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?![\\s\\S])"}]},
+    "provider_name": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}
+  }
+}

@@ -1,0 +1,19 @@
+spec: sandbox-provider-spec/0.1
+provider: deny-rules
+verified: {date: 2026-10-02, sdks: {deny-rules-sdk: 1.0.0}}
+resources:
+  sizes: [{cpu: 2, memory_mib: 4096, disk_mib: 2048}]
+  disk_mib: 2048
+  regions: [beta:us-west]
+  located_in: [US]
+  kernel: dedicated
+  long_running: false
+  gpus: []
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: true
+  at_end: destroyed
+gates:
+  network_lockdown:
+    - {policy: denylist, entry_kinds: [names], max_deny: 5}
+evidence: {}
