@@ -141,18 +141,6 @@ def schema_errors(document: Any, schema_name: str) -> list[str]:
     return messages
 
 
-def _registries() -> dict[str, set[str]]:
-    registries = spec_dir() / "registries"
-    regions = load(registries / "regions.json")
-    gpus = load(registries / "gpu-models.json")
-    return {
-        "regions": set(regions["regions"]),
-        "areas": set(regions["areas"]),
-        "countries": set(regions["countries"]),
-        "gpus": set(gpus["gpu_models"]),
-    }
-
-
 def _is_number(value: Any) -> TypeGuard[int | float]:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
