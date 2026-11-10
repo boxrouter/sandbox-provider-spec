@@ -5,6 +5,10 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Boat declares `located_in: [DE, FI, FR]`, cited from its compliance page (read 2026-11-10): sandboxes run on
+  machines in Germany, Finland and France. Snapshot copies the page says can be stored outside the EU are
+  storage, not where a sandbox runs.
+
 - Boxd declares `gates.terminal` with `reattach: true`, with certifying `terminal.interactive` and `coverage.terminal.reattach` reports from the Boxd adapter against release 0.3.177 (`verified.date` 2026-11-09). This is the terminal declaration deferred from 0.3.177.
 
 - Rebuilt 0.3.177 without the Boxd terminal declaration and supersede 0.3.176. Cloud #4630 (`47d6d712d`) declared `gates.terminal` before its certifying reports existed, so the standalone check failed. The declaration, its evidence and the reports are deferred to 0.3.178.

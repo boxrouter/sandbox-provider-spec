@@ -25,7 +25,7 @@ resources:
   gpus: unknown
   disk_mib: unknown
   regions: unknown
-  located_in: unknown
+  located_in: [DE, FI, FR]
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   long_running: unknown
@@ -57,6 +57,10 @@ evidence:
     source: https://docs.boat.dev/machines
     read: '2026-11-05'
     quote: '`small` | **$0.018** | 2 vCPU | 4 GB | 51 GB; `default` | **$0.036** | 4 vCPU | 8 GB | 51 GB'
+  resources.located_in:
+    source: https://docs.boat.dev/compliance
+    read: '2026-11-10'
+    quote: Sandboxes run on machines in Germany, Finland and France.
   resources.default_size:
     source: https://docs.boat.dev/machines
     read: '2026-11-01'

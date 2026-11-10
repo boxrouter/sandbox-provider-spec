@@ -25,9 +25,16 @@ control sandbox after its end and was rerun once; the committed report is the cl
 `min_seconds` stay unknown until a dated quote or report establishes them, and
 `counts_paused_time` is `unknown` because Boat has no pause.
 
+## Placement countries
+
+`located_in` is `[DE, FI, FR]` from the [compliance page](https://docs.boat.dev/compliance) (read
+2026-11-10): "Sandboxes run on machines in Germany, Finland and France." The same page says snapshot
+copies can be stored outside the EU. That is where a snapshot is stored, not where a sandbox runs, so it
+does not change `located_in`; the adapter also creates every sandbox with background snapshots off.
+
 ## Left unknown
 
-Regions, placement country, disk size in MiB (the docs give "51 GB" without a unit base), paused
+Regions, disk size in MiB (the docs give "51 GB" without a unit base), paused
 retention (Boat has no pause), GPUs (the docs say none), long-running and run limits. Default user
 and working directory (`user`, `/home/user`) are observed but are claimed only through a report.
 
