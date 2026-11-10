@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-09
+  date: 2026-11-10
   sdks: {boxd: 0.3.0}
 resources:
   kernel: dedicated
@@ -33,6 +33,8 @@ resources:
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: true
+  default_user: boxd
+  default_cwd: /home/boxd
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: unknown
@@ -61,6 +63,12 @@ x-boxd:
   isolated: true
   usage_records: boxd.machines.usage
 evidence:
+  resources.default_user:
+    tests: [facts.default_user]
+    report: reports/adapter-defaults.json
+  resources.default_cwd:
+    tests: [facts.default_cwd]
+    report: reports/adapter-defaults.json
   resources.extendable_lifetime:
     tests: [facts.extendable_lifetime]
     report: reports/lifetime-extend.json
