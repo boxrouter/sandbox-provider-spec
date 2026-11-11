@@ -35,3 +35,15 @@ cgroup bounds. `vm` shows no cgroup bound, so the test takes its measured path: 
 size by a process kill. That path's CPU burn uses threads in one Python process, which cannot exceed
 one CPU, so it does not test a 2 CPU limit; separately, eight busy processes in a `vm` sandbox of
 2 CPUs measured 1.98 CPU-seconds per second on 2026-11-06.
+
+## Lifetime cannot be extended
+
+`resources.extendable_lifetime` stays unstated for both classes. Modal's
+[Sandboxes guide](https://modal.com/docs/guide/sandboxes), read 2026-11-11, says “Sandboxes have a
+default maximum lifetime of 5 minutes. You can change this by passing a timeout of up to 24 hours to
+the Sandbox.create(...) function,” and, for longer work, to snapshot the filesystem and restore from
+it in a later sandbox. The [`modal.Sandbox` reference](https://modal.com/docs/reference/modal.Sandbox)
+(SDK 1.6.3, read 2026-11-11) lists no method that changes a running sandbox's timeout, and neither
+does modal 1.6.1's `modal/sandbox.py`, whose gRPC stub has no sandbox call that updates a timeout
+(`SandboxCreate`, `SandboxWait`, `SandboxTerminate`, `SandboxTagsSet` and the like only). That is an absence, not a statement that extending is impossible, so the fact is not declared
+`false`; it becomes `true` only if Modal documents or ships an extend operation.
