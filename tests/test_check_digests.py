@@ -10,6 +10,7 @@ import os
 import re
 import time
 from dataclasses import replace
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,8 @@ from sandbox_provider_spec.load import load
 from sandbox_provider_spec.report import report
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
 from sandbox_provider_spec.suite import Test as Scenario
+
+loader = import_module("sandbox_provider_spec.document_cache")
 
 PACKAGE = Path(digests.__file__).parent
 
@@ -363,34 +366,34 @@ def test_import_candidate_cache_is_bounded() -> None:
 
 def _catalog_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, text: str) -> Path:
     monkeypatch.setattr(digests, "spec_dir", lambda: tmp_path)
-    digests._catalogs.clear()
+    loader._document_texts.clear()
     path = tmp_path / "catalog.yaml"
     path.write_text(text, encoding="utf-8")
     return path
 
 
-def _count_loads(monkeypatch: pytest.MonkeyPatch) -> list[Path]:
-    loads: list[Path] = []
-    real = load
+def _count_parses(monkeypatch: pytest.MonkeyPatch) -> list[bytes]:
+    parses: list[bytes] = []
+    real = loader._parse
 
-    def record(path: Path) -> Any:
-        loads.append(Path(path))
-        return real(path)
+    def record(suffix: str, content: bytes) -> Any:
+        parses.append(content)
+        return real(suffix, content)
 
-    monkeypatch.setattr(digests, "load", record)
-    return loads
+    monkeypatch.setattr(loader, "_parse", record)
+    return parses
 
 
 def test_catalog_is_parsed_once_across_repeated_digest_calls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    digests._catalogs.clear()
-    loads = _count_loads(monkeypatch)
+    loader._document_texts.clear()
+    parses = _count_parses(monkeypatch)
     suite = _suite()
     first = digests.check_digests(suite.tests)
     for _ in range(4):
         assert digests.check_digests(suite.tests) == first
-    assert [path.name for path in loads] == ["catalog.yaml"]
+    assert parses == [(spec_dir() / "catalog.yaml").read_bytes()]
 
 
 def test_same_size_same_mtime_rewrite_is_observed(
@@ -442,7 +445,7 @@ def test_invalid_and_duplicate_key_catalogs_still_refuse_and_are_not_cached(
     path.write_text("a: [unclosed\n", encoding="utf-8")
     with pytest.raises(Exception, match="expected"):
         digests.check_digests(tests)
-    assert len(digests._catalogs) == 0
+    assert len(loader._document_texts) == 0
 
 
 def test_digest_calls_do_not_mutate_the_cached_catalog(
@@ -452,51 +455,49 @@ def test_digest_calls_do_not_mutate_the_cached_catalog(
     path = _catalog_dir(monkeypatch, tmp_path, base)
     tests = _suite().tests
     digests.check_digests(tests)
-    (cached,) = digests._catalogs.values()
-    assert cached == load(path)
+    (cached,) = loader._document_texts.values()
+    assert json.loads(cached) == load(path)
 
 
 def test_catalog_cache_is_bounded_and_evicts_least_recently_used(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     path = _catalog_dir(monkeypatch, tmp_path, "n: 0\n")
-    loads = _count_loads(monkeypatch)
-    for index in range(digests._CATALOG_ENTRIES + 3):
+    parses = _count_parses(monkeypatch)
+    for index in range(loader._DOCUMENT_TEXTS + 3):
         path.write_text(f"n: {index}\n", encoding="utf-8")
-        assert digests._catalog_document(path) == {"n": index}
-    assert len(digests._catalogs) == digests._CATALOG_ENTRIES
-    loaded = len(loads)
-    path.write_text(f"n: {digests._CATALOG_ENTRIES + 2}\n", encoding="utf-8")
-    digests._catalog_document(path)
-    assert len(loads) == loaded
+        assert loader.cached_load(path) == {"n": index}
+    assert len(loader._document_texts) == loader._DOCUMENT_TEXTS
+    parsed = len(parses)
+    path.write_text(f"n: {loader._DOCUMENT_TEXTS + 2}\n", encoding="utf-8")
+    loader.cached_load(path)
+    assert len(parses) == parsed
     path.write_text("n: 0\n", encoding="utf-8")
-    digests._catalog_document(path)
-    assert len(loads) == loaded + 1
+    loader.cached_load(path)
+    assert len(parses) == parsed + 1
 
 
 def test_file_changed_and_restored_during_a_parse_cannot_poison_the_cache(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     path = _catalog_dir(monkeypatch, tmp_path, "n: 1\n")
-    real = load
+    real = loader._parse
 
-    def aba(source: Path) -> Any:
+    def aba(suffix: str, content: bytes) -> Any:
         path.write_text("n: 2\n", encoding="utf-8")
-        parsed = real(source)
+        parsed = real(suffix, content)
         path.write_text("n: 1\n", encoding="utf-8")
         return parsed
 
-    monkeypatch.setattr(digests, "load", aba)
-    assert digests._catalog_document(path) == {"n": 1}
-    monkeypatch.setattr(digests, "load", real)
-    assert digests._catalog_document(path) == {"n": 1}
+    monkeypatch.setattr(loader, "_parse", aba)
+    assert loader.cached_load(path) == {"n": 1}
+    monkeypatch.setattr(loader, "_parse", real)
+    assert loader.cached_load(path) == {"n": 1}
     path.write_text("n: 2\n", encoding="utf-8")
-    assert digests._catalog_document(path) == {"n": 2}
+    assert loader.cached_load(path) == {"n": 2}
 
 
-def test_refusals_match_the_strict_loader_and_do_not_name_the_private_copy(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_refusals_match_the_strict_loader(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     base = (spec_dir() / "catalog.yaml").read_text(encoding="utf-8")
     path = _catalog_dir(monkeypatch, tmp_path, base)
     for text in (base + "\nbaseline_result: {}\n", "a: [unclosed\n", "a: &x [*y]\n"):
@@ -504,8 +505,6 @@ def test_refusals_match_the_strict_loader_and_do_not_name_the_private_copy(
         with pytest.raises(Exception) as direct:  # noqa: PT011
             load(path)
         with pytest.raises(type(direct.value)) as cached:
-            digests._catalog_document(path)
+            digests.check_digests(_suite().tests[:1])
         assert str(cached.value) == str(direct.value)
-        assert "tmp" not in str(cached.value).lower().replace(str(tmp_path).lower(), "")
-        assert str(tmp_path) not in str(cached.value)
-        assert len(digests._catalogs) == 0
+        assert len(loader._document_texts) == 0

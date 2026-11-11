@@ -24,9 +24,6 @@ import ast
 import hashlib
 import json
 import re
-import tempfile
-import threading
-from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from dataclasses import replace
 from functools import lru_cache
@@ -34,7 +31,7 @@ from pathlib import Path
 from typing import Any
 
 from sandbox_provider_spec.check import spec_dir
-from sandbox_provider_spec.load import load
+from sandbox_provider_spec.document_cache import cached_load
 from sandbox_provider_spec.suite import SPEC, Test, suite_path
 
 PACKAGE = Path(__file__).resolve().parent
@@ -357,7 +354,7 @@ def historical_rule_digest(test: Test, suite_digest: object) -> str | None:
         or tuple(rules) == test.rules
     ):
         return None
-    catalog = _catalog_document(spec_dir() / "catalog.yaml")
+    catalog = cached_load(spec_dir() / "catalog.yaml")
     return check_digest(replace(test, rules=tuple(rules)), catalog, shared_digest())
 
 
@@ -387,41 +384,9 @@ def _check_digest_with_dependencies(
     )
 
 
-_CATALOG_ENTRIES = 4
-_catalogs: OrderedDict[str, Any] = OrderedDict()
-_catalogs_lock = threading.Lock()
-
-
-def _catalog_document(path: Path) -> Any:
-    """The strictly loaded catalog, parsed once per distinct file content.
-
-    The file is read on every call and keyed by the SHA-256 of its bytes, so a rewrite of the
-    same size and modification time still reparses. On a miss the strict loader parses a private
-    copy of exactly those bytes, so a parse can never be stored under the key of other content,
-    even if the file changes and changes back meanwhile. The document stays internal: callers only
-    hash entries of it. A parse that raises is never stored.
-    """
-    content = path.read_bytes()
-    key = hashlib.sha256(content).hexdigest()
-    with _catalogs_lock:
-        if key in _catalogs:
-            _catalogs.move_to_end(key)
-            return _catalogs[key]
-    with tempfile.TemporaryDirectory() as private:
-        copy = Path(private) / path.name
-        copy.write_bytes(content)
-        document = load(copy)
-    with _catalogs_lock:
-        _catalogs[key] = document
-        _catalogs.move_to_end(key)
-        while len(_catalogs) > _CATALOG_ENTRIES:
-            _catalogs.popitem(last=False)
-    return document
-
-
 def check_digests(tests: tuple[Test, ...]) -> dict[str, str]:
     """Digest of each selected test, keyed by id."""
-    catalog = _catalog_document(spec_dir() / "catalog.yaml")
+    catalog = cached_load(spec_dir() / "catalog.yaml")
     shared = shared_digest()
     dependencies = tuple(test_dependencies(test) for test in tests)
     names = {name for test_dependencies in dependencies for name in test_dependencies}

@@ -73,6 +73,8 @@ def read_suite(path: Path | None = None) -> Suite:
     return read_suite_at(chosen, signatures)
 
 
+# The next change that alters the shared check digest anyway should also parse these files through
+# document_cache.cached_load (an AST edit here or in load.py makes every report's digests stale).
 @lru_cache(maxsize=8)
 def read_suite_at(chosen: Path, signatures: tuple[tuple[Path, int, int], ...] = ()) -> Suite:
     # File signatures participate in the bounded cache key, not suite parsing.
