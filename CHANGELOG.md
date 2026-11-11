@@ -5,6 +5,10 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- `providers/boxd/publication.yaml` records the founder's 2026-11-09 decision to publish Boxd's default route (a
+  decision with receipts for the provider and its default class). Without it `publication.json` held Boxd hidden
+  and every benchmark page build dropped its batches.
+
 - `conformance/historical-suite-rules.json` records the coverage suite that 0.3.182 replaced
   (`sha256:f79f539d…`), as the conformance rules require for any suite change. Without it, reports of
   that suite read "report suite digest is not recognized", including Boat, Daytona, E2B and Vercel
