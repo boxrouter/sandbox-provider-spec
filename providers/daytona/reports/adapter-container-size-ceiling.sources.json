@@ -354,12 +354,13 @@
       "boxrouter_daytona/transport.py::_span",
       "boxrouter_daytona/transport.py::_status",
       "boxrouter_daytona/transport.py::_traced",
+      "boxrouter_daytona/transport.py::ensure_toolbox_pool",
       "boxrouter_daytona/transport.py::instrument_async_client",
       "boxrouter_daytona/transport.py::instrument_async_client.call_api"
     ]
   },
   "format": 1,
-  "report_sha256": "88b712594b6060298bca7d5b6cabc6b2b160bec1544b55aea4fd4566c1bcb1b0",
+  "report_sha256": "9723b42f6423bbf42f3518072e6dd573203d13164dd891d63f0e0d89cac478d7",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
@@ -655,8 +656,8 @@
     "boxrouter_daytona/image_preparation.py::aprepare_image": "sha256:34f71a30454b4beed540f264c4e01ea404f501d40b1761197168f1f65f0fd3cd",
     "boxrouter_daytona/image_preparation.py::resources_from_daytona": "sha256:c8172659299ed49a0b18c9d34f1e35f2aed1d2ba67412c9bf5daf9e73fa72218",
     "boxrouter_daytona/images.py::": "sha256:b2cf65b53b0825ff73c5d084a12e26501ea59c211431be86ae570eafddfb584a",
-    "boxrouter_daytona/multipart_upload.py::": "sha256:b5199b0b1387800b1c3aa6e931e1ab64bde0e7e29e483f96af565a59e3814ce4",
-    "boxrouter_daytona/multipart_upload.py::upload_async": "sha256:ae005eeb909fc561cecce3a6004c793d7f138cb66027fee1159ef0ddf9a3e85c",
+    "boxrouter_daytona/multipart_upload.py::": "sha256:f20f0305676c23f2b847aa72e4639183fdd9ca1d64a56781a8db298d64c016bb",
+    "boxrouter_daytona/multipart_upload.py::upload_async": "sha256:93486f11d44b0302587afd606cfe9065ef0b7ec11a321c63e3f3e1ded0ce24b2",
     "boxrouter_daytona/options.py::": "sha256:fdb2ee122b0f09d92afa4b13ff01b5f43f6986fe28e655575b463d641b83b6a5",
     "boxrouter_daytona/options.py::create_params": "sha256:2614b85b895426f581085bf50e8a6f6976c9bd2e38179e72fa7145214f18f4c3",
     "boxrouter_daytona/options.py::native_options": "sha256:9615386828975b930d19ed17d62e36931e0d0e1aedbbc772f8a76f32d2ff8a56",
@@ -705,7 +706,7 @@
     "boxrouter_daytona/spec.py::DaytonaDriver.create": "sha256:5ca2dad9a6b62c4e2d1bcfcefe02f606e62b21b6fbded6906439d8c0ff6df261",
     "boxrouter_daytona/spec.py::DaytonaDriver.create_options": "sha256:8817131b89423d7bbb56fae99b03b0646c3fc1fdc77ffe079663c059a9e1d21f",
     "boxrouter_daytona/spec.py::_builds_dockerfile": "sha256:78b9b22d8227f39c0cf3e2f4226f27fceea51290aec287f9aed95abe8e48f22e",
-    "boxrouter_daytona/transport.py::": "sha256:e3307078891cc1e874cf52a9294b9b0bc70177ba0646d70d26d9044c8d178c3a",
+    "boxrouter_daytona/transport.py::": "sha256:5331ecfbc53a701ac34401392c8010a1a74f891368f26f2234d1645a438881f4",
     "boxrouter_daytona/transport.py::TracedAsyncDaytona.__init__": "sha256:6bc11ce81daeee0e51cf660c45d21fbad50ff1168d136eec9557bea3c0ff8b90",
     "boxrouter_daytona/transport.py::_finish": "sha256:295193376e2928429304e19c598946c0c76134ef67b788d8cd63113042a4f07d",
     "boxrouter_daytona/transport.py::_method": "sha256:e7e2c1c19ae3e75d78dacc92de84124ffef0b8afafd7b091f59f7e94d3a0e737",
@@ -713,6 +714,7 @@
     "boxrouter_daytona/transport.py::_span": "sha256:d3c977b26d2fbd3bc2193bd96b34876da195479bda8ef5356d61c8a4ebc8b76c",
     "boxrouter_daytona/transport.py::_status": "sha256:3081c5275a1841e676a1a548f11a144736f96d45f8dec7a52d91442b2d16609c",
     "boxrouter_daytona/transport.py::_traced": "sha256:9f368fcabe2e767f687337f44ffc60d46b46c4b426bd00d4ed01b584fc77fa89",
+    "boxrouter_daytona/transport.py::ensure_toolbox_pool": "sha256:8f9fe9a72c9db0ef7b06406c285b2c8cc4f4d71829953d0d9fded3657af7b409",
     "boxrouter_daytona/transport.py::instrument_async_client": "sha256:ad1f7f5fa267399d9653677f31ce5212bacaa028d67d16c92f0049e4a9ebec70",
     "boxrouter_daytona/transport.py::instrument_async_client.call_api": "sha256:0f3539abb8d459e2c731fdaf5b1c845131cfbd34bb0dbe1ccafc4ee4b054f278"
   }
