@@ -9,10 +9,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T14:43:23.272539+00:00",
+  "finished_at": "2026-11-11T18:36:01.674699+00:00",
   "provider": "daytona",
-  "revision": "7466ebfc68cd8dbbbbad951361131f7dabc3d7de",
-  "run_id": "public-db156e55558576ca1766",
+  "revision": "86057153dfc12be9ee02ccd53f8d3cfdb069c63c",
+  "run_id": "public-d4f7275f4ca5f35cb0a0",
   "sdk_versions": {
     "daytona": "0.226.1"
   },
@@ -20,7 +20,7 @@
     "coverage.custom_images.prepare.registry"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T14:42:59.528787+00:00",
+  "started_at": "2026-11-11T18:35:38.430519+00:00",
   "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
   "tests": [
     {
@@ -34,7 +34,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23741,
+      "duration_ms": 23242,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
