@@ -5,6 +5,11 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Agent37 declares its default class (`providers/agent37`): no lifetime timer and
+  `max_lifetime_seconds: unlimited` (it serves only `lifetime_seconds: null`), `located_in: [US]`, and its
+  default image's user `node` and directory `/home/node`, each cited from Agent37's documentation or a
+  committed adapter report. Everything else is `unknown`.
+
 - A request may set `lifetime_seconds: null`: a sandbox with no lifetime, which runs until the caller
   destroys it. New rule `matching/no-lifetime`: such a request fits only a declaration with no
   `lifetime_timer` block and `resources.max_lifetime_seconds: unlimited`, and is refused before
