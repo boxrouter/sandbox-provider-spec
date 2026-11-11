@@ -225,8 +225,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -245,8 +243,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -265,8 +261,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -286,8 +280,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -307,8 +299,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -328,8 +318,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_kernel_feature
     target: box
     in:
@@ -348,8 +336,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_kernel_feature
     target: box
     in:
@@ -368,8 +354,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_kernel_feature
     target: box
     in:
@@ -388,8 +372,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_kernel_feature
     target: box
     in:
@@ -407,8 +389,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_outbound_traffic
     target: box
     in:
@@ -427,8 +407,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_outbound_traffic
     target: box
     in:
@@ -448,8 +426,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_outbound_traffic
     target: box
     in:
@@ -469,8 +445,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -489,8 +463,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -509,8 +481,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -529,8 +499,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -549,8 +517,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -569,8 +535,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -588,8 +552,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -608,7 +570,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       resources:
         memory_min_mib: 512
   - op: fixture.coverage_fact
@@ -630,7 +591,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       resources:
         memory_min_mib: 512
   - op: fixture.coverage_fact
@@ -651,8 +611,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -672,8 +630,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.coverage_fact
     target: box
     in:
@@ -699,7 +655,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       resources:
         "<<": $runner.test_size
         size_is_ceiling: true
@@ -723,7 +678,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       resources: $runner.test_size
   - op: fixture.coverage_fact
     target: box
@@ -743,7 +697,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       resources: $runner.larger_size
   - op: fixture.coverage_fact
     target: box
@@ -865,7 +818,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         tcp_ports:
           tls: none
@@ -917,7 +869,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         desktop: {}
   - op: fixture.coverage_desktop
@@ -942,7 +893,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         desktop:
           live_view: true
@@ -974,7 +924,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         previews:
           access: public
@@ -1013,7 +962,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         previews:
           access: public
@@ -1054,7 +1002,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         previews:
           access: public
@@ -1095,7 +1042,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         previews:
           access: public
@@ -1177,7 +1123,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       requirements:
         terminal:
           reattach: true
@@ -1224,7 +1169,6 @@ tests:
     as: box
     in:
       image: $image
-      lifetime_seconds: 300
   - wait_ms: 2000
   - op: files.exists
     target: box
@@ -1249,7 +1193,6 @@ tests:
     as: box
     in:
       image: $image
-      lifetime_seconds: 300
   - wait_ms: 2000
   - op: files.exists
     target: box
@@ -1274,7 +1217,6 @@ tests:
         network_lockdown:
           policy: denylist
           deny: $runner.denylist_names_entries
-      lifetime_seconds: 600
   - op: fixture.coverage_denylist
     target: box
     in:
@@ -1300,7 +1242,6 @@ tests:
         network_lockdown:
           policy: denylist
           deny: $runner.denylist_addresses_entries
-      lifetime_seconds: 600
   - op: fixture.coverage_denylist
     target: box
     in:
@@ -1330,7 +1271,6 @@ tests:
         network_lockdown:
           policy: denylist
           deny: $runner.denylist_mixed_entries
-      lifetime_seconds: 600
   - op: fixture.coverage_denylist
     target: box
     in:
@@ -1360,7 +1300,6 @@ tests:
         network_lockdown:
           policy: allowlist
           allow: $runner.allowed_mixed
-      lifetime_seconds: 600
   - op: fixture.coverage_allowlist
     target: box
     in:
@@ -1426,7 +1365,6 @@ tests:
           policy: allowlist
           allow: $runner.allowed_domains
           changeable: true
-      lifetime_seconds: 600
   - op: fixture.coverage_policy_change
     target: box
     in:
@@ -1456,7 +1394,6 @@ tests:
           policy: allowlist
           allow: $runner.allowed_domains
           changeable: false
-      lifetime_seconds: 600
   - op: fixture.coverage_policy_change
     target: box
     in:
@@ -1487,7 +1424,6 @@ tests:
           allow: $runner.allowed_domains
           switchable: true
           switches_to: [deny_all]
-      lifetime_seconds: 600
   - op: fixture.coverage_policy_change
     target: box
     in:
@@ -1532,7 +1468,6 @@ tests:
           allow: $runner.allowed_domains
           switchable: true
           switches_to: [denylist]
-      lifetime_seconds: 600
   - op: fixture.coverage_policy_change
     target: box
     in:
@@ -1621,7 +1556,6 @@ tests:
           allow: $runner.allowed_domains
           switchable: false
           switches_to: [deny_all]
-      lifetime_seconds: 600
   - op: fixture.coverage_policy_change
     target: box
     in:
@@ -1653,7 +1587,6 @@ tests:
           switchable: true
           switches_to: [deny_all]
           cuts_open_connections: true
-      lifetime_seconds: 600
   - op: fixture.coverage_open_connection
     target: box
     in:
@@ -1693,7 +1626,6 @@ tests:
           switchable: true
           switches_to: [deny_all]
           cuts_open_connections: false
-      lifetime_seconds: 600
   - op: fixture.coverage_open_connection
     target: box
     in:
@@ -1849,7 +1781,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       secret: $secret
       requirements:
         hidden_secrets:
@@ -1879,7 +1810,6 @@ tests:
   - op: create
     as: box
     in:
-      lifetime_seconds: 300
       secret: $secret
       requirements:
         hidden_secrets:
@@ -1910,7 +1840,6 @@ tests:
         network_lockdown:
           policy: denylist
           deny: $runner.max_deny_entries
-      lifetime_seconds: 600
   - op: fixture.coverage_denylist
     target: box
     in:
@@ -1976,7 +1905,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: dockerfile, build_context: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2011,7 +1939,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: oci, prepared: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2039,7 +1966,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: private_oci, prepared: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2066,7 +1992,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: oci, prepared: true, image_config: [env]}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2092,7 +2017,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: oci, prepared: true, image_config: [workdir]}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2118,7 +2042,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: oci, prepared: true, image_config: [user]}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2152,7 +2075,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: dockerfile, prepared: true, build_context: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2184,7 +2106,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: dockerfile, prepared: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2222,7 +2143,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: dockerfile, prepared: true, build_context: true}
-      lifetime_seconds: 300
     as: box
   - op: run
     target: box
@@ -2279,7 +2199,6 @@ tests:
       resources: $runner.larger_size
       requirements:
         custom_images: {source: oci, prepared: true}
-      lifetime_seconds: 300
     as: box
   - op: fixture.coverage_fact
     target: box
@@ -2308,7 +2227,6 @@ tests:
       image: $image
       requirements:
         custom_images: {source: oci, prepared: true}
-      lifetime_seconds: 300
     as: box
   - op: fixture.coverage_fact
     target: box
@@ -2702,8 +2620,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.address_families
     target: box
     in:
@@ -2723,8 +2639,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.address_families
     target: box
     in:
@@ -2744,8 +2658,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.address_families
     target: box
     in:
@@ -2764,8 +2676,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.guest_reserved_tcp_ports
     target: box
     in:
@@ -2782,8 +2692,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2801,8 +2709,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2820,8 +2726,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2839,8 +2743,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2858,8 +2760,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2879,8 +2779,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2900,8 +2798,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2919,8 +2815,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -2938,8 +2832,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.regular_write_usability
     target: box
     in:
@@ -3368,8 +3260,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.file_stream
     target: box
     in:
@@ -3440,8 +3330,6 @@ tests:
   steps:
   - op: create
     as: box
-    in:
-      lifetime_seconds: 300
   - op: fixture.file_stream
     target: box
     in:

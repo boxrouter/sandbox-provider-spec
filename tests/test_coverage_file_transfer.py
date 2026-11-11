@@ -418,9 +418,7 @@ TRANSFER_LIFETIME_IDS = {
 _LITERAL_BOUNDS = {
     "file_links.v1.link_lifetime.read": 900,
     "file_links.v1.link_lifetime.write": 900,
-    "files.stream.v1.write.64mib": 300,
     "files.stream.v1.write.5gib": 900,
-    "files.stream.v1.read.64mib": 300,
     "files.stream.v1.read.5gib": 900,
 }
 
@@ -524,7 +522,7 @@ def test_the_override_does_not_reach_the_other_requested_bounds() -> None:
         {"link_lifetime_wait_seconds": 600, "file_transfer_lifetime_seconds": 300},
     )
     assert [row["result"] for row in results] == ["passed", "passed"]
-    assert [create["lifetime_seconds"] for create in sandbox.creates] == [900, 300]
+    assert [create.get("lifetime_seconds") for create in sandbox.creates] == [900, None]
 
 
 def test_the_report_binds_definitions_not_the_selected_configuration() -> None:

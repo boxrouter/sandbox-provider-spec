@@ -1,17 +1,17 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.terminal.reattach": "sha256:712852c7137a5a7f132fb058875bb665c7783f4234c116a005514fbe747c48c2"
+    "coverage.terminal.reattach": "sha256:b725fb49d321a9f040c3ec7c853c623a5d40f0a6b31e312ffc6e1967e3ea0bd6"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T11:51:09.769865+00:00",
+  "finished_at": "2026-11-11T19:11:28.567574+00:00",
   "provider": "boxd",
-  "revision": "8f25efe5a47ad292d05da13354acb7b244f99696",
-  "run_id": "public-9c61f095215fa60b8dae",
+  "revision": "70407bd759b9c27953766aa2bad186d2e54db937",
+  "run_id": "public-70f0a95b107e904b7746",
   "sdk_versions": {
     "boxd": "0.3.0"
   },
@@ -19,8 +19,8 @@
     "coverage.terminal.reattach"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T11:51:00.789822+00:00",
-  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "started_at": "2026-11-11T19:11:22.049928+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
       "cleanup": [
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 8979,
+      "duration_ms": 6516,
       "id": "coverage.terminal.reattach",
       "proves": [
         {

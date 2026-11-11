@@ -1,17 +1,17 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-07T12:14:57.593675+00:00",
+  "finished_at": "2026-11-11T19:15:00.543397+00:00",
   "provider": "boxd",
-  "revision": "573fc124a27609df626510c1bcbc443507ff6673",
-  "run_id": "public-ef3d54e1c131532535ee",
+  "revision": "3e0ec169f4da3f7acda20aa43bc8eecf74c4198b",
+  "run_id": "public-bcba8d79262493d10fd9",
   "sdk_versions": {
     "boxd": "0.3.0"
   },
@@ -19,8 +19,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-07T12:14:39.323850+00:00",
-  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "started_at": "2026-11-11T19:14:35.753480+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
       "cleanup": [
@@ -29,7 +29,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 18268,
+      "duration_ms": 24788,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -49,7 +49,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.911, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.97775, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.977, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.99425, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }

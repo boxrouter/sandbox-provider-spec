@@ -234,7 +234,7 @@ def test_prepared_distro_dockerfile_row_proves_only_source_and_prepared() -> Non
     assert create["in"]["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True}
     }
-    assert create["in"]["lifetime_seconds"] <= 300
+    assert "lifetime_seconds" not in create["in"]
     reads = [step for step in test["steps"] if step.get("op") == "run"]
     assert [read["in"]["bash_script"] for read in reads] == [f"base64 -w0 -- {DISTRO_MARKER}"]
     assert reads[0]["expect"] == {
@@ -271,7 +271,7 @@ def test_prepared_distro_row_dispatches_prepare_create_and_marker(tmp_path: Path
     assert driver.create_inputs["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True}
     }
-    assert driver.create_inputs["lifetime_seconds"] == 300
+    assert "lifetime_seconds" not in driver.create_inputs
     assert driver.run_inputs == [{"bash_script": f"base64 -w0 -- {DISTRO_MARKER}"}]
     cleanup = cast(list[dict[str, object]], outcome["cleanup"])
     assert {item["kind"] for item in cleanup} == {"image", "sandbox"}
@@ -349,7 +349,7 @@ def test_prepared_distro_context_row_proves_only_source_prepared_and_context() -
     assert create["in"]["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True, "build_context": True}
     }
-    assert create["in"]["lifetime_seconds"] <= 300
+    assert "lifetime_seconds" not in create["in"]
     reads = [step for step in test["steps"] if step.get("op") == "run"]
     assert [read["in"]["bash_script"] for read in reads] == [
         f"base64 -w0 -- {path}" for path in DISTRO_CONTEXT_READS
@@ -423,7 +423,7 @@ def test_prepared_distro_context_row_dispatches_prepare_create_and_reads(
     assert driver.create_inputs["requirements"] == {
         "custom_images": {"source": "dockerfile", "prepared": True, "build_context": True}
     }
-    assert driver.create_inputs["lifetime_seconds"] == 300
+    assert "lifetime_seconds" not in driver.create_inputs
     assert [run["bash_script"] for run in driver.run_inputs] == [
         f"base64 -w0 -- {path}" for path in DISTRO_CONTEXT_READS
     ]
@@ -482,7 +482,7 @@ def test_build_context_row_proves_only_source_and_context() -> None:
     assert create["in"]["requirements"] == {
         "custom_images": {"source": "dockerfile", "build_context": True}
     }
-    assert create["in"]["lifetime_seconds"] <= 300
+    assert "lifetime_seconds" not in create["in"]
     reads = [step for step in test["steps"] if step.get("op") == "run"]
     assert [read["in"]["bash_script"] for read in reads] == [
         f"base64 -w0 -- {path}" for path in BUILD_CONTEXT_BYTES
@@ -511,7 +511,7 @@ def test_build_context_row_dispatches_prepare_create_and_reads(tmp_path: Path) -
     assert driver.create_inputs["requirements"] == {
         "custom_images": {"source": "dockerfile", "build_context": True}
     }
-    assert driver.create_inputs["lifetime_seconds"] == 300
+    assert "lifetime_seconds" not in driver.create_inputs
     assert [run["bash_script"] for run in driver.run_inputs] == [
         f"base64 -w0 -- {path}" for path in BUILD_CONTEXT_BYTES
     ]

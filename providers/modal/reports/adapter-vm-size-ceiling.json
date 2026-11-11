@@ -1,8 +1,8 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a",
-    "coverage.facts.sizes.delivered": "sha256:1df4708b22c503947450b78dc393eaee4fa9422ebd4421761fed031f95f519e7"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f",
+    "coverage.facts.sizes.delivered": "sha256:86bb6d733bc3b45c0880664ef1c85b87b13da276cb2d4d980078aaf98f504223"
   },
   "class": "vm",
   "clean": true,
@@ -10,10 +10,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-06T11:50:17.717417+00:00",
+  "finished_at": "2026-11-11T19:07:40.923642+00:00",
   "provider": "modal",
-  "revision": "25fd073a6f673243b44674813fa03a93d3a7eb4f",
-  "run_id": "public-31f08cbe3abcfe28579d",
+  "revision": "d4b5b1c738afe26af31e435cc243f220d7c35a40",
+  "run_id": "public-7b43c56bf2b3f958a85a",
   "sdk_versions": {
     "modal": "1.6.1"
   },
@@ -22,8 +22,8 @@
     "coverage.facts.sizes.delivered"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-06T11:49:58.978909+00:00",
-  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "started_at": "2026-11-11T19:00:22.472314+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
       "cleanup": [
@@ -32,7 +32,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 14669,
+      "duration_ms": 436457,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -52,7 +52,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.03, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0075, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.013, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.00325, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
@@ -69,7 +69,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4068,
+      "duration_ms": 1989,
       "id": "coverage.facts.sizes.delivered",
       "proves": [],
       "result": "passed",

@@ -1,7 +1,7 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "class": "container",
   "clean": true,
@@ -9,10 +9,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T19:32:42.195357+00:00",
+  "finished_at": "2026-11-11T19:49:43.608038+00:00",
   "provider": "daytona",
-  "revision": "2cefdd05ec56f55b491d8530ce50dd226b61c3c1",
-  "run_id": "public-2f2ecf2496ffb07d61fa",
+  "revision": "fae6668d862b344082b35853e5f12d9dfb864b2c",
+  "run_id": "public-15789058e2cbc7eb6efb",
   "sdk_versions": {
     "daytona": "0.226.1"
   },
@@ -20,8 +20,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T19:32:27.837351+00:00",
-  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
+  "started_at": "2026-11-11T19:49:39.362350+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
       "cleanup": [
@@ -30,7 +30,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 14356,
+      "duration_ms": 4244,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {

@@ -5,6 +5,17 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Coverage tests no longer name an incidental `lifetime_seconds` in their create steps: 76 tests
+  (the facts, previews, desktop, terminal, network-lockdown, hidden-secrets, custom-image and
+  regular-write tests, and the 64 MiB streams) create with the lifetime the run gives its fixtures.
+  A provider with no lifetime timer can now run them; before, its create was refused. A coverage create
+  names a lifetime only when its test proves a lifetime fact, or when its own work outlasts the default
+  (the two 5 GiB streams); `tests/test_create_lifetime.py` enforces this. The changed tests have new
+  check digests. The cited reports that ran them are re-certified live: Boxd `adapter-terminal-coverage` and
+  `adapter-default-size-ceiling`, Daytona `adapter-container-custom-images-oci` and
+  `adapter-container-size-ceiling`, and Modal `adapter-default-size-ceiling` and `adapter-vm-size-ceiling`, all
+  passing. Modal's two declarations move `verified.date` to 2026-11-11, so their SHA-256 changes.
+
 - Agent37 declares its default class (`providers/agent37`): no lifetime timer and
   `max_lifetime_seconds: unlimited` (it serves only `lifetime_seconds: null`), `located_in: [US]`, and its
   default image's user `node` and directory `/home/node`, each cited from Agent37's documentation or a
