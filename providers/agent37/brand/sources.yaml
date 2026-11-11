@@ -1,0 +1,19 @@
+# Provenance and terms record for Agent37's logo and mark (the one terms record per provider).
+retrieved_at: TODO
+owner: TODO
+source_page: TODO
+assets:
+  logo.svg:
+    source: TODO
+    role: TODO
+    modifications: none
+  mark.svg:
+    source: TODO
+    role: TODO
+    modifications: none
+terms:
+  source: TODO
+  effective: TODO
+  reuse_permission: TODO   # explicit | not_found
+  press_kit: TODO          # URL | not_found
+  adoption: pending

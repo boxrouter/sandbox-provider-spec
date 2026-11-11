@@ -1,0 +1,4 @@
+# Brand: chart colour, logo, one-colour mark and launch state. All keys optional.
+# TODO(brand): add `color: '#RRGGBB'`, `logo: brand/logo.svg` and `mark: brand/mark.svg` with the
+# files and brand/sources.yaml, then `launched: true` only at launch.
+order: 7
