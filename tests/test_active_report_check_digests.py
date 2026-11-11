@@ -12,6 +12,7 @@ import pytest
 import yaml
 
 from sandbox_provider_spec.check_digests import check_digests, historical_rule_digest
+from sandbox_provider_spec.evidence import _source_suite_rules
 from sandbox_provider_spec.suite import read_suite
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
@@ -109,4 +110,24 @@ def test_active_reports_keep_current_check_digests() -> None:
     assert not mismatches, (
         "Active hosted reports have stale SPS check digests; refresh or rebind them in "
         "the same change:\n" + "\n".join(mismatches)
+    )
+
+
+def test_active_reports_ran_a_recognized_suite() -> None:
+    """A suite change records the outgoing suite in `historical-suite-rules.json`.
+
+    Without it every active report of the old suite reads "report suite digest is not
+    recognized", even for checks the change left alone (SPS 0.3.182 missed this).
+    """
+    if not (WORKSPACE_ROOT / "packages").is_dir():
+        pytest.skip("hosted reports are only present in the canonical source workspace")
+    unrecognized = sorted(
+        f"{report_path.relative_to(WORKSPACE_ROOT)}: {report.get('suite_digest')}"
+        for report_path, _support in _active_reports()
+        if (report := json.loads(report_path.read_text(encoding="utf-8"))).get("suite_digest")
+        and _source_suite_rules(report["suite_digest"])[1]
+    )
+    assert not unrecognized, (
+        "Active hosted reports name a suite this package does not recognize; record the old "
+        "suite under its digest in historical-suite-rules.json:\n" + "\n".join(unrecognized)
     )

@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- `conformance/historical-suite-rules.json` records the coverage suite that 0.3.182 replaced
+  (`sha256:f79f539d…`), as the conformance rules require for any suite change. Without it, reports of
+  that suite read "report suite digest is not recognized", including Boat, Daytona, E2B and Vercel
+  baseline reports whose checks did not change. A new test refuses an active hosted report whose suite
+  this package does not recognize.
+
 - Coverage tests no longer name an incidental `lifetime_seconds` in their create steps: 76 tests
   (the facts, previews, desktop, terminal, network-lockdown, hidden-secrets, custom-image and
   regular-write tests, and the 64 MiB streams) create with the lifetime the run gives its fixtures.
