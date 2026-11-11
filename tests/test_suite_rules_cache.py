@@ -4,13 +4,11 @@
 
 import hashlib
 import json
-from datetime import date
 from importlib import import_module
 from pathlib import Path
 from typing import Any
 
 import pytest
-import yaml
 
 from sandbox_provider_spec import evidence
 
@@ -32,13 +30,13 @@ def test_repeated_suite_evidence_parses_once(
     monkeypatch.setattr(evidence, "_conformance_root", lambda: tmp_path)
     digest = "sha256:" + hashlib.sha256(content).hexdigest()
     calls = []
-    parse = yaml.safe_load
+    parse = loader._parse
 
-    def observed(source: Any) -> Any:
+    def observed(suffix: str, source: bytes) -> Any:
         calls.append(source)
-        return parse(source)
+        return parse(suffix, source)
 
-    monkeypatch.setattr(yaml, "safe_load", observed)
+    monkeypatch.setattr(loader, "_parse", observed)
     first, errors = evidence._source_suite_rules(digest)
     assert errors == []
     assert first is not None
@@ -86,21 +84,24 @@ def test_coverage_rules_and_changed_bytes_are_current(
 @pytest.mark.parametrize(
     "content,expected",
     [
-        (b"tests: [{id: sample, rules: [2026-10-29]}]", {"sample": [date(2026, 10, 29)]}),
-        (b"tests: [{id: sample, rules: {1: value}}]", {"sample": {1: "value"}}),
+        (b"tests: [{id: sample, rules: [2026-10-29]}]", ({"sample": ["2026-10-29"]}, [])),
+        (b"tests: [{id: sample, rules: {1: value}}]", ({"sample": {"1": "value"}}, [])),
+        (
+            b"tests: [{id: sample, id: again, rules: []}]",
+            (None, ["package has an invalid conformance suite: duplicate key: id"]),
+        ),
     ],
 )
-def test_safe_yaml_values_keep_their_original_types(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, content: bytes, expected: dict[str, Any]
+def test_suites_read_as_the_strict_loader_reads_them(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, content: bytes, expected: Any
 ) -> None:
     conformance = tmp_path / "conformance"
     conformance.mkdir()
     (conformance / "suite.yaml").write_bytes(content)
     monkeypatch.setattr(evidence, "_conformance_root", lambda: tmp_path)
     digest = "sha256:" + hashlib.sha256(content).hexdigest()
-    assert evidence._source_suite_rules(digest) == (expected, [])
-    assert evidence._source_suite_rules(digest) == (expected, [])
-    assert loader._document_texts == {}
+    assert evidence._source_suite_rules(digest) == expected
+    assert evidence._source_suite_rules(digest) == expected
 
 
 def test_invalid_suite_and_repaired_content_are_not_cached_as_valid(

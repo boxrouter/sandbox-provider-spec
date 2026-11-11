@@ -5,6 +5,11 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- The catalog, check-digest and evidence readers share one strict parse per file content, using libyaml
+  when it is installed. `sandbox-provider-spec check` on one declaration parses `suite.yaml` and
+  `coverage.yaml` once instead of about ten times. Evidence now reads the packaged suites with the strict
+  loader too, so a duplicate key there is reported as an invalid suite. Check digests are unchanged.
+
 - Boat declares `located_in: [DE, FI, FR]`, cited from its compliance page (read 2026-11-10): sandboxes run on
   machines in Germany, Finland and France. Snapshot copies the page says can be stored outside the EU are
   storage, not where a sandbox runs.

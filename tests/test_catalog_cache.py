@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: BoxRouter, Inc.
 # SPDX-License-Identifier: Apache-2.0
-"""load_catalog parses each distinct catalog once and hands every caller its own copy."""
+"""cached_load parses each distinct file once, as the strict loader would, and hands every caller
+its own copy."""
 
 from __future__ import annotations
 
@@ -9,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 
 from sandbox_provider_spec import check
 from sandbox_provider_spec.load import DuplicateKeyError, load
@@ -24,15 +26,16 @@ def _catalog_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, text: str) -> 
     return path
 
 
-def _count_loads(monkeypatch: pytest.MonkeyPatch) -> list[Path]:
-    loads: list[Path] = []
+def _count_parses(monkeypatch: pytest.MonkeyPatch) -> list[bytes]:
+    parses: list[bytes] = []
+    real = loader._parse
 
-    def record(path: Path) -> Any:
-        loads.append(Path(path))
-        return load(path)
+    def record(suffix: str, content: bytes) -> Any:
+        parses.append(content)
+        return real(suffix, content)
 
-    monkeypatch.setattr(loader, "load", record)
-    return loads
+    monkeypatch.setattr(loader, "_parse", record)
+    return parses
 
 
 def test_the_installed_catalog_reads_as_the_strict_loader_reads_it() -> None:
@@ -43,10 +46,10 @@ def test_the_installed_catalog_reads_as_the_strict_loader_reads_it() -> None:
 
 def test_unchanged_content_is_parsed_once(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _catalog_dir(monkeypatch, tmp_path, "gates: {a: 1}\n")
-    loads = _count_loads(monkeypatch)
+    parses = _count_parses(monkeypatch)
     for _ in range(5):
         assert check.load_catalog() == {"gates": {"a": 1}}
-    assert len(loads) == 1
+    assert len(parses) == 1
 
 
 def test_each_caller_gets_its_own_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -84,21 +87,23 @@ def test_the_cache_is_bounded(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     assert len(loader._document_texts) == loader._DOCUMENT_TEXTS
 
 
-def test_a_catalog_changed_during_its_parse_is_not_stored(
+def test_a_catalog_changed_during_its_parse_is_stored_under_the_parsed_bytes(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     path = _catalog_dir(monkeypatch, tmp_path, "n: 1\n")
+    real = loader._parse
 
-    def parse_then_change(source: Path) -> Any:
-        document = load(source)
+    def parse_then_change(suffix: str, content: bytes) -> Any:
+        document = real(suffix, content)
         path.write_text("n: 2\n", encoding="utf-8")
         return document
 
-    monkeypatch.setattr(loader, "load", parse_then_change)
+    monkeypatch.setattr(loader, "_parse", parse_then_change)
     assert check.load_catalog() == {"n": 1}
-    assert len(loader._document_texts) == 0
-    monkeypatch.setattr(loader, "load", load)
+    monkeypatch.setattr(loader, "_parse", real)
     assert check.load_catalog() == {"n": 2}
+    path.write_text("n: 1\n", encoding="utf-8")
+    assert check.load_catalog() == {"n": 1}
 
 
 def test_yaml_and_json_with_the_same_bytes_are_cached_apart(
@@ -109,7 +114,7 @@ def test_yaml_and_json_with_the_same_bytes_are_cached_apart(
     for name in ("catalog.yaml", "catalog.json"):
         (tmp_path / name).write_text(text, encoding="utf-8")
         loader.cached_load(tmp_path / name)
-    assert {suffix for suffix, _, _ in loader._document_texts} == {".yaml", ".json"}
+    assert {suffix for suffix, _ in loader._document_texts} == {".yaml", ".json"}
 
 
 def test_nothing_is_written_to_disk(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -119,10 +124,58 @@ def test_nothing_is_written_to_disk(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert sorted(path.name for path in tmp_path.iterdir()) == ["catalog.yaml"]
 
 
-def test_safe_yaml_does_not_replace_strict_validation(
+def test_supplied_bytes_are_parsed_strictly(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    path = _catalog_dir(monkeypatch, tmp_path, "n: 1\nn: 2\n")
-    assert loader.cached_load(path, yaml_content=path.read_bytes()) == {"n": 2}
+    path = _catalog_dir(monkeypatch, tmp_path, "n: 1\n")
     with pytest.raises(DuplicateKeyError):
-        check.load_catalog()
+        loader.cached_load(path, content=b"n: 1\nn: 2\n")
+    assert loader.cached_load(path, content=b"d: 2026-10-29\n") == {"d": "2026-10-29"}
+
+
+@pytest.mark.skipif(not yaml.__with_libyaml__, reason="PyYAML is built without libyaml")
+def test_the_libyaml_loader_still_refuses_duplicate_keys(tmp_path: Path) -> None:
+    assert issubclass(loader._FastLoader, yaml.CSafeLoader)
+    for text in ("n: 1\nn: 2\n", "a: {k: 1, k: 2}\n", "- {x: 1}\n- {y: 1, y: 2}\n"):
+        with pytest.raises(DuplicateKeyError):
+            yaml.load(text, Loader=loader._FastLoader)
+        with pytest.raises(DuplicateKeyError):
+            loader.cached_load(tmp_path / "x.yaml", content=text.encode())
+
+
+def _package_yaml() -> list[Path]:
+    root = Path(__file__).resolve().parents[1]
+    return sorted(
+        path
+        for folder in ("spec", "conformance", "providers", "examples")
+        for path in (root / folder).rglob("*.y*ml")
+    )
+
+
+def test_every_package_yaml_reads_as_the_strict_loader_reads_it() -> None:
+    assert len(_package_yaml()) > 30
+    for path in _package_yaml():
+        assert loader.cached_load(path) == load(path), path
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "a: b: c\n",
+        "a: [1, 2\n",
+        "key: 'unterminated\n",
+        "\tfoo: 1\n",
+        "a: *nope\n",
+        "!!python/object:os.system x\n",
+        "- a\nb: c\n",
+        "a: !!binary aGk=\n",
+    ],
+)
+def test_refusals_carry_the_strict_loader_messages(tmp_path: Path, text: str) -> None:
+    path = tmp_path / "bad.yaml"
+    path.write_text(text, encoding="utf-8")
+    with pytest.raises(Exception) as direct:
+        load(path)
+    with pytest.raises(type(direct.value)) as cached:
+        loader.cached_load(path)
+    assert str(cached.value) == str(direct.value)

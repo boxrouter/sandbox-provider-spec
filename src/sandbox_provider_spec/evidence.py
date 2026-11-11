@@ -198,7 +198,7 @@ def _unconditional_rule_tests(gate: str, repository_root: Path) -> dict[str, lis
     for path in (conformance / "suite.yaml", conformance / "coverage.yaml"):
         if not path.is_file():
             continue
-        document = load(path)
+        document = cached_load(path)
         if not isinstance(document, dict) or not isinstance(document.get("tests"), list):
             continue
         for test in document["tests"]:
@@ -614,7 +614,7 @@ def _baseline_test_ids(repository_root: Path) -> set[str]:
     ):
         if not suite_path.is_file():
             continue
-        document = load(suite_path)
+        document = cached_load(suite_path)
         tests = document.get("tests") if isinstance(document, dict) else None
         if not isinstance(tests, list):
             continue
@@ -798,13 +798,13 @@ def _source_suite_rules(suite_digest: Any) -> tuple[dict[str, Any] | None, list[
     )
     if suite_digest in (core_digest, coverage_digest):
         try:
-            core = cached_load(conformance / "suite.yaml", yaml_content=core_bytes)
+            core = cached_load(conformance / "suite.yaml", content=core_bytes)
             core_tests = core["tests"]
             if suite_digest == core_digest:
                 source_tests = core_tests
             else:
                 assert coverage_bytes is not None
-                coverage = cached_load(coverage_path, yaml_content=coverage_bytes)
+                coverage = cached_load(coverage_path, content=coverage_bytes)
                 source_tests = [
                     test for test in core_tests if test["id"].startswith("baseline.")
                 ] + coverage["tests"]
