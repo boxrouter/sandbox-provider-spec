@@ -117,6 +117,8 @@ class Request:
     """A checked request in the specification's vocabulary."""
 
     lifetime_seconds: int | None = None
+    #: `lifetime_seconds: null`: a sandbox with no lifetime, which nothing ends.
+    no_lifetime: bool = False
     at_end: str | None = None
     gates: dict[str, GateAsk] = field(default_factory=dict)
     extras: dict[str, Document] = field(default_factory=dict)
@@ -702,6 +704,7 @@ def validate_request(
                 details={"word": key, "known": sorted(allowed)},
             )
     lifetime = raw.get("lifetime_seconds")
+    no_lifetime = mode != "restores_need" and "lifetime_seconds" in raw and lifetime is None
     if lifetime is not None:
         normalized_lifetime = _whole_number(lifetime)
         if normalized_lifetime is None or normalized_lifetime < 1:
@@ -722,6 +725,13 @@ def validate_request(
             f"unrecognised at_end {at_end!r}",
             path="at_end",
             details={"word": at_end, "known": list(AT_END)},
+        )
+    if no_lifetime and at_end is not None:
+        raise Rejected(
+            "setting",
+            "at_end with a null lifetime_seconds",
+            path="at_end",
+            fix="leave at_end out: nothing ends a sandbox with no lifetime",
         )
 
     requirements = raw.get("requirements", {})
@@ -931,6 +941,7 @@ def validate_request(
             raise
     return Request(
         lifetime_seconds=lifetime,
+        no_lifetime=no_lifetime,
         at_end=at_end,
         gates=gates,
         extras=extras,

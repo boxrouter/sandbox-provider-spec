@@ -50,6 +50,7 @@ REPEATED_MOUNT = "volumes.mounts repeats a mount"
 WITH_IMAGE = "root, package_manager, libc or kernel_features together with an image"
 IDLE_ALWAYS = "idle_shutdown together with long_running"
 AT_END_PAUSE = "at_end: paused without pause_resume"
+NO_LIFETIME_AT_END = "at_end with a null lifetime_seconds"
 RESOURCE_FALSE = "a resource set to false or zero"
 ANY_KNOB = '"any" on a knob that need not be named'
 ANY_IN_LIST = '"any" inside a list'
@@ -213,6 +214,12 @@ def check_request(
         requirements = {}
     if document.get("at_end") == "paused" and "pause_resume" not in requirements:
         errors.append(AT_END_PAUSE)
+    if (
+        "at_end" in document
+        and "lifetime_seconds" in document
+        and document["lifetime_seconds"] is None
+    ):
+        errors.append(NO_LIFETIME_AT_END)
     if _zero_or_false(document.get("lifetime_seconds")) and "lifetime_seconds" in document:
         errors.append(RESOURCE_FALSE)
     _check_resources(document.get("resources"), requirements, catalog, errors)

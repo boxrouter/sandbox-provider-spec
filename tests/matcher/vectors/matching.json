@@ -1315,6 +1315,79 @@
       }
     },
     {
+      "id": "no-lifetime-fits-only-a-provider-that-never-ends-a-sandbox",
+      "providers": [
+        "gamma",
+        "no-timer-capped",
+        "open-ended"
+      ],
+      "request": {
+        "lifetime_seconds": null
+      },
+      "rules": [
+        "matching/no-lifetime"
+      ],
+      "expect": {
+        "eligible": [
+          "open-ended"
+        ],
+        "chosen": "open-ended",
+        "results": {
+          "open-ended": {
+            "eligible": true
+          },
+          "gamma": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          },
+          "no-timer-capped": {
+            "eligible": false,
+            "failure_reasons": [
+              "resource_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "a-number-lifetime-still-fits-by-max-lifetime",
+      "providers": [
+        "gamma",
+        "open-ended"
+      ],
+      "request": {
+        "lifetime_seconds": 300
+      },
+      "rules": [
+        "matching/no-lifetime"
+      ],
+      "expect": {
+        "eligible": [
+          "gamma",
+          "open-ended"
+        ],
+        "chosen": "gamma"
+      }
+    },
+    {
+      "id": "no-lifetime-with-at-end-is-refused-before-matching",
+      "provider": "open-ended",
+      "request": {
+        "lifetime_seconds": null,
+        "at_end": "destroyed"
+      },
+      "rules": [
+        "matching/no-lifetime",
+        "request/refused-before-matching"
+      ],
+      "expect": {
+        "eligible": [],
+        "rejected": "setting"
+      }
+    },
+    {
       "id": "oci-image-fits-oci-source",
       "provider": "alpha",
       "request": {

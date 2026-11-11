@@ -531,7 +531,7 @@ def fit_resources(
 
     needs = resources.get("needs", {})
     asked_facts: set[str] = set()
-    if request.lifetime_seconds is not None:
+    if request.lifetime_seconds is not None or request.no_lifetime:
         asked_facts.add("max_lifetime_seconds")
     if any(key in asked for key in ("cpu_min", "memory_min_mib")):
         asked_facts.add("sizes")
@@ -616,6 +616,23 @@ def fit_resources(
                 resource="lifetime_seconds",
                 asked=request.lifetime_seconds,
                 offered=minimum,
+            )
+        )
+    if request.no_lifetime and (
+        declaration.lifetime_timer or resources.get("max_lifetime_seconds") != "unlimited"
+    ):
+        declared_max = resources.get("max_lifetime_seconds", UNKNOWN)
+        unknown = not declaration.lifetime_timer and declared_max == UNKNOWN
+        failed.append(
+            _fail(
+                "resource",
+                "resource_unknown" if unknown else "resource_mismatch",
+                "no lifetime: the provider ends sandboxes "
+                f"(lifetime_timer {'declared' if declaration.lifetime_timer else 'left out'}, "
+                f"max_lifetime_seconds {declared_max})",
+                resource="lifetime_seconds",
+                asked=None,
+                offered=declared_max,
             )
         )
     if request.at_end is not None:

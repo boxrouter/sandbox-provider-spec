@@ -4,7 +4,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "lifetime_seconds": {"type": "integer", "minimum": 1},
+    "lifetime_seconds": {"type": ["integer", "null"], "minimum": 1},
     "at_end": {"enum": ["destroyed", "paused"]},
     "requirements": {"$ref": "#/$defs/requirements"},
     "resources": {"$ref": "#/$defs/resources"},
@@ -12,6 +12,7 @@
     "restores_need": {"$ref": "#/$defs/restores_need"}
   },
   "allOf": [
+    {"if": {"required": ["lifetime_seconds"], "properties": {"lifetime_seconds": {"type": "null"}}}, "then": {"not": {"required": ["at_end"]}}},
     {"if": {"required": ["requirements"], "properties": {"requirements": {"required": ["custom_images"], "properties": {"custom_images": {"required": ["build_context"]}}}}}, "then": {"required": ["image"], "properties": {"image": {"type": "object", "required": ["dockerfile"]}}}},
     {"if": {"required": ["requirements"], "properties": {"requirements": {"required": ["custom_images"]}}}, "then": {"required": ["image"]}},
     {"if": {"required": ["image"]}, "then": {"properties": {"resources": {"not": {"anyOf": [{"required": ["root"]}, {"required": ["package_manager"]}, {"required": ["libc"]}]}}}}}

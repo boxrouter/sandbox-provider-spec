@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: open-ended
+verified: {date: 2026-11-11, sdks: {open-ended-sdk: 1.0.0}}
+resources:
+  max_lifetime_seconds: unlimited
+gates: {}
+evidence: {}

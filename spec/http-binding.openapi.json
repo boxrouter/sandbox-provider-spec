@@ -3355,7 +3355,10 @@
         "additionalProperties": false,
         "properties": {
           "lifetime_seconds": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 1
           },
           "at_end": {
@@ -3378,6 +3381,25 @@
           }
         },
         "allOf": [
+          {
+            "if": {
+              "required": [
+                "lifetime_seconds"
+              ],
+              "properties": {
+                "lifetime_seconds": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "at_end"
+                ]
+              }
+            }
+          },
           {
             "if": {
               "required": [

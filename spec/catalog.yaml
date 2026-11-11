@@ -583,6 +583,7 @@ rejected_before_matching:
   - idle_shutdown together with long_running
   - idle_seconds that is not a positive integer
   - "at_end: paused without pause_resume"
+  - at_end with a null lifetime_seconds
   - a resource set to false or zero
   - a non-positive CPU, memory, disk or GPU request
   - non-boolean long_running or extendable_lifetime

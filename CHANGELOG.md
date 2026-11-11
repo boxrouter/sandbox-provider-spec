@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- A request may set `lifetime_seconds: null`: a sandbox with no lifetime, which runs until the caller
+  destroys it. New rule `matching/no-lifetime`: such a request fits only a declaration with no
+  `lifetime_timer` block and `resources.max_lifetime_seconds: unlimited`, and is refused before
+  matching (`setting`) when it also names `at_end`; `sandbox-provider-spec check` reports that as
+  `at_end with a null lifetime_seconds`. A request with a number is matched as before.
+
 - The catalog, check-digest and evidence readers share one strict parse per file content, using libyaml
   when it is installed. `sandbox-provider-spec check` on one declaration parses `suite.yaml` and
   `coverage.yaml` once instead of about ten times. Evidence now reads the packaged suites with the strict

@@ -1,0 +1,7 @@
+spec: sandbox-provider-spec/0.1
+provider: no-timer-capped
+verified: {date: 2026-11-11, sdks: {no-timer-capped-sdk: 1.0.0}}
+resources:
+  max_lifetime_seconds: 3600
+gates: {}
+evidence: {}

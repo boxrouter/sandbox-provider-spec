@@ -1409,6 +1409,16 @@ def test_kernel_features_request_with_image_is_refused() -> None:
     assert "together with an image: resources.kernel_features" in errors[0]
 
 
+@pytest.mark.rule("matching/no-lifetime")
+def test_a_null_lifetime_is_a_request_and_takes_no_at_end() -> None:
+    open_ended = {"lifetime_seconds": None}
+    assert not sandbox_provider_spec.check_request(open_ended)
+    assert sandbox_provider_spec.schema_errors(open_ended, "request-schema.json") == []
+    with_end = {"lifetime_seconds": None, "at_end": "destroyed"}
+    assert sandbox_provider_spec.check_request(with_end) == [check.NO_LIFETIME_AT_END]
+    assert sandbox_provider_spec.schema_errors(with_end, "request-schema.json")
+
+
 def test_outbound_traffic_request_is_a_known_unique_all_of_list() -> None:
     assert not sandbox_provider_spec.check_request(
         {"resources": {"outbound_traffic": ["http", "any_tcp"]}}

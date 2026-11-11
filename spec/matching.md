@@ -307,6 +307,10 @@ pinned.
 
 - A request's `at_end` **MUST** fit only a declaration whose provider ends the lifetime <!-- rule: matching/at-end -->
   itself (`enforced_by: provider`) and whose `at_end` offers the same state.
+- A request with `lifetime_seconds: null` **MUST** fit only a declaration with no <!-- rule: matching/no-lifetime -->
+  `lifetime_timer` block (the provider never ends a sandbox) and
+  `resources.max_lifetime_seconds: unlimited`. Such a request with an `at_end` **MUST** be
+  refused before matching, because nothing ends the sandbox.
 
 **Images.**
 
