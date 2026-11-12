@@ -66,6 +66,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.run_id import native_name, own_run, stale
 
 STATES = {
@@ -416,10 +417,9 @@ class DaytonaDriver(ImageSnapshotDriver):  # pylint: disable=too-many-public-met
             options["linked_sandbox"] = linked.id
             options["ephemeral"] = True
             options["auto_delete_interval"] = 0
-        # Capture may outlast the SDK's usual minute-long wait. Keep its source
-        # alive through capture and observation; explicit timer settings win.
-        snapshot_test = "snapshots" in mapping(inputs, "requirements")
-        lifetime = number(inputs, "lifetime_seconds", 300 if snapshot_test else 120)
+        # The default also keeps a snapshot test's source alive through capture, which may
+        # outlast the SDK's usual minute-long wait; explicit timer settings win.
+        lifetime = number(inputs, "lifetime_seconds", DEFAULT_LIFETIME_SECONDS)
         if lifetime % 60:
             raise Unsupported("Daytona's native TTL accepts whole minutes")
         snapshot = cast(str | None, self.fixtures.get(f"daytona_{self.execution_class}_snapshot"))

@@ -428,6 +428,11 @@ per selected test, and requires any check-digest map to cover exactly those test
 When the suite changes, record
 the old suite's test ids and rules under its verified digest before its reports can remain
 evidence; do not add a digest without checking the original suite bytes.
+A check whose create steps stopped naming `lifetime_seconds` records the number they named in
+[historical-create-lifetimes.json](../conformance/historical-create-lifetimes.json). A report of
+the earlier definition keeps standing for the check only where a run of the new definition
+sends the same create: on a provider with a lifetime timer, when the recorded number is the
+default lifetime (300 seconds) that every driver sends for a create that names none.
 
 In a Git checkout, each cited source report must be committed in `HEAD` and have no staged or
 unstaged changes. A source archive without Git uses the reports it ships. An installed
@@ -495,7 +500,7 @@ An elapsed observation bound is `not_run`; it does not establish a native comman
 
 | Operation | Inputs | Native observation |
 | --- | --- | --- |
-| `create` | Optional `environment`, `lifetime_seconds`, `at_end`, `resources`, prepared `image`, `secret`, and `volumes` (`volume`, `path`, optional `read_only`); `read_only: true` mounts that volume read-only and requires `requirements.volumes.read_only_mounts: true`; `join` may name an earlier sandbox binding whose `private_network` the new sandbox joins; Docker coverage also supplies the driver-specific `user` input described above; gate tests supply `requirements`. | Owned `resource`, opaque `identity`; provider-specific opaque context can accompany it. |
+| `create` | Optional `environment`, `lifetime_seconds` (300 when left out, on a provider with a lifetime timer), `at_end`, `resources`, prepared `image`, `secret`, and `volumes` (`volume`, `path`, optional `read_only`); `read_only: true` mounts that volume read-only and requires `requirements.volumes.read_only_mounts: true`; `join` may name an earlier sandbox binding whose `private_network` the new sandbox joins; Docker coverage also supplies the driver-specific `user` input described above; gate tests supply `requirements`. | Owned `resource`, opaque `identity`; provider-specific opaque context can accompany it. |
 | `resize` | Running sandbox target; `resources` selects a different declared CPU and memory size using the same resource-request shape as `create`. | Native resize operation returns after applying the new resources; later observations check allocation, running processes and files. |
 | `get` | Sandbox target. | `state`: `active`, `paused`, `stopped`, or `destroyed`; `active` is the specification's `running`. |
 | `list` | None. | `sandboxes`, a list containing opaque `identity` fields. |

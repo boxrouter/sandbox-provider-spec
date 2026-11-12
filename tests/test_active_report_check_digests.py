@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 import yaml
 
-from sandbox_provider_spec.check_digests import check_digests, historical_rule_digest
+from sandbox_provider_spec.check_digests import check_digests, historical_check_digest
 from sandbox_provider_spec.evidence import _source_suite_rules
 from sandbox_provider_spec.suite import read_suite
 
@@ -99,7 +99,7 @@ def test_active_reports_keep_current_check_digests() -> None:
                 continue
             if (
                 recorded[test_id] != current[test_id]
-                and historical_rule_digest(by_id[test_id], report.get("suite_digest"))
+                and historical_check_digest(by_id[test_id], report.get("suite_digest"))
                 != recorded[test_id]
             ):
                 mismatches.append(

@@ -34,7 +34,7 @@ from sandbox_provider_spec.suite import Test as Scenario
 
 @pytest.mark.parametrize(
     "snapshot_test,explicit_lifetime,minutes",
-    [(True, None, 5), (True, 60, 1), (False, None, 2)],
+    [(True, None, 5), (True, 60, 1), (False, None, 5)],
 )
 def test_snapshot_budget_preserves_explicit_timer_settings(
     monkeypatch: pytest.MonkeyPatch,

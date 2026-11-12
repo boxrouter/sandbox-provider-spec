@@ -55,6 +55,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.run_id import native_name, stale
 
 #: Blaxel's deployment status, in the suite's state words; any other is passed on lowercase.
@@ -347,7 +348,7 @@ class BlaxelDriver(Driver):  # pylint: disable=too-many-public-methods
                 {"name": key, "value": value}
                 for key, value in strings(inputs, "environment").items()
             ],
-            "ttl": f"{number(inputs, 'lifetime_seconds', 300)}s",
+            "ttl": f"{number(inputs, 'lifetime_seconds', DEFAULT_LIFETIME_SECONDS)}s",
         }
         requirements = cast(Mapping[str, Mapping[str, Any]], inputs.get("requirements", {}))
         for gate, settings in requirements.items():

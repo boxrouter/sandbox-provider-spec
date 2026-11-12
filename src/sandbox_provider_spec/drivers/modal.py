@@ -47,6 +47,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.proofs import GPU_NAMES
 from sandbox_provider_spec.run_id import native_name, stale
 
@@ -341,7 +342,7 @@ class ModalDriver(Driver):  # pylint: disable=too-many-public-methods
             self.app_ids.add(app.app_id)
         options["app"] = app
         options["env"] = cast(dict[str, str | None], strings(inputs, "environment"))
-        options["timeout"] = number(inputs, "lifetime_seconds", 120)
+        options["timeout"] = number(inputs, "lifetime_seconds", DEFAULT_LIFETIME_SECONDS)
         if app.app_id is None:
             raise NotRun("native_app_identity_unavailable")
         app_id = app.app_id

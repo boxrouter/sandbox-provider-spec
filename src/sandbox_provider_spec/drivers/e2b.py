@@ -71,6 +71,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.run_id import native_name, run_id, stale
 
 
@@ -318,7 +319,7 @@ class E2BDriver(Driver):  # pylint: disable=too-many-public-methods
             metadata={"sps.run": marker, "sps.run_id": run_id()},
             envs=strings(inputs, "environment"),
             lifecycle=lifecycle,
-            timeout=number(inputs, "lifetime_seconds", 120),
+            timeout=number(inputs, "lifetime_seconds", DEFAULT_LIFETIME_SECONDS),
             network=network or None,
             iam=iam,
             volume_mounts=mounts or None,

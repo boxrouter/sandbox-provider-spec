@@ -5,6 +5,17 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- A report run before 0.3.182 stopped naming `lifetime_seconds` in 76 coverage creates still stands
+  for those checks where a run now sends the same create. New `src/sandbox_provider_spec/lifetime.py`
+  owns `DEFAULT_LIFETIME_SECONDS` (300): the lifetime a create that names none asks for on a provider
+  with a lifetime timer. Every native driver now sends it (E2B, Modal, Vercel and Daytona sent 120 s, so
+  0.3.182 had shortened their runs of these tests from 300 s), and an adapter's own default can read it.
+  `conformance/historical-create-lifetimes.json` records the number each of those creates named, and
+  `check_digests.historical_check_digest` (formerly `historical_rule_digest`, which restored only rule
+  labels) restores it when it equals the `create_lifetime` the caller's driver sends for a create that
+  names none. The 64 checks that named 300 s qualify on providers with a timer; the 12 network-lockdown
+  checks that named 600 s never do. Check digests are unchanged.
+
 - `providers/boxd/publication.yaml` holds Boxd hidden again (founder reversal 2026-11-12, "not put boxd for now"): it
   withdraws the 0.3.184 decision to publish Boxd's default route, so `publication.json` keeps Boxd out of every benchmark
   page build. Adopt 0.3.185, not 0.3.184.

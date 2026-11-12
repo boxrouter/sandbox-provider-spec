@@ -25,6 +25,7 @@ path = [
   "conformance/fixtures/endpoints-worker/records-response.schema.json",
   "conformance/fixtures/endpoints-worker/wrangler.toml",
   "conformance/fixtures/endpoints/inventory.md",
+  "conformance/historical-create-lifetimes.json",
   "conformance/historical-suite-rules.json",
   "conformance/suite.yaml",
   "distribution-manifest.json",

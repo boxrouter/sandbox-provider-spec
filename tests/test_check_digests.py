@@ -20,6 +20,7 @@ from sandbox_provider_spec import check_digests as digests
 from sandbox_provider_spec import conformance
 from sandbox_provider_spec.check import spec_dir
 from sandbox_provider_spec.driver import Driver
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.load import load
 from sandbox_provider_spec.report import report
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
@@ -60,14 +61,107 @@ def test_historical_rule_labels_preserve_only_unchanged_checks(identifier: str) 
     old = replace(test, rules=())
     expected = digests.check_digest(old, load(spec_dir() / "catalog.yaml"), digests.shared_digest())
 
-    assert digests.historical_rule_digest(test, historical_suite) == expected
+    assert digests.historical_check_digest(test, historical_suite) == expected
     assert (
-        digests.historical_rule_digest(
+        digests.historical_check_digest(
             replace(test, title=test.title + " changed"), historical_suite
         )
         != expected
     )
-    assert digests.historical_rule_digest(test, "sha256:" + "0" * 64) is None
+    assert digests.historical_check_digest(test, "sha256:" + "0" * 64) is None
+
+
+SUITE_BEFORE_0_3_182 = "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b"
+
+
+def _named_lifetime(test: Scenario, seconds: int) -> Scenario:
+    return replace(
+        test,
+        steps=tuple(
+            {**step, "in": {**step.get("in", {}), "lifetime_seconds": seconds}}
+            if step.get("op") == "create"
+            else step
+            for step in test.steps
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("identifier", "named"),
+    (
+        ("coverage.facts.size_is_ceiling.true", 300),
+        ("coverage.custom_images.prepare.registry", 300),
+        ("coverage.network_lockdown.switchable.true", 600),
+    ),
+)
+def test_a_dropped_create_lifetime_counts_only_when_the_run_sends_it(
+    identifier: str, named: int
+) -> None:
+    """SPS 0.3.182 stopped naming these lifetimes; the run's default now fills them in.
+
+    A report of the earlier definition still stands where the caller's driver sends that
+    same number for a create that names none, and nowhere else.
+    """
+    test = {test.id: test for test in _suite().tests}[identifier]
+    history = json.loads((suite_path().parent / "historical-suite-rules.json").read_text())
+    rules = tuple(history[SUITE_BEFORE_0_3_182][identifier])
+    earlier = _named_lifetime(replace(test, rules=rules), named)
+    expected = digests.check_digest(
+        earlier, load(spec_dir() / "catalog.yaml"), digests.shared_digest()
+    )
+
+    assert (
+        digests.historical_check_digest(test, SUITE_BEFORE_0_3_182, create_lifetime=named)
+        == expected
+    )
+    for other in (None, 120, named + 1):
+        assert (
+            digests.historical_check_digest(test, SUITE_BEFORE_0_3_182, create_lifetime=other)
+            != expected
+        )
+    assert (
+        digests.historical_check_digest(test, "sha256:" + "0" * 64, create_lifetime=named) is None
+    )
+
+
+@pytest.mark.parametrize(
+    ("report_path", "identifier"),
+    (
+        (
+            "providers/blaxel/reports/adapter-default-size-ceiling.json",
+            "coverage.facts.size_is_ceiling.true",
+        ),
+        (
+            "providers/e2b/reports/native-default-registry.json",
+            "coverage.custom_images.prepare.registry",
+        ),
+        ("providers/e2b/reports/native-default-coverage.json", "coverage.desktop.live_view"),
+    ),
+)
+def test_committed_reports_of_a_dropped_lifetime_still_stand(
+    report_path: str, identifier: str
+) -> None:
+    """Reports run before SPS 0.3.182 named 300 s; a run now sends the same 300 s default."""
+    recorded = json.loads((PACKAGE.parents[1] / report_path).read_text())
+    test = {test.id: test for test in _suite().tests}[identifier]
+    assert recorded["check_digests"][identifier] != digests.check_digests((test,))[identifier]
+
+    assert (
+        digests.historical_check_digest(
+            test, recorded["suite_digest"], create_lifetime=DEFAULT_LIFETIME_SECONDS
+        )
+        == recorded["check_digests"][identifier]
+    )
+
+
+def test_recorded_create_lifetimes_name_only_creates_that_now_name_none() -> None:
+    recorded = json.loads((suite_path().parent / "historical-create-lifetimes.json").read_text())
+    tests = {test.id: test for suite in (read_suite(), _suite()) for test in suite.tests}
+    for identifier, seconds in recorded.items():
+        creates = [step for step in tests[identifier].steps if step.get("op") == "create"]
+        assert creates, identifier
+        assert all("lifetime_seconds" not in step.get("in", {}) for step in creates), identifier
+        assert isinstance(seconds, int) and seconds > 0, identifier
 
 
 def test_check_digests_resolves_each_dependency_once(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -56,6 +56,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.run_id import native_name, stale
 
 #: How long a create waits for the team's concurrency limit (10 on the Hobby plan).
@@ -329,7 +330,7 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
         # only kind Vercel can stop and resume; a non-persistent one is removed.
         options: dict[str, Any] = {
             "env": strings(inputs, "environment"),
-            "execution_time_limit": number(inputs, "lifetime_seconds", 120),
+            "execution_time_limit": number(inputs, "lifetime_seconds", DEFAULT_LIFETIME_SECONDS),
             "persistent": ending == "stopped" or "pause_resume" in requirements,
         }
         for gate, settings in requirements.items():

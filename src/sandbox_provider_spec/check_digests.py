@@ -331,31 +331,53 @@ def check_digest(test: Test, catalog: Mapping[str, Any], shared: str) -> str:
     return _check_digest_with_dependencies(test, catalog, shared, dependencies, file_digests)
 
 
-def historical_rule_digest(test: Test, suite_digest: object) -> str | None:
-    """Digest this check with only its rule labels from a recognized earlier suite.
+def _history(name: str) -> Mapping[str, Any]:
+    try:
+        history = json.loads((suite_path().parent / name).read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {}
+    return history if isinstance(history, dict) else {}
 
-    Rule labels classify coverage; they do not change the operation or proof. Equality with
-    a recorded check digest still proves every other input, including executable code,
-    catalog entries, steps and proof targets, is unchanged.
+
+def historical_check_digest(
+    test: Test, suite_digest: object, *, create_lifetime: int | None = None
+) -> str | None:
+    """Digest this check as a recognized earlier suite ran it, where that run still counts.
+
+    Two differences are restored, and nothing else:
+
+    - the rule labels the earlier suite gave it (`historical-suite-rules.json`). Labels
+      classify coverage; they change no operation or proof.
+    - the `lifetime_seconds` its create steps named before the suite left it to the run
+      (`historical-create-lifetimes.json`), only when it equals `create_lifetime`: the lifetime
+      the caller's driver sends for a create that names none. The earlier run then sent the
+      request a run of this definition sends, so its result stands.
+
+    Equality with a recorded check digest still proves every other input, including
+    executable code, catalog entries, steps and proof targets, is unchanged.
     """
     if not isinstance(suite_digest, str):
         return None
-    try:
-        history = json.loads(
-            (suite_path().parent / "historical-suite-rules.json").read_text(encoding="utf-8")
-        )
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        return None
-    suites = history.get(suite_digest) if isinstance(history, dict) else None
+    suites = _history("historical-suite-rules.json").get(suite_digest)
     rules = suites.get(test.id) if isinstance(suites, dict) else None
-    if (
-        not isinstance(rules, list)
-        or any(not isinstance(rule, str) for rule in rules)
-        or tuple(rules) == test.rules
-    ):
+    if not isinstance(rules, list) or any(not isinstance(rule, str) for rule in rules):
+        return None
+    earlier = replace(test, rules=tuple(rules))
+    lifetime = _history("historical-create-lifetimes.json").get(test.id)
+    if lifetime == create_lifetime and isinstance(lifetime, int) and not isinstance(lifetime, bool):
+        earlier = replace(
+            earlier,
+            steps=tuple(
+                {**step, "in": {**step.get("in", {}), "lifetime_seconds": lifetime}}
+                if step.get("op") == "create" and "lifetime_seconds" not in step.get("in", {})
+                else step
+                for step in earlier.steps
+            ),
+        )
+    if earlier == test:
         return None
     catalog = cached_load(spec_dir() / "catalog.yaml")
-    return check_digest(replace(test, rules=tuple(rules)), catalog, shared_digest())
+    return check_digest(earlier, catalog, shared_digest())
 
 
 def _check_digest_with_dependencies(

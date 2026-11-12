@@ -14,6 +14,7 @@ from e2b import NotFoundException, Sandbox, Secret, Template
 
 from sandbox_provider_spec.driver import NotRun, Resource, Unsupported
 from sandbox_provider_spec.drivers import e2b as native
+from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 
 TASK_OPERATIONS = (
     "allocation.observe",
@@ -324,7 +325,7 @@ def test_create_passes_native_create_options_and_proves_minimum_allocation(
         {"resources": {"cpu_min": 2, "memory_min_mib": 1024}},
     )
     assert result["identity"] == "sandbox-id"
-    assert calls[0]["timeout"] == 120
+    assert calls[0]["timeout"] == DEFAULT_LIFETIME_SECONDS
     assert calls[0]["request_timeout"] == 60
     assert calls[0]["lifecycle"] == {"on_timeout": "kill"}
 

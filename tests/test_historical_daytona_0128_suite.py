@@ -13,7 +13,7 @@ from typing import Any
 import pytest
 
 from sandbox_provider_spec import check_digests
-from sandbox_provider_spec.check_digests import historical_rule_digest
+from sandbox_provider_spec.check_digests import historical_check_digest
 from sandbox_provider_spec.evidence import _source_suite_rules, check_report_evidence
 from sandbox_provider_spec.suite import read_suite, suite_path
 
@@ -86,7 +86,7 @@ def test_changed_executable_check_identity_is_not_excused(
     # The #4013 probe change moved this check's identity, so the recorded run is
     # stale for it; the identity mechanism must detect that, not excuse it.
     assert current != recorded
-    assert historical_rule_digest(scenario, SUITE) is None
+    assert historical_check_digest(scenario, SUITE) is None
     real_digest = check_digests.file_digest
 
     def changed_dependency(name: str) -> str:
@@ -95,4 +95,4 @@ def test_changed_executable_check_identity_is_not_excused(
 
     monkeypatch.setattr(check_digests, "file_digest", changed_dependency)
     assert check_digests.check_digests((scenario,))[test_id] not in {recorded, current}
-    assert historical_rule_digest(scenario, SUITE) is None
+    assert historical_check_digest(scenario, SUITE) is None
