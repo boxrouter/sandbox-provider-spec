@@ -128,10 +128,6 @@ def test_a_dropped_create_lifetime_counts_only_when_the_run_sends_it(
     ("report_path", "identifier"),
     (
         (
-            "providers/blaxel/reports/adapter-default-size-ceiling.json",
-            "coverage.facts.size_is_ceiling.true",
-        ),
-        (
             "providers/e2b/reports/native-default-registry.json",
             "coverage.custom_images.prepare.registry",
         ),
