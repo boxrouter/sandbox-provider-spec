@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: vercel
 verified:
-  date: '2026-11-05'
+  date: '2026-11-12'
   sdks:
     vercel-sandbox: 0.9.0
 resources:
