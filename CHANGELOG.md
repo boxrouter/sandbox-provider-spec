@@ -5,9 +5,9 @@ says what each kind of release may change.
 
 ## Unreleased
 
-- `providers/boxd/publication.yaml` records the founder's 2026-11-09 decision to publish Boxd's default route (a
-  decision with receipts for the provider and its default class). Without it `publication.json` held Boxd hidden
-  and every benchmark page build dropped its batches.
+- `providers/boxd/publication.yaml` holds Boxd hidden again (founder reversal 2026-11-12, "not put boxd for now"): it
+  withdraws the 0.3.184 decision to publish Boxd's default route, so `publication.json` keeps Boxd out of every benchmark
+  page build. Adopt 0.3.185, not 0.3.184.
 
 - `conformance/historical-suite-rules.json` records the coverage suite that 0.3.182 replaced
   (`sha256:f79f539d…`), as the conformance rules require for any suite change. Without it, reports of
