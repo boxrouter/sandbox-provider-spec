@@ -4,7 +4,7 @@ provider: agent37
 # documentation proves it. Kernel, sizes, default_size, size_is_ceiling, disk_mib, regions and
 # the gates stay unknown until a report proves them.
 verified:
-  date: 2026-11-11
+  date: 2026-11-12
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
   sdks: {"httpx": "0.28.1"}
 resources:

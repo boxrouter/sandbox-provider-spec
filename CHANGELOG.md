@@ -5,6 +5,10 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Agent37's declaration moves `verified.date` to 2026-11-12, so its SHA-256 changes. Its cited report
+  `adapter-defaults.json` is re-certified live against boxrouter-agent37 0.1.3, whose `provider.py` changed
+  (`facts.default_cwd`, `facts.default_user`).
+
 - A report run before 0.3.182 stopped naming `lifetime_seconds` in 76 coverage creates still stands
   for those checks where a run now sends the same create. New `src/sandbox_provider_spec/lifetime.py`
   owns `DEFAULT_LIFETIME_SECONDS` (300): the lifetime a create that names none asks for on a provider
