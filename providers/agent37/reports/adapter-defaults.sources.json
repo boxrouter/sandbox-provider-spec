@@ -568,7 +568,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "453b277079d1f5a3bad94334a3a92954e8cc42f669aa2821c807dade1dfc8c81",
+  "report_sha256": "9c01af066571841256832e648f88e1f0bbf243592cecba35bc6b3d3538ade443",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -636,7 +636,7 @@
     "boxrouter_agent37/sandbox.py::AsyncAgent37Provider._run": "sha256:9a462e89bcf906067a7397185818f10c6dbb181f8cd50589ed822de469e2d975",
     "boxrouter_agent37/sandbox.py::_text": "sha256:75884f15950d8ef156b5152904073d2cea61cc9bcd6f0f6ee202286a607076d3",
     "boxrouter_agent37/sandbox.py::created_time": "sha256:0e443a6660954de6d7ff7ff24cbfafd9561d99287bb9acb6baebbfe695f7b17d",
-    "boxrouter_agent37/support.yaml": "sha256:405e1728e48a8e0ab32230a5e3acd9ed48d40e5612f5bb497d309eeaedc1e54f",
+    "boxrouter_agent37/support.yaml": "sha256:cd6baa28df2c08562d048802cc9213e3ce27ad374c97469074de06eb04481730",
     "boxrouter_agent37/transport.py::": "sha256:72d48589d47a86892fa9d9a10d49ba1b3cc5014b342df1a32fa4d17d912f05f1",
     "boxrouter_agent37/transport.py::Agent37Client.__init__": "sha256:f0203eda458e581b8d0adb8449cb491d3d1e35e62591bfc3bfeb879017102ab7",
     "boxrouter_agent37/transport.py::Agent37Client.control": "sha256:320cd2a5e12545de94615d50e8c0e055494eb51b99c841222f8ea4136b179aad",
