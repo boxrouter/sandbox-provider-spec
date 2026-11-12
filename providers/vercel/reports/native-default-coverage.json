@@ -1,29 +1,29 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.arch.amd64": "sha256:6d3bf472505f81b15c42a58d94f6e7749d08f1fca0c4e90b3535e7f70bc2641e",
-    "coverage.facts.disk_in_memory.false": "sha256:13efabc6b89b2a29c5206a12204088ad0af4c2008eebc3840abf116be8a9a59d",
-    "coverage.facts.libc.glibc": "sha256:44d96222bd18d3725c39a47f12ac22fcd99050fee0194a2d3a0f3109e78ebb84",
+    "coverage.facts.arch.amd64": "sha256:d28c0aa7b03821a621496d8eaad6ed43066a94978f4162cb3d6999220a733af9",
+    "coverage.facts.disk_in_memory.false": "sha256:6b4c9daad0d2612edd3ba5b1425ca98d7385bbd2d9aaf1cb97146f57df0d5dbd",
+    "coverage.facts.libc.glibc": "sha256:910cbaa72998aefc08327a3c68725d8393b6ed7c90c204c80a78743731a9bbd7",
     "coverage.facts.max_process": "sha256:ecf64bce5f12d5512b36568a3c60fe25ec0823738eeb0ceea5064fdf0ce7e8d6",
-    "coverage.facts.package_manager.apt": "sha256:0922f9b376aa2b093a0ebf86ae5dfeb4067dc23d3497977373985a935f9452bf",
-    "coverage.facts.root.sudo": "sha256:004ac7ec3c22ce91d6dcfbbeb710a530264b003263df9526df36795213af4a62",
+    "coverage.facts.package_manager.apt": "sha256:ef6893b20934b97a39bb9dd737b6d7c91f84ed6fc5883ff5a69c05dc35270d3b",
+    "coverage.facts.root.sudo": "sha256:f9d7d8863b16838b702004fad35afb9d7aa0349abd3728828618c640b3b988aa",
     "coverage.hidden_secrets.injection.sets_header": "sha256:88f216a69114d5f407bea17fadf743600201b7460863eea3610b306b16d2717f",
     "coverage.hidden_secrets.intercepts.injected_hosts": "sha256:386cc658e9e4f67bff6cef08e35be38c49b6e21d89dd3a8cfd80820282a5a069",
     "coverage.hidden_secrets.scrubs_responses.false": "sha256:689f85643777c7761eac694e7b2b434bf293b7cdd91a4aa37ecd778cb74540f7",
     "coverage.hidden_secrets.transparent.true": "sha256:ff2a86b123a6e0e2ae6420e75896ed4a31542b00973df5c2ec9d41cd645ce7a2",
-    "coverage.previews.loopback": "sha256:d53d90c7ddf19549bf61ee42aab7caa85e97cbd1380492f3acd1f66f7dc6a38e",
-    "coverage.previews.survives_pause": "sha256:ca6dbc36850060a4d33b6cbb3e3b9702e7b3c89bdfefb55cebca2522f6961f77",
-    "coverage.previews.websocket": "sha256:cc83ccbe84c081184fa5b61b0cb9709e19c644d8f08b63914add95ba72195d9f"
+    "coverage.previews.loopback": "sha256:c042b18ff3a3a1c949d378743b926674f458798c5e62ff57a7878c5dff7f3481",
+    "coverage.previews.survives_pause": "sha256:b0aa0c806c9892911d7a2dcb05c91665c6a69262a6442cd7d02ecb955555866b",
+    "coverage.previews.websocket": "sha256:5fc72aafb3f476875632d03252c8f2fcfbf48836bcff112cb5c41dc9bf980d99"
   },
   "clean": true,
   "driver": {
     "name": "VercelDriver",
-    "version": "0.3.141"
+    "version": "0.3.179"
   },
-  "finished_at": "2026-10-29T01:48:04.326626+00:00",
+  "finished_at": "2026-11-12T11:23:32.836104+00:00",
   "provider": "vercel",
-  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
-  "run_id": "public-8b619bb439c261d17b5f",
+  "revision": "89be27b16c418f90b6088c06cf7ce39bb874e16c",
+  "run_id": "public-925a3d0e96db18e7fd44",
   "sdk_versions": {
     "vercel-sandbox": "0.9.0"
   },
@@ -43,8 +43,8 @@
     "coverage.hidden_secrets.transparent.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-10-29T01:37:21.091306+00:00",
-  "suite_digest": "sha256:864b6f5253d02d6656d54d1dfd10bd9747d655df02626f448d6db48159f94a37",
+  "started_at": "2026-11-12T11:12:46.713700+00:00",
+  "suite_digest": "sha256:f79f539d8db867cdbb548aec6cd92dafd7b340feb5ca370b768dae6d4894d53b",
   "tests": [
     {
       "cleanup": [
@@ -53,7 +53,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1098,
+      "duration_ms": 899,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -91,7 +91,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 886,
+      "duration_ms": 1122,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -129,7 +129,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6881,
+      "duration_ms": 8864,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -165,7 +165,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 854,
+      "duration_ms": 873,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -201,7 +201,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5027,
+      "duration_ms": 4922,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -242,7 +242,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 600972,
+      "duration_ms": 600881,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -307,7 +307,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1590,
+      "duration_ms": 2202,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -358,7 +358,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2217,
+      "duration_ms": 2389,
       "id": "coverage.previews.loopback",
       "proves": [
         {
@@ -416,7 +416,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6481,
+      "duration_ms": 6227,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -505,7 +505,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3487,
+      "duration_ms": 3434,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -549,7 +549,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3275,
+      "duration_ms": 3906,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -601,7 +601,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 6145,
+      "duration_ms": 6664,
       "id": "coverage.hidden_secrets.intercepts.injected_hosts",
       "proves": [
         {
@@ -645,7 +645,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4319,
+      "duration_ms": 3738,
       "id": "coverage.hidden_secrets.transparent.true",
       "proves": [
         {
