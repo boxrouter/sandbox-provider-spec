@@ -1,12 +1,8 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "custom_images.provider_artifact": "sha256:7dfb8611fb246611105a28aae5056e30c436f02cfd1311753b73c1adc97f127d",
-    "facts.default_cwd": "sha256:4770954ea1c1ba78f194445298fc6c511a73285f220a2c045c5ed33d47f5a566",
-    "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2",
     "network_lockdown.allowlist.addresses": "sha256:fe1f2068faa9b1554b96682d8e5b4bd79258d0f2d08a284559638eab895c2f72",
     "network_lockdown.allowlist.names": "sha256:f9166496e0cc6eb8097e2dabe3de2bd23095e653617de53b244bc6cc3e3d5619",
-    "network_lockdown.deny_all": "sha256:06d455dae14a2d8adcc41c1475ebb3669140a4c5740396ce81d4c6cf16536076",
     "network_lockdown.max_allow": "sha256:0fc408f3b29fa24fcaa1831891ef68d954db039a25bf22e547be32a62e22bd9d",
     "network_lockdown.wildcards": "sha256:f5144726bf5c98f6c8e06a8d76e2ab5bce9da9f20acaff4274503419d8b6656a"
   },
@@ -16,25 +12,21 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-10-29T07:10:29.757228+00:00",
+  "finished_at": "2026-11-12T17:17:26.738833+00:00",
   "provider": "modal",
-  "revision": "58abc45321592fe47230d49a47abda296e567712",
-  "run_id": "public-788e321be2c1f7e47621",
+  "revision": "342a0f1d31d6b9f2c3d80bab92704315bf0cc603",
+  "run_id": "public-ed7edb95d3bd978bd88a",
   "sdk_versions": {
     "modal": "1.6.1"
   },
   "selected_tests": [
-    "facts.default_user",
-    "facts.default_cwd",
-    "network_lockdown.deny_all",
     "network_lockdown.allowlist.names",
     "network_lockdown.allowlist.addresses",
     "network_lockdown.max_allow",
-    "network_lockdown.wildcards",
-    "custom_images.provider_artifact"
+    "network_lockdown.wildcards"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-10-29T07:09:43.307450+00:00",
+  "started_at": "2026-11-12T17:17:00.418750+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -44,112 +36,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2295,
-      "id": "facts.default_user",
-      "proves": [
-        {
-          "fact": "resources.default_user",
-          "value": "root"
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "facts/default-environment"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "default_user": "root"
-          },
-          "operation": "environment.observe",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1683,
-      "id": "facts.default_cwd",
-      "proves": [
-        {
-          "fact": "resources.default_cwd",
-          "value": "/"
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "facts/default-environment"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "default_cwd": "/"
-          },
-          "operation": "environment.observe",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 2406,
-      "id": "network_lockdown.deny_all",
-      "proves": [
-        {
-          "gate": "network_lockdown",
-          "knob": "policy",
-          "value": "deny_all"
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "network_lockdown/deny-all"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "passed": {
-              "matches": true
-            }
-          },
-          "operation": "fixture.coverage_network_checks",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 2181,
+      "duration_ms": 2872,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -194,7 +81,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 18185,
+      "duration_ms": 2139,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -239,7 +126,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 14929,
+      "duration_ms": 18790,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -278,7 +165,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2860,
+      "duration_ms": 2517,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
@@ -304,63 +191,6 @@
             }
           },
           "operation": "fixture.coverage_network_checks",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1906,
-      "id": "custom_images.provider_artifact",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "provider_artifact"
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "custom_images/provider-artifact"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "exit_code": {
-              "actual": 0,
-              "matches": true
-            },
-            "stdout": "root\n/\n"
-          },
-          "operation": "run",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "stdout": {
-              "actual": {
-                "length": 267,
-                "type": "str"
-              },
-              "matches": true
-            }
-          },
-          "operation": "run",
           "result": "passed"
         }
       ]

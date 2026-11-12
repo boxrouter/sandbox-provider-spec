@@ -4,8 +4,8 @@
     "custom_images.dockerfile": "sha256:2e5e59b69524335ba0ab551e6e10c9a1279f97bb259e87971b52dac6a160244f",
     "facts.default_cwd": "sha256:4770954ea1c1ba78f194445298fc6c511a73285f220a2c045c5ed33d47f5a566",
     "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2",
-    "idle_shutdown.custom_idle_time.true": "sha256:a36133acbf89bbdfbf85211d2ae53dbafce17d48190eb48dc6eabeeda58c8e67",
-    "lifetime_timer.at_end.destroyed": "sha256:e69b08b31b135ac58bbde7378a9e35c9e016fc838fd2630ea73adece79c016c3",
+    "idle_shutdown.custom_idle_time.true": "sha256:a8ca31ba009147e021a3d6c10f607079bdae8898cc6285c93cecfdc84105d316",
+    "lifetime_timer.at_end.destroyed": "sha256:c74763497fdc4d8cebb5c8860a11f353093b92be1a5ffc1d0b092f0298bfdadf",
     "previews.access.public": "sha256:1ff07a1479a21982f5e8a59abbd35b5c2b910bd62a1b76495d7f18cb1b9c77f4",
     "previews.link_lifetime_seconds.public": "sha256:c4f3fbd9e79d04da92ae655d64d5012b90d5d7c8df50933c7c1537c0c26564c6",
     "previews.revocable.false.public": "sha256:93b0b8abdc61086eef3fc23a404471e81450dbfae9971bbd0d8c8e7d1a8af535",
@@ -19,12 +19,12 @@
   "clean": true,
   "driver": {
     "name": "ModalDriver",
-    "version": "0.3.141"
+    "version": "0.3.189"
   },
-  "finished_at": "2026-10-29T00:53:40.356654+00:00",
+  "finished_at": "2026-11-12T14:36:11.555053+00:00",
   "provider": "modal",
-  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
-  "run_id": "public-4dd0e352979dd8ed233e",
+  "revision": "0bdbf550c868fb48db8c0a3c2465f015efb7ca92",
+  "run_id": "public-1a15ab3c55fd5f7ca908",
   "sdk_versions": {
     "modal": "1.6.1"
   },
@@ -44,8 +44,8 @@
     "previews.link_lifetime_seconds.public"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-10-29T00:40:18.613348+00:00",
-  "suite_digest": "sha256:a937b66167cee4260622e869226dbc7a8eae5b2e06e0f785b48ca37aeead78f6",
+  "started_at": "2026-11-12T14:22:51.987487+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
       "cleanup": [
@@ -62,7 +62,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2163,
+      "duration_ms": 1899,
       "id": "processes.input.true",
       "proves": [
         {
@@ -121,7 +121,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2137,
+      "duration_ms": 1759,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -153,7 +153,7 @@
           "observations": {
             "terminal": {
               "actual": {
-                "length": 234,
+                "length": 281,
                 "type": "bytes"
               },
               "matches": true
@@ -175,7 +175,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2053,
+      "duration_ms": 1811,
       "id": "facts.default_user",
       "proves": [
         {
@@ -213,7 +213,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1942,
+      "duration_ms": 1773,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -251,7 +251,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 305447,
+      "duration_ms": 305497,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -303,7 +303,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 120564,
+      "duration_ms": 120569,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {
@@ -385,7 +385,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6051,
+      "duration_ms": 4405,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -481,7 +481,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7230,
+      "duration_ms": 5544,
       "id": "snapshots.original_after.continues",
       "proves": [
         {
@@ -516,7 +516,7 @@
               "actual": true,
               "matches": true
             },
-            "baseline_gap_ms": 100,
+            "baseline_gap_ms": 101,
             "capture": "native_default",
             "longest_gap_ms": 100,
             "original_after": {
@@ -560,7 +560,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4305,
+      "duration_ms": 2512,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -606,7 +606,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2222,
+      "duration_ms": 2388,
       "id": "previews.access.public",
       "proves": [
         {
@@ -682,7 +682,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 41640,
+      "duration_ms": 47114,
       "id": "custom_images.dockerfile",
       "proves": [
         {
@@ -757,7 +757,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2733,
+      "duration_ms": 2032,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -825,7 +825,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 303251,
+      "duration_ms": 302262,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {

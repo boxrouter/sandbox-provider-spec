@@ -1,8 +1,7 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f",
-    "coverage.facts.sizes.delivered": "sha256:86bb6d733bc3b45c0880664ef1c85b87b13da276cb2d4d980078aaf98f504223"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "class": "default",
   "clean": true,
@@ -10,19 +9,18 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T18:55:11.663699+00:00",
+  "finished_at": "2026-11-12T17:17:32.584999+00:00",
   "provider": "modal",
-  "revision": "f5385f431907f272f125842abf3783ce2ae17747",
-  "run_id": "public-f9a386f33f793eef2740",
+  "revision": "342a0f1d31d6b9f2c3d80bab92704315bf0cc603",
+  "run_id": "public-f7e19be8ae31313082d7",
   "sdk_versions": {
     "modal": "1.6.1"
   },
   "selected_tests": [
-    "coverage.facts.size_is_ceiling.true",
-    "coverage.facts.sizes.delivered"
+    "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T18:55:06.510592+00:00",
+  "started_at": "2026-11-12T17:17:28.733116+00:00",
   "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
@@ -32,7 +30,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3764,
+      "duration_ms": 3851,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -52,46 +50,10 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"200000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n6:memory:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n5:job:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n4:devices:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n3:cpuset:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n2:cpuacct:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\\n1:cpu:/ta-01M75ZDGKQ1RHDAKVH7J26TEAV\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"1073741824\"}, \"membership\": \"7:pids:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n6:memory:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n5:job:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n4:devices:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n3:cpuset:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n2:cpuacct:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\\n1:cpu:/ta-01M78C7D7Y9KMQF5HXR2PANE6V\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
             "size_is_ceiling": {
               "matches": true
             }
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1387,
-      "id": "coverage.facts.sizes.delivered",
-      "proves": [],
-      "result": "passed",
-      "rules": [
-        "facts/sizes"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "cpu_delivered": {
-              "matches": true
-            },
-            "memory_delivered": {
-              "matches": true
-            },
-            "observed_cpu": 4,
-            "observed_memory_mib": 8192
           },
           "operation": "fixture.coverage_fact",
           "result": "passed"

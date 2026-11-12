@@ -1,8 +1,7 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f",
-    "coverage.facts.sizes.delivered": "sha256:86bb6d733bc3b45c0880664ef1c85b87b13da276cb2d4d980078aaf98f504223"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "class": "vm",
   "clean": true,
@@ -10,19 +9,18 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T19:07:40.923642+00:00",
+  "finished_at": "2026-11-12T17:16:58.235916+00:00",
   "provider": "modal",
-  "revision": "d4b5b1c738afe26af31e435cc243f220d7c35a40",
-  "run_id": "public-7b43c56bf2b3f958a85a",
+  "revision": "342a0f1d31d6b9f2c3d80bab92704315bf0cc603",
+  "run_id": "public-ce4455c64bbe81aa7f39",
   "sdk_versions": {
     "modal": "1.6.1"
   },
   "selected_tests": [
-    "coverage.facts.size_is_ceiling.true",
-    "coverage.facts.sizes.delivered"
+    "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T19:00:22.472314+00:00",
+  "started_at": "2026-11-12T17:16:51.457210+00:00",
   "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
@@ -32,7 +30,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 436457,
+      "duration_ms": 6777,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -52,46 +50,10 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.013, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.00325, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.974, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.9935, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
             "size_is_ceiling": {
               "matches": true
             }
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1989,
-      "id": "coverage.facts.sizes.delivered",
-      "proves": [],
-      "result": "passed",
-      "rules": [
-        "facts/sizes"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "cpu_delivered": {
-              "matches": true
-            },
-            "memory_delivered": {
-              "matches": true
-            },
-            "observed_cpu": 16,
-            "observed_memory_mib": 32103
           },
           "operation": "fixture.coverage_fact",
           "result": "passed"
