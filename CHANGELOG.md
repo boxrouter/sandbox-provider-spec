@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Modal and Blaxel declarations: `verified.date` 2026-11-12 (modal `declaration.yaml` and
+  `declaration-vm.yaml`, blaxel `declaration.yaml`), so their SHA-256 changes. The #5148 evidence
+  lane refreshed the cited live reports on that date: `native-default-core` (ModalDriver 0.3.189
+  for modal, BlaxelDriver 0.3.189 for blaxel) and the adapter-side certify reports
+  (`adapter-default-core`, size-ceiling, provider-artifact) under `providers/modal/reports/` and
+  `providers/blaxel/reports/`.
 - Daytona container declaration: `verified.date` 2026-11-12. Kit #5312 refreshed the Daytona reports on that date; the date moves with them so the reports are not newer than the declaration they cite. No behaviour change.
 - Agent37's declaration states its four shapes in `resources.sizes` (2 vCPU / 4096 MiB, 4 / 8192,
   4 / 16384 and 4 / 32768, each with the disk a create that names none gets), `default_size`
