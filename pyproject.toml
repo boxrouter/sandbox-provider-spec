@@ -92,8 +92,15 @@ ban-relative-imports = "all"
 
 [tool.mypy]
 python_version = "3.11"
+follow_imports_for_stubs = true  # lets the numpy override below skip its stub
 strict = true
 files = ["src", "tests", "tools"]
+
+[[tool.mypy.overrides]]
+# The workspace environment holds the benchmark runner's numpy 2.5, whose stub uses the Python 3.12 `type`
+# statement: with python_version 3.11 mypy aborts parsing it. No package here uses numpy, so skip it.
+module = ["numpy", "numpy.*"]
+follow_imports = "skip"
 
 [tool.pyright]
 include = ["src", "tests", "tools"]
