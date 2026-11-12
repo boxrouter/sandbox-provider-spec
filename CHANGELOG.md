@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- A run on a provider with no lifetime timer may set `file_transfer_lifetime_seconds` to null: the
+  file-link and 1 GiB/5 GiB stream checks that request that lifetime then send creates that name no
+  lifetime, so they run instead of ending `not_run`. coverage.yaml is unchanged, and a run that sets
+  a number (or leaves the default 600) sends the same creates as before. The check digests of the
+  file-link and stream checks change, because `coverage_file_transfer.py` changed.
+
 - Agent37's declaration moves `verified.date` to 2026-11-12, so its SHA-256 changes. Its cited report
   `adapter-defaults.json` is re-certified live against boxrouter-agent37 0.1.3, whose `provider.py` changed
   (`facts.default_cwd`, `facts.default_user`). It is re-certified again against 0.1.4, whose `guest.py`

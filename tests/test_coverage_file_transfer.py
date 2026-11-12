@@ -504,6 +504,19 @@ def test_the_lifetime_defaults_to_600_and_an_override_reaches_create_unchanged()
         )
 
 
+def test_a_null_lifetime_reaches_create_as_no_lifetime() -> None:
+    """A provider with no lifetime timer runs the transfer rows; their creates name no lifetime."""
+    suite, referenced = _coverage_ids()
+    sandbox = RecordingSandbox()
+    fixtures: dict[str, object] = {
+        "link_lifetime_wait_seconds": 600,
+        "file_transfer_lifetime_seconds": None,
+    }
+    results = _run_creates(suite, referenced, sandbox, fixtures)
+    assert [row["result"] for row in results] == ["passed"] * len(referenced)
+    assert ["lifetime_seconds" in create for create in sandbox.creates] == [False] * len(referenced)
+
+
 @pytest.mark.parametrize("bad", [0, -1, True, 300.5, "300"])
 def test_an_invalid_lifetime_override_refuses_before_any_driver_call(bad: object) -> None:
     sandbox = RecordingSandbox()

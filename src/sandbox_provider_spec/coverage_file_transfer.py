@@ -57,7 +57,8 @@ LIFETIME_MARGIN_SECONDS = 5
 INTERRUPT_SETTLE_SECONDS = 3
 INTERRUPT_SETTLE_POLLS = 10
 #: Sandbox lifetime the file-link and 1 GiB stream checks request unless the run overrides
-#: `file_transfer_lifetime_seconds`; the other rows keep their own requested bounds.
+#: `file_transfer_lifetime_seconds`; the other rows keep their own requested bounds. A run on a
+#: provider with no lifetime timer sets it to null, and those creates then ask for no lifetime.
 TRANSFER_LIFETIME_SECONDS = 600
 _HTTP_TIMEOUT_SECONDS = 600
 _OBSERVE = r"""
@@ -681,8 +682,10 @@ class FileTransferRunner(RegularWriteUsabilityRunner):
         lifetime = self.fixtures.setdefault(
             "file_transfer_lifetime_seconds", TRANSFER_LIFETIME_SECONDS
         )
-        if not isinstance(lifetime, int) or isinstance(lifetime, bool) or lifetime < 1:
-            raise ValueError("file_transfer_lifetime_seconds must be a positive integer")
+        if lifetime is not None and (
+            not isinstance(lifetime, int) or isinstance(lifetime, bool) or lifetime < 1
+        ):
+            raise ValueError("file_transfer_lifetime_seconds must be a positive integer or null")
         self.send, self.sleep = send, sleep
 
     def _test_operation(
@@ -693,4 +696,11 @@ class FileTransferRunner(RegularWriteUsabilityRunner):
             if operation == "fixture.file_links":
                 return file_links(check, inputs)
             return file_stream(check, inputs)
+        if (
+            operation == "create"
+            and "lifetime_seconds" in inputs
+            and inputs["lifetime_seconds"] is None
+        ):
+            # A null `file_transfer_lifetime_seconds` asks for no lifetime: the create names none.
+            inputs = {key: value for key, value in inputs.items() if key != "lifetime_seconds"}
         return super()._test_operation(operation, target, inputs)
