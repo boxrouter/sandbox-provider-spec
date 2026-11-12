@@ -610,7 +610,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "f74ca8e5b4f230cbe5583215dbc233d5155b8acade1b1813c1f34883be692d88",
+  "report_sha256": "73477f49c236532d048208293629ae40f45822221da9e0691c0d750d04aac5a8",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
@@ -678,7 +678,7 @@
     "boxrouter_agent37/network.py::apply": "sha256:900eb3e264b44878cc90f2a81708272893798289f6bd2d530cff8f1abcce33d7",
     "boxrouter_agent37/network.py::requested": "sha256:4a272bc707e657af61a0df252ac70cc38a77ebe5ed2d42a5addc4fd1015da291",
     "boxrouter_agent37/network.py::setting": "sha256:2749e4262359979a2e41a5b4bab9f36c7d791e552e359f5eb277d94ac571e86f",
-    "boxrouter_agent37/provider.py::": "sha256:9164e0af4093360f6a20e682310933b5a777a3f86bfb487f09bad403b5922e09",
+    "boxrouter_agent37/provider.py::": "sha256:3cedcbe7aeb6605eba01de4d6d9c7bca385135bdbbe58278fbf021ab91e54160",
     "boxrouter_agent37/provider.py::Agent37Provider._acreate_native": "sha256:76b137dce79226d734e09a7a4a666106ba5513abbbfcb500a5d45bc2ef849679",
     "boxrouter_agent37/provider.py::Agent37Provider._client": "sha256:e55f20fb1cf965fa25511eae139324a1ae7311163383be8251eea345893cb43b",
     "boxrouter_agent37/provider.py::Agent37Provider._handle": "sha256:cc7b0ab4d0195a57455a683cd242147f497b2f54422bf71d4fc62f7eb660d3cf",
