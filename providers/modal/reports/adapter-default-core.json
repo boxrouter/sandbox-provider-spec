@@ -12,10 +12,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-12T17:17:26.738833+00:00",
+  "finished_at": "2026-11-12T20:32:10.977260+00:00",
   "provider": "modal",
-  "revision": "342a0f1d31d6b9f2c3d80bab92704315bf0cc603",
-  "run_id": "public-ed7edb95d3bd978bd88a",
+  "revision": "d0f6732f18d3d70d64fad392096e4a0acf431d89",
+  "run_id": "public-251e096597ade8f05e3b",
   "sdk_versions": {
     "modal": "1.6.1"
   },
@@ -26,7 +26,7 @@
     "network_lockdown.wildcards"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-12T17:17:00.418750+00:00",
+  "started_at": "2026-11-12T20:31:26.088256+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -36,7 +36,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2872,
+      "duration_ms": 4756,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -81,7 +81,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2139,
+      "duration_ms": 3611,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -126,7 +126,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 18790,
+      "duration_ms": 32522,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -165,7 +165,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2517,
+      "duration_ms": 3997,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
