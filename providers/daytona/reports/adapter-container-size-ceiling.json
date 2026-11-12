@@ -9,10 +9,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-11T19:49:43.608038+00:00",
+  "finished_at": "2026-11-12T22:01:01.694795+00:00",
   "provider": "daytona",
-  "revision": "fae6668d862b344082b35853e5f12d9dfb864b2c",
-  "run_id": "public-15789058e2cbc7eb6efb",
+  "revision": "113d6c881d2de29caf181771220f55342f4474d8",
+  "run_id": "public-fb602c4495feb2ee0d1a",
   "sdk_versions": {
     "daytona": "0.226.1"
   },
@@ -20,7 +20,7 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-11T19:49:39.362350+00:00",
+  "started_at": "2026-11-12T22:00:58.187822+00:00",
   "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
@@ -30,7 +30,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4244,
+      "duration_ms": 3505,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -50,7 +50,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu.max\": \"100000 100000\", \"/sys/fs/cgroup/init.scope/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/init.scope/memory.max\": \"max\", \"/sys/fs/cgroup/memory.max\": \"1073741824\"}, \"membership\": \"0::/init.scope\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu.max\": \"100000 100000\", \"/sys/fs/cgroup/init.scope/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/init.scope/memory.max\": \"max\", \"/sys/fs/cgroup/memory.max\": \"4294967296\"}, \"membership\": \"0::/init.scope\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
