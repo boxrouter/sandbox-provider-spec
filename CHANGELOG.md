@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Daytona container declaration: `verified.date` 2026-11-12. Kit #5312 refreshed the Daytona reports on that date; the date moves with them so the reports are not newer than the declaration they cite. No behaviour change.
 - Agent37's declaration states its four shapes in `resources.sizes` (2 vCPU / 4096 MiB, 4 / 8192,
   4 / 16384 and 4 / 32768, each with the disk a create that names none gets), `default_size`
   2 / 4096 / 4096 and `size_is_ceiling: true`, so its SHA-256 changes. A live probe showed Agent37's

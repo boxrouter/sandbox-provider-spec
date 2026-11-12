@@ -26,7 +26,7 @@ sandbox-provider-spec = "sandbox_provider_spec.cli:main"
 docker = ["docker==7.2.0"]
 e2b = [
     "e2b==2.59.0",
-    "e2b-code-interpreter==2.10.0",
+    "e2b-code-interpreter==2.11.3",
     "e2b-desktop==2.6.0",
 ]
 modal = ["modal==1.6.1"]
