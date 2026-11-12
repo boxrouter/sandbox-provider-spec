@@ -8,10 +8,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-04T19:48:53.364505+00:00",
+  "finished_at": "2026-11-12T14:20:49.776805+00:00",
   "provider": "blaxel",
-  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
-  "run_id": "public-1c147eb7a2bf7bdd48be",
+  "revision": "8012615a5f4eea79baae37e6d31685111c9e8ff6",
+  "run_id": "public-b0647bd95d1f05d30f03",
   "sdk_versions": {
     "blaxel": "0.4.8"
   },
@@ -19,7 +19,7 @@
     "custom_images.provider_artifact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-04T19:48:49.521926+00:00",
+  "started_at": "2026-11-12T14:20:48.874077+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -29,7 +29,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3841,
+      "duration_ms": 901,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -59,7 +59,7 @@
               "actual": 0,
               "matches": true
             },
-            "stdout": "root\n/\n"
+            "stdout": "user\n<HOME>\n"
           },
           "operation": "run",
           "result": "passed"
@@ -68,7 +68,7 @@
           "observations": {
             "stdout": {
               "actual": {
-                "length": 286,
+                "length": 400,
                 "type": "str"
               },
               "matches": true

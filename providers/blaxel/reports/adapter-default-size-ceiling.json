@@ -1,17 +1,17 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-05T03:22:16.725908+00:00",
+  "finished_at": "2026-11-12T16:34:14.171935+00:00",
   "provider": "blaxel",
-  "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
-  "run_id": "public-98fafb43fb0d0e135c79",
+  "revision": "8012615a5f4eea79baae37e6d31685111c9e8ff6",
+  "run_id": "public-92dbc636b7d0a779507f",
   "sdk_versions": {
     "blaxel": "0.4.8"
   },
@@ -19,8 +19,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-05T03:22:06.834623+00:00",
-  "suite_digest": "sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295",
+  "started_at": "2026-11-12T16:34:04.278130+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
       "cleanup": [
@@ -29,7 +29,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 9889,
+      "duration_ms": 9892,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
