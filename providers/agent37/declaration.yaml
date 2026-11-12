@@ -1,14 +1,23 @@
 spec: sandbox-provider-spec/0.1
 provider: agent37
 # Every value is `unknown` or absent until a committed run report or a dated quote of Agent37's
-# documentation proves it. Kernel, sizes, default_size, size_is_ceiling, disk_mib, regions and
-# every gate but network_lockdown stay unknown until a report proves them.
+# documentation proves it. Kernel, regions and every gate but network_lockdown stay unknown
+# until a report proves them.
 verified:
   date: 2026-11-12
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
   sdks: {"httpx": "0.28.1"}
 resources:
   kernel: unknown
+  # Agent37's four shapes (instance sizing page). Each size's disk is the default a create that
+  # sends no `disk` gets on a non-VM template; the adapter never sends `disk`.
+  sizes:
+  - {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  - {cpu: 4, memory_mib: 8192, disk_mib: 6144}
+  - {cpu: 4, memory_mib: 16384, disk_mib: 12288}
+  - {cpu: 4, memory_mib: 32768, disk_mib: 24576}
+  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  size_is_ceiling: true
   # Agent37's own default image (template agent37-base), proven by the cited adapter report.
   default_user: node
   default_cwd: /home/node
@@ -39,6 +48,23 @@ gates:
       max_allow: {at_least: 32}
       switchable: true
 evidence:
+  resources.sizes:
+    source: https://www.agent37.com/docs/agents-api/instance-sizing
+    read: 2026-11-12
+    quote: >-
+      | 2 | 4 GB | 2-12 GB | $4.76 per month (the default) | | 4 | 8 GB | 2-20 GB | $9.34 per month |
+      | 4 | 16 GB | 2-40 GB | $15.48 per month | | 4 | 32 GB | 2-80 GB | $27.76 per month | ...
+      Other templates default to 4, 6, 12, or 24 GB disk by shape.
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/adapter-default-size-ceiling.json
+  resources.default_size:
+    source: https://www.agent37.com/docs/agents-api/instances/create
+    read: 2026-11-12
+    quote: >-
+      The instance shape, for example `{ "cpu": 2, "memory": 4, "disk": 6 }`. Omitted, most
+      templates use 2 vCPU / 4 GB. ... When omitted, it defaults to 12 GB for these two VM
+      templates, or 4, 6, 12, or 24 GB by shape for other templates.
   resources.default_user:
     tests: [facts.default_user]
     report: reports/adapter-defaults.json

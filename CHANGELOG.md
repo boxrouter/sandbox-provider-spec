@@ -5,6 +5,11 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Agent37's declaration states its four shapes in `resources.sizes` (2 vCPU / 4096 MiB, 4 / 8192,
+  4 / 16384 and 4 / 32768, each with the disk a create that names none gets), `default_size`
+  2 / 4096 / 4096 and `size_is_ceiling: true`, so its SHA-256 changes. A live probe showed Agent37's
+  "GB" is a GiB; `size_is_ceiling` rests on the new report `adapter-default-size-ceiling.json`.
+
 - A run on a provider with no lifetime timer may set `file_transfer_lifetime_seconds` to null: the
   file-link and 1 GiB/5 GiB stream checks that request that lifetime then send creates that name no
   lifetime, so they run instead of ending `not_run`. coverage.yaml is unchanged, and a run that sets
