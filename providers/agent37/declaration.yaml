@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: agent37
 # Every value is `unknown` or absent until a committed run report or a dated quote of Agent37's
 # documentation proves it. Kernel, sizes, default_size, size_is_ceiling, disk_mib, regions and
-# the gates stay unknown until a report proves them.
+# every gate but network_lockdown stay unknown until a report proves them.
 verified:
   date: 2026-11-12
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
@@ -23,7 +23,21 @@ resources:
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
-gates: {}
+gates:
+  # Agent37's `network` field (instance network page): "deny-all", "allow-all" or an allow list of
+  # domains (HTTPS on 443, `*.` wildcards) and IPv4 addresses or ranges, set at create or changed
+  # on a running instance by PATCH. It has no denylist. Agent37 documents up to 100 entries; the
+  # suite's limit test lists 32, so 32 is what was seen working. Names and addresses are proven in
+  # separate lists: the mixed-list probe reads Agent37's TLS refusal of an unlisted name as
+  # ambiguous (not_run), so a list mixing both kinds stays unproven.
+  network_lockdown:
+    - policy: allowlist
+      entry_kinds: [addresses]
+    - policy: [deny_all, allowlist, open]
+      entry_kinds: [names]
+      allow_wildcards: true
+      max_allow: {at_least: 32}
+      switchable: true
 evidence:
   resources.default_user:
     tests: [facts.default_user]
@@ -44,3 +58,27 @@ evidence:
       `us` is the only region that runs every instance type. `eu` and `ap-south` run VM and
       Performance instances, so a create in either should also send `"type": "vm"` or
       `"type": "performance"`. A `default` create there returns `400 invalid_request`
+  gates.network_lockdown.1.policy:
+    reports:
+      - tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]
+        report: reports/network-lockdown.json
+      - tests: [coverage.network_lockdown.open]
+        report: reports/network-lockdown-coverage.json
+  gates.network_lockdown.1.entry_kinds:
+    tests: [network_lockdown.allowlist.names]
+    report: reports/network-lockdown.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/network-lockdown.json
+  gates.network_lockdown.1.max_allow:
+    tests: [network_lockdown.max_allow]
+    report: reports/network-lockdown.json
+  gates.network_lockdown.1.switchable:
+    tests: [coverage.network_lockdown.switchable.true]
+    report: reports/network-lockdown-coverage.json
+  gates.network_lockdown.0.policy:
+    tests: [network_lockdown.allowlist.addresses]
+    report: reports/network-lockdown-addresses.json
+  gates.network_lockdown.0.entry_kinds:
+    tests: [network_lockdown.allowlist.addresses]
+    report: reports/network-lockdown-addresses.json
