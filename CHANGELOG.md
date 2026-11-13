@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.3.196 carries adapter-modal 0.4.247's recertified reports `adapter-default-core`, `adapter-default-size-ceiling` and
+  `adapter-vm-size-ceiling` under `providers/modal/reports/`. No declaration or catalog change.
 - 0.3.195 republishes 0.3.194's contents with adapter-superserve 0.1.7's recertified reports under
   `providers/superserve/reports/`. Those reports changed under 0.3.194 after it was published (cloud#6090), so one
   version had two contents. No declaration or catalog change.
