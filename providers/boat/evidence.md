@@ -25,6 +25,15 @@ control sandbox after its end and was rerun once; the committed report is the cl
 `min_seconds` stay unknown until a dated quote or report establishes them, and
 `counts_paused_time` is `unknown` because Boat has no pause.
 
+## Disk
+
+The [size table](https://docs.boat.dev/machines) has a separate Disk column: 51 GB for `small` and for
+`default`, "the maximum size of your own files" (the operating system and preinstalled tools are not in
+it). The docs give no unit base, so the declaration takes the lower reading, 51 decimal gigabytes
+(48637 MiB). A live stock `default` machine on 2026-11-11 (`df -B1 /`) showed a 78.4 GiB root with
+54.4 GiB free after 20.8 GiB of operating system and tools, which holds either reading. Disk is not memory:
+`disk_in_memory: false` cites a certifying `coverage.facts.disk_in_memory.false` report from the adapter.
+
 ## Placement countries
 
 `located_in` is `[DE, FI, FR]` from the [compliance page](https://docs.boat.dev/compliance) (read
@@ -34,8 +43,7 @@ does not change `located_in`; the adapter also creates every sandbox with backgr
 
 ## Left unknown
 
-Regions, disk size in MiB (the docs give "51 GB" without a unit base), paused
-retention (Boat has no pause), GPUs (the docs say none), long-running and run limits. Default user
+Regions, paused retention (Boat has no pause), GPUs (the docs say none), long-running and run limits. Default user
 and working directory (`user`, `/home/user`) are observed but are claimed only through a report.
 
 ## Gates

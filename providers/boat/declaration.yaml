@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boat
 verified:
-  date: '2026-11-09'
+  date: '2026-11-11'
   sdks:
     boat-sdk: 1.13.0
 resources:
@@ -9,11 +9,14 @@ resources:
   sizes:
   - cpu: 2
     memory_mib: 4096
+    disk_mib: 48637
   - cpu: 4
     memory_mib: 8192
+    disk_mib: 48637
   default_size:
     cpu: 4
     memory_mib: 8192
+    disk_mib: 48637
   max_lifetime_seconds: 2592000
   extendable_lifetime: true
   needs:
@@ -23,13 +26,14 @@ resources:
     max_lifetime_seconds:
       paid_plan: 7200
   gpus: unknown
-  disk_mib: unknown
+  disk_mib: 48637
   regions: unknown
   located_in: [DE, FI, FR]
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   long_running: unknown
   size_is_ceiling: true
+  disk_in_memory: false
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: unknown
@@ -49,6 +53,10 @@ evidence:
     tests:
     - coverage.facts.size_is_ceiling.true
     report: reports/adapter-default-size-ceiling.json
+  resources.disk_in_memory:
+    tests:
+    - coverage.facts.disk_in_memory.false
+    report: reports/adapter-default-disk-in-memory.json
   resources.kernel:
     source: https://docs.boat.dev/machines
     read: '2026-11-01'
@@ -61,6 +69,10 @@ evidence:
     source: https://docs.boat.dev/compliance
     read: '2026-11-10'
     quote: Sandboxes run on machines in Germany, Finland and France.
+  resources.disk_mib:
+    source: https://docs.boat.dev/machines
+    read: '2026-11-11'
+    quote: '`small` | **$0.018** | 2 vCPU | 4 GB | 51 GB; `default` | **$0.036** | 4 vCPU | 8 GB | 51 GB'
   resources.default_size:
     source: https://docs.boat.dev/machines
     read: '2026-11-01'

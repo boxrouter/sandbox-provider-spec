@@ -16,10 +16,11 @@ def test_boat_offers_small_beside_the_documented_default() -> None:
     native = load(ROOT / "providers" / "boat" / "declaration.yaml")
     resources = native["resources"]
     assert resources["sizes"] == [
-        {"cpu": 2, "memory_mib": 4096},
-        {"cpu": 4, "memory_mib": 8192},
+        {"cpu": 2, "memory_mib": 4096, "disk_mib": 48637},
+        {"cpu": 4, "memory_mib": 8192, "disk_mib": 48637},
     ]
-    assert resources["default_size"] == {"cpu": 4, "memory_mib": 8192}
+    assert resources["default_size"] == {"cpu": 4, "memory_mib": 8192, "disk_mib": 48637}
+    assert resources["disk_in_memory"] is False
     assert resources["size_is_ceiling"] is True
     assert native["gates"] == {}
     assert sandbox_provider_spec.schema_errors(native, "declaration-schema.json") == []

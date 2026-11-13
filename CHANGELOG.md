@@ -5,6 +5,13 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Boat declares its disk: `disk_mib: 48637` on each size and provider-wide, and `disk_in_memory: false`. The
+  documentation's machine table gives every offered size 51 GB of disk in its own column, read as decimal
+  gigabytes (the lower reading); a live stock machine (2026-11-11) showed a 78 GiB root with 54 GiB free. A
+  request that names memory and disk is now matched against each separately, so a 4 vCPU, 8192 MiB machine
+  with an 8192 MiB disk floor fits Boat's `default` size. `disk_in_memory: false` cites a certifying
+  `coverage.facts.disk_in_memory.false` report from the Boat adapter.
+
 - Agent37 gains `declaration-vm.yaml`, its `vm` class (a dedicated kernel; the same four shapes; regions
   `agent37:us`, `agent37:eu` and `agent37:ap-south`; the default class's `network_lockdown`),
   with five reports on that class. The region registry lists the three Agent37 regions with their countries.
