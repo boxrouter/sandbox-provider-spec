@@ -1,9 +1,9 @@
 spec: sandbox-provider-spec/0.1
 provider: superserve
-# Draft: every value is `unknown`, absent or a dated quote of Superserve's documentation. A fact
-# whose proof must be a test (the lifetime timer, `size_is_ceiling`, the `network_lockdown` variants)
-# is stated in the adapter's support.yaml under `adds` until its report is committed, because this
-# checker refuses a citation of a report that does not exist yet (see evidence.md).
+# Draft: every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed
+# adapter report. A fact whose proof must be a test and whose report is not committed yet (the lifetime
+# timer, the `network_lockdown` variants) is stated in the adapter's support.yaml under `adds`, because
+# this checker refuses a citation of a report that does not exist yet (see evidence.md).
 verified:
   date: 2026-11-13
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
@@ -11,11 +11,17 @@ verified:
   sdks: {"superserve": "0.12.0"}
 resources:
   kernel: unknown
-  sizes: unknown
-  # The documentation gives superserve/base 2 vCPU / 4096 MiB / 8192 MiB, but a live run on this
-  # team on 2026-10-23 saw 1 vCPU / 1024 MiB and a 7.8 G disk, and a plan caps a sandbox's shape:
-  # the live recon settles sizes and the default size.
-  default_size: unknown
+  # A sandbox inherits its shape from the template it starts from and cannot override it, so each
+  # size is a template's: the default template `superserve/base` (templates page; live check
+  # 2026-11-13 in evidence.md) and the standard-image template the adapter builds itself
+  # (image_preparation.py: 2 vCPU, 2048 MiB, 8192 MiB, the team's legacy Free cap).
+  sizes:
+  - {cpu: 2, memory_mib: 2048, disk_mib: 8192}
+  - {cpu: 2, memory_mib: 4096, disk_mib: 8192}
+  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 8192}
+  size_is_ceiling: true
+  default_user: root
+  default_cwd: /home/user
   gpus: unknown
   regions: unknown
   # Superserve's own bound on one timer window (`timeout_seconds`, 1 to 604800).
@@ -27,6 +33,21 @@ resources:
   extendable_lifetime: unknown
 gates: {}
 evidence:
+  resources.sizes:
+    source: https://docs.superserve.ai/templates/overview
+    read: 2026-11-13
+    quote: >-
+      | `superserve/base` | `ubuntu:24.04` | 2 · 4096 MiB · 8192 MiB | ... A sandbox inherits its
+      VM shape (vCPU, memory, disk) from the template it starts from
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/adapter-default-size-ceiling.json
+  resources.default_user:
+    tests: [facts.default_user]
+    report: reports/adapter-defaults.json
+  resources.default_cwd:
+    tests: [facts.default_cwd]
+    report: reports/adapter-defaults.json
   resources.default_size:
     source: https://docs.superserve.ai/templates/overview
     read: 2026-11-13
