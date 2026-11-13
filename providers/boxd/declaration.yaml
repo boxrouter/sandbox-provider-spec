@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-12
+  date: 2026-11-11
   sdks: {boxd: 0.3.0}
 resources:
   kernel: dedicated
