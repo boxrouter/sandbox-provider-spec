@@ -1,0 +1,135 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.network_lockdown.open": "sha256:63333d5008af7824859cd7abd726b10dbadc6e94956ffc30d496789738e62b84",
+    "coverage.network_lockdown.switchable.true": "sha256:9c4efba9493dbf85cdf0b237cd56d46eac16b18e5d6cd49718577d5ba1366c4b"
+  },
+  "class": "vm",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-13T00:58:25.387747+00:00",
+  "provider": "agent37",
+  "revision": "d913d294afdd69ee094bfd921f7bb9c89eebca62",
+  "run_id": "public-8d69b3ab1d8da9f318e1",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "selected_tests": [
+    "coverage.network_lockdown.switchable.true",
+    "coverage.network_lockdown.open"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-13T00:56:59.767268+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 57920,
+      "id": "coverage.network_lockdown.switchable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 27698,
+      "id": "coverage.network_lockdown.open",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "open"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/open"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

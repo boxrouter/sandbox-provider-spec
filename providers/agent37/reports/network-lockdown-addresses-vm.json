@@ -1,0 +1,72 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.allowlist.addresses": "sha256:9c40628b4f28ce3c0700be1e509a76fdef3719baed4699848b4532dde37d2dfd"
+  },
+  "class": "vm",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-13T01:31:46.532569+00:00",
+  "provider": "agent37",
+  "revision": "8b9b4b40ba71f1f05bae161479ded579d80d011a",
+  "run_id": "public-ea10ace7346cfcdb98cd",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "selected_tests": [
+    "network_lockdown.allowlist.addresses"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-13T01:31:34.364695+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 12166,
+      "id": "network_lockdown.allowlist.addresses",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "addresses"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

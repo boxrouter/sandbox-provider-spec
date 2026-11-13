@@ -69,6 +69,24 @@
     }
   },
   "regions": {
+    "agent37:us": {
+      "countries": [
+        "US"
+      ],
+      "source": "https://www.agent37.com/docs/agents-api/instances/create"
+    },
+    "agent37:eu": {
+      "countries": [
+        "FR"
+      ],
+      "source": "https://www.agent37.com/docs/agents-api/instances/create"
+    },
+    "agent37:ap-south": {
+      "countries": [
+        "IN"
+      ],
+      "source": "https://www.agent37.com/docs/agents-api/instances/create"
+    },
     "blaxel:us-pdx-1": {
       "countries": [
         "US"

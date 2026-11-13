@@ -1,0 +1,97 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "facts.default_cwd": "sha256:4770954ea1c1ba78f194445298fc6c511a73285f220a2c045c5ed33d47f5a566",
+    "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2"
+  },
+  "class": "vm",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-12T22:33:07.136670+00:00",
+  "provider": "agent37",
+  "revision": "d59369260bdc60db3739412c76042445f31b5643",
+  "run_id": "public-91be42a1b0bfc0b90b4f",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "selected_tests": [
+    "facts.default_user",
+    "facts.default_cwd"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-12T22:33:03.396992+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2098,
+      "id": "facts.default_user",
+      "proves": [
+        {
+          "fact": "resources.default_user",
+          "value": "root"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_user": "root"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1640,
+      "id": "facts.default_cwd",
+      "proves": [
+        {
+          "fact": "resources.default_cwd",
+          "value": "/root"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_cwd": "<HOME>"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

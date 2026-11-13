@@ -24,6 +24,35 @@ proves. Values without supporting evidence remain `unknown`. No conformance repo
   `reports/adapter-default-size-ceiling.json`. The instance's cgroup holds a 2-core CPU quota
   (`cpu.cfs_quota_us` 200000 over 100000) and a 4294967296-byte memory limit.
 
+## VM class (`declaration-vm.yaml`)
+
+Agent37's `vm` instance type: a full Linux virtual machine with its own kernel, on the same API
+keys, endpoints and wallet as a default instance. Agent37 says it "needs a funded workspace"
+(create page, read 2026-11-12): an account whose wallet cannot cover a day of VM compute cannot use
+this class.
+
+- `kernel: dedicated`: the VM instances page (read 2026-11-12) says a `vm` instance is "a full
+  Linux virtual machine with its own kernel and KVM hardware virtualization". A live probe on
+  2026-11-12 (run `agent37-vm-20261112T093014Z`) read kernel `7.0.0-38-generic`, `/dev/kvm` and
+  `/dev/fuse`, and full capabilities for root.
+- `sizes`, `default_size`: the instance sizing page says a VM takes the same four shapes as a
+  default instance; the create page gives the same disk-by-shape default for a template other than
+  `agent37-ubuntu` and `agent37-android`. The probe's standard-image VM with no `resources` read
+  2 vCPU, 4 GB and 4 GB of disk.
+- `size_is_ceiling: true`: `coverage.facts.size_is_ceiling.true` passed in
+  `reports/adapter-vm-size-ceiling.json`.
+- `default_user: root`, `default_cwd: /root`: the class's default image is `agent37-ubuntu`
+  (Ubuntu with Docker running), which the adapter creates for a `provider_default` image on this
+  class; `facts.default_user` and `facts.default_cwd` passed in `reports/adapter-vm-defaults.json`.
+- `regions` and `located_in: ["US"]`: the VM instances page says VMs run in `us`, `eu` (France)
+  and `ap-south` (India, Mumbai), and the create page says `us` is the default region.
+- `max_lifetime_seconds: unlimited`: as for the default class (concepts page).
+
+The `network_lockdown` variants are those of the default class, proven again on VMs:
+`reports/network-lockdown-vm.json` (deny all, names, wildcards, 32 entries),
+`reports/network-lockdown-addresses-vm.json` (addresses) and
+`reports/network-lockdown-coverage-vm.json` (open, switchable).
+
 TODO(recon): cite the recon report rows for kernel, sizes, regions and the other limits.
 
 ## Gates

@@ -1,0 +1,117 @@
+spec: sandbox-provider-spec/0.1
+provider: agent37
+class: vm
+# Agent37's `vm` instance type: the same API, keys and wallet as a default instance, with its own
+# kernel. Every value is `unknown` or absent until a committed run report or a dated quote of
+# Agent37's documentation proves it.
+verified:
+  date: 2026-11-13
+  # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
+  sdks: {"httpx": "0.28.1"}
+resources:
+  kernel: dedicated
+  # The default class's four shapes; each size's disk is the default a create that sends no
+  # `disk` gets on a template other than Agent37's two VM templates.
+  sizes:
+  - {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  - {cpu: 4, memory_mib: 8192, disk_mib: 6144}
+  - {cpu: 4, memory_mib: 16384, disk_mib: 12288}
+  - {cpu: 4, memory_mib: 32768, disk_mib: 24576}
+  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  size_is_ceiling: true
+  # This class's own default image (template agent37-ubuntu), proven by the cited adapter report.
+  default_user: root
+  default_cwd: /root
+  gpus: unknown
+  regions: ["agent37:us", "agent37:eu", "agent37:ap-south"]
+  located_in: ["US"]
+  # An instance has no lifetime timer, so this declaration has no `lifetime_timer` block: it
+  # serves only requests that ask for no lifetime (`lifetime_seconds: null`).
+  max_lifetime_seconds: unlimited
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  long_running: unknown
+  extendable_lifetime: unknown
+gates:
+  # Agent37's `network` field, as on a default instance (see declaration.yaml), proven again on VMs.
+  network_lockdown:
+    - policy: allowlist
+      entry_kinds: [addresses]
+    - policy: [deny_all, allowlist, open]
+      entry_kinds: [names]
+      allow_wildcards: true
+      max_allow: {at_least: 32}
+      switchable: true
+evidence:
+  resources.kernel:
+    source: https://www.agent37.com/docs/agents-api/vm-instances
+    read: 2026-11-12
+    quote: >-
+      A `vm` instance is a full Linux virtual machine with its own kernel and KVM hardware
+      virtualization. It uses the same API keys, endpoints, URLs, and prepaid wallet as a default
+      instance.
+  resources.sizes:
+    source: https://www.agent37.com/docs/agents-api/instance-sizing
+    read: 2026-11-12
+    quote: >-
+      A VM instance takes the same four shapes, and its compute is 2.5x the default rate. A VM or
+      `performance` instance takes 2-100 GB of disk on every shape.
+  resources.default_size:
+    source: https://www.agent37.com/docs/agents-api/instances/create
+    read: 2026-11-12
+    quote: >-
+      Omitted, most templates use 2 vCPU / 4 GB. ... When omitted, it defaults to 12 GB for these
+      two VM templates, or 4, 6, 12, or 24 GB by shape for other templates.
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/adapter-vm-size-ceiling.json
+  resources.default_user:
+    tests: [facts.default_user]
+    report: reports/adapter-vm-defaults.json
+  resources.default_cwd:
+    tests: [facts.default_cwd]
+    report: reports/adapter-vm-defaults.json
+  resources.regions:
+    source: https://www.agent37.com/docs/agents-api/vm-instances
+    read: 2026-11-12
+    quote: >-
+      VM instances run in every region: `us`, `eu` (France), and `ap-south` (India, Mumbai).
+      Outside the US they are the *only* type available, so a create in `eu` or `ap-south` has to
+      send `"type": "vm"`.
+  resources.located_in:
+    source: https://www.agent37.com/docs/agents-api/instances/create
+    read: 2026-11-12
+    quote: >-
+      **region** `string` (default: us) Where the instance runs: `us`, `eu` (France), or
+      `ap-south` (India, Mumbai).
+  resources.max_lifetime_seconds:
+    source: https://www.agent37.com/docs/agents-api/concepts
+    read: 2026-11-12
+    quote: >-
+      An isolated, persistent computer for code, services, or an agent harness. Built from a
+      template. Lives until you delete it, metered per minute for what it holds
+  gates.network_lockdown.1.policy:
+    reports:
+      - tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]
+        report: reports/network-lockdown-vm.json
+      - tests: [coverage.network_lockdown.open]
+        report: reports/network-lockdown-coverage-vm.json
+  gates.network_lockdown.1.entry_kinds:
+    tests: [network_lockdown.allowlist.names]
+    report: reports/network-lockdown-vm.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/network-lockdown-vm.json
+  gates.network_lockdown.1.max_allow:
+    tests: [network_lockdown.max_allow]
+    report: reports/network-lockdown-vm.json
+  gates.network_lockdown.1.switchable:
+    tests: [coverage.network_lockdown.switchable.true]
+    report: reports/network-lockdown-coverage-vm.json
+  gates.network_lockdown.0.policy:
+    tests: [network_lockdown.allowlist.addresses]
+    report: reports/network-lockdown-addresses-vm.json
+  gates.network_lockdown.0.entry_kinds:
+    tests: [network_lockdown.allowlist.addresses]
+    report: reports/network-lockdown-addresses-vm.json

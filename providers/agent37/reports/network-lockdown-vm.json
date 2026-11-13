@@ -1,0 +1,191 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.allowlist.names": "sha256:66d279c6f7da3e0cd6cf4c6819440efda31d11be59d5ef2d7dac89d77dc4fcd4",
+    "network_lockdown.deny_all": "sha256:87e3ed331e30ddf507518d6cccd6fb58f3b662247a88f936b1541b280eb18f72",
+    "network_lockdown.max_allow": "sha256:cbc88f31496179af098e8f78798cc33156b95ecca38047c9cbf4146542f9afee",
+    "network_lockdown.wildcards": "sha256:fc08bcb4a23b67f88b1fb2fc74dee398f978bdb08b44a43944b1da92c051f725"
+  },
+  "class": "vm",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-13T01:42:45.254765+00:00",
+  "provider": "agent37",
+  "revision": "8b9b4b40ba71f1f05bae161479ded579d80d011a",
+  "run_id": "public-fdb63074dd958d4f2aed",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "selected_tests": [
+    "network_lockdown.deny_all",
+    "network_lockdown.allowlist.names",
+    "network_lockdown.max_allow",
+    "network_lockdown.wildcards"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-13T01:31:52.836741+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 40639,
+      "id": "network_lockdown.deny_all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "deny_all"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/deny-all"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 44024,
+      "id": "network_lockdown.allowlist.names",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 507096,
+      "id": "network_lockdown.max_allow",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "max_allow",
+          "value": {
+            "at_least": 32
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/max-allow"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 60657,
+      "id": "network_lockdown.wildcards",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "allow_wildcards",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/wildcards"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

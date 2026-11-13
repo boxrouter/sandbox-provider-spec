@@ -5,6 +5,9 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Agent37 gains `declaration-vm.yaml`, its `vm` class (a dedicated kernel; the same four shapes; regions
+  `agent37:us`, `agent37:eu` and `agent37:ap-south`; the default class's `network_lockdown`),
+  with five reports on that class. The region registry lists the three Agent37 regions with their countries.
 - Brand files: Agent37 has `providers/agent37/brand.yaml` and `brand/` (the symbol from agent37.com, `order: 7`, no `launched`
   until it is offered in the legal roster), so `brand.json` carries its logo and mark. `brand.yaml` accepts an optional
   `mark_colours: own`, shipped in `brand.json`, which says the mark file is drawn in the brand's own colours; without it a
