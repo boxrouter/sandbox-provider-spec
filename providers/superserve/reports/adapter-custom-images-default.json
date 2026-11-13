@@ -11,10 +11,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T13:10:58.578739+00:00",
+  "finished_at": "2026-11-13T15:34:30.653759+00:00",
   "provider": "superserve",
-  "revision": "b044f1e4492cd2b13da11a3d707360d1603427dd",
-  "run_id": "public-f755e3883b4f52a8c77f",
+  "revision": "17f6c405e213d41602ea6b58987c6ed47df504c0",
+  "run_id": "public-0d4ed92467730208e60d",
   "sdk_versions": {
     "superserve": "0.12.0"
   },
@@ -25,8 +25,8 @@
     "coverage.custom_images.prepare.delete"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T13:09:45.373791+00:00",
-  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
+  "started_at": "2026-11-13T15:33:17.189810+00:00",
+  "suite_digest": "sha256:1d410dfb6f824f7f283fb959e2ece62cf52ffadcd2a3620c75f0924f5aae3fbd",
   "tests": [
     {
       "cleanup": [
@@ -39,7 +39,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 19633,
+      "duration_ms": 19679,
       "id": "coverage.custom_images.runs_entrypoint.false",
       "proves": [
         {
@@ -90,7 +90,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 18546,
+      "duration_ms": 18709,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -142,7 +142,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17571,
+      "duration_ms": 17674,
       "id": "coverage.custom_images.prepare.idempotent",
       "proves": [
         {
@@ -198,7 +198,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 17452,
+      "duration_ms": 17399,
       "id": "coverage.custom_images.prepare.delete",
       "proves": [
         {

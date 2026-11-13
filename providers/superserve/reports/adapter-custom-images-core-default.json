@@ -9,10 +9,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T13:08:27.421484+00:00",
+  "finished_at": "2026-11-13T15:32:25.252557+00:00",
   "provider": "superserve",
-  "revision": "b044f1e4492cd2b13da11a3d707360d1603427dd",
-  "run_id": "public-1ae90d2bc388cf114ef3",
+  "revision": "17f6c405e213d41602ea6b58987c6ed47df504c0",
+  "run_id": "public-1e935d0d70825b054c2b",
   "sdk_versions": {
     "superserve": "0.12.0"
   },
@@ -21,7 +21,7 @@
     "custom_images.provider_artifact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T13:08:08.516817+00:00",
+  "started_at": "2026-11-13T15:32:04.722830+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -35,7 +35,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 18549,
+      "duration_ms": 20147,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -92,7 +92,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 353,
+      "duration_ms": 380,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
