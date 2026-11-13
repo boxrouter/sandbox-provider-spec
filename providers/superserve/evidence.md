@@ -56,8 +56,8 @@ into this declaration, with their citations, once the live runs commit the repor
 - `network_lockdown`: not stated yet. Superserve documents an allow list (IPs, CIDRs, domains with `*.`
   wildcards) and a deny list (IPs and CIDRs only), set at create and replaced on an active sandbox
   (networking page and OpenAPI `NetworkConfig`, read 2026-11-13). The gate lands with the adapter's
-  network implementation, because declaring it requires `network_update`; the drafted variants and the
-  tests that prove them are in `scratchspace/superserve/ss-decl/network-variants.yaml`.
+  network implementation, because declaring it requires `network_update`; the variants and the tests
+  that prove them are drafted with that implementation.
 
 ## Gates
 
