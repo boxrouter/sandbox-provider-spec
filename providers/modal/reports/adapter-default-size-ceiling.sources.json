@@ -379,7 +379,7 @@
     ]
   },
   "format": 2,
-  "report_sha256": "2e686d49f200a36ee0a3a6e9e82b1acdf6ab3fd15102b8bc873b3ce5dc18c1d6",
+  "report_sha256": "e292a224a7269ad7c395dc1c8eee5f48429900dbf4be389db15a11a9a0dd389e",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -736,8 +736,8 @@
     "boxrouter_modal/submission.py::cache_owner": "sha256:148eeee675ada3f8f1accc3f26985d0b83aea2f4a0abe83dad44d0104e41334d",
     "boxrouter_modal/submission.py::create_view": "sha256:818c35e15a55c41c1a4efe1aa1e33aad7a3c78f6ecd5f93de79e25e909893204",
     "boxrouter_modal/submission.py::sandbox_submission_client": "sha256:c4292c8207415de780a2beb56268bf527ca4d39f63885629d09c4c46137ce0f7",
-    "boxrouter_modal/support-vm.yaml": "sha256:a3cff4533207078d745bf444787ea6bb41c7910335c90f41a9643bf63699d901",
-    "boxrouter_modal/support.yaml": "sha256:e1b2c3a62fb46c60361ac849ebb2fe3b5bbf067f38ae295fe179c75a864535e5",
+    "boxrouter_modal/support-vm.yaml": "sha256:885bdddd0a401888483bb1442899da4ca6c4cc7687224af6648fd18a030f073d",
+    "boxrouter_modal/support.yaml": "sha256:1e80366305db9dd3469b81fc5e892062a7b3bd41dd1b100e7fe4937f4726b7e1",
     "boxrouter_modal/transport.py::": "sha256:3a8b2db801e7fba4c41fdb439ba85e88ff95d1953eb6a7fe54775e1695b37a1c",
     "boxrouter_modal/transport.py::_TracedStream.__aenter__": "sha256:28a490c4d3d230c38bb30f1d9def1016d17c7cc65f5b91eff94f830b4c626f5a",
     "boxrouter_modal/transport.py::_TracedStream.__aexit__": "sha256:de8292d0e78d211b2e5d995aae780da04a28ee9cf01e1563949671024c878ca2",
