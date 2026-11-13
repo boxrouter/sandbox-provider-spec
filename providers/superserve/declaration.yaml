@@ -1,30 +1,41 @@
 spec: sandbox-provider-spec/0.1
 provider: superserve
-# Scaffold skeleton: every value is `unknown` or absent until recon or a committed report proves it.
-# Fill from the recon report (`make new-adapter NAME=superserve --from-recon <report.json>` pre-fills
-# what it can). Never guess: an unproven value stays `unknown`; a gate stays absent until a
-# certified report cites it under `evidence`. The checker (`make -C packages/sandbox-provider-spec
-# check-declarations`) accepts this file as is.
+# Draft: every value is `unknown`, absent or a dated quote of Superserve's documentation. A fact
+# whose proof must be a test (the lifetime timer, `size_is_ceiling`, the `network_lockdown` variants)
+# is stated in the adapter's support.yaml under `adds` until its report is committed, because this
+# checker refuses a citation of a report that does not exist yet (see evidence.md).
 verified:
   date: 2026-11-13
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
   sdks: {"superserve": "0.12.0"}
-# TODO(recon): kernel, sizes, default_size, size_is_ceiling, disk_mib, regions and located_in.
-# Lifetime: fixtures request 900s and wait 300000ms. The test proves {at_least: 300};
-# write an exact max_lifetime_seconds as the admission cap, not the observed floor and not the
-# fixture's 900 s (the provider's own bound, from recon).
 resources:
   kernel: unknown
+  sizes: unknown
+  # The documentation gives superserve/base 2 vCPU / 4096 MiB / 8192 MiB, but a live run on this
+  # team on 2026-10-23 saw 1 vCPU / 1024 MiB and a 7.8 G disk, and a plan caps a sandbox's shape:
+  # the live recon settles sizes and the default size.
+  default_size: unknown
   gpus: unknown
   regions: unknown
-  located_in: unknown
+  # Superserve's own bound on one timer window (`timeout_seconds`, 1 to 604800).
+  max_lifetime_seconds: 604800
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
-# TODO(recon): lifetime_timer {enforced_by, counts_paused_time, at_end} once the timer is observed.
-# TODO(certify): gates (processes, terminal, network_lockdown, pause_resume, ...) with `evidence`.
 gates: {}
-evidence: {}
+evidence:
+  resources.default_size:
+    source: https://docs.superserve.ai/templates/overview
+    read: 2026-11-13
+    quote: >-
+      | `superserve/base` | `ubuntu:24.04` | 2 · 4096 MiB · 8192 MiB |
+  resources.max_lifetime_seconds:
+    source: https://api.superserve.ai/openapi.yaml
+    read: 2026-11-13
+    quote: >-
+      Optional auto-pause timeout in seconds. The sandbox is paused once its current active session has
+      run this long; each resume starts a fresh window. When unset, the sandbox stays active until
+      explicitly paused. Also settable later via `PATCH /sandboxes/{sandbox_id}`. Maximum 604800 (7 days).
