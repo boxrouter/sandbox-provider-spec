@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   sign-off:
-    runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
