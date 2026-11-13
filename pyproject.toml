@@ -70,6 +70,7 @@ testpaths = ["tests"]
 # so parametrized rows reuse that matrix instead of rebuilding it in every worker.
 # Bound concurrent process-heavy files so timing diagnostics do not compete eight ways.
 addopts = "-ra -n 2 --dist loadfile"
+tmp_path_retention_policy = "failed"
 markers = [
     "rule(rule_id): specification rule checked by this test",
     "loopback: test starts a loopback server",
