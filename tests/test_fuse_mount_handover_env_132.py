@@ -156,6 +156,25 @@ def test_default_profile_rejects_missing_plan_and_unknown_compute_region() -> No
     assert errors(None, current) == ["environment handover default plan identity is invalid"]
 
 
+def test_default_path_observation_is_optional_but_exactly_valued() -> None:
+    current = binding()
+    base = prerequisites(current)
+    for value in ("free", "occupied"):
+        assert errors(base + ["default_path:" + value]) == [], (
+            "a captured default path observation must pass unchanged"
+        )
+    assert errors(base) == []
+    assert errors(base + ["default_path:unknown"]) == [
+        "environment handover default path observation is invalid"
+    ]
+    assert errors(base + ["default_path:free", "default_path:occupied"]) == [
+        "environment handover default path observation is invalid"
+    ]
+    assert errors(base + ["default_path_free"]) == [
+        "environment handover prerequisites do not match the binding"
+    ]
+
+
 def test_new_suite_identities_are_distinct_from_frozen_130_and_131() -> None:
     suite = read_suite(suite_path().with_name("coverage.yaml"))
     ids = {item.id for item in suite.tests}

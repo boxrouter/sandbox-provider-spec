@@ -204,6 +204,23 @@ def handover_scope_errors_132(
         expected.add("region:" + region)
     else:
         return ["environment handover placement fields are invalid"]
+    # A capture may record whether the guest's default mount path was free. It is
+    # optional so published proofs without the observation stay valid; an unknown
+    # or duplicated value is not.
+    default_path = (
+        [
+            value
+            for value in prerequisites
+            if isinstance(value, str) and value.startswith("default_path:")
+        ]
+        if isinstance(prerequisites, list)
+        else []
+    )
+    if len(default_path) > 1 or (
+        default_path and default_path[0] not in {"default_path:free", "default_path:occupied"}
+    ):
+        return ["environment handover default path observation is invalid"]
+    expected.update(default_path)
     if not isinstance(prerequisites, list) or any(
         not isinstance(item, str) for item in prerequisites
     ):
