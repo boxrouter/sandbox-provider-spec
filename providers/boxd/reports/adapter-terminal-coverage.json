@@ -8,10 +8,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T01:18:24.575918+00:00",
+  "finished_at": "2026-11-13T12:08:55.237796+00:00",
   "provider": "boxd",
-  "revision": "a410297241004e8ca684dd6cebf42d7071d448d2",
-  "run_id": "public-c23c6376f440362ad6a8",
+  "revision": "e8b013b32644ba478f2e586d1db0123c14addd91",
+  "run_id": "public-aa7f4160939887af806a",
   "sdk_versions": {
     "boxd": "0.3.0"
   },
@@ -19,7 +19,7 @@
     "coverage.terminal.reattach"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T01:18:18.707547+00:00",
+  "started_at": "2026-11-13T12:08:49.398772+00:00",
   "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5867,
+      "duration_ms": 5837,
       "id": "coverage.terminal.reattach",
       "proves": [
         {
