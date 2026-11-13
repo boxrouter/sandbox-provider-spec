@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Superserve declares what its adapter's committed reports prove: `processes` (`input: true`, `cancel: true`,
+  `reattach: false`), `network_lockdown` (an allowlist of names and addresses with wildcards, and a switch between
+  an allowlist and open), `custom_images` (`oci` prepared, `provider_artifact`, neither running an image's
+  entrypoint) and a provider-enforced `lifetime_timer` that destroys at its end. Each value cites the adapter's
+  report, committed beside the declaration. No catalog change.
+
 - Add one coverage row, `coverage.custom_images.prepare.dockerfile_standard_base_context`: a prepared Dockerfile whose base is the provider's own standard image (the runner fixture `standard_base_dockerfile` holds its `FROM` and four `COPY`/`ADD` lines) copies a text file and a byte-exact binary, adds a plain file and unpacks a compressed local tar carried under a non-tar name, and every marker is read back byte-exact. It proves `source: dockerfile`, `prepared: true` and `build_context: true` only. A provider that accepts a Dockerfile only on its standard image (Boxd) has no other way to prove build context; `coverage.custom_images.prepare.dockerfile_distro_context` is unchanged and still runs on providers that accept a named distribution base. The row is additive: no existing check digest changes. The coverage suite it replaces (`sha256:3756d977…`, 154 ids) is recorded in `conformance/historical-suite-rules.json`, so reports of it stay recognized. No declaration or catalog change.
 
 - Boat declares its disk: `disk_mib: 48637` on each size and provider-wide, and `disk_in_memory: false`. The

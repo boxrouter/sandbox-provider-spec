@@ -31,7 +31,38 @@ resources:
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
-gates: {}
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end: [destroyed]
+gates:
+  # `commands.spawn` (a stdin write and its explicit EOF, a signal that ends the process); no reattach,
+  # because the service stops a command whose connection is gone.
+  processes:
+  - input: true
+    cancel: true
+    reattach: false
+  # Superserve's `network` rules: `allow_out` takes addresses, CIDRs and domains with `*.` wildcards, and a
+  # PATCH replaces both lists on an active sandbox. Not declared: deny_all (Superserve's refusal of an
+  # unlisted name over TLS reads as ambiguous, so `network_lockdown.deny_all` is not_run), a denylist and
+  # `changeable`.
+  network_lockdown:
+  - policy: allowlist
+    entry_kinds: [names, addresses]
+    allow_wildcards: true
+  - policy: [allowlist, open]
+    entry_kinds: [names, addresses]
+    allow_wildcards: true
+    switchable: true
+  # A public OCI image is built as a team template and a sandbox boots from it; an image's ENTRYPOINT and
+  # CMD do not run in a template-booted sandbox, and no template option takes registry credentials, so a
+  # private registry image is refused. A template the caller names is a provider artifact.
+  custom_images:
+  - source: oci
+    prepared: true
+    runs_entrypoint: false
+  - source: provider_artifact
+    runs_entrypoint: false
 evidence:
   resources.sizes:
     source: https://docs.superserve.ai/templates/overview
@@ -60,3 +91,57 @@ evidence:
       Optional auto-pause timeout in seconds. The sandbox is paused once its current active session has
       run this long; each resume starts a fresh window. When unset, the sandbox stays active until
       explicitly paused. Also settable later via `PATCH /sandboxes/{sandbox_id}`. Maximum 604800 (7 days).
+  lifetime_timer.enforced_by:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/adapter-default.json
+  lifetime_timer.at_end:
+    tests: [lifetime_timer.at_end.destroyed]
+    report: reports/adapter-default.json
+  gates.processes.0.input:
+    tests: [processes.input.true]
+    report: reports/adapter-default.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.true]
+    report: reports/adapter-default.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.false]
+    report: reports/adapter-default.json
+  gates.network_lockdown.0.policy:
+    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
+    report: reports/adapter-network-lockdown-default.json
+  gates.network_lockdown.0.entry_kinds:
+    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
+    report: reports/adapter-network-lockdown-default.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/adapter-network-lockdown-default.json
+  gates.network_lockdown.1.policy:
+    reports:
+    - tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
+      report: reports/adapter-network-lockdown-default.json
+    - tests: [coverage.network_lockdown.open]
+      report: reports/adapter-network-lockdown-coverage-default.json
+  gates.network_lockdown.1.entry_kinds:
+    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
+    report: reports/adapter-network-lockdown-default.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/adapter-network-lockdown-default.json
+  gates.network_lockdown.1.switchable:
+    tests: [coverage.network_lockdown.switchable.true]
+    report: reports/adapter-network-lockdown-coverage-default.json
+  gates.custom_images.0.source:
+    tests: [custom_images.oci]
+    report: reports/adapter-custom-images-core-default.json
+  gates.custom_images.0.prepared:
+    tests: [coverage.custom_images.prepare.registry]
+    report: reports/adapter-custom-images-default.json
+  gates.custom_images.0.runs_entrypoint:
+    tests: [coverage.custom_images.runs_entrypoint.false]
+    report: reports/adapter-custom-images-default.json
+  gates.custom_images.1.source:
+    tests: [custom_images.provider_artifact]
+    report: reports/adapter-custom-images-core-default.json
+  gates.custom_images.1.runs_entrypoint:
+    tests: [coverage.custom_images.runs_entrypoint.false]
+    report: reports/adapter-custom-images-default.json

@@ -1,8 +1,7 @@
 # Superserve declaration evidence
 
 The declaration records only what a committed report or a dated quote of the provider's documentation
-proves. Values without supporting evidence remain `unknown`. The committed reports prove `size_is_ceiling`,
-`default_user` and `default_cwd`; the timer and network claims wait for theirs.
+proves. Values without supporting evidence remain `unknown`.
 
 ## Resources
 
@@ -41,25 +40,31 @@ proves. Values without supporting evidence remain `unknown`. The committed repor
   `max_process_seconds`, `long_running`, `extendable_lifetime`: `unknown` or absent; the documentation
   states none of them. `located_in` is absent because Superserve names no country for a default placement.
 
-## Facts proved by a test, stated outside the declaration until their reports exist
+## Facts proved by adapter reports
 
-The SPS checker refuses a citation of a report that is not committed, and refuses a documentation
-quote for these paths, so the adapter's `support.yaml` states the timer under `adds`. These facts move
-into this declaration, with their citations, once the live runs commit the reports.
+These values cite the adapter's committed reports, copied beside this file as `reports/adapter-*.json`.
 
-- Lifetime timer `{enforced_by: provider, counts_paused_time: false, at_end: [destroyed]}`. The adapter
+- Lifetime timer `{enforced_by: provider, counts_paused_time: unknown, at_end: [destroyed]}`. The adapter
   creates with `timeout_seconds` set to the lifetime and `auto_delete_seconds` 0. Documentation
   (lifecycle page and OpenAPI, read 2026-11-13): `timeout_seconds` pauses the sandbox once its current
   active session has run that long, each resume starts a fresh window, and `auto_delete_seconds: 0`
-  "deletes the sandbox as soon as it pauses". Proof to commit: `lifetime_timer.at_end.destroyed` in the
-  default core report (`reports/default.json`); `counts_paused_time` is quotable from the same page.
-- `network_lockdown`: not stated yet. Superserve documents an allow list (IPs, CIDRs, domains with `*.`
-  wildcards) and a deny list (IPs and CIDRs only), set at create and replaced on an active sandbox
-  (networking page and OpenAPI `NetworkConfig`, read 2026-11-13). The gate lands with the adapter's
-  network implementation, because declaring it requires `network_update`; the variants and the tests
-  that prove them are drafted with that implementation.
+  "deletes the sandbox as soon as it pauses". Proof: `lifetime_timer.at_end.destroyed` in
+  `reports/adapter-default.json`. `counts_paused_time` stays `unknown`: the adapter offers no pause, so
+  `lifetime_timer.counts_paused_time.false` cannot run.
+- `processes`: `commands.spawn`, a stdin write and its explicit EOF, and a signal that ends the process;
+  no reattach, because the service stops a command whose connection is gone (`processes.input.true`,
+  `processes.cancel.true`, `processes.reattach.false` in `reports/adapter-default.json`).
+- `network_lockdown`: an allowlist of names and addresses with `*.` wildcards, and a switch between an
+  allowlist and open (`reports/adapter-network-lockdown-default.json`,
+  `reports/adapter-network-lockdown-coverage-default.json`). Not declared: `deny_all` (Superserve's refusal of
+  an unlisted name over TLS reads as ambiguous, so its row is `not_run`), a denylist (its rows need a recording
+  receiver at a blocked address) and `changeable` (Core refuses the empty allowlist that row sets).
+- `custom_images`: a public OCI image is built as a team template and a sandbox boots from it, as
+  `provider_artifact` when the caller names the template; an image's ENTRYPOINT and CMD do not run, and no
+  template option takes registry credentials, so a private registry image is refused
+  (`reports/adapter-custom-images-core-default.json`, `reports/adapter-custom-images-default.json`).
 
 ## Gates
 
-No gate is declared here. Pause, resume, snapshots, extending a lifetime, previews and terminals are not
-offered in this version, so their gates stay absent.
+Pause, resume, snapshots, extending a lifetime, previews and terminals are not offered in this version, so
+their gates stay absent.

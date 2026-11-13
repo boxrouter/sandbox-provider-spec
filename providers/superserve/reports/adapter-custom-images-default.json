@@ -1,0 +1,246 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.delete": "sha256:dd4a9c11b8a278b9ce10581f36edd1b824b1ee8bf0c284e88aa174a64e9dfa0a",
+    "coverage.custom_images.prepare.idempotent": "sha256:0c7ac37983fe6da9eeb83d0de06e6f1766e26d3f8d57bbdf542c3dbbc316a543",
+    "coverage.custom_images.prepare.registry": "sha256:478827a2f000a987aa4d266a1c5a42980bfc45195d944cd9bc3d7c08b542e305",
+    "coverage.custom_images.runs_entrypoint.false": "sha256:61dbd9ddb37cbf3d81cb9850902a544a99af7e5aa71a488d133002990b5ec5d2"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-13T13:10:58.578739+00:00",
+  "provider": "superserve",
+  "revision": "b044f1e4492cd2b13da11a3d707360d1603427dd",
+  "run_id": "public-f755e3883b4f52a8c77f",
+  "sdk_versions": {
+    "superserve": "0.12.0"
+  },
+  "selected_tests": [
+    "coverage.custom_images.runs_entrypoint.false",
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.idempotent",
+    "coverage.custom_images.prepare.delete"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-13T13:09:45.373791+00:00",
+  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19633,
+      "id": "coverage.custom_images.runs_entrypoint.false",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "runs_entrypoint",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/runs-entrypoint"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": false,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 18546,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 17571,
+      "id": "coverage.custom_images.prepare.idempotent",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 17452,
+      "id": "coverage.custom_images.prepare.delete",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
