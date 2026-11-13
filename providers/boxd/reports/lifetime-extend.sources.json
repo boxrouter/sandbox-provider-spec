@@ -579,7 +579,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "e82905c8910b714e604a496472c8d53720ff34fd195a789673d835b06f442b37",
+  "report_sha256": "8d50c52a0a32ef6e1fe7da5e90db496d018acab700c7d384619eeaf4fab15dd5",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -718,7 +718,7 @@
     "boxrouter_core/commands.py::prepare_command": "sha256:f370a8abe6dc5465bd317ef2f969ffd781fe265bd7a94760d02d455e512347a5",
     "boxrouter_core/commands.py::recorded": "sha256:14fdbd4608cb6a296eb0bc185737b6a5ca7cdbeea64f6bdbb5d11059d6005472",
     "boxrouter_core/commands.py::user_name": "sha256:9a9ce9b295d79e492c1f477fc52573a26c5886f50abb9f516aebeb65467afcd8",
-    "boxrouter_core/connect_bound.py::": "sha256:fe88868a61ad048e13f4454e7bf47a5eab678f68b122bea306dc96a7de8ac87b",
+    "boxrouter_core/connect_bound.py::": "sha256:52d606ac2cfb22f2e31707b84cca607b0e8194f7e1762996121ef40db110d0b7",
     "boxrouter_core/contract.py::": "sha256:d2611c21a5592726eb4a32cbc33903a9ec50fd9d9a8c204db019f7e90c849ec2",
     "boxrouter_core/contract.py::BufferedCommand.parse": "sha256:4c6a50070f0791e72d5aa7ecb3d51e15e8c50696175525953a44df18f06c4f7e",
     "boxrouter_core/contract.py::BufferedCommand.validated": "sha256:8d6ea59c2a715f8f035269e1b8bca37e27128d838e3e246f7227f68978c497b2",
