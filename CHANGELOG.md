@@ -11,6 +11,11 @@ says what each kind of release may change.
   compared two pids about half the time. Each call's heartbeat now writes its own file (`idle_activity.py` takes the
   path as its argument). The check digests of every check that runs `coverage_network.py` change.
 
+- E2B and Agent37 declarations: `verified.date` 2026-11-12 (E2B) and 2026-11-13 (Agent37), so their SHA-256 changes. The
+  cited network-lockdown reports were re-run live because the heartbeat change above changes their check digests: E2B
+  `native-default-core` (17 passed) and Agent37 `network-lockdown`, `network-lockdown-addresses` and
+  `network-lockdown-coverage` (7 passed, including `coverage.network_lockdown.switchable.true`).
+
 - Modal and Blaxel declarations: `verified.date` 2026-11-12 (modal `declaration.yaml` and
   `declaration-vm.yaml`, blaxel `declaration.yaml`), so their SHA-256 changes. The #5148 evidence
   lane refreshed the cited live reports on that date: `native-default-core` (ModalDriver 0.3.189
