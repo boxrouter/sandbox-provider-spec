@@ -1,13 +1,12 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "network_lockdown.allowlist.names": "sha256:f9166496e0cc6eb8097e2dabe3de2bd23095e653617de53b244bc6cc3e3d5619",
-    "network_lockdown.max_allow": "sha256:0fc408f3b29fa24fcaa1831891ef68d954db039a25bf22e547be32a62e22bd9d",
-    "network_lockdown.wildcards": "sha256:f5144726bf5c98f6c8e06a8d76e2ab5bce9da9f20acaff4274503419d8b6656a",
+    "network_lockdown.allowlist.names": "sha256:66d279c6f7da3e0cd6cf4c6819440efda31d11be59d5ef2d7dac89d77dc4fcd4",
+    "network_lockdown.max_allow": "sha256:cbc88f31496179af098e8f78798cc33156b95ecca38047c9cbf4146542f9afee",
+    "network_lockdown.wildcards": "sha256:fc08bcb4a23b67f88b1fb2fc74dee398f978bdb08b44a43944b1da92c051f725",
     "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce",
     "processes.cancel.true": "sha256:4b3aa1ade5e0c2955b9a0b1d23a513b8b5b6577eddfd0a75f100e23115f0c970",
     "processes.input.true": "sha256:c97400d0004d0de0f9410af8b7b953bf12f4894a073972c9553b6d5d1adaf185",
-    "processes.reattach.false": "sha256:92cc0a22ae9949a631134aa7c4c663322d302800d9775301152a6367139e329e",
     "processes.reattach.true": "sha256:7e0249a1b14e19f75f0dcd2dc813eecc54bf1fee8c6235902685320c153d7b2b"
   },
   "clean": true,
@@ -15,10 +14,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-07T12:04:44.786065+00:00",
+  "finished_at": "2026-11-13T01:50:05.802703+00:00",
   "provider": "boxd",
-  "revision": "573fc124a27609df626510c1bcbc443507ff6673",
-  "run_id": "public-40258a8ecdeef3499d0e",
+  "revision": "a410297241004e8ca684dd6cebf42d7071d448d2",
+  "run_id": "public-82549dea06759a1e8983",
   "sdk_versions": {
     "boxd": "0.3.0"
   },
@@ -26,14 +25,13 @@
     "processes.input.true",
     "processes.cancel.true",
     "processes.reattach.true",
-    "processes.reattach.false",
     "pause_resume.files_and_memory",
     "network_lockdown.allowlist.names",
     "network_lockdown.max_allow",
     "network_lockdown.wildcards"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-07T12:04:12.884500+00:00",
+  "started_at": "2026-11-13T01:49:05.512503+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -47,7 +45,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2526,
+      "duration_ms": 4326,
       "id": "processes.input.true",
       "proves": [
         {
@@ -102,7 +100,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2258,
+      "duration_ms": 3534,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -199,7 +197,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2302,
+      "duration_ms": 2766,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -254,34 +252,6 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "processes.reattach.false",
-      "proves": [
-        {
-          "gate": "processes",
-          "knob": "reattach",
-          "value": false
-        }
-      ],
-      "reason": "absent",
-      "result": "differs",
-      "rules": [
-        "processes/reattach"
-      ],
-      "steps": [
-        {
-          "observations": {
-            "absent": {
-              "matches": false
-            }
-          },
-          "operation": "native.operation_absent",
-          "result": "differs"
-        }
-      ]
-    },
-    {
       "cleanup": [
         {
           "kind": "process",
@@ -292,7 +262,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2701,
+      "duration_ms": 4251,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
@@ -411,7 +381,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2260,
+      "duration_ms": 4165,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -456,7 +426,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17781,
+      "duration_ms": 36501,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -495,7 +465,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2070,
+      "duration_ms": 4744,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
