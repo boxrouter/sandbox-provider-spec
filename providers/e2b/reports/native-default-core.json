@@ -5,9 +5,9 @@
     "facts.default_cwd": "sha256:4770954ea1c1ba78f194445298fc6c511a73285f220a2c045c5ed33d47f5a566",
     "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2",
     "facts.extendable_lifetime": "sha256:598a5c76f1e19a3c4c154606b5cda0e21a436e09f6e9e4fecbf201b2665acbe7",
-    "lifetime_timer.at_end.destroyed": "sha256:e69b08b31b135ac58bbde7378a9e35c9e016fc838fd2630ea73adece79c016c3",
-    "lifetime_timer.at_end.paused": "sha256:cc21de8dbe3035ce5731f64753c3edae9ba649dccd4230018809eb4dac519db4",
-    "network_lockdown.allowlist.addresses": "sha256:fe1f2068faa9b1554b96682d8e5b4bd79258d0f2d08a284559638eab895c2f72",
+    "lifetime_timer.at_end.destroyed": "sha256:c74763497fdc4d8cebb5c8860a11f353093b92be1a5ffc1d0b092f0298bfdadf",
+    "lifetime_timer.at_end.paused": "sha256:8c73fb5b93ac000563192fd696a954fee4ccd5363a56db37430e4410c8236371",
+    "network_lockdown.allowlist.addresses": "sha256:9c40628b4f28ce3c0700be1e509a76fdef3719baed4699848b4532dde37d2dfd",
     "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce",
     "previews.access.public": "sha256:1ff07a1479a21982f5e8a59abbd35b5c2b910bd62a1b76495d7f18cb1b9c77f4",
     "previews.link_lifetime_seconds.public": "sha256:c4f3fbd9e79d04da92ae655d64d5012b90d5d7c8df50933c7c1537c0c26564c6",
@@ -22,12 +22,12 @@
   "clean": true,
   "driver": {
     "name": "E2BDriver",
-    "version": "0.3.141"
+    "version": "0.3.190"
   },
-  "finished_at": "2026-10-29T00:13:57.770997+00:00",
+  "finished_at": "2026-11-12T22:09:08.146072+00:00",
   "provider": "e2b",
-  "revision": "46e7634ee29d806efe27d26024fc170adaed5a9d",
-  "run_id": "public-ad130bc25d8e8e3de0f9",
+  "revision": "c9ba7c1e9623b00a5e7800276aba56de877cec11",
+  "run_id": "public-002dde3c4a7655c7fe5c",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
@@ -53,8 +53,8 @@
     "previews.link_lifetime_seconds.public"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-10-28T23:51:55.786466+00:00",
-  "suite_digest": "sha256:a937b66167cee4260622e869226dbc7a8eae5b2e06e0f785b48ca37aeead78f6",
+  "started_at": "2026-11-12T21:47:10.992281+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
       "cleanup": [
@@ -67,7 +67,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1151,
+      "duration_ms": 986,
       "id": "processes.input.true",
       "proves": [
         {
@@ -122,7 +122,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1799,
+      "duration_ms": 972,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -223,7 +223,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 834,
+      "duration_ms": 499,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -284,7 +284,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 604,
+      "duration_ms": 303,
       "id": "facts.default_user",
       "proves": [
         {
@@ -318,7 +318,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 599,
+      "duration_ms": 425,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -356,7 +356,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 611933,
+      "duration_ms": 611019,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -437,7 +437,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 306305,
+      "duration_ms": 305540,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -485,7 +485,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 66120,
+      "duration_ms": 65333,
       "id": "lifetime_timer.at_end.paused",
       "proves": [
         {
@@ -537,7 +537,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1709,
+      "duration_ms": 1270,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
@@ -668,7 +668,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2432,
+      "duration_ms": 1563,
       "id": "snapshots.keeps.files_and_memory",
       "proves": [
         {
@@ -771,7 +771,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 874,
+      "duration_ms": 919,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -809,7 +809,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 21489,
+      "duration_ms": 22068,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -858,7 +858,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1128,
+      "duration_ms": 1253,
       "id": "previews.access.public",
       "proves": [
         {
@@ -926,7 +926,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1594,
+      "duration_ms": 1415,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -1020,7 +1020,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 574,
+      "duration_ms": 904,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -1059,7 +1059,7 @@
           "observations": {
             "stdout": {
               "actual": {
-                "length": 267,
+                "length": 400,
                 "type": "str"
               },
               "matches": true
@@ -1081,7 +1081,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1119,
+      "duration_ms": 1270,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -1145,7 +1145,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 301708,
+      "duration_ms": 301407,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {
