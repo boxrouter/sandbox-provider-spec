@@ -29,10 +29,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T15:37:40.017186+00:00",
+  "finished_at": "2026-11-13T17:04:40.115251+00:00",
   "provider": "superserve",
-  "revision": "17f6c405e213d41602ea6b58987c6ed47df504c0",
-  "run_id": "public-0fae0af8d362e0d5e169",
+  "revision": "95a710453396c13de38c9aba0cb668dcfa8ba007",
+  "run_id": "public-ae342fae661f77688a68",
   "sdk_versions": {
     "superserve": "0.12.0"
   },
@@ -61,7 +61,7 @@
     "baseline.process_eof_is_not_exit"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T15:32:03.732031+00:00",
+  "started_at": "2026-11-13T16:59:03.974528+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -71,7 +71,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2744,
+      "duration_ms": 2241,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -106,7 +106,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 554,
+      "duration_ms": 594,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -141,7 +141,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 352,
+      "duration_ms": 456,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -172,7 +172,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 439,
+      "duration_ms": 399,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -212,7 +212,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 412,
+      "duration_ms": 397,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -247,7 +247,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 427,
+      "duration_ms": 418,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -279,7 +279,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 331,
+      "duration_ms": 598,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -321,7 +321,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 306,
+      "duration_ms": 702,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -356,7 +356,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 420,
+      "duration_ms": 402,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -391,7 +391,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 544,
+      "duration_ms": 435,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -441,7 +441,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 530,
+      "duration_ms": 514,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -490,7 +490,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15497,
+      "duration_ms": 15676,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -558,7 +558,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 424,
+      "duration_ms": 604,
       "id": "processes.input.true",
       "proves": [
         {
@@ -613,7 +613,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 673,
+      "duration_ms": 794,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -733,7 +733,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 312,
+      "duration_ms": 441,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -766,7 +766,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 374,
+      "duration_ms": 386,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -799,7 +799,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 328,
+      "duration_ms": 449,
       "id": "facts.default_user",
       "proves": [
         {
@@ -833,7 +833,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 340,
+      "duration_ms": 511,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -867,7 +867,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 985,
+      "duration_ms": 948,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -908,7 +908,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 309721,
+      "duration_ms": 308378,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -960,7 +960,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 562,
+      "duration_ms": 787,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
