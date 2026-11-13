@@ -5,6 +5,9 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.3.195 republishes 0.3.194's contents with adapter-superserve 0.1.7's recertified reports under
+  `providers/superserve/reports/`. Those reports changed under 0.3.194 after it was published (cloud#6090), so one
+  version had two contents. No declaration or catalog change.
 - Superserve declares what its adapter's committed reports prove: `processes` (`input: true`, `cancel: true`,
   `reattach: false`), `network_lockdown` (an allowlist of names and addresses with wildcards, and a switch between
   an allowlist and open), `custom_images` (`oci` prepared, `provider_artifact`, neither running an image's
