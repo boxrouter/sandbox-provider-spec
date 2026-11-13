@@ -515,8 +515,6 @@
       "boxrouter_core/telemetry.py::provider_operation",
       "boxrouter_core/telemetry.py::span",
       "boxrouter_core/waiting.py::",
-      "boxrouter_core/waiting.py::_positive",
-      "boxrouter_core/waiting.py::_slice",
       "boxrouter_core/waiting.py::_truthy",
       "boxrouter_core/waiting.py::polls",
       "boxrouter_core/waiting.py::wait_until",
@@ -1249,7 +1247,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "518c222295b32c11b1fd89cfdad3fa17da4a2634b10a46d67563252f26dd4ac2",
+  "report_sha256": "315696db653943b0314888d878f3dd51e5c84aa0de4b43e1bd8a44538f9ae18f",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
