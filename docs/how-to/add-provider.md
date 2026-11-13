@@ -29,7 +29,7 @@ of the [HTTP binding](../../spec/binding-http.md) needs no driver here: follow t
    colour, a logo and a one-colour mark (SVG, PNG or WebP files in the provider folder), and
    `launched: true` once the provider is offered in production; without it a consumer lists the
    provider nowhere that names only launched providers, such as a legal roster. A provider that
-   BoxRouter serves needs a brand mark (`tests/test_provider_brand.py`). A mark is drawn in one
+   a deployment serves needs a brand mark (`tests/test_provider_brand.py`). A mark is drawn in one
    colour, so it follows the page's text colour; `mark_colours: own` says the mark file is drawn
    in the brand's own colours instead, and a consumer then draws it as an image. A coloured mark
    holds only the brand's paths and fills: no `<image>`, no rectangle behind the drawing, no
