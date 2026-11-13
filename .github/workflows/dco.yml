@@ -3,6 +3,10 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  # At most one run per ref waits; a newer pending run replaces it and running jobs finish.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   sign-off:
     runs-on: ${{ vars.CI_RUNNER_BACKFILL || vars.CI_RUNNER }}
