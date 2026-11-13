@@ -448,6 +448,65 @@ def test_prepared_distro_context_row_fails_on_a_dropped_file(tmp_path: Path, dro
     assert outcome["result"] == "differs"
 
 
+STANDARD_BASE_ROW = "coverage.custom_images.prepare.dockerfile_standard_base_context"
+STANDARD_BASE_DOCKERFILE = (
+    "FROM ghcr.io/boxrouter/standard-image@sha256:" + "a" * 64 + "\n"
+    "COPY copied.txt /opt/sps-copy\n"
+    "COPY binary.bin /opt/sps-binary\n"
+    "ADD added.txt /opt/sps-added\n"
+    "ADD bundle.bin /opt/sps-bundle/\n"
+)
+STANDARD_BASE_FIXTURES = {"standard_base_dockerfile": STANDARD_BASE_DOCKERFILE}
+
+
+def test_standard_base_context_row_takes_its_base_from_a_fixture_and_keeps_the_distro_context() -> (
+    None
+):
+    test = _coverage_row(STANDARD_BASE_ROW)
+    distro = _coverage_row(DISTRO_CONTEXT_ROW)
+    assert test["proves"] == distro["proves"]
+    assert test["rules"] == distro["rules"]
+    prepare = next(step for step in test["steps"] if step.get("op") == "image.prepare")
+    given = prepare["in"]
+    assert set(given) == {"source", "dockerfile", "context"}
+    assert given["dockerfile"] == "$runner.standard_base_dockerfile"
+    # The base is the only difference: context, creates and every read are the distro row's.
+    assert given["context"] == distro["steps"][0]["in"]["context"]
+    assert test["steps"][1:] == distro["steps"][1:]
+    assert "lifetime_seconds" not in test["steps"][1]["in"]
+
+
+def test_standard_base_context_row_dispatches_the_fixture_dockerfile_and_reads_every_byte(
+    tmp_path: Path,
+) -> None:
+    driver = ImageContextDriver(tmp_path)
+    outcome = Runner(driver, STANDARD_BASE_FIXTURES).run_test(_coverage_scenario(STANDARD_BASE_ROW))
+    assert outcome["result"] == "passed"
+    assert driver.calls == ["image.prepare", "create"] + ["run"] * len(DISTRO_CONTEXT_READS)
+    assert driver.prepare_inputs["dockerfile"] == STANDARD_BASE_DOCKERFILE
+    assert driver.create_inputs["requirements"] == {
+        "custom_images": {"source": "dockerfile", "prepared": True, "build_context": True}
+    }
+    assert [run["bash_script"] for run in driver.run_inputs] == [
+        f"base64 -w0 -- {path}" for path in DISTRO_CONTEXT_READS
+    ]
+
+
+def test_standard_base_context_row_is_not_run_without_its_fixture(tmp_path: Path) -> None:
+    driver = ImageContextDriver(tmp_path)
+    outcome = Runner(driver).run_test(_coverage_scenario(STANDARD_BASE_ROW))
+    assert outcome["result"] == "not_run"
+    assert driver.calls == []
+
+
+@pytest.mark.parametrize("tamper", ["copied.txt", "binary.bin", "added.txt", "bundle.bin"])
+def test_standard_base_context_row_fails_on_bad_bytes(tmp_path: Path, tamper: str) -> None:
+    outcome = Runner(ImageContextDriver(tmp_path, tamper), STANDARD_BASE_FIXTURES).run_test(
+        _coverage_scenario(STANDARD_BASE_ROW)
+    )
+    assert outcome["result"] == "differs"
+
+
 BUILD_CONTEXT_ROW = "coverage.custom_images.build_context"
 BUILD_CONTEXT_DOCKERFILE = (
     "FROM public.ecr.aws/docker/library/python:3.12-slim\n"
@@ -587,6 +646,6 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
     preserved = history["sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295"]
     suite = read_suite(suite_path().with_name("coverage.yaml"))
     live = {test.id: list(test.rules) for test in suite.tests}
-    assert set(live) - set(preserved) == {DISTRO_ROW, DISTRO_CONTEXT_ROW}
+    assert set(live) - set(preserved) == {DISTRO_ROW, DISTRO_CONTEXT_ROW, STANDARD_BASE_ROW}
     for identifier in set(live) & set(preserved):
         assert preserved[identifier] == live[identifier], identifier

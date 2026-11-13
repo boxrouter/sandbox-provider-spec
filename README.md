@@ -220,7 +220,7 @@ output streams, read and write files, stream a background process's output, open
 HTTPS, and keep the host's cloud credentials out of reach.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 47 knobs; the conformance suite has 239 tests.
+The vocabulary has 16 gates and 47 knobs; the conformance suite has 240 tests.
 
 ## Principles
 

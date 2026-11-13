@@ -7002,5 +7002,469 @@
     "files.stream.v1.read.5gib": [
       "facts/file-stream-read"
     ]
+  },
+  "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc": {
+    "baseline.create_env": [
+      "baseline/lifecycle"
+    ],
+    "baseline.get": [
+      "baseline/lifecycle"
+    ],
+    "baseline.list": [
+      "baseline/lifecycle"
+    ],
+    "baseline.destroy": [
+      "baseline/lifecycle"
+    ],
+    "baseline.run_output": [
+      "baseline/run"
+    ],
+    "baseline.run_exit_code": [
+      "baseline/run"
+    ],
+    "baseline.run_separate_streams": [
+      "baseline/run"
+    ],
+    "baseline.run_cwd": [
+      "baseline/run"
+    ],
+    "baseline.run_env": [
+      "baseline/run"
+    ],
+    "baseline.files_write": [
+      "baseline/files"
+    ],
+    "baseline.files_read": [
+      "baseline/files"
+    ],
+    "baseline.process_stream": [
+      "baseline/process-output"
+    ],
+    "baseline.environment_bash": [
+      "baseline/environment"
+    ],
+    "baseline.environment_python3": [
+      "baseline/environment"
+    ],
+    "baseline.outbound_network": [
+      "baseline/outbound-network"
+    ],
+    "baseline.process_eof_is_not_exit": [
+      "baseline/process-eof-not-exit"
+    ],
+    "guest_user.selectable": [
+      "user-selection/commands",
+      "user-selection/files-write",
+      "user-selection/process-start"
+    ],
+    "coverage.facts.max_lifetime.active": [
+      "facts/max-lifetime"
+    ],
+    "baseline.no_metadata": [
+      "baseline/no-metadata"
+    ],
+    "baseline.files_write_binary": [
+      "baseline/files"
+    ],
+    "coverage.volumes.read_only": [
+      "volumes/read-only"
+    ],
+    "coverage.facts.arch.amd64": [
+      "facts/arch"
+    ],
+    "coverage.facts.arch.arm64": [
+      "facts/arch"
+    ],
+    "coverage.facts.root.by_default": [
+      "facts/root"
+    ],
+    "coverage.facts.root.sudo": [
+      "facts/root"
+    ],
+    "coverage.facts.root.per_command": [
+      "facts/root"
+    ],
+    "coverage.facts.kernel_features.fuse": [
+      "facts/kernel-fuse"
+    ],
+    "coverage.facts.kernel_features.ebpf": [
+      "facts/kernel-ebpf"
+    ],
+    "coverage.facts.kernel_features.nested_cgroups": [
+      "facts/kernel-nested-cgroups"
+    ],
+    "coverage.facts.kernel_features.netfilter": [
+      "facts/kernel-netfilter"
+    ],
+    "coverage.facts.outbound_traffic.http": [
+      "facts/outbound-http"
+    ],
+    "coverage.facts.outbound_traffic.any_tcp": [
+      "facts/outbound-tcp"
+    ],
+    "coverage.facts.outbound_traffic.udp": [
+      "facts/outbound-udp"
+    ],
+    "coverage.facts.package_manager.apt": [
+      "facts/package-manager"
+    ],
+    "coverage.facts.package_manager.apk": [
+      "facts/package-manager"
+    ],
+    "coverage.facts.package_manager.dnf": [
+      "facts/package-manager"
+    ],
+    "coverage.facts.package_manager.pacman": [
+      "facts/package-manager"
+    ],
+    "coverage.facts.package_manager.none": [
+      "facts/package-manager"
+    ],
+    "coverage.facts.libc.glibc": [
+      "facts/libc"
+    ],
+    "coverage.facts.libc.musl": [
+      "facts/libc"
+    ],
+    "coverage.facts.on_memory_exhausted.process_killed": [
+      "facts/on-memory-exhausted"
+    ],
+    "coverage.facts.on_memory_exhausted.sandbox_ended": [
+      "facts/on-memory-exhausted"
+    ],
+    "coverage.facts.disk_in_memory.true": [
+      "facts/disk-in-memory"
+    ],
+    "coverage.facts.disk_in_memory.false": [
+      "facts/disk-in-memory"
+    ],
+    "coverage.facts.size_is_ceiling.true": [
+      "facts/size-is-ceiling"
+    ],
+    "coverage.facts.size_is_ceiling.false": [
+      "facts/size-is-ceiling"
+    ],
+    "coverage.facts.sizes.delivered": [
+      "facts/sizes"
+    ],
+    "coverage.facts.max_run": [
+      "facts/max-run"
+    ],
+    "coverage.facts.max_process": [
+      "facts/max-process"
+    ],
+    "coverage.docker.host": [
+      "docker/runs-containers",
+      "docker/host"
+    ],
+    "coverage.tcp_ports.none": [
+      "tcp_ports/reachable",
+      "tcp_ports/tls-none"
+    ],
+    "coverage.desktop.control": [
+      "desktop/control"
+    ],
+    "coverage.desktop.live_view": [
+      "desktop/control",
+      "desktop/live-view"
+    ],
+    "coverage.previews.websocket": [
+      "previews/websocket"
+    ],
+    "coverage.previews.loopback": [
+      "previews/loopback"
+    ],
+    "coverage.previews.any_port": [
+      "previews/any-port"
+    ],
+    "coverage.previews.survives_pause": [
+      "previews/survives-pause"
+    ],
+    "coverage.previews.reserved_ports": [
+      "previews/reserved-ports"
+    ],
+    "coverage.terminal.reattach": [
+      "terminal/reattach"
+    ],
+    "coverage.custom_images.runs_entrypoint.true": [
+      "custom_images/runs-entrypoint"
+    ],
+    "coverage.custom_images.runs_entrypoint.false": [
+      "custom_images/runs-entrypoint"
+    ],
+    "coverage.network_lockdown.denylist.names": [
+      "network_lockdown/denylist"
+    ],
+    "coverage.network_lockdown.denylist.addresses": [
+      "network_lockdown/denylist"
+    ],
+    "coverage.network_lockdown.denylist.mixed": [
+      "network_lockdown/denylist",
+      "network_lockdown/entry-kinds"
+    ],
+    "coverage.network_lockdown.allowlist.mixed": [
+      "network_lockdown/allowlist",
+      "network_lockdown/entry-kinds"
+    ],
+    "coverage.network_lockdown.allowlist.range": [
+      "network_lockdown/allowlist",
+      "network_lockdown/entry-kinds"
+    ],
+    "coverage.network_lockdown.changeable.true": [
+      "network_lockdown/changeable"
+    ],
+    "coverage.network_lockdown.changeable.false": [
+      "network_lockdown/changeable"
+    ],
+    "coverage.network_lockdown.switchable.true": [
+      "network_lockdown/switchable"
+    ],
+    "coverage.network_lockdown.policy_transition.denylist": [
+      "network_lockdown/switchable"
+    ],
+    "coverage.network_lockdown.open": [
+      "network_lockdown/open"
+    ],
+    "coverage.network_lockdown.switchable.false": [
+      "network_lockdown/switchable"
+    ],
+    "coverage.network_lockdown.switchable.cuts_open_connections.true": [
+      "network_lockdown/switchable"
+    ],
+    "coverage.network_lockdown.switchable.cuts_open_connections.false": [
+      "network_lockdown/switchable"
+    ],
+    "coverage.hidden_secrets.rotates.true": [
+      "hidden_secrets/rotates"
+    ],
+    "coverage.hidden_secrets.rotates.false": [
+      "hidden_secrets/rotates"
+    ],
+    "coverage.hidden_secrets.scrubs_responses.true": [
+      "hidden_secrets/scrubs-responses"
+    ],
+    "coverage.hidden_secrets.scrubs_responses.false": [
+      "hidden_secrets/scrubs-responses"
+    ],
+    "coverage.hidden_secrets.injection.sets_header": [
+      "hidden_secrets/injection"
+    ],
+    "coverage.hidden_secrets.intercepts.injected_hosts": [
+      "hidden_secrets/intercepts"
+    ],
+    "coverage.hidden_secrets.intercepts.all_https": [
+      "hidden_secrets/intercepts"
+    ],
+    "coverage.hidden_secrets.max_inject_into": [
+      "hidden_secrets/max-inject-into"
+    ],
+    "coverage.hidden_secrets.wildcards": [
+      "hidden_secrets/wildcards"
+    ],
+    "coverage.network_lockdown.max_deny": [
+      "network_lockdown/max-deny"
+    ],
+    "coverage.hidden_secrets.transparent.true": [
+      "hidden_secrets/transparent"
+    ],
+    "coverage.hidden_secrets.transparent.false": [
+      "hidden_secrets/transparent"
+    ],
+    "coverage.custom_images.build_context": [
+      "custom_images/build-context"
+    ],
+    "coverage.custom_images.prepare.registry": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.private_oci": [
+      "custom_images/private-oci",
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.image_config.env": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.image_config.workdir": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.image_config.user": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.dockerfile_context": [
+      "custom_images/prepared",
+      "custom_images/build-context"
+    ],
+    "coverage.custom_images.prepare.dockerfile_distro": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.dockerfile_distro_context": [
+      "custom_images/prepared",
+      "custom_images/build-context"
+    ],
+    "coverage.custom_images.prepare.size": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepared_size_without_request": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.idempotent": [
+      "custom_images/prepared"
+    ],
+    "coverage.custom_images.prepare.delete": [
+      "custom_images/prepared"
+    ],
+    "fuse_mount.lifecycle": [
+      "fuse_mount/lifecycle"
+    ],
+    "fuse_mount.default_placement": [
+      "fuse_mount/lifecycle",
+      "fuse_mount/default-placement"
+    ],
+    "fuse_mount.provider_terminal_handover": [
+      "fuse_mount/provider-terminal-handover"
+    ],
+    "fuse_mount.provider_terminal_handover_read": [
+      "fuse_mount/provider-terminal-handover-read"
+    ],
+    "fuse_mount.provider_terminal_handover_shared": [
+      "fuse_mount/provider-terminal-handover-shared"
+    ],
+    "fuse_mount.provider_terminal_handover_130": [
+      "fuse_mount/provider-terminal-handover-130"
+    ],
+    "fuse_mount.provider_terminal_handover_read_130": [
+      "fuse_mount/provider-terminal-handover-read-130"
+    ],
+    "fuse_mount.provider_terminal_handover_shared_130": [
+      "fuse_mount/provider-terminal-handover-shared-130"
+    ],
+    "fuse_mount.provider_terminal_branch_fork": [
+      "fuse_mount/provider-terminal-branch-fork"
+    ],
+    "fuse_mount.provider_terminal_handover_env_132": [
+      "fuse_mount/provider-terminal-handover-env-132"
+    ],
+    "fuse_mount.provider_terminal_handover_read_env_132": [
+      "fuse_mount/provider-terminal-handover-read-env-132"
+    ],
+    "fuse_mount.provider_terminal_handover_shared_env_132": [
+      "fuse_mount/provider-terminal-handover-shared-env-132"
+    ],
+    "fuse_mount.provider_terminal_branch_fork_env_132": [
+      "fuse_mount/provider-terminal-branch-fork-env-132"
+    ],
+    "http.buffered.bytes_and_exit_codes": [],
+    "http.buffered.execution_term": [],
+    "http.buffered.group_kill": [],
+    "http.buffered.observation_versus_execution": [],
+    "http.buffered.background_survives": [],
+    "http.buffered.output_limit": [],
+    "coverage.facts.outbound_ip_families.ipv4": [
+      "facts/outbound-ip-families"
+    ],
+    "coverage.facts.outbound_ip_families.ipv6": [
+      "facts/outbound-ip-families"
+    ],
+    "coverage.facts.ipv4_destination_reach.native": [
+      "facts/outbound-ip-families"
+    ],
+    "coverage.facts.guest_reserved_tcp_ports.8080": [
+      "facts/guest-reserved-tcp-ports"
+    ],
+    "files.regular_write.usability.v1.exact_bytes": [
+      "files/regular-write-exact-bytes"
+    ],
+    "files.regular_write.usability.v1.create_parents": [
+      "files/regular-write-parents"
+    ],
+    "files.regular_write.usability.v1.create_access": [
+      "files/regular-write-create-access"
+    ],
+    "files.regular_write.usability.v1.overwrite_access": [
+      "files/regular-write-overwrite-access"
+    ],
+    "files.regular_write.usability.v1.authority": [
+      "files/regular-write-authority"
+    ],
+    "files.regular_write.usability.v1.executable_effect": [
+      "facts/files-write-executable-effect"
+    ],
+    "files.regular_write.usability.v1.byte_bound": [
+      "files/regular-write-byte-bound"
+    ],
+    "files.regular_write.usability.v1.outcome": [
+      "files/regular-write-outcome"
+    ],
+    "files.regular_write.usability.v1.staging_cleanup": [
+      "files/regular-write-staging-cleanup"
+    ],
+    "file_links.v1.credential.read": [
+      "file-links/own-credential"
+    ],
+    "file_links.v1.credential.write": [
+      "file-links/own-credential"
+    ],
+    "file_links.v1.read_exact": [
+      "file-links/read-exact-bytes"
+    ],
+    "file_links.v1.write_exact": [
+      "file-links/write-exact-bytes"
+    ],
+    "file_links.v1.write_parents": [
+      "file-links/write-parents"
+    ],
+    "file_links.v1.write_usable": [
+      "file-links/write-usable"
+    ],
+    "file_links.v1.one_path.read": [
+      "file-links/one-path"
+    ],
+    "file_links.v1.one_path.write": [
+      "file-links/one-path"
+    ],
+    "file_links.v1.one_operation": [
+      "file-links/one-operation"
+    ],
+    "file_links.v1.expiry.read": [
+      "file-links/expiry"
+    ],
+    "file_links.v1.expiry.write": [
+      "file-links/expiry"
+    ],
+    "file_links.v1.link_lifetime.read": [
+      "file-links/link-lifetime"
+    ],
+    "file_links.v1.link_lifetime.write": [
+      "file-links/link-lifetime"
+    ],
+    "file_links.v1.user_selection": [
+      "file-links/user-selection"
+    ],
+    "file_links.v1.revocable.read": [
+      "file-links/revocable"
+    ],
+    "file_links.v1.revocable.write": [
+      "file-links/revocable"
+    ],
+    "file_links.v1.interrupted_write": [
+      "file-links/interrupted-write"
+    ],
+    "files.stream.v1.write.64mib": [
+      "facts/file-stream-write"
+    ],
+    "files.stream.v1.write.1gib": [
+      "facts/file-stream-write"
+    ],
+    "files.stream.v1.write.5gib": [
+      "facts/file-stream-write"
+    ],
+    "files.stream.v1.read.64mib": [
+      "facts/file-stream-read"
+    ],
+    "files.stream.v1.read.1gib": [
+      "facts/file-stream-read"
+    ],
+    "files.stream.v1.read.5gib": [
+      "facts/file-stream-read"
+    ]
   }
 }

@@ -1,9 +1,9 @@
 # Runner fixture inventory
 
-`suite.yaml` and `coverage.yaml` currently reference 77 distinct `$runner.*` names. The
+`suite.yaml` and `coverage.yaml` currently reference 78 distinct `$runner.*` names. The
 40 endpoint-supplied values below are the keys a deployment of this endpoint service
 supplies through the run's fixture file.
-The other 37 values are run inputs or values the runner derives, as described below; they are
+The other 38 values are run inputs or values the runner derives, as described below; they are
 not values served by this endpoint service.
 
 The `Dockerfile` and `fly.toml` beside this file build and configure one controlled
@@ -64,7 +64,7 @@ for unauthenticated TLS tunnels, the receiver associates the connection with the
 the first request. Proxy destinations are restricted to the app hostname, configured
 wildcard suffix, and fixture ports 80, 443, 8443, 7000 and 7001.
 
-## Other runner inputs and derived values (37)
+## Other runner inputs and derived values (38)
 
 | `$runner` key | Purpose |
 | --- | --- |
@@ -102,6 +102,7 @@ wildcard suffix, and fixture ports 80, 443, 8443, 7000 and 7001.
 | `reserved_ports` | List of guest ports reserved by port-forwarding coverage. |
 | `restored_size` | Larger resource request used to restore a resized sandbox. |
 | `run_nonce` | Runner-generated per-run marker; omit from fixture files. |
+| `standard_base_dockerfile` | Run input: a Dockerfile on the provider's standard image for the standard-base build-context check. |
 | `test_gpu` | Native resource request containing exactly one reviewed GPU model. |
 | `test_gpu_models` | Derived one-element registry model list from `test_gpu`. |
 | `test_size` | Native resource request for concrete size coverage. |

@@ -2176,6 +2176,62 @@ tests:
       equals:
         exit_code: 0
         stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LXVucGFja2Vk}
+- id: coverage.custom_images.prepare.dockerfile_standard_base_context
+  title: A prepared Dockerfile on the provider's standard image copies and unpacks build context.
+  rules: [custom_images/prepared, custom_images/build-context]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: build_context, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: $runner.standard_base_dockerfile
+      context:
+        copied.txt: sps-distro-context-copy
+        binary.bin: {base64: AAECAwQFBgcICQoLDA0ODw==}
+        added.txt: sps-distro-context-add
+        bundle.bin: {base64: H4sIAAAAAAAC/+3RQQ6CMBBA0R6FC6CMbeU8RLowxJa0Q8LxRdyRqCuMJv9tppl20eTHUDT0R7OnZtF6v87Fdq5n8XLy1jr32Is0rTWVN18wFe3y8pWckr579+n+T8Vn/1uXh5APOutO/c/Ove5v7aa/FRFTNfTfXRlL3V+L5lRfUtQwaz3FsbsMoTcAAAAAAAAAAAAAAAAAftsdQ6orDQAoAAA=}
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true, build_context: true}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: base64 -w0 -- /opt/sps-copy
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LWNvcHk=}
+  - op: run
+    target: box
+    in:
+      bash_script: base64 -w0 -- /opt/sps-binary
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: AAECAwQFBgcICQoLDA0ODw==}
+  - op: run
+    target: box
+    in:
+      bash_script: base64 -w0 -- /opt/sps-added
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LWFkZA==}
+  - op: run
+    target: box
+    in:
+      bash_script: base64 -w0 -- /opt/sps-bundle/nested/marker.txt
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: c3BzLWRpc3Ryby1jb250ZXh0LXVucGFja2Vk}
 - id: coverage.custom_images.prepare.size
   title: A prepared registry image accepts and delivers the requested size.
   rules: [custom_images/prepared]

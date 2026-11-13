@@ -2236,7 +2236,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "f940d4fcaefe0d535938a83e30b4158cd0c9a8e0e237cb25c4a044b54dea893f",
+  "report_sha256": "9782d4c867ec35e9e28ffd25029fae1f2077565bda5a3640a5a116d0d60aeeec",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -2373,7 +2373,7 @@
     "boxrouter_boxd/transport.py::RequestStreamUnary.intercept_stream_unary": "sha256:ef253e8910837b3fb82dc1ad4c89c79dc15bf302e7bd4881ed4673b9a88be3ca",
     "boxrouter_boxd/transport.py::RequestUnaryStream.intercept_unary_stream": "sha256:5c2c3d1c005cbe6c09719a2869e093fccdb2b8844156d7293201ff1c69b5153c",
     "boxrouter_boxd/transport.py::RequestUnaryUnary.intercept_unary_unary": "sha256:819c6993d2ca9a6470c5c52129d88bf07c1bb147cf7e139e940f7945a7e40aa5",
-    "boxrouter_boxd/transport.py::_observe": "sha256:bd95dc043d00b8fb556f51b467a3cff8963f1f6eed1f88529192b9daf7188718",
+    "boxrouter_boxd/transport.py::_observe": "sha256:1ac631f814071a61f0d0a617b16ab6e0bfc90b71756240f9d688e7200a26b1fa",
     "boxrouter_boxd/transport.py::connect_options": "sha256:12f767cf57ecd445218f67b9fda59089bde3b82e892459317a021bc2973d19fe",
     "boxrouter_boxd/transport.py::homed_client": "sha256:93a53295864ef86fa2244c02c84e062468b75a144cf7eec6120150fe391c68a6",
     "boxrouter_boxd/transport.py::idle_options": "sha256:fb4d2b7020b2976305d9c8b1c0c564eb6f655d62f255095566cbd504399e8142",
