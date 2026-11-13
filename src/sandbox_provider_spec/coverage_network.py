@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import urllib.parse
+import uuid
 from collections.abc import Mapping
 from typing import cast
 
@@ -224,8 +225,8 @@ def denylist(driver: Driver, box: object, inputs: Mapping[str, object]) -> Mappi
     return {"listed_blocked": not any(blocked_results), "unlisted_allowed": all(allowed_results)}
 
 
-def ticker(driver: Driver, box: object) -> Mapping[str, object]:
-    result = driver.call("files.read_bytes", box, {"path": "/tmp/sps-idle-activity.json"})
+def ticker(driver: Driver, box: object, path: str) -> Mapping[str, object]:
+    result = driver.call("files.read_bytes", box, {"path": path})
     payload = result.get("data")
     if not isinstance(payload, (bytes, str)):
         raise NativeFailure("network_process_probe_invalid")
@@ -257,15 +258,21 @@ def policy_change(
         "/tmp/sps-idle-activity.py",
         (suite_path().parent / "fixtures/idle_activity.py").read_bytes(),
     )
+    # Each call's heartbeat writes its own file: a heartbeat an earlier call left running on this
+    # sandbox would otherwise overwrite the file this call reads, under its own pid.
+    heartbeat = f"/tmp/sps-idle-activity-{uuid.uuid4().hex}.json"
     started = driver.call(
         "run",
         box,
-        {"bash_script": "nohup python3 /tmp/sps-idle-activity.py </dev/null >/dev/null 2>&1 &"},
+        {
+            "bash_script": "nohup python3 /tmp/sps-idle-activity.py "
+            f"{heartbeat} </dev/null >/dev/null 2>&1 &"
+        },
     )
     if started.get("exit_code") != 0:
         raise NativeFailure("network_process_probe_failed")
     time.sleep(1)
-    before = ticker(driver, box)
+    before = ticker(driver, box, heartbeat)
     try:
         new_policy = inputs.get("new_policy")
         if not isinstance(new_policy, Mapping):
@@ -278,7 +285,7 @@ def policy_change(
     recorder_observed = after_observed["recorded"] is actual_after
     changed = initial_state_observed and recorder_observed and actual_after != reachable_before
     time.sleep(0.3)
-    after = ticker(driver, box)
+    after = ticker(driver, box, heartbeat)
     retained = driver.call("files.read_bytes", box, {"path": "/tmp/sps-network-retained"})
     preserved = (
         before.get("pid") == after.get("pid")

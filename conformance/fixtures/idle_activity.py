@@ -4,13 +4,14 @@
 
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
 started = previous = time.monotonic()
 count = 0
 longest_gap = 0.0
-path = Path("/tmp/sps-idle-activity.json")
+path = Path(sys.argv[1])
 while True:
     now = time.monotonic()
     count += 1

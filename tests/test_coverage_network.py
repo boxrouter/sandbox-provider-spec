@@ -438,6 +438,10 @@ class NetworkDriver(Driver):
         self.replace_process = replace_process
         self.files: dict[str, bytes] = {}
         self.count = 0
+        # Heartbeat pids by the file each one writes; heartbeats on one file take turns, as
+        # two of them rewriting it do.
+        self.heartbeats: dict[str, list[int]] = {}
+        self.reads: dict[str, int] = {}
 
     def call(self, operation: str, target: object, inputs: Inputs) -> Observation:
         del target
@@ -445,12 +449,16 @@ class NetworkDriver(Driver):
             self.files[str(inputs["path"])] = base64.b64decode(str(inputs["data"]))
             return {}
         if operation == "files.read_bytes":
-            path = inputs["path"]
-            if path == "/tmp/sps-idle-activity.json":
+            path = str(inputs["path"])
+            if path in self.heartbeats:
                 self.count += 10
-                pid = 2 if self.replace_process and self.changed else 1
+                writers = self.heartbeats[path]
+                self.reads[path] = self.reads.get(path, 0) + 1
+                pid = writers[self.reads[path] % len(writers)]
+                if self.replace_process and self.changed:
+                    pid = 0
                 return {"data": json.dumps({"pid": pid, "count": self.count})}
-            return {"data": self.files[str(path)]}
+            return {"data": self.files[path]}
         if operation == "network.update":
             if not self.update:
                 raise Unsupported("native_update_absent")
@@ -459,6 +467,10 @@ class NetworkDriver(Driver):
         assert operation == "run"
         script = str(inputs["bash_script"])
         if script.startswith("nohup"):
+            # The fixture's output file is its first argument; without one it writes its old path.
+            argument = script.split()[3]
+            path = "/tmp/sps-idle-activity.json" if argument.startswith("<") else argument
+            self.heartbeats.setdefault(path, []).append(sum(map(len, self.heartbeats.values())) + 1)
             return {"exit_code": 0}
         return {
             "exit_code": 0,
@@ -507,6 +519,29 @@ def test_policy_change_checks_the_same_process_and_retained_file(
         "policy_changed": True,
         "source_preserved": False,
     }
+
+
+def test_policy_change_twice_on_one_sandbox_keeps_its_own_heartbeat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The first call's heartbeat keeps running and must not write the second call's file."""
+    monkeypatch.setattr(
+        probe,
+        "checked_probe",
+        lambda driver, _target, _requests: [
+            {
+                "reached": not cast(NetworkDriver, driver).changed,
+                "recorded": not cast(NetworkDriver, driver).changed,
+            }
+        ],
+    )
+    monkeypatch.setattr(time, "sleep", lambda _: None)
+    driver = NetworkDriver()
+    inputs = {"allowed_url": "https://fixture.invalid/", "new_policy": {"policy": "deny_all"}}
+    assert probe.policy_change(driver, {}, inputs)["source_preserved"] is True
+    driver.changed = False
+    assert probe.policy_change(driver, {}, inputs)["source_preserved"] is True
+    assert len(driver.heartbeats) == 2
 
 
 def test_audited_native_update_absence_proves_false_only_with_unchanged_control(

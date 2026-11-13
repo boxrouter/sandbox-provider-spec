@@ -5,6 +5,12 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- `coverage.network_lockdown.switchable.true` and `coverage.network_lockdown.policy_transition.denylist` no longer
+  fail at random. Each `fixture.coverage_policy_change` call starts its own idle-activity heartbeat, and the first call's
+  heartbeat kept running and rewrote the shared `/tmp/sps-idle-activity.json` under its own pid, so the second call
+  compared two pids about half the time. Each call's heartbeat now writes its own file (`idle_activity.py` takes the
+  path as its argument). The check digests of every check that runs `coverage_network.py` change.
+
 - Modal and Blaxel declarations: `verified.date` 2026-11-12 (modal `declaration.yaml` and
   `declaration-vm.yaml`, blaxel `declaration.yaml`), so their SHA-256 changes. The #5148 evidence
   lane refreshed the cited live reports on that date: `native-default-core` (ModalDriver 0.3.189
