@@ -1,0 +1,17 @@
+owner: FoundryLabs, Inc. (E2B)
+source_page: https://e2b.dev/brand
+assets:
+  mark.svg:
+    source: https://e2b.dev/brand/e2b-symbol-fire-orange-m.svg
+    retrieved_at: '2026-11-13'
+    role: Official E2B symbol in Fire Orange (#FF3001), drawn in its own colour (mark_colours own)
+    modifications: >-
+      viewBox changed from "0 0 64 60" to "13.79 12.93 36.43 34.15", the symbol's drawn extent
+      with a margin, so it draws in a 16 px box at 14.5 x 13.0 px like the white mark it
+      replaces (brand/sizes.yaml). The path, the fill and the width and height are unchanged.
+  logo.png:
+    source: not recorded
+    role: White logo for dark backgrounds
+    modifications: not recorded
+notes:
+  terms: not recorded; no reuse terms were checked for this change.

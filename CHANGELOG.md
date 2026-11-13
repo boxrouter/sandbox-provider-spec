@@ -5,6 +5,15 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- Brand files: Agent37 has `providers/agent37/brand.yaml` and `brand/` (the symbol from agent37.com, `order: 7`, no `launched`
+  until it is offered in the legal roster), so `brand.json` carries its logo and mark. `brand.yaml` accepts an optional
+  `mark_colours: own`, shipped in `brand.json`, which says the mark file is drawn in the brand's own colours; without it a
+  mark is one colour. Boat (blue `#5B74E0`), E2B (Fire Orange `#FF3001`, now `brand/mark.svg`; `mark.png` is removed) and
+  Modal (its green 3D logo, now both `logo` and `mark`; `brand/mark.svg` is removed) set it. Each provider's
+  `brand/sizes.yaml` records its mark's drawn size in a 16 px box. `tests/test_provider_brand.py` fails when a provider
+  Cloud serves has no mark, when a coloured mark holds an `<image>`, a rect over the viewBox, a white fill or a filter, or
+  when a mark draws more than 1 px from its recorded size. No declaration or catalog change.
+
 - `coverage.network_lockdown.switchable.true` and `coverage.network_lockdown.policy_transition.denylist` no longer
   fail at random. Each `fixture.coverage_policy_change` call starts its own idle-activity heartbeat, and the first call's
   heartbeat kept running and rewrote the shared `/tmp/sps-idle-activity.json` under its own pid, so the second call

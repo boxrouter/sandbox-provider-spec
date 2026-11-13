@@ -2,5 +2,6 @@
 order: 3
 color: '#BDF3CA'
 logo: brand/logo.svg
-mark: brand/mark.svg
+mark: brand/logo.svg
+mark_colours: own
 launched: true

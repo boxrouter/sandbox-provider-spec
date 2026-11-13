@@ -1,0 +1,16 @@
+retrieved_at: '2026-11-13'
+owner: Agent37
+source_page: https://www.agent37.com
+assets:
+  mark.svg:
+    source: https://www.agent37.com/logo.svg
+    role: >-
+      Official Agent37 symbol, one colour for dark backgrounds; the logo and the mark are
+      this one file
+    modifications: >-
+      stroke="currentColor" changed to stroke="#FEFEFE", because a file drawn as an image
+      or mask has no inherited colour; paths and viewBox unchanged
+notes:
+  no_wordmark: >-
+    Agent37's own site publishes the symbol as /logo.svg and as the 192 px PNG /192.png
+    (the same drawing). No wordmark-only file was found, so no lockup is shipped.

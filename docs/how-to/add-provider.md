@@ -25,12 +25,19 @@ of the [HTTP binding](../../spec/binding-http.md) needs no driver here: follow t
    native driver. Keep report identity and versions, run both suites, and check the
    declaration against its cited reports. Follow [Run conformance](run-conformance.md)
    for native-run prerequisites and cleanup.
-5. **Add brand and publication (optional).** `providers/<id>/brand.yaml` names a chart
+5. **Add brand and publication.** `providers/<id>/brand.yaml` names a chart
    colour, a logo and a one-colour mark (SVG, PNG or WebP files in the provider folder), and
    `launched: true` once the provider is offered in production; without it a consumer lists the
-   provider nowhere that names only launched providers, such as a legal roster.
-   `providers/<id>/publication.yaml` sets `hidden`, `candidate` or `published` for the provider
-   and each class; without it the provider is hidden. `providers/<id>/notes.yaml` holds the
+   provider nowhere that names only launched providers, such as a legal roster. A provider that
+   BoxRouter serves needs a brand mark (`tests/test_provider_brand.py`). A mark is drawn in one
+   colour, so it follows the page's text colour; `mark_colours: own` says the mark file is drawn
+   in the brand's own colours instead, and a consumer then draws it as an image. A coloured mark
+   holds only the brand's paths and fills: no `<image>`, no rectangle behind the drawing, no
+   white fill and no filter. Each provider's `brand/sizes.yaml` records how large its mark draws
+   in a 16 px box, and a replacement mark must stay within 1 px of that size.
+   `providers/<id>/brand/sources.yaml` records where each file came from.
+   `providers/<id>/publication.yaml` (optional) sets `hidden`, `candidate` or `published` for the
+   provider and each class; without it the provider is hidden. `providers/<id>/notes.yaml` holds the
    provider's own published sentences (facts, notes, price and in-development reasons). `make check`
    validates them, and releases ship them as `brand.json`, `publication.json` and `notes.json`.
    A published provider and class each need an authorized, content-bound receipt. The

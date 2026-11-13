@@ -7,9 +7,15 @@ assets:
     role: Official white boat symbol for the dark site, without the wordmark
     modifications: wordmark removed; the boat symbol is unchanged
   mark.svg:
-    source: https://boat.dev/icon-dark.svg
-    role: Official one-colour white symbol for dark backgrounds
-    modifications: none
+    source: https://boat.dev/icon.svg
+    retrieved_at: '2026-11-13'
+    role: >-
+      Official boat symbol in a lighter blue (#5B74E0) for dark backgrounds, drawn in its own
+      colour (mark_colours own)
+    modifications: >-
+      fill changed from the official #263FA9 to #5B74E0, because #263FA9 is too dark on the
+      dashboard's near-black background; path and viewBox unchanged. The white
+      https://boat.dev/icon-dark.svg it replaces is no longer shipped.
 terms:
   source: https://boat.dev/terms
   effective: '2026-10-12'

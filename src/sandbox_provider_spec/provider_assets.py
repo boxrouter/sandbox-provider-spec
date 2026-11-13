@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Validate providers' brand and publication files and build their release JSON.
 
-`providers/<id>/brand.yaml` (chart colour, logo, mark, launched), `providers/<id>/publication.yaml`
-(hidden, candidate or published) and `providers/<id>/notes.yaml` (the provider's sentences) are
-optional. `sandbox-provider-spec provider-assets --out DIR` writes `brand.json`,
-`publication.json` and `notes.json`, each self-contained.
+`providers/<id>/brand.yaml` (chart colour, logo, mark, mark_colours, launched),
+`providers/<id>/publication.yaml` (hidden, candidate or published) and `providers/<id>/notes.yaml`
+(the provider's sentences) are optional. `sandbox-provider-spec provider-assets --out DIR` writes
+`brand.json`, `publication.json` and `notes.json`, each self-contained.
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ NOTES_SCHEMA = "sandbox-provider-spec.notes/1"
 NOTE_KEY = re.compile(r"[a-z0-9][a-z0-9_.-]*")
 STATES = ("hidden", "candidate", "published")
 IMAGE_SUFFIXES = (".svg", ".png", ".webp")
-BRAND_KEYS = ("color", "launched", "logo", "mark", "order")
+BRAND_KEYS = ("color", "launched", "logo", "mark", "mark_colours", "order")
 RECEIPT_KEYS = ("approved_by", "reference", "content_sha256")
 SHA256 = re.compile(r"[0-9a-f]{64}")
 COLOR = re.compile(r"#[0-9A-Fa-f]{6}")
@@ -68,6 +68,12 @@ def brand(folder: Path) -> dict[str, Any] | None:
         if declared["launched"] is not True:
             raise ValueError(f"{source}: launched must be true; omit it before launch")
         result["launched"] = True
+    if "mark_colours" in declared:
+        if declared["mark_colours"] != "own":
+            raise ValueError(f"{source}: mark_colours must be 'own'; omit it for a one-colour mark")
+        if "mark" not in declared:
+            raise ValueError(f"{source}: mark_colours needs a mark")
+        result["mark_colours"] = "own"
     for kind, suffix in (("logo", ""), ("mark", "-mark")):
         if kind not in declared:
             continue

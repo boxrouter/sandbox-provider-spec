@@ -1,0 +1,5 @@
+# Brand: chart colour, logo, one-colour mark and launch state. All keys optional.
+order: 7
+color: '#3FB8A4'
+logo: brand/mark.svg
+mark: brand/mark.svg

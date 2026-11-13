@@ -2,5 +2,6 @@
 order: 1
 color: '#F64F33'
 logo: brand/logo.png
-mark: brand/mark.png
+mark: brand/mark.svg
+mark_colours: own
 launched: true

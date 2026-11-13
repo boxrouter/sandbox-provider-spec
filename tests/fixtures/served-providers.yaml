@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
+# Providers BoxRouter serves: those with byok or credits not "off" in infra's policies/provider-levels.yaml
+# (copied 2026-11-13, infra e8504ba). Add a provider here when infra serves it; its spec folder then
+# needs a brand mark (tests/test_provider_brand.py).
+- agent37
+- blaxel
+- boat
+- boxd
+- daytona
+- e2b
+- modal
+- vercel

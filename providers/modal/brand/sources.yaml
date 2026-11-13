@@ -1,0 +1,13 @@
+owner: Modal Labs, Inc.
+source_page: https://modal.com/blog/what-is-modals-logo
+assets:
+  logo.svg:
+    source: >-
+      Modal's official 3D logo, the SVG download on https://modal.com/blog/what-is-modals-logo
+      (brand assets: https://modal.com/brand)
+    role: >-
+      Official Modal logo in its own green gradients, drawn in its own colours; it is both
+      the logo and the mark (mark_colours own)
+    modifications: not recorded for the file shipped since 0.3.142; its viewBox is square (300 x 300)
+notes:
+  terms: not recorded; no reuse terms were checked for this change.
