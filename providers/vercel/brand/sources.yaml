@@ -19,7 +19,5 @@ notes:
     "Do not modify the Vercel marks." "Do not display the Vercel marks more prominently than your
     trademarks, product, service, or company name." Permitted uses must carry the attribution
     statement in the footer or another clear and conspicuous location.
-  attribution: >-
-    Vercel, the Vercel design, Next.js and related marks, designs and logos are trademarks or
-    registered trademarks of Vercel, Inc. or its affiliates in the US and other countries.
+  attribution: The required statement is `attribution` in ../brand.yaml, which web draws wherever the mark is shown.
   terms: not recorded beyond the brand page's guidelines.

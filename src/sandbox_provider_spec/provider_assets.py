@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Validate providers' brand and publication files and build their release JSON.
 
-`providers/<id>/brand.yaml` (chart colour, logo, mark, mark_colours, launched),
+`providers/<id>/brand.yaml` (chart colour, logo, mark, mark_colours, launched, attribution),
 `providers/<id>/publication.yaml` (hidden, candidate or published) and `providers/<id>/notes.yaml`
 (the provider's sentences) are optional. `sandbox-provider-spec provider-assets --out DIR` writes
 `brand.json`, `publication.json` and `notes.json`, each self-contained.
@@ -28,7 +28,8 @@ NOTES_SCHEMA = "sandbox-provider-spec.notes/1"
 NOTE_KEY = re.compile(r"[a-z0-9][a-z0-9_.-]*")
 STATES = ("hidden", "candidate", "published")
 IMAGE_SUFFIXES = (".svg", ".png", ".webp")
-BRAND_KEYS = ("color", "launched", "logo", "mark", "mark_colours", "order")
+BRAND_KEYS = ("attribution", "color", "launched", "logo", "mark", "mark_colours", "order")
+MAX_ATTRIBUTION = 1000
 RECEIPT_KEYS = ("approved_by", "reference", "content_sha256")
 SHA256 = re.compile(r"[0-9a-f]{64}")
 COLOR = re.compile(r"#[0-9A-Fa-f]{6}")
@@ -64,6 +65,14 @@ def brand(folder: Path) -> dict[str, Any] | None:
         if not isinstance(order, int) or isinstance(order, bool) or order < 0:
             raise ValueError(f"{source}: order must be a non-negative integer")
         result["order"] = order
+    if "attribution" in declared:
+        statement = declared["attribution"]
+        if not _nonblank(statement) or len(statement.strip()) > MAX_ATTRIBUTION:
+            raise ValueError(
+                f"{source}: attribution must be a non-blank statement of at most "
+                f"{MAX_ATTRIBUTION} characters"
+            )
+        result["attribution"] = statement.strip()
     if "launched" in declared:
         if declared["launched"] is not True:
             raise ValueError(f"{source}: launched must be true; omit it before launch")

@@ -113,6 +113,14 @@ def test_brand_embeds_the_named_assets(tmp_path: Path) -> None:
     assert base64.b64decode(declared["logo"]["base64"]) == b"<svg/>"
 
 
+def test_brand_carries_a_required_attribution_statement(tmp_path: Path) -> None:
+    provider(
+        tmp_path, "sixth", **{"brand.yaml": {"attribution": "  Sixth is a mark of Sixth, Inc.  "}}
+    )
+    declared = provider_assets.build(tmp_path)["brand.json"]["providers"]["sixth"]
+    assert declared == {"attribution": "Sixth is a mark of Sixth, Inc."}
+
+
 @pytest.mark.parametrize(
     "brand",
     [
@@ -125,6 +133,9 @@ def test_brand_embeds_the_named_assets(tmp_path: Path) -> None:
         {"unknown": 1},
         {"launched": False},
         {"launched": "yes"},
+        {"attribution": "   "},
+        {"attribution": 7},
+        {"attribution": "x" * 1001},
     ],
 )
 def test_bad_brand_is_refused(tmp_path: Path, brand: dict[str, Any]) -> None:
