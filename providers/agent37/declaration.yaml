@@ -4,7 +4,7 @@ provider: agent37
 # documentation proves it. Kernel, regions and every gate but network_lockdown stay unknown
 # until a report proves them.
 verified:
-  date: 2026-11-12
+  date: 2026-11-13
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
   sdks: {"httpx": "0.28.1"}
 resources:

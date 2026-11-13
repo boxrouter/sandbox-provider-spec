@@ -1126,8 +1126,8 @@
       "boxrouter_core/waiting.py::wait_until"
     ]
   },
-  "format": 1,
-  "report_sha256": "ca0704a6857c5c10fc0488cd8baf764adebb55ee2fe547bf7e53e0074b0d7c7c",
+  "format": 2,
+  "report_sha256": "a6fe6212699fb48086dfbc5d50cc59783a58af82f4e728ab66c3b2af02c75d71",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
@@ -1169,7 +1169,7 @@
     "boxrouter_adapter_kit/standard_image_assets/standard-image.json": "sha256:f499784936cbd3d0e9829e5a6ed7073000e925ad7e8922b9ca866d9f4ad387fa",
     "boxrouter_agent37/errors.py::": "sha256:ea2f76ad8221092e13373aab7e13a37bd16b9d095e70926660a5597b1b22f30d",
     "boxrouter_agent37/errors.py::_facts": "sha256:2416be4381b9caaa1a30e879f4ad1bdf9f3d60792222b0e8167c67b0a6a6e662",
-    "boxrouter_agent37/guest.py::": "sha256:1047cc54041f8c6f1bbf6c015f1798803fd4c73de3fcde6b7725d40f847a22db",
+    "boxrouter_agent37/guest.py::": "sha256:e74d5f71b40a415612c99fbaace3c8059abcdaa8b625543e39ed25f303da526d",
     "boxrouter_agent37/guest.py::Guest.__init__": "sha256:0ed839e161ebcf182d9e213d56708cd79abbd099a26d209baebfb8f15fd7bad6",
     "boxrouter_agent37/guest.py::Guest.execute": "sha256:e48b9b8dc339f29b06687d88639a400b61c4fdd26a463f746e60d1c91bf78435",
     "boxrouter_agent37/guest.py::Guest.feed": "sha256:b5dc50712081fc16055ebce231d4600e4ee7b5a199836b5fbf5f37a49e5bbf1e",

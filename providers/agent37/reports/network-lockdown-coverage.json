@@ -1,18 +1,18 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.network_lockdown.open": "sha256:c719cd5e5560c4f498fc993f2b2d8e3f9553ba70a69a542c769be418a22dffca",
-    "coverage.network_lockdown.switchable.true": "sha256:64ba3be7e6daac3bd40bfcc6d7c03b7be36ca0239d841e7db36d44521633c8ec"
+    "coverage.network_lockdown.open": "sha256:63333d5008af7824859cd7abd726b10dbadc6e94956ffc30d496789738e62b84",
+    "coverage.network_lockdown.switchable.true": "sha256:9c4efba9493dbf85cdf0b237cd56d46eac16b18e5d6cd49718577d5ba1366c4b"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-12T09:28:12.057409+00:00",
+  "finished_at": "2026-11-13T00:13:06.718754+00:00",
   "provider": "agent37",
-  "revision": "65029b1fb6db9a1cafb15c7d761476b4148301d3",
-  "run_id": "public-469120a62200c06214a4",
+  "revision": "7d548c574dabd2f37ae779096f1d16982874a901",
+  "run_id": "public-de5f63e9b8fc69b92d12",
   "sdk_versions": {
     "httpx": "0.28.1"
   },
@@ -21,7 +21,7 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-12T09:27:27.339778+00:00",
+  "started_at": "2026-11-13T00:12:24.144214+00:00",
   "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
   "tests": [
     {
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 27435,
+      "duration_ms": 26219,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -83,7 +83,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17280,
+      "duration_ms": 16353,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
