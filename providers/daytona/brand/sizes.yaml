@@ -1,4 +1,4 @@
 # Drawn-ink size of the mark, in px, when it is drawn "contain" in a 16 px box (Chromium, 2026-11-13).
 # tests/test_provider_brand.py holds a mark to within 1 px of this.
 width: 13.5
-height: 14.3
+height: 14.2

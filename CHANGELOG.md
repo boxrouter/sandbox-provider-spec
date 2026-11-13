@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.3.197: Daytona's and Vercel's brand marks are the providers' official SVG symbols (`brand/mark.svg`; `mark.png` is removed), so every provider's mark is a vector file that web can flatten to its one-colour benchmark mark. Both stay one-colour (no `mark_colours`) and draw at the sizes their PNGs did. No declaration or catalog change.
 - 0.3.196 carries adapter-modal 0.4.247's recertified reports `adapter-default-core`, `adapter-default-size-ceiling` and
   `adapter-vm-size-ceiling` under `providers/modal/reports/`. No declaration or catalog change.
 - 0.3.195 republishes 0.3.194's contents with adapter-superserve 0.1.7's recertified reports under

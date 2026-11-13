@@ -1,0 +1,26 @@
+retrieved_at: '2026-11-13'
+owner: Daytona Platforms Inc.
+source_page: https://www.daytona.io/brand
+assets:
+  mark.svg:
+    source: https://framerusercontent.com/images/k2z1jCEWqymEd7reVoRseEVMFHU.svg
+    role: >-
+      Official Daytona symbol (the brand page's black glyph, the page's Glyph asset), drawn as a
+      one-colour mask
+    modifications: >-
+      viewBox="0 0 512 512" added, then widened to "-6.4 -30.4 548.7 548.7" so the symbol draws in a
+      16 px box at 13.5 x 14.2 px like the PNG mark it replaces (brand/sizes.yaml). The paths, fill and
+      width and height are unchanged.
+  logo.png:
+    source: not recorded
+    role: White logo for dark backgrounds
+    modifications: not recorded
+notes:
+  one_colour: >-
+    The brand page offers the symbol and the wordmark in black and in white only (the same artwork;
+    the files differ in the group's fill, #000 and #fff). The dashboard and the benchmarks draw the
+    mark as a mask in the page's text colour, so the black file is used.
+  brand_rules: >-
+    No recolouring rule. "Use the Logotype whenever possible and the Glyph only in UI with limited
+    space." Uses beyond the guidelines need contact with a visual mockup.
+  terms: not recorded beyond the brand page's guidelines.
