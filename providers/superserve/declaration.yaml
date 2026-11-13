@@ -1,0 +1,30 @@
+spec: sandbox-provider-spec/0.1
+provider: superserve
+# Scaffold skeleton: every value is `unknown` or absent until recon or a committed report proves it.
+# Fill from the recon report (`make new-adapter NAME=superserve --from-recon <report.json>` pre-fills
+# what it can). Never guess: an unproven value stays `unknown`; a gate stays absent until a
+# certified report cites it under `evidence`. The checker (`make -C packages/sandbox-provider-spec
+# check-declarations`) accepts this file as is.
+verified:
+  date: 2026-11-13
+  # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
+  # export strips BoxRouter packages, so only the provider SDK is named here).
+  sdks: {"superserve": "0.12.0"}
+# TODO(recon): kernel, sizes, default_size, size_is_ceiling, disk_mib, regions and located_in.
+# Lifetime: fixtures request 900s and wait 300000ms. The test proves {at_least: 300};
+# write an exact max_lifetime_seconds as the admission cap, not the observed floor and not the
+# fixture's 900 s (the provider's own bound, from recon).
+resources:
+  kernel: unknown
+  gpus: unknown
+  regions: unknown
+  located_in: unknown
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  long_running: unknown
+  extendable_lifetime: unknown
+# TODO(recon): lifetime_timer {enforced_by, counts_paused_time, at_end} once the timer is observed.
+# TODO(certify): gates (processes, terminal, network_lockdown, pause_resume, ...) with `evidence`.
+gates: {}
+evidence: {}
