@@ -345,11 +345,12 @@
       "boxrouter_modal/transport.py::race_router_connections.raced_open_connection",
       "boxrouter_modal/transport.py::trace_channel",
       "boxrouter_modal/transport.py::trace_channel.traced_connect",
-      "boxrouter_modal/transport.py::trace_channel.traced_request"
+      "boxrouter_modal/transport.py::trace_channel.traced_request",
+      "boxrouter_modal/transport.py::widen_router_connection_window.widened"
     ]
   },
-  "format": 1,
-  "report_sha256": "6ee1fbb968794462888668d9c1e981f01e7d5efd0c29fce0b549e82a1e788fa0",
+  "format": 2,
+  "report_sha256": "a957b4f9dc2e04ad0a56115bd09f799a614fb5e86437631a83344a154c1ef8ea",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
@@ -679,7 +680,7 @@
     "boxrouter_modal/submission.py::cache_owner": "sha256:148eeee675ada3f8f1accc3f26985d0b83aea2f4a0abe83dad44d0104e41334d",
     "boxrouter_modal/submission.py::create_view": "sha256:818c35e15a55c41c1a4efe1aa1e33aad7a3c78f6ecd5f93de79e25e909893204",
     "boxrouter_modal/submission.py::sandbox_submission_client": "sha256:c4292c8207415de780a2beb56268bf527ca4d39f63885629d09c4c46137ce0f7",
-    "boxrouter_modal/transport.py::": "sha256:3e324ce9f8ab5853126088339b882abc8f06d33a5007446058217158407b17a8",
+    "boxrouter_modal/transport.py::": "sha256:3a8b2db801e7fba4c41fdb439ba85e88ff95d1953eb6a7fe54775e1695b37a1c",
     "boxrouter_modal/transport.py::_TracedStream.__aenter__": "sha256:28a490c4d3d230c38bb30f1d9def1016d17c7cc65f5b91eff94f830b4c626f5a",
     "boxrouter_modal/transport.py::_TracedStream.__aexit__": "sha256:de8292d0e78d211b2e5d995aae780da04a28ee9cf01e1563949671024c878ca2",
     "boxrouter_modal/transport.py::_TracedStream.__init__": "sha256:ccec24867db732bc96d3a109911872f2f49b3fbb8a93bc13bff2523e8687fb6e",
@@ -694,6 +695,7 @@
     "boxrouter_modal/transport.py::race_router_connections.raced_open_connection": "sha256:c33dba5cab3bffacd82d3c89ab56667f6264d15a3085d48f9717ddaa319cdc80",
     "boxrouter_modal/transport.py::trace_channel": "sha256:76c44a17caea7b3bdae755f8f930d615d8177e113095972fad678aa43b4ba282",
     "boxrouter_modal/transport.py::trace_channel.traced_connect": "sha256:3845b33c805d1daa04eeebc6bc17207e26d3c3d714ee490785e35b6346f1f05e",
-    "boxrouter_modal/transport.py::trace_channel.traced_request": "sha256:74f8488bed35fa93fbc24e41e1c768d50dfc1cbbe426616eeae59ccb6c265a48"
+    "boxrouter_modal/transport.py::trace_channel.traced_request": "sha256:74f8488bed35fa93fbc24e41e1c768d50dfc1cbbe426616eeae59ccb6c265a48",
+    "boxrouter_modal/transport.py::widen_router_connection_window.widened": "sha256:ba76b30e6afadc80b65f005079e891bbc8afd54855a0a539c84bad169d8d6ce9"
   }
 }
