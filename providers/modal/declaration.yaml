@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: default
 verified:
-  date: '2026-11-12'
+  date: '2026-11-13'
   sdks:
     modal: 1.6.1
 resources:
