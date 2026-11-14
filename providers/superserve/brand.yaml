@@ -1,0 +1,5 @@
+# Brand: chart colour, logo, one-colour mark and launch state. All keys optional.
+color: '#B2FAB4'
+logo: brand/mark.svg
+mark: brand/mark.svg
+mark_colours: own
