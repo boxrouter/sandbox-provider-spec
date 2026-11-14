@@ -9,6 +9,7 @@ in a local subprocess, so they need no Docker and no network.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import dataclasses
 import itertools
 import json
@@ -549,11 +550,15 @@ class ContractProvider(LocalProvider, manifest=False):
             if self.kill_group:
                 os.killpg(process.pid, 9)
                 await asyncio.gather(*readers)
+                await process.wait()
             else:
                 process.kill()  # the command's children keep running
                 for reader in readers:
                     reader.cancel()
-            await process.wait()
+                # Python 3.11 resolves wait() only when the pipes close;
+                # a left-behind child holds them.
+                with contextlib.suppress(TimeoutError):
+                    await asyncio.wait_for(process.wait(), 1)
             timed_out = True
         return RunResult(
             exit_code=None if timed_out else process.returncode,
