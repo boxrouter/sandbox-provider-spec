@@ -32,6 +32,7 @@ from sandbox_provider_spec.coverage_file_transfer import (
     http_send,
 )
 from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, NotRun, Observation
+from sandbox_provider_spec.opt_in import OPT_IN_CHECKS, opt_in_group, select_tests, without_opt_in
 from sandbox_provider_spec.report import report
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import read_suite, suite_path
@@ -379,6 +380,50 @@ def test_suite_rows_reach_the_runner_and_record_not_run_without_driver_hooks() -
     runner = FileTransferRunner(Bare(), {})
     results = runner.run(type(suite)(suite.digest, tuple(selected[:2]), suite.baseline_ids))
     assert [result["result"] for result in results] == ["not_run", "not_run"]
+
+
+def _transfer_ids(suite: Any) -> set[str]:
+    return {
+        test.id
+        for test in suite.tests
+        if test.id.startswith(("file_links.v1.", "files.stream.v1."))
+    }
+
+
+def test_streamed_transfer_checks_are_not_in_the_default_selection() -> None:
+    suite = read_suite(suite_path().parent / "coverage.yaml")
+    transfer = _transfer_ids(suite)
+    assert len(transfer) == 23 and all(
+        opt_in_group(name) == "streamed_transfer" for name in transfer
+    )
+    default = select_tests(suite)
+    kept = {test.id for test in default.tests}
+    assert not kept & transfer
+    assert kept == {test.id for test in suite.tests} - transfer
+    # the baseline identity and digest stay those of the whole suite
+    assert default.digest == suite.digest and default.baseline_ids == suite.baseline_ids
+    assert set(suite.baseline_ids) <= kept
+    # the 64 MiB and 1 GiB rows are among what a default run leaves out
+    assert {"files.stream.v1.write.64mib", "files.stream.v1.read.1gib"} <= transfer
+
+
+def test_streamed_transfer_checks_run_when_a_run_opts_in() -> None:
+    suite = read_suite(suite_path().parent / "coverage.yaml")
+    opted = select_tests(suite, opted_in=["streamed_transfer"])
+    assert {test.id for test in opted.tests} == {test.id for test in suite.tests}
+    focused = select_tests(suite, ["files.stream.v1.write.1gib"], ["streamed_transfer"])
+    assert [test.id for test in focused.tests] == ["files.stream.v1.write.1gib"]
+
+
+def test_naming_an_opt_in_check_without_the_option_says_so() -> None:
+    suite = read_suite(suite_path().parent / "coverage.yaml")
+    with pytest.raises(ValueError, match="opt-in"):
+        select_tests(suite, ["files.stream.v1."])
+    with pytest.raises(ValueError, match="no shared tests match"):
+        select_tests(suite, ["no.such.test."], ["streamed_transfer"])
+    with pytest.raises(ValueError, match="unknown opt-in"):
+        without_opt_in(suite, ["everything"])
+    assert set(OPT_IN_CHECKS) == {"streamed_transfer"}
 
 
 @dataclass

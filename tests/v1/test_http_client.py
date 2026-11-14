@@ -540,8 +540,12 @@ def test_ids_that_could_change_the_path_are_refused() -> None:
         raise AssertionError("no request may be sent")
 
     for bad in ("..", ".", "a/b", "a?b", "", "x" * 129, "a b"):
+
+        async def get_bad(p: HttpProvider, name: str = bad) -> Any:
+            return await p.get(name)
+
         with pytest.raises(SpsError) as raised:
-            call(lambda p, bad=bad: p.get(bad), handler)
+            call(get_bad, handler)
         assert raised.value.code == "invalid_request"
     with pytest.raises(SpsError):
         call(lambda p: p.process_output("sbx-17", "../x"), handler)
