@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.3.201 carries the prober's first live report `prober-default-core` under `providers/e2b/reports/`. No declaration or catalog change.
 - 0.3.200: `spec/provider-api.md` holds the normative rules of the provider API 1.0 (18 rules under the `provider-api` topic), and `check-rules` reads it. `spec.md` now says that prices and per-sandbox cost belong to the provider API; speed and reliability stay undeclared. The 18 rules are waived in `untested.yaml` until the 1.0 contract tests name them. No declaration or catalog change.
 - 0.3.199: adds `spec/provider-api-1.0.openapi.yaml`, the OpenAPI 3.1 file for the 1.0 provider API (20 operations, the twelve error codes with their fault), with one example per schema under `spec/provider-api-1.0-examples/`. No declaration or catalog change.
 - 0.3.198: `brand.yaml` takes an optional `attribution` (a statement of at most 1000 characters that a brand's rules require wherever its mark is shown), carried in `brand.json`. Vercel declares its statement. Additive; no declaration or catalog change.
