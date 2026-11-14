@@ -1,11 +1,9 @@
 spec: sandbox-provider-spec/0.1
 provider: superserve
-# Draft: every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed
-# adapter report. A fact whose proof must be a test and whose report is not committed yet (the lifetime
-# timer, the `network_lockdown` variants) is stated in the adapter's support.yaml under `adds`, because
-# this checker refuses a citation of a report that does not exist yet (see evidence.md).
+# Every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed adapter
+# report (see evidence.md).
 verified:
-  date: 2026-11-13
+  date: 2026-11-14
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
   sdks: {"superserve": "0.12.0"}
@@ -26,14 +24,14 @@ resources:
   regions: unknown
   # Superserve's own bound on one timer window (`timeout_seconds`, 1 to 604800).
   max_lifetime_seconds: 604800
-  paused_retention_seconds: unknown
+  paused_retention_seconds: 2592000
   max_run_seconds: unknown
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
 lifetime_timer:
   enforced_by: provider
-  counts_paused_time: unknown
+  counts_paused_time: false
   at_end: [destroyed]
 gates:
   # `commands.spawn` (a stdin write and its explicit EOF, a signal that ends the process); no reattach,
@@ -57,12 +55,60 @@ gates:
   # A public OCI image is built as a team template and a sandbox boots from it; an image's ENTRYPOINT and
   # CMD do not run in a template-booted sandbox, and no template option takes registry credentials, so a
   # private registry image is refused. A template the caller names is a provider artifact.
+  # A registry image becomes a team template whose `start_cmd` is the image's ENTRYPOINT and CMD, started once
+  # while the template is built and kept alive in its snapshot (image_preparation.py); the template carries the
+  # image's env, working directory and user. A template the caller names carries the same, but one BoxRouter
+  # did not build has no recorded start command, so the adapter refuses `runs_entrypoint: true` for it.
   custom_images:
   - source: oci
     prepared: true
-    runs_entrypoint: false
+    image_config:
+    - env
+    - workdir
+    - user
+    runs_entrypoint: true
   - source: provider_artifact
-    runs_entrypoint: false
+    image_config:
+    - env
+    - workdir
+    - user
+    runs_entrypoint: true
+  # Docker Engine in a second team template built on the standard image (`dockerd` is its `start_cmd`); a create
+  # naming `docker` starts from it, never from a caller's image.
+  docker:
+  - networking: host
+    conflicts:
+    - custom_images
+  # Superserve's `pause` and `resume` keep processes and memory (`Pause.memory`, no cold restart). The adapter
+  # swaps `auto_delete_seconds` 0 for the 30-day retention for the length of a caller's pause (lifecycle.py).
+  pause_resume:
+  - keeps: files_and_memory
+  # `idle_timeout_seconds` (60 s to 7 days) pauses an idle sandbox; the adapter's `auto_delete_seconds: 0`
+  # deletes it at that pause, so `on_idle` is `destroyed`.
+  idle_shutdown:
+  - custom_idle_time: true
+    on_idle: destroyed
+  # Preview URLs (previews.py). A public preview is proven; the private variants are not declared: the
+  # provider answers a link credential with a redirect (a cookie bootstrap) that the runner does not follow,
+  # and `previews.access.private` uses that form (evidence.md). `loopback` is not declared
+  # either (evidence.md).
+  previews:
+  - access: public
+    revocable: true
+    max_ports:
+      at_least: 2
+    any_port: true
+    link_lifetime_seconds:
+      at_least: 120
+    reserved_ports: [49983]
+    websocket: true
+    survives_pause: true
+  # A pty under the guest supervisor (terminals.py): closing an observer never ends the shell.
+  terminal:
+  - reattach: true
+  snapshots:
+  - keeps: files_and_memory
+    deletable: true
 evidence:
   resources.sizes:
     source: https://docs.superserve.ai/templates/overview
@@ -137,11 +183,109 @@ evidence:
     tests: [coverage.custom_images.prepare.registry]
     report: reports/adapter-custom-images-default.json
   gates.custom_images.0.runs_entrypoint:
-    tests: [coverage.custom_images.runs_entrypoint.false]
+    tests: [coverage.custom_images.runs_entrypoint.true]
     report: reports/adapter-custom-images-default.json
+  gates.custom_images.0.image_config:
+    reports:
+    - tests:
+      - coverage.custom_images.prepare.image_config.env
+      report: reports/adapter-custom-images-default.json
+    - tests:
+      - coverage.custom_images.prepare.image_config.workdir
+      report: reports/adapter-custom-images-default.json
+    - tests:
+      - coverage.custom_images.prepare.image_config.user
+      report: reports/adapter-custom-images-default.json
   gates.custom_images.1.source:
     tests: [custom_images.provider_artifact]
     report: reports/adapter-custom-images-core-default.json
   gates.custom_images.1.runs_entrypoint:
-    tests: [coverage.custom_images.runs_entrypoint.false]
+    tests: [coverage.custom_images.runs_entrypoint.true]
     report: reports/adapter-custom-images-default.json
+  gates.custom_images.1.image_config:
+    reports:
+    - tests:
+      - coverage.custom_images.prepare.image_config.env
+      report: reports/adapter-custom-images-default.json
+    - tests:
+      - coverage.custom_images.prepare.image_config.workdir
+      report: reports/adapter-custom-images-default.json
+    - tests:
+      - coverage.custom_images.prepare.image_config.user
+      report: reports/adapter-custom-images-default.json
+  resources.paused_retention_seconds:
+    source: https://api.superserve.ai/openapi.yaml
+    read: 2026-11-14
+    quote: >-
+      `auto_delete_seconds` ... Optional garbage-collection window for paused sandboxes, in seconds. Once the
+      sandbox has been continuously paused for this long it is deleted automatically. ... Maximum 2592000 (30 days).
+  lifetime_timer.counts_paused_time:
+    source: https://api.superserve.ai/openapi.yaml
+    read: 2026-11-14
+    quote: >-
+      `timeout_seconds` ... The sandbox is paused once its current active session has run this long; each
+      resume starts a fresh window.
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/adapter-pause-default.json
+  gates.idle_shutdown.0.custom_idle_time:
+    tests:
+    - idle_shutdown.custom_idle_time.true
+    report: reports/adapter-idle-default.json
+  gates.idle_shutdown.0.on_idle:
+    tests:
+    - idle_shutdown.on_idle.destroyed
+    report: reports/adapter-idle-default.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/adapter-previews-core-default.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.true.public
+    report: reports/adapter-previews-core-default.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/adapter-previews-core-default.json
+  gates.previews.0.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/adapter-previews-core-default.json
+  gates.previews.0.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/adapter-previews-default.json
+  gates.terminal.0.reattach:
+    tests:
+    - coverage.terminal.reattach
+    report: reports/adapter-terminal-default.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_and_memory
+    report: reports/adapter-snapshots-default.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/adapter-snapshots-default.json
+  gates.previews.0.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/adapter-previews-default.json
+  gates.previews.0.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/adapter-previews-default.json
+  gates.docker.0.networking:
+    tests:
+    - coverage.docker.host
+    report: reports/adapter-docker-default.json
+  gates.previews.0.reserved_ports:
+    tests:
+    - coverage.previews.reserved_ports
+    report: reports/adapter-previews-default.json
+  gates.docker.0.conflicts:
+    source: providers/superserve/evidence.md
+    read: '2026-11-14'
+    quote: a create that names `docker` starts from it, never from a caller's image

@@ -1,0 +1,183 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "snapshots.deletable.true": "sha256:deba125dd3b3293161a9c4ae91749ccd4619813741f2c6ef71e0d1ad5d777e7f",
+    "snapshots.keeps.files_and_memory": "sha256:98a28cf45707f65a9bd9f170e556991259b242a55104271d92f67c9a1313eb02"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-14T03:23:44.709602+00:00",
+  "implementation": "withheld",
+  "provider": "superserve",
+  "revision": "7a0c8ce07c67ff72d012f754434fd2b9f938786f",
+  "run_id": "public-b35f80017522540a4eb2",
+  "sdk_versions": {
+    "superserve": "0.12.0",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "snapshots.keeps.files_and_memory",
+    "snapshots.deletable.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-14T03:23:42.311532+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1756,
+      "id": "snapshots.keeps.files_and_memory",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "bWVtb3J5LW1hcmtlcg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 640,
+      "id": "snapshots.deletable.true",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "deletable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/deletable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

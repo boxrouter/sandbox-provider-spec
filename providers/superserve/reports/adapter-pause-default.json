@@ -1,0 +1,151 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-14T03:11:37.621734+00:00",
+  "implementation": "withheld",
+  "provider": "superserve",
+  "revision": "7a0c8ce07c67ff72d012f754434fd2b9f938786f",
+  "run_id": "public-fc215bd222cc1d1419b0",
+  "sdk_versions": {
+    "superserve": "0.12.0",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "pause_resume.files_and_memory"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-14T03:11:35.999274+00:00",
+  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1619,
+      "id": "pause_resume.files_and_memory",
+      "proves": [
+        {
+          "gate": "pause_resume",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "pause_resume/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "bWVtb3J5LW1hcmtlcg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

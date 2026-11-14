@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T17:03:58.730210+00:00",
+  "finished_at": "2026-11-14T03:16:30.130383+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "95a710453396c13de38c9aba0cb668dcfa8ba007",
-  "run_id": "public-85a48e1c3b65a44f21e3",
+  "revision": "7a0c8ce07c67ff72d012f754434fd2b9f938786f",
+  "run_id": "public-6dc6380a5309663c8f6e",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -23,7 +23,7 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T17:03:22.527943+00:00",
+  "started_at": "2026-11-14T03:15:57.068234+00:00",
   "suite_digest": "sha256:1d410dfb6f824f7f283fb959e2ece62cf52ffadcd2a3620c75f0924f5aae3fbd",
   "tests": [
     {
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23610,
+      "duration_ms": 21603,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -85,7 +85,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 12589,
+      "duration_ms": 11456,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {

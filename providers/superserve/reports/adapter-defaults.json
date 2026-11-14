@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T17:03:43.979829+00:00",
+  "finished_at": "2026-11-14T05:02:31.054403+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "95a710453396c13de38c9aba0cb668dcfa8ba007",
-  "run_id": "public-73dd03feb4b70876a87f",
+  "revision": "9f357ae6dcf1c6c6c90e45bb4e93871dc90cd4b8",
+  "run_id": "public-780c000d6f154eec6952",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -23,8 +23,8 @@
     "facts.default_cwd"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T17:03:41.738885+00:00",
-  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "started_at": "2026-11-14T05:02:29.461478+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
       "cleanup": [
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1743,
+      "duration_ms": 1205,
       "id": "facts.default_user",
       "proves": [
         {
@@ -67,7 +67,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 492,
+      "duration_ms": 386,
       "id": "facts.default_cwd",
       "proves": [
         {
