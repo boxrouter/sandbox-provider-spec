@@ -181,7 +181,7 @@ async def _fs_put(
     def work() -> None:
         try:
             results.put(cloud.write_file(machine_id, path, size, _drain(incoming)))
-        except BaseException as exc:
+        except Exception as exc:  # noqa: BLE001 - forward worker failures to the HTTP caller
             results.put(exc)
         finally:
             dead.set()
@@ -211,7 +211,7 @@ async def _fs_put(
     outcome = await asyncio.to_thread(results.get)
     if isinstance(outcome, ApiError):
         raise outcome
-    if isinstance(outcome, BaseException):
+    if isinstance(outcome, Exception):
         raise ApiError(502, "provider_error", f"write failed: {outcome}")
     await _send_json(send, 200, outcome)
 
@@ -372,7 +372,7 @@ def make_app(cloud: ExampleCloud) -> Any:
                 exc.status,
                 {"error": {"code": exc.code, "message": exc.message}},
             )
-        except Exception:
+        except Exception:  # noqa: BLE001 - contain unexpected failures at the HTTP boundary
             await _send_json(
                 send, 500, {"error": {"code": "provider_error", "message": "internal error"}}
             )

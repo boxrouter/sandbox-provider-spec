@@ -26,7 +26,7 @@ def _docker_client() -> Any:
     try:
         client = docker.from_env(timeout=5)
         client.ping()
-    except Exception as exc:
+    except docker.errors.DockerException as exc:
         pytest.skip(
             f"Example Cloud tests need a local Docker daemon ({exc})",
             allow_module_level=True,
@@ -80,9 +80,10 @@ def call_json(
 
 @pytest.fixture(scope="session")
 def image() -> str:
+    docker = pytest.importorskip("docker", reason="Example Cloud tests need the docker extra")
     try:
         DOCKER.images.get(IMAGE)
-    except Exception:
+    except docker.errors.ImageNotFound:
         DOCKER.images.pull(IMAGE)
     return IMAGE
 

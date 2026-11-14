@@ -10,6 +10,7 @@ under the server's state directory and outlive their container.
 
 from __future__ import annotations
 
+import contextlib
 import io
 import json
 import queue
@@ -87,10 +88,10 @@ def _now() -> str:
 
 
 def _parse_time(text: str) -> datetime:
-    return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    return datetime.fromisoformat(text)
 
 
-def _plus(text: str, seconds: int | float) -> str:
+def _plus(text: str, seconds: float) -> str:
     return (
         (_parse_time(text) + timedelta(seconds=seconds))
         .isoformat(timespec="milliseconds")
@@ -506,7 +507,7 @@ class ExampleCloud:
             raise ApiError(400, "invalid_request", f"bad file path: {path}")
 
         def tar_stream() -> Iterator[bytes]:
-            out: queue.Queue[bytes | BaseException | None] = queue.Queue(maxsize=32)
+            out: queue.Queue[bytes | Exception | None] = queue.Queue(maxsize=32)
 
             def produce() -> None:
                 try:
@@ -516,7 +517,7 @@ class ExampleCloud:
                         info.mode = 0o644
                         info.mtime = int(time.time())
                         archive.addfile(info, _IterRead(body))
-                except BaseException as exc:  # propagates to the upload below
+                except Exception as exc:  # noqa: BLE001 - forward producer failures to the caller
                     out.put(exc)
                 finally:
                     out.put(None)
@@ -526,7 +527,7 @@ class ExampleCloud:
                 chunk = out.get()
                 if chunk is None:
                     return
-                if isinstance(chunk, BaseException):
+                if isinstance(chunk, Exception):
                     raise chunk
                 yield chunk
 
@@ -696,7 +697,5 @@ class ExampleCloud:
     def close(self) -> None:
         self._closed.set()
         for client in (self.client, self.streams):
-            try:
+            with contextlib.suppress(DockerException, RequestException, OSError):
                 client.close()
-            except Exception:
-                pass
