@@ -1,0 +1,6 @@
+{
+  "path": "/workspace/big.bin",
+  "operation": "write",
+  "lifetime_seconds": 3600,
+  "size": 5368709120
+}

@@ -1,0 +1,20 @@
+retrieved_at: '2026-11-14'
+owner: Superserve Inc.
+source_page: https://console.superserve.ai
+assets:
+  mark.svg:
+    source: https://console.superserve.ai/logo-mark.svg
+    role: >-
+      Official Superserve symbol in its own green (#B2FAB4); the logo and the mark are this one
+      file (mark_colours own)
+    modifications: none; byte-identical to the served file (sha256 8b800c24...cc756)
+notes:
+  also_published_at: >-
+    apps/console/public/logo-mark.svg in https://github.com/superserve-ai/superserve
+  no_brand_page: superserve.ai/brand, /press and /media-kit return 404; no brand kit exists
+  no_wordmark: >-
+    superserve.ai/assets/logo.svg is the symbol plus the word "superserve" in white, drawn for
+    dark backgrounds, so no lockup is shipped.
+  terms: >-
+    no reuse terms or brand guidelines were found; Superserve's Terms of Use reserve its name and
+    logos as trademarks, as a web search summary says (the PDF text itself was not read).

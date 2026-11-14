@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.invalid/sps-provider.schema.json",
+  "title": "sps-provider.yaml",
+  "description": "The static facts of a provider package for the 1.0 Python interface. The file sits in the Python package that the provider's entry point names, so that tools can read it without importing the package's code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider_id", "name", "spec_version", "credential_fields", "api_domains"],
+  "properties": {
+    "provider_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{2,32}$",
+      "description": "The stable provider id; the name of the entry point and the id that discovery's `provider.id` uses."
+    },
+    "name": {"type": "string", "minLength": 1, "description": "The display name."},
+    "spec_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "The newest 1.x minor that this package implements, as `major.minor`."
+    },
+    "credential_fields": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The values that the provider's API needs. The constructor receives a mapping from each name to its value.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"},
+          "secret": {"type": "boolean", "default": true, "description": "True when the value must never be logged or returned."},
+          "required": {"type": "boolean", "default": true},
+          "default": {"type": "string", "description": "The value used when the consumer gives none. Only for a field that is not secret."},
+          "description": {"type": "string"}
+        },
+        "if": {"required": ["default"]},
+        "then": {"required": ["secret"], "properties": {"secret": {"const": false}}}
+      }
+    },
+    "api_domains": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Every host name that the package connects to: an exact host name, or a suffix with a leading dot that matches every host under it.",
+      "items": {
+        "type": "string",
+        "pattern": "^\\.?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.docker.host": "sha256:fa51ffe7c58bee3009d79149db9b375662914d7d487029c8a266d7324811bf3d"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-14T06:23:04.198416+00:00",
+  "provider": "superserve",
+  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
+  "run_id": "public-960e9333d5bdc6350e5a",
+  "sdk_versions": {
+    "superserve": "0.12.0"
+  },
+  "selected_tests": [
+    "coverage.docker.host"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-14T06:23:00.107978+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4088,
+      "id": "coverage.docker.host",
+      "proves": [
+        {
+          "gate": "docker",
+          "knob": "networking",
+          "value": "host"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "docker/runs-containers",
+        "docker/host"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "fixture.coverage_docker_create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "network_mode_matches": {
+              "matches": true
+            },
+            "outbound": {
+              "matches": true
+            },
+            "published_reachable": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_docker",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

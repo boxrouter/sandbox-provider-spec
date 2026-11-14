@@ -17,11 +17,11 @@ from typing import Any
 import pytest
 
 from sandbox_provider_spec import check_digests as digests
-from sandbox_provider_spec import conformance
 from sandbox_provider_spec.check import spec_dir
 from sandbox_provider_spec.driver import Driver
 from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.load import load
+from sandbox_provider_spec.opt_in import select_tests
 from sandbox_provider_spec.report import report
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
 from sandbox_provider_spec.suite import Test as Scenario
@@ -361,7 +361,7 @@ def test_every_unshared_file_is_claimed_or_declared_unexecuted() -> None:
 
 
 def test_report_records_digests_for_selected_tests_only() -> None:
-    suite = conformance.select(_suite(), ["coverage.docker."])
+    suite = select_tests(_suite(), ["coverage.docker."])
     driver = Driver()
     driver.provider = "e2b"
     driver.sdk_versions = {"example-sdk": "1.0.0"}

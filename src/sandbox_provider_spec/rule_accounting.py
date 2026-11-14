@@ -56,6 +56,7 @@ def _read_anchors(root: Path, errors: list[str]) -> dict[str, list[str]]:
         Path("spec/vocabulary.md"),
         Path("spec/matching.md"),
         Path("spec/declarations.md"),
+        Path("spec/provider-api.md"),
     ):
         path = root / relative
         if not path.is_file():

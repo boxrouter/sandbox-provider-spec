@@ -1,0 +1,1353 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
+openapi: 3.1.0
+info:
+  title: Sandbox Provider API
+  version: 1.0.0
+  summary: The operations that a sandbox provider implements.
+  description: |
+    A provider implements eleven required operations and any of the optional ones. This file is the
+    authority for the shapes of every request and result. The rules that span operations
+    (idempotency, lifetime, ids, destroy, files, processes, cost, errors, versioning) are in
+    provider-api.md next to this file.
+
+    Every operation has a dotted name, such as `files.read`. The `operationId` is that name with
+    each dot replaced by an underscore (`files_read`).
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+servers:
+  - url: "{base_url}"
+    description: The HTTPS base URL that the provider chooses. Every path is relative to it.
+    variables:
+      base_url:
+        default: https://api.example.com/sps
+        description: The provider's base URL, without a trailing slash.
+security:
+  - bearerAuth: []
+tags:
+  - name: required
+    description: The eleven operations that every provider implements.
+  - name: optional
+    description: Operations of the optional sections. Claimed in discovery, turned on by the tester.
+paths:
+  /v1/discovery:
+    get:
+      operationId: discovery
+      tags: [required]
+      summary: What this account can create, and the prices
+      description: Account-scoped. Two accounts on different plans may see different classes, regions, sizes and prices.
+      responses:
+        "200":
+          description: The discovery document.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Discovery"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes:
+    post:
+      operationId: create
+      tags: [required]
+      summary: Create a sandbox (idempotent)
+      description: >-
+        Returns when the sandbox can serve `run`, `files.*` and `process.*`; its state is `running`.
+        A repeat with the same key and body returns the first sandbox with status 201.
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CreateRequest"}
+      responses:
+        "201":
+          description: The sandbox created by this call or found by its idempotency key.
+          headers:
+            Request-Id: {$ref: "#/components/headers/RequestId"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "402": {$ref: "#/components/responses/QuotaExceeded"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    get:
+      operationId: list
+      tags: [required]
+      summary: List sandboxes that have not ended, filtered by labels
+      description: >-
+        Returns sandboxes in the states `running`, `paused` and `stopped`. The order is unspecified and the cursor is opaque.
+        A sandbox created or ended during paging may appear twice or not at all.
+      parameters:
+        - name: label
+          in: query
+          required: false
+          description: >-
+            `<key>=<value>`; may repeat. A sandbox matches when it has every given label with exactly that value.
+            The first `=` separates the key from the value.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items: {type: string, pattern: "^[^=]+=.*$"}
+        - name: cursor
+          in: query
+          required: false
+          description: The `next_cursor` of the previous page.
+          schema: {type: string, minLength: 1}
+        - name: limit
+          in: query
+          required: false
+          description: Page size, 1 to `limits.list_limit` of discovery.
+          schema: {type: integer, minimum: 1, default: 100}
+      responses:
+        "200":
+          description: One page of sandboxes.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SandboxPage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    get:
+      operationId: get
+      tags: [required]
+      summary: Read one sandbox
+      description: >-
+        Returns the current state. While the provider keeps a record of an ended sandbox, the state is `destroyed`;
+        afterwards the answer is `not_found`. It observes only: it never resumes, wakes or extends a sandbox.
+      responses:
+        "200":
+          description: The sandbox.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    delete:
+      operationId: destroy
+      tags: [required]
+      summary: End a sandbox; returns once accepted
+      description: >-
+        Returns as soon as the provider has accepted the request: the sandbox will end without any further call.
+        A repeated destroy of an ending or ended sandbox succeeds with state `destroyed`. A destroy of an id that the
+        provider has no record of is `not_found`, which a consumer treats as done.
+      responses:
+        "200":
+          description: The destroy was accepted.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DestroyResult"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/run:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: run
+      tags: [required]
+      summary: Run a command and return its exit code and output
+      description: >-
+        The call is held open until the command ends. A nonzero exit code and a timeout are results, not errors.
+        For longer work, use `process.start`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/RunRequest"}
+      responses:
+        "200":
+          description: The command ended, or timed out.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RunResult"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/files:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/FilePathQuery"}
+    get:
+      operationId: files_read
+      tags: [required]
+      summary: Read a file as a byte stream
+      description: >-
+        The body is the whole file or the response fails: a connection that ends before the last byte is a failed read,
+        never a short file. A consumer that needs only a prefix may close the stream early. A missing file is
+        `not_found`, a directory is `invalid_request`, and a file over `limits.file_bytes` is `too_large`.
+      responses:
+        "200":
+          description: The file's bytes.
+          headers:
+            Content-Length:
+              description: The size in bytes, when the provider knows it. Otherwise the body uses chunked transfer.
+              schema: {type: integer, minimum: 0}
+          content:
+            application/octet-stream:
+              schema: {type: string, contentMediaType: application/octet-stream}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/TooLarge"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    put:
+      operationId: files_write
+      tags: [required]
+      summary: Write a file from a byte stream
+      description: >-
+        Creates the file or replaces its whole content. The parent directory must exist. Success is reported only after
+        every byte is in the file. A body shorter or longer than `Content-Length` fails with `invalid_request` and outcome
+        `unknown`: the file may be partly written.
+      parameters:
+        - name: Content-Length
+          in: header
+          required: true
+          description: The size of the body in bytes, at most `limits.file_bytes`.
+          schema: {type: integer, minimum: 0}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, contentMediaType: application/octet-stream}
+      responses:
+        "200":
+          description: Every byte is in the file.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/FileInfo"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/TooLarge"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/processes:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: process_start
+      tags: [required]
+      summary: Start a background process
+      description: >-
+        Returns at once. The process keeps running after the call returns and while nobody reads its output.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProcessStartRequest"}
+      responses:
+        "200":
+          description: The process started.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Process"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/processes/{process_id}/output:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/ProcessId"}
+    get:
+      operationId: process_output
+      tags: [required]
+      summary: Read a process's output and exit status
+      description: >-
+        Closing stdout and stderr does not mean that the process exited: only `state: exited` with an `exit_code` means that.
+        The provider keeps at least `limits.process_output_bytes` of the newest output per stream, and the record for at
+        least `limits.process_retention_seconds` after exit; after that the answer is `not_found`.
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: The `next_cursor` of the previous call. Without it, reading starts at the oldest output still kept.
+          schema: {type: string, minLength: 1}
+        - name: wait_ms
+          in: query
+          required: false
+          description: >-
+            Holds the call until new output arrives, the process exits or the time passes, whichever is first.
+            0 to `limits.wait_ms`.
+          schema: {type: integer, minimum: 0, default: 0}
+      responses:
+        "200":
+          description: New output since the cursor.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/OutputPage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/cost:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    get:
+      operationId: cost
+      tags: [required]
+      summary: The sandbox's cost
+      description: >-
+        While the sandbox exists the status is `accruing`. The cost reaches `final` within 7 days after the sandbox ends
+        and stays readable for at least 7 days after that.
+      responses:
+        "200":
+          description: The cost so far, or the final cost.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Cost"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/file-links:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: files_link
+      tags: [optional]
+      summary: A provider-signed URL that moves file bytes directly
+      description: Section `file_links`. The URL carries no credential of the consumer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/FileLinkRequest"}
+      responses:
+        "200":
+          description: The link.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/FileLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/pause:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: pause
+      tags: [optional]
+      summary: Pause a sandbox
+      description: Section `pause_resume`. What survives is the claimed `keeps` value.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EmptyObject"}
+      responses:
+        "200":
+          description: The sandbox after the pause.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/resume:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: resume
+      tags: [optional]
+      summary: Resume a paused sandbox
+      description: Section `pause_resume`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EmptyObject"}
+      responses:
+        "200":
+          description: The sandbox after the resume.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/lifetime:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: lifetime_extend
+      tags: [optional]
+      summary: Extend a sandbox's lifetime
+      description: >-
+        Resource fact `extendable_lifetime`. The sandbox may run at least `seconds` more from now. An extension never
+        shortens a lifetime.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/LifetimeExtendRequest"}
+      responses:
+        "200":
+          description: The sandbox with its new `ends_at`.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/processes/{process_id}/stdin:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/ProcessId"}
+    post:
+      operationId: process_write_stdin
+      tags: [optional]
+      summary: Write bytes to a process's stdin
+      description: Section `processes` with `input`. At most 1 MiB per call. Never retried after an `unknown` outcome.
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, contentMediaType: application/octet-stream}
+      responses:
+        "200":
+          description: The bytes were written.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/TooLarge"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    delete:
+      operationId: process_close_stdin
+      tags: [optional]
+      summary: Close a process's stdin
+      description: Section `processes` with `input`. Closing twice succeeds.
+      responses:
+        "200":
+          description: Stdin is closed.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/processes/{process_id}/cancel:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/ProcessId"}
+    post:
+      operationId: process_cancel
+      tags: [optional]
+      summary: End a process and its children
+      description: Section `processes` with `cancel`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EmptyObject"}
+      responses:
+        "200":
+          description: The process was ended.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/previews:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: preview_link
+      tags: [optional]
+      summary: An HTTPS URL that reaches a port of the sandbox
+      description: >-
+        Section `previews`. The knobs (`access`, `websocket`, and the others) are claimed in discovery and named at create.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/PreviewRequest"}
+      responses:
+        "200":
+          description: The preview link.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PreviewLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/tcp-links:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: tcp_link
+      tags: [optional]
+      summary: A host and port that reach a TCP port of the sandbox
+      description: Section `tcp_ports`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/TcpLinkRequest"}
+      responses:
+        "200":
+          description: The TCP link.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/TcpLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        The provider account's own API token, as the provider issues it. It is the only credential: a request never carries a
+        second secret, and no field names an account.
+  x-sps-errors:
+    invalid_request:
+      status: 400
+      x-sps-fault: caller
+    unauthenticated:
+      status: 401
+      x-sps-fault: caller
+    forbidden:
+      status: 403
+      x-sps-fault: caller
+    not_found:
+      status: 404
+      x-sps-fault: caller
+    conflict:
+      status: 409
+      x-sps-fault: caller
+    too_large:
+      status: 413
+      x-sps-fault: caller
+    unsupported:
+      status: 422
+      x-sps-fault: caller
+    quota_exceeded:
+      status: 402
+      x-sps-fault: caller
+    rate_limited:
+      status: 429
+      x-sps-fault: caller
+    unavailable:
+      status: 503
+      x-sps-fault: provider
+    timeout:
+      status: 504
+      x-sps-fault: provider
+    provider_error:
+      status: 500
+      x-sps-fault: provider
+  headers:
+    RequestId:
+      description: An id that the provider's support staff can look up. A provider should send it.
+      schema: {type: string}
+    RetryAfter:
+      description: The same value as `retry_after_seconds` of the error, set when retrying later can work.
+      schema: {type: integer, minimum: 0}
+  parameters:
+    SandboxId:
+      name: sandbox_id
+      in: path
+      required: true
+      description: The sandbox id that the provider chose.
+      schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    ProcessId:
+      name: process_id
+      in: path
+      required: true
+      description: The process id that the provider chose.
+      schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    FilePathQuery:
+      name: path
+      in: query
+      required: true
+      description: An absolute path in the filesystem that commands see.
+      schema: {$ref: "#/components/schemas/FilePath"}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >-
+        8 to 63 characters from `a-z 0-9 -`, starting with a letter or a digit (a UUID fits). Within 24 hours a repeated
+        create with the same key never makes a second sandbox.
+      schema: {type: string, pattern: "^[a-z0-9][a-z0-9-]{7,62}$"}
+  responses:
+    InvalidRequest:
+      description: The request is malformed, has an unknown field, or has a value out of range.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Unauthenticated:
+      description: The token is missing, wrong or expired.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    QuotaExceeded:
+      description: The account reached its plan, spending or concurrency limit.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Forbidden:
+      description: The token is valid but may not do this.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    NotFound:
+      description: The sandbox, process, file or directory does not exist.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Conflict:
+      description: >-
+        The sandbox's state forbids the operation, or an `Idempotency-Key` was reused with a different body or while its
+        create is in progress.
+      headers:
+        Retry-After: {$ref: "#/components/headers/RetryAfter"}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    TooLarge:
+      description: A file or body is over a declared limit.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Unsupported:
+      description: The request names a class, region, size, image, section or value that this provider does not offer.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    RateLimited:
+      description: The account sent too many requests.
+      headers:
+        Retry-After: {$ref: "#/components/headers/RetryAfter"}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Unavailable:
+      description: "The provider cannot serve a valid request now: no capacity, or maintenance."
+      headers:
+        Retry-After: {$ref: "#/components/headers/RetryAfter"}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    Timeout:
+      description: The provider did not finish the operation in time.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+    ProviderError:
+      description: Any other failure on the provider's side.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+  schemas:
+    Timestamp:
+      type: string
+      format: date-time
+      pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+      description: An RFC 3339 time in UTC with a `Z` suffix.
+    Decimal:
+      type: string
+      pattern: "^[0-9]+(\\.[0-9]+)?$"
+      description: An amount or quantity as a decimal string, such as `0.000014`; never a JSON number.
+    Labels:
+      type: object
+      maxProperties: 32
+      propertyNames: {pattern: "^[A-Za-z0-9_./-]{1,63}$"}
+      additionalProperties: {type: string, maxLength: 255}
+      description: >-
+        At most 32 entries. A key is 1 to 63 bytes from `A-Z a-z 0-9 _ . / -`; a value is 0 to 255 bytes of UTF-8. Labels
+        carry no meaning for the provider and never change what a sandbox may do.
+    Env:
+      type: object
+      propertyNames: {pattern: "^[A-Za-z_][A-Za-z0-9_]*$"}
+      additionalProperties: {type: string}
+      description: >-
+        Environment variables. Names and values together are at most 65536 bytes, counting 2 bytes of overhead per variable.
+    FilePath:
+      type: string
+      minLength: 1
+      maxLength: 4096
+      pattern: "^/[^\\u0000]*$"
+      description: >-
+        An absolute path of at most 4096 bytes, with no NUL byte and no component over 255 bytes. It names a path in the
+        filesystem that commands see.
+    Port:
+      type: integer
+      minimum: 1
+      maximum: 65535
+      description: A TCP port inside the sandbox.
+    PriceItem:
+      enum: [cpu, memory, disk, gpu, machine, create, egress, snapshot, volume, start, request, feature]
+      description: >-
+        What is charged: CPU, memory, disk, GPUs, a whole fixed-size machine, each sandbox created, traffic out of the
+        sandbox, stored snapshots, persistent volumes, each start or resume, API requests, or a recurring fee for an
+        enabled feature.
+    PriceUnit:
+      enum:
+        - vcpu_second
+        - vcpu_hour
+        - vcpu_month
+        - core_second
+        - core_hour
+        - gib_second
+        - gib_hour
+        - gib_month
+        - gb_second
+        - gb_hour
+        - gb_month
+        - gpu_second
+        - gpu_hour
+        - machine_second
+        - machine_hour
+        - gib
+        - gb
+        - each
+        - month
+      description: >-
+        The unit as the provider states it. A month is 730 hours. `each` is one item, once; `month` is one item per month
+        (a recurring fee, for example the `feature` item). GiB is 2^30 bytes and GB is 10^9 bytes; a provider that
+        says "GB" but bills binary gigabytes writes `gib`. A `core` is a physical core.
+    EmptyObject:
+      type: object
+      maxProperties: 0
+      additionalProperties: false
+      description: The body `{}`.
+    Error:
+      type: object
+      required: [code, message, outcome]
+      properties:
+        code:
+          enum:
+            - invalid_request
+            - unauthenticated
+            - forbidden
+            - not_found
+            - conflict
+            - too_large
+            - unsupported
+            - quota_exceeded
+            - rate_limited
+            - unavailable
+            - timeout
+            - provider_error
+          description: >-
+            Authoritative; the HTTP status only mirrors it. `x-sps-errors` under `components` gives each code's status and
+            fault.
+        message:
+          type: string
+          maxLength: 1024
+          description: For people. It holds no credential and no response body from another system.
+        outcome:
+          enum: [failed, unknown]
+          description: >-
+            `failed`: the operation had no effect. `unknown`: it may have taken effect. Caller-fault codes have outcome
+            `failed`, except `invalid_request` for a streamed file upload whose body size differs from its declared size;
+            some or all bytes may have been written.
+        retry_after_seconds:
+          type: [integer, "null"]
+          minimum: 0
+          description: Set when retrying later can work; the same value goes in a `Retry-After` header.
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: {$ref: "#/components/schemas/Error"}
+      description: The body of every error response.
+    Size:
+      type: object
+      description: One size in discovery's `resources.sizes` that a price can name.
+      required: [cpu, memory_mib]
+      properties:
+        cpu: {type: number, exclusiveMinimum: 0, description: "Virtual CPUs."}
+        memory_mib: {type: integer, minimum: 1, description: "Memory in MiB."}
+    Price:
+      type: object
+      description: >-
+        One priced item of a class. The four required fields are enough to publish a price list; the rest state the rules that
+        real price lists have. An item that a class does not list has an unknown price, never a zero price.
+      required: [item, price_usd, unit, basis]
+      properties:
+        item: {$ref: "#/components/schemas/PriceItem"}
+        price_usd:
+          $ref: "#/components/schemas/Decimal"
+          description: The price of one `unit` in US dollars. `"0"` is allowed only together with `included` true.
+        unit: {$ref: "#/components/schemas/PriceUnit"}
+        basis:
+          enum: [allocated, used, max_allocated_used, fixed, count]
+          description: >-
+            What is measured: the reserved capacity, the actual use, the larger of the two, a fixed machine size, or a count of
+            events.
+        included:
+          type: boolean
+          description: The item is included in the price of something else, or free. Requires `price_usd` `"0"`.
+        states:
+          type: array
+          uniqueItems: true
+          items: {enum: [running, paused, stopped]}
+          description: >-
+            The sandbox states in which a time-based item accrues. When absent, the item accrues while running and other states
+            are unknown.
+        increment_seconds:
+          type: integer
+          minimum: 1
+          description: Time is billed in whole increments of this many seconds, rounded up.
+        minimum_seconds:
+          type: integer
+          minimum: 1
+          description: The least time billed per sandbox.
+        minimum_quantity:
+          $ref: "#/components/schemas/Decimal"
+          description: The smallest quantity billed, in the unit's quantity (for example `0.125` cores).
+        allowance:
+          type: object
+          required: [quantity, period, scope]
+          properties:
+            quantity: {$ref: "#/components/schemas/Decimal"}
+            period: {enum: [month, sandbox]}
+            scope: {enum: [account, sandbox]}
+          description: A quantity included before this price applies.
+        size:
+          $ref: "#/components/schemas/Size"
+          description: Only for this size (item `machine`).
+        region: {type: string, minLength: 1, description: "Only in this region."}
+        gpu_model: {type: string, minLength: 1, description: "Only for this GPU model id."}
+        variant: {type: string, minLength: 1, description: "Only for this named variant of the class, such as `preemptible`."}
+      allOf:
+        - if:
+            required: [price_usd]
+            properties:
+              price_usd: {pattern: "^0+(\\.0+)?$"}
+          then:
+            required: [included]
+            properties:
+              included: {const: true}
+        - if:
+            required: [included]
+            properties:
+              included: {const: true}
+          then:
+            properties:
+              price_usd: {pattern: "^0+(\\.0+)?$"}
+    Image:
+      type: object
+      required: [id, default, description]
+      properties:
+        id: {type: string, minLength: 1, description: "The image id that `create` and the Sandbox object use."}
+        default: {type: boolean, description: "True for the one image that a create without an image gets."}
+        description: {type: string}
+      description: One of the provider's ready-made images.
+    Limits:
+      type: object
+      description: >-
+        The provider's limits. Each value is at least its floor, which every conforming provider meets.
+      required:
+        - file_bytes
+        - run_timeout_ms
+        - output_bytes
+        - wait_ms
+        - process_output_bytes
+        - process_retention_seconds
+        - list_limit
+      properties:
+        file_bytes: {type: integer, minimum: 1073741824, description: "Largest file that `files.read` and `files.write` accept."}
+        run_timeout_ms: {type: integer, minimum: 60000, description: "Largest `timeout_ms` that `run` accepts."}
+        output_bytes: {type: integer, minimum: 16777216, description: "Largest `output_limit_bytes` for `run`, per stream."}
+        wait_ms: {type: integer, minimum: 30000, description: "Longest `wait_ms` that `process.output` honors."}
+        process_output_bytes: {type: integer, minimum: 1048576, description: "Output kept per stream of a process, newest first."}
+        process_retention_seconds:
+          type: integer
+          minimum: 600
+          description: How long a process's record and output stay readable after it exits.
+        list_limit: {type: integer, minimum: 100, description: "Largest page that `list` returns."}
+    ProviderInfo:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          pattern: "^[a-z0-9-]{2,32}$"
+          description: The stable provider id; the same id the adapter's `provider_id` uses.
+        name: {type: string, minLength: 1, description: "The display name."}
+        docs_url: {type: string, format: uri, description: "A link to the provider's documentation."}
+    SandboxClass:
+      type: object
+      description: >-
+        A wholesale different kind of sandbox, such as a container or a microVM. A declaration's `evidence` and `verified`
+        fields are left out: proof comes from the tester's report, not from the provider's own document.
+      required: [id, name, ready, resources, lifetime_timer, images, prices]
+      properties:
+        id: {type: string, minLength: 1, description: "`default` for the main class; `create` names a class by this id."}
+        name: {type: string, minLength: 1, description: "The display name."}
+        ready:
+          type: boolean
+          description: False means do not create new sandboxes in this class now; existing sandboxes keep working.
+        unavailable_regions:
+          type: array
+          uniqueItems: true
+          items: {type: string, minLength: 1}
+          description: Regions that refuse new sandboxes now.
+        resources:
+          $ref: "declaration-schema.json#/properties/resources"
+          description: >-
+            Regions, located-in countries, sizes, default size, disk, arch, maximum lifetime and the other SPS resource facts.
+        lifetime_timer:
+          $ref: "declaration-schema.json#/properties/lifetime_timer"
+          description: How the provider ends a sandbox when its lifetime runs out.
+        gates:
+          $ref: "declaration-schema.json#/properties/gates"
+          description: The optional sections claimed, with their variants and knob values. A claim alone turns on nothing.
+        images:
+          type: array
+          minItems: 1
+          items: {$ref: "#/components/schemas/Image"}
+          contains:
+            type: object
+            required: [default]
+            properties:
+              default: {const: true}
+          minContains: 1
+          maxContains: 1
+          description: The ready-made images. Exactly one has `default` true, and it meets the baseline.
+        prices:
+          type: array
+          items: {$ref: "#/components/schemas/Price"}
+          description: What this class costs.
+    Discovery:
+      type: object
+      required: [spec_version, provider, limits, classes]
+      properties:
+        spec_version:
+          type: string
+          pattern: "^1\\.[0-9]+$"
+          description: The newest 1.x minor that this provider implements.
+        provider: {$ref: "#/components/schemas/ProviderInfo"}
+        limits: {$ref: "#/components/schemas/Limits"}
+        classes:
+          type: array
+          minItems: 1
+          items: {$ref: "#/components/schemas/SandboxClass"}
+          description: The sandbox classes that this account can use.
+      description: What this account can create, and the prices. Two accounts may see different documents.
+    SandboxSize:
+      type: object
+      required: [cpu, memory_mib, disk_mib]
+      properties:
+        cpu: {type: number, exclusiveMinimum: 0, description: "Virtual CPUs that the provider allocated."}
+        memory_mib: {type: integer, minimum: 1, description: "Memory in MiB that the provider allocated."}
+        disk_mib: {type: [integer, "null"], minimum: 1, description: "Disk in MiB, or null when the provider does not know it."}
+      description: What the provider allocated.
+    CreateRequest:
+      type: object
+      additionalProperties: false
+      description: >-
+        The body without `sandbox_class`, `env` and `labels` is an SPS request. The provider picks the first size in its
+        `resources.sizes` that meets every floor, or `default_size` when the request has no floors. If no size, region, image,
+        class or section meets the request it answers `unsupported` and creates nothing.
+      properties:
+        sandbox_class: {type: string, minLength: 1, default: default, description: "A class id from discovery."}
+        resources:
+          $ref: "request-schema.json#/$defs/resources"
+          description: "Floors and pins: `cpu_min`, `memory_min_mib`, `disk_min_mib`, `region`, `arch` and the other SPS asks."
+        requirements:
+          $ref: "request-schema.json#/$defs/requirements"
+          description: The optional sections this sandbox needs, with knob values and settings.
+        image:
+          $ref: "request-schema.json#/$defs/image"
+          description: A custom image (needs the `custom_images` section). Absent means the class's default image.
+        lifetime_seconds:
+          type: [integer, "null"]
+          minimum: 1
+          default: 300
+          description: >-
+            How long the sandbox may run. The provider ends it in the `at_end` state no later than this many seconds after
+            `create` returns, even if the consumer has gone away. Null asks for no lifetime; a provider that cannot run a
+            sandbox without one answers `unsupported`.
+        at_end:
+          enum: [destroyed, paused]
+          default: destroyed
+          description: The state the lifetime ends in. `paused` needs the `pause_resume` section.
+        env:
+          $ref: "#/components/schemas/Env"
+          description: Environment variables for every command and process in the sandbox.
+        labels:
+          $ref: "#/components/schemas/Labels"
+          description: Labels, returned exactly by `get` and `list`.
+      allOf:
+        - if:
+            required: [lifetime_seconds]
+            properties:
+              lifetime_seconds: {type: "null"}
+          then:
+            not: {required: [at_end]}
+    Sandbox:
+      type: object
+      required: [id, sandbox_class, state, size, region, image, labels, created_at, ends_at, at_end]
+      properties:
+        id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: The sandbox id. It names one sandbox for as long as the provider keeps any record of it.
+        sandbox_class: {type: string, minLength: 1, description: "Its class."}
+        state:
+          enum: [running, paused, stopped, destroyed]
+          description: The SPS sandbox states.
+        size: {$ref: "#/components/schemas/SandboxSize"}
+        region: {type: [string, "null"], description: "The region it runs in, when the provider knows it."}
+        image: {type: [string, "null"], description: "The image id from discovery, or null for a custom image."}
+        labels: {$ref: "#/components/schemas/Labels"}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        ends_at:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: When the lifetime timer will end it; null with no lifetime.
+        at_end:
+          enum: [destroyed, paused, null]
+          description: The state the timer ends it in; null with no lifetime.
+      description: Returned by `create`, `get`, `list`, `pause`, `resume` and `lifetime.extend`.
+    SandboxPage:
+      type: object
+      required: [sandboxes, next_cursor]
+      properties:
+        sandboxes:
+          type: array
+          items: {$ref: "#/components/schemas/Sandbox"}
+        next_cursor:
+          type: [string, "null"]
+          description: Opaque. Null means that this page is the last one.
+    Cost:
+      type: object
+      required: [sandbox_id, status, total_usd, source, lines, as_of]
+      properties:
+        sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        status:
+          enum: [accruing, final]
+          description: "`final` means that the amount will not change."
+        total_usd: {$ref: "#/components/schemas/Decimal", description: "The sum of the line amounts, in US dollars."}
+        source:
+          enum: [reported, calculated]
+          description: >-
+            `reported`: the provider's billing system states the amounts. `calculated`: each quantity comes from the provider's
+            own usage records and is multiplied by the price in discovery.
+        lines:
+          type: array
+          items: {$ref: "#/components/schemas/CostLine"}
+          description: One line per priced item and period.
+        as_of: {$ref: "#/components/schemas/Timestamp", description: "When these figures were read."}
+      description: >-
+        The sandbox's cost. Quantities come from the provider's own records of the sandbox, never from a clock in the consumer
+        or in an adapter.
+    CostLine:
+      type: object
+      required: [item, quantity, unit, amount_usd]
+      properties:
+        item: {$ref: "#/components/schemas/PriceItem"}
+        quantity: {$ref: "#/components/schemas/Decimal", description: "The measured quantity, in `unit`."}
+        unit: {$ref: "#/components/schemas/PriceUnit"}
+        amount_usd: {$ref: "#/components/schemas/Decimal", description: "The amount in US dollars."}
+        start:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: The start of the period, when the line covers one.
+        end:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: The end of the period, when the line covers one.
+    DestroyResult:
+      type: object
+      required: [sandbox_id, state]
+      properties:
+        sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        state: {enum: [destroying, destroyed]}
+        cost:
+          anyOf: [{$ref: "#/components/schemas/Cost"}, {type: "null"}]
+          description: >-
+            Null unless the provider's usage records disappear with the sandbox; then the final cost. A consumer uses it when
+            present and otherwise reads `cost` until it is final.
+    RunRequest:
+      type: object
+      additionalProperties: false
+      required: [argv]
+      properties:
+        argv:
+          type: array
+          minItems: 1
+          maxItems: 1024
+          items: {type: string}
+          description: The program and its arguments, run directly without a shell.
+        cwd:
+          anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
+          default: null
+          description: Working directory. Null means the class's default (`default_cwd`). A missing directory is `not_found`.
+        env:
+          $ref: "#/components/schemas/Env"
+          description: Variables added to the sandbox's environment for this command only.
+        timeout_ms:
+          type: integer
+          minimum: 1
+          default: 60000
+          description: How long the command may run, at most `limits.run_timeout_ms`.
+        output_limit_bytes:
+          type: integer
+          minimum: 0
+          default: 16777216
+          description: Bytes kept per stream, at most `limits.output_bytes`.
+    RunResult:
+      type: object
+      required: [exit_code, stdout, stderr, stdout_truncated, stderr_truncated, timed_out]
+      properties:
+        exit_code:
+          type: [integer, "null"]
+          description: The exit status; 128 + N when signal N ended it; null only when `timed_out`.
+        stdout: {type: string, description: "The first `output_limit_bytes` bytes of stdout, decoded as UTF-8 with invalid bytes replaced by U+FFFD."}
+        stderr: {type: string, description: "The first `output_limit_bytes` bytes of stderr, decoded as UTF-8 with invalid bytes replaced by U+FFFD."}
+        stdout_truncated: {type: boolean, description: "True when stdout was longer than the limit."}
+        stderr_truncated: {type: boolean, description: "True when stderr was longer than the limit."}
+        timed_out:
+          type: boolean
+          description: >-
+            True when `timeout_ms` passed before the command exited. The provider ended the command and every process that it
+            started.
+    FileInfo:
+      type: object
+      required: [path, size]
+      properties:
+        path: {$ref: "#/components/schemas/FilePath"}
+        size: {type: integer, minimum: 0, description: "The bytes written."}
+    ProcessStartRequest:
+      type: object
+      additionalProperties: false
+      required: [argv]
+      properties:
+        argv:
+          type: array
+          minItems: 1
+          maxItems: 1024
+          items: {type: string}
+          description: As for `run`.
+        cwd:
+          anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
+          default: null
+          description: As for `run`.
+        env: {$ref: "#/components/schemas/Env", description: "As for `run`."}
+        stdin:
+          type: boolean
+          default: false
+          description: Keep stdin open for `process.write_stdin` (needs the `processes` section with `input`).
+    Process:
+      type: object
+      required: [id, sandbox_id, started_at]
+      properties:
+        id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: The process id. It names one process in the sandbox for as long as the provider keeps any record of it.
+        sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        started_at: {$ref: "#/components/schemas/Timestamp"}
+    OutputChunk:
+      type: object
+      required: [stream, data]
+      properties:
+        stream: {enum: [stdout, stderr]}
+        data: {type: string}
+    OutputPage:
+      type: object
+      required: [chunks, next_cursor, gap, stdout_closed, stderr_closed, state, exit_code]
+      properties:
+        chunks:
+          type: array
+          items: {$ref: "#/components/schemas/OutputChunk"}
+          description: >-
+            New output in the order that each stream wrote it; the order between the two streams is unspecified.
+        next_cursor: {type: string, minLength: 1, description: "Pass it to the next call to continue."}
+        gap: {type: boolean, description: "True when output between `cursor` and the first chunk was discarded."}
+        stdout_closed: {type: boolean, description: "Stdout reached end of file."}
+        stderr_closed: {type: boolean, description: "Stderr reached end of file."}
+        state: {enum: [running, exited], description: "Whether the process has exited."}
+        exit_code:
+          type: [integer, "null"]
+          description: Set exactly when `state` is `exited`; 128 + N for signal N.
+      allOf:
+        - if:
+            properties:
+              state: {const: exited}
+          then:
+            properties:
+              exit_code: {type: integer}
+          else:
+            properties:
+              exit_code: {type: "null"}
+    FileLinkRequest:
+      type: object
+      additionalProperties: false
+      required: [path, operation, lifetime_seconds]
+      properties:
+        path: {$ref: "#/components/schemas/FilePath"}
+        operation: {enum: [read, write]}
+        lifetime_seconds: {type: integer, minimum: 1, description: "How long the link works."}
+        size: {type: integer, minimum: 0, description: "The size of the file to write, when the operation is `write` and the provider needs it."}
+    FileLink:
+      type: object
+      required: [method, url, headers, expires_at]
+      properties:
+        method: {type: string, minLength: 1, description: "The HTTP method to use on the URL."}
+        url: {type: string, format: uri, description: "A provider-signed URL. It is sensitive: never log it."}
+        headers: {type: object, additionalProperties: {type: string}, description: "Headers to send with the request."}
+        form_field:
+          type: [string, "null"]
+          description: The multipart form field that carries the bytes, or null when the body is the raw bytes.
+        expires_at: {$ref: "#/components/schemas/Timestamp"}
+        reusable: {type: boolean, default: false, description: "True when the link may be used more than once."}
+    LifetimeExtendRequest:
+      type: object
+      additionalProperties: false
+      required: [seconds]
+      properties:
+        seconds: {type: integer, minimum: 1, description: "The sandbox may run at least this many seconds more from now."}
+    PreviewRequest:
+      type: object
+      additionalProperties: false
+      required: [port]
+      properties:
+        port: {$ref: "#/components/schemas/Port"}
+    PreviewLink:
+      type: object
+      required: [url, headers, expires_at]
+      properties:
+        url: {type: string, format: uri, description: "An HTTPS URL that reaches the port. It is sensitive: never log it."}
+        headers: {type: object, additionalProperties: {type: string}, description: "Headers to send with each request."}
+        expires_at:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: When the link stops working; null when it does not expire.
+    TcpLinkRequest:
+      type: object
+      additionalProperties: false
+      required: [port]
+      properties:
+        port: {$ref: "#/components/schemas/Port"}
+    TcpLink:
+      type: object
+      required: [host, port]
+      properties:
+        host: {type: string, minLength: 1}
+        port: {$ref: "#/components/schemas/Port"}

@@ -10,6 +10,7 @@ example requests, and driver notes help apply it; they do not define additional 
 | Express a workload | [Requests](spec.md#8-requests), [vocabulary](vocabulary.md), and [request schema](request-schema.json) |
 | Compare providers or implement a matcher | [Matching](matching.md), [matcher test vectors](../tests/matcher/README.md), and [request examples](../examples/requests/) |
 | Publish or correct provider facts | [Declarations](declarations.md) and [declaration schema](declaration-schema.json) |
+| Implement or call the provider API | [Provider API rules](provider-api.md): credentials, idempotent create, lifetime, destroy, files, processes, cost, errors, versioning and the adapter manifest |
 | Verify claims or write a driver | [Conformance](conformance.md), [core suite](../conformance/suite.yaml), [coverage suite](../conformance/coverage.yaml), and [report schema](report-schema.json) |
 | Look up the machine-readable vocabulary | [Catalog source](catalog.yaml), [generated catalog](catalog.json), [catalog schema](catalog-schema.json), and [registries](registries/) |
 | Understand versions and claims | [Versioning](spec.md#12-versioning), [governance](../GOVERNANCE.md#versioning), [conformance claims](../GOVERNANCE.md#conformance-claims), and [changelog](../CHANGELOG.md) |

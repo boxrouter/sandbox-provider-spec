@@ -1,0 +1,5 @@
+{
+  "id": "base",
+  "default": true,
+  "description": "Ubuntu 24.04 with bash and python3"
+}

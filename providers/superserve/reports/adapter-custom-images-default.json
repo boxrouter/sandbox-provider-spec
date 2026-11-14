@@ -3,30 +3,36 @@
   "check_digests": {
     "coverage.custom_images.prepare.delete": "sha256:dd4a9c11b8a278b9ce10581f36edd1b824b1ee8bf0c284e88aa174a64e9dfa0a",
     "coverage.custom_images.prepare.idempotent": "sha256:0c7ac37983fe6da9eeb83d0de06e6f1766e26d3f8d57bbdf542c3dbbc316a543",
+    "coverage.custom_images.prepare.image_config.env": "sha256:5998cea75401814471291486ac5fed39be3870e9c9cb825b58180dd45a773481",
+    "coverage.custom_images.prepare.image_config.user": "sha256:91eaa617c30e4afa49934f8ed35e7997defad84500251be500685b94e7e6da19",
+    "coverage.custom_images.prepare.image_config.workdir": "sha256:150b41f6fef9f5c13714071ea1c8611819bdb608c0e2b03b14801a5a98b2a6d5",
     "coverage.custom_images.prepare.registry": "sha256:478827a2f000a987aa4d266a1c5a42980bfc45195d944cd9bc3d7c08b542e305",
-    "coverage.custom_images.runs_entrypoint.false": "sha256:61dbd9ddb37cbf3d81cb9850902a544a99af7e5aa71a488d133002990b5ec5d2"
+    "coverage.custom_images.runs_entrypoint.true": "sha256:9953e00e724e2a094957807e606484ad3583f5bf2bab61c4aa618bda47da0e50"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T17:02:42.525588+00:00",
+  "finished_at": "2026-11-14T06:26:44.281096+00:00",
   "provider": "superserve",
-  "revision": "95a710453396c13de38c9aba0cb668dcfa8ba007",
-  "run_id": "public-55e22888a1ecd4bd7647",
+  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
+  "run_id": "public-34515f6f73d0827e6456",
   "sdk_versions": {
     "superserve": "0.12.0"
   },
   "selected_tests": [
-    "coverage.custom_images.runs_entrypoint.false",
+    "coverage.custom_images.runs_entrypoint.true",
     "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.image_config.env",
+    "coverage.custom_images.prepare.image_config.workdir",
+    "coverage.custom_images.prepare.image_config.user",
     "coverage.custom_images.prepare.idempotent",
     "coverage.custom_images.prepare.delete"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T17:01:31.389992+00:00",
-  "suite_digest": "sha256:1d410dfb6f824f7f283fb959e2ece62cf52ffadcd2a3620c75f0924f5aae3fbd",
+  "started_at": "2026-11-14T06:24:12.654715+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
       "cleanup": [
@@ -39,13 +45,13 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 20186,
-      "id": "coverage.custom_images.runs_entrypoint.false",
+      "duration_ms": 21935,
+      "id": "coverage.custom_images.runs_entrypoint.true",
       "proves": [
         {
           "gate": "custom_images",
           "knob": "runs_entrypoint",
-          "value": false
+          "value": true
         }
       ],
       "result": "passed",
@@ -70,7 +76,7 @@
         {
           "observations": {
             "exists": {
-              "actual": false,
+              "actual": true,
               "matches": true
             }
           },
@@ -90,7 +96,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 19419,
+      "duration_ms": 20809,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -134,6 +140,174 @@
     {
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 23797,
+      "id": "coverage.custom_images.prepare.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/usr/share/grafana\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 23745,
+      "id": "coverage.custom_images.prepare.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/usr/share/grafana\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 23802,
+      "id": "coverage.custom_images.prepare.image_config.user",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "user"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "472\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
           "kind": "image",
           "result": "deleted"
         },
@@ -142,7 +316,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15838,
+      "duration_ms": 17852,
       "id": "coverage.custom_images.prepare.idempotent",
       "proves": [
         {
@@ -198,7 +372,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 15689,
+      "duration_ms": 19682,
       "id": "coverage.custom_images.prepare.delete",
       "proves": [
         {

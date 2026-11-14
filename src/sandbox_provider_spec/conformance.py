@@ -18,19 +18,10 @@ from typing import cast
 from sandbox_provider_spec import drivers as drivers_package
 from sandbox_provider_spec.coverage_file_transfer import FileTransferRunner
 from sandbox_provider_spec.driver import Driver, Observation
+from sandbox_provider_spec.opt_in import OPT_IN_CHECKS, select_tests
 from sandbox_provider_spec.report import report, revision, write_report
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
-
-
-def select(suite: Suite, prefixes: list[str]) -> Suite:
-    """Focused runs retain both files' digest and the complete baseline identity."""
-    tests = tuple(
-        test for test in suite.tests if any(test.id.startswith(prefix) for prefix in prefixes)
-    )
-    if not tests:
-        raise ValueError("no shared tests match selection")
-    return Suite(suite.digest, tests, suite.baseline_ids)
 
 
 def run_suite(
@@ -108,6 +99,14 @@ def arguments(parser: argparse.ArgumentParser) -> None:
         help="core selects original tests; coverage selects baseline and supplementary tests",
     )
     parser.add_argument("--test", action="append", default=[], help="test id or prefix; repeatable")
+    parser.add_argument(
+        "--opt-in",
+        action="append",
+        choices=sorted(OPT_IN_CHECKS),
+        default=[],
+        help="also run an opt-in check group (streamed_transfer: file links and streamed "
+        "transfer, including the 1 GiB rows); a run without it leaves those checks out",
+    )
     parser.add_argument("--live", action="store_true", help="explicitly authorize native resources")
 
 
@@ -159,8 +158,7 @@ def run(args: argparse.Namespace) -> int:
         if selected_suite == "coverage"
         else read_suite()
     )
-    if args.test:
-        suite = select(suite, args.test)
+    suite = select_tests(suite, args.test, getattr(args, "opt_in", None) or [])
     fixtures = json.loads(args.fixtures.read_text()) if args.fixtures else {}
     try:
         module = import_module(f"sandbox_provider_spec.drivers.{args.provider}")

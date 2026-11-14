@@ -15,6 +15,7 @@ import pytest
 from sandbox_provider_spec import conformance
 from sandbox_provider_spec import drivers as drivers_package
 from sandbox_provider_spec.driver import Driver
+from sandbox_provider_spec.opt_in import select_tests
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
 from sandbox_provider_spec.suite import Test as Scenario
 
@@ -92,7 +93,64 @@ def test_report_binds_only_the_selected_suite(
 
 def test_focused_run_retains_digest_without_selecting_baseline() -> None:
     suite = read_suite(suite_path().with_name("coverage.yaml"))
-    focused = conformance.select(suite, ["coverage.docker."])
+    focused = select_tests(suite, ["coverage.docker."])
     assert [test.id for test in focused.tests] == ["coverage.docker.host"]
     assert focused.digest == suite.digest
     assert focused.baseline_ids == suite.baseline_ids
+
+
+def test_cli_takes_the_streamed_transfer_opt_in() -> None:
+    parser = argparse.ArgumentParser()
+    conformance.arguments(parser)
+    arguments = ["e2b", "--output", "report.json"]
+    assert parser.parse_args(arguments).opt_in == []
+    assert parser.parse_args([*arguments, "--opt-in", "streamed_transfer"]).opt_in == [
+        "streamed_transfer"
+    ]
+    with pytest.raises(SystemExit):
+        parser.parse_args([*arguments, "--opt-in", "everything"])
+
+
+@pytest.mark.parametrize("opt_in", [[], ["streamed_transfer"]])
+def test_a_run_reports_the_streamed_transfer_checks_only_when_opted_in(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, opt_in: list[str]
+) -> None:
+    ordinary = Scenario("baseline.example", "baseline", (), ())
+    streamed = Scenario("files.stream.v1.write.1gib", "stream", (), ())
+    links = Scenario("file_links.v1.read_exact", "links", (), ())
+    suite = Suite("sha256:" + "3" * 64, (ordinary, streamed, links), (ordinary.id,))
+    driver = Driver()
+    driver.provider = "e2b"
+    driver.sdk_versions = {"example-sdk": "1.0.0"}
+    monkeypatch.setattr(conformance, "read_suite", lambda _path=None: suite)
+    monkeypatch.setattr(conformance, "suite_path", lambda: tmp_path / "conformance/suite.yaml")
+    monkeypatch.setattr(conformance, "revision", lambda _root: "0" * 40)
+    monkeypatch.setattr(
+        conformance,
+        "import_module",
+        lambda _name: SimpleNamespace(make_driver=lambda **_kwargs: driver),
+    )
+    monkeypatch.setattr(
+        conformance,
+        "run_suite",
+        lambda _driver, chosen, _fixtures: [
+            {"id": test.id, "result": "not_run"} for test in chosen.tests
+        ],
+    )
+    output = tmp_path / "report.json"
+    args = argparse.Namespace(
+        provider="e2b",
+        execution_class="default",
+        live=True,
+        suite="coverage",
+        test=[],
+        opt_in=opt_in,
+        fixtures=None,
+        output=output,
+    )
+    conformance.run(args)
+    document = json.loads(output.read_text())
+    assert document["selected_tests"] == (
+        [ordinary.id] if not opt_in else [ordinary.id, streamed.id, links.id]
+    )
+    assert document["suite_digest"] == suite.digest

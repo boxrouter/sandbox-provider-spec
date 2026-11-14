@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
+provider_id: example
+name: Example Cloud
+spec_version: "1.0"
+credential_fields:
+  - name: api_key
+    secret: true
+    description: "API key from the Example Cloud console"
+  - name: endpoint
+    secret: false
+    required: false
+    default: "https://api.example.test"
+    description: "Example Cloud base URL"
+api_domains: [api.example.test]

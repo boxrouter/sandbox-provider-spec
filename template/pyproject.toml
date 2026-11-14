@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sps-provider-example"
+version = "0.1.0"
+description = "The template provider adapter: a 1.0 Provider over Example Cloud"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = [
+    "sandbox-provider-spec",
+    "httpx==0.28.1",
+]
+
+[project.entry-points."sandbox_provider_spec.providers"]
+example = "sps_provider_example:ExampleProvider"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sps_provider_example"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100

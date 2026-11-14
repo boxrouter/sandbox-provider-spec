@@ -112,7 +112,8 @@ coverage run already supplies that selection alongside its supplementary observa
 | `--live` | Required: creates native resources on the account. |
 | `--output` | Required: the JSON report destination. Use a path outside the checkout. |
 | `--class` | Declaration class; defaults to `default`. Driver notes describe class selection. Single-declaration providers omit class from the report. |
-| `--test` | Test id or prefix; repeatable. Omit it to select every test. |
+| `--test` | Test id or prefix; repeatable. Omit it to select every test except the opt-in checks below. |
+| `--opt-in` | Opt-in check group to run as well; repeatable. `streamed_transfer` adds the file-link and streamed-transfer checks. |
 | `--fixtures` | External JSON object keyed by fixture name; only validated public proof quantities are recorded. |
 | `--suite` | `core` (default) selects the core suite: gate, lifetime and fact tests, and all but one baseline test. `coverage` selects every baseline test and the supplementary tests. Run both suites for a provider. |
 
@@ -641,6 +642,13 @@ explicit `Unsupported` has a fixed public reason; an unmapped method or missing 
 produces `not_run`.
 
 ### File links and streamed transfer
+
+These checks are opt-in. Neither `--suite coverage` nor a `--test` prefix selects them: a run
+executes them only with `--opt-in streamed_transfer`, and naming one in `--test` without the
+option is refused. No declaration has to state `file_links` or `file_stream_max_bytes`, no
+baseline or default selection depends on them, and a provider that does declare either still
+needs a passing test of that size in a committed report. The tests keep their ids, rules and
+digests, so reports that hold them remain valid.
 
 The `file_links.v1.*` and `files.stream.v1.*` coverage tests prove the
 [`file_links`](vocabulary.md#file_links) gate and the `file_stream_max_bytes` fact. They

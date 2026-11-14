@@ -1,0 +1,122 @@
+{
+  "spec_version": "1.0",
+  "provider": {
+    "id": "example",
+    "name": "Example Cloud",
+    "docs_url": "https://docs.example.com"
+  },
+  "limits": {
+    "file_bytes": 5368709120,
+    "run_timeout_ms": 600000,
+    "output_bytes": 16777216,
+    "wait_ms": 60000,
+    "process_output_bytes": 4194304,
+    "process_retention_seconds": 3600,
+    "list_limit": 1000
+  },
+  "classes": [
+    {
+      "id": "default",
+      "name": "Linux container",
+      "ready": true,
+      "unavailable_regions": [],
+      "resources": {
+        "regions": [
+          "example:us-east",
+          "example:eu-west"
+        ],
+        "located_in": [
+          "US",
+          "DE"
+        ],
+        "sizes": [
+          {
+            "cpu": 2,
+            "memory_mib": 2048
+          },
+          {
+            "cpu": 4,
+            "memory_mib": 8192
+          }
+        ],
+        "default_size": {
+          "cpu": 2,
+          "memory_mib": 2048
+        },
+        "disk_mib": 20480,
+        "arch": [
+          "amd64"
+        ],
+        "max_lifetime_seconds": 86400
+      },
+      "lifetime_timer": {
+        "enforced_by": "provider",
+        "at_end": [
+          "destroyed",
+          "paused"
+        ],
+        "counts_paused_time": false
+      },
+      "gates": {
+        "file_links": [
+          {
+            "operations": [
+              "read",
+              "write"
+            ],
+            "link_lifetime_seconds": 3600
+          }
+        ],
+        "pause_resume": [
+          {
+            "keeps": "files_and_memory"
+          }
+        ]
+      },
+      "images": [
+        {
+          "id": "base",
+          "default": true,
+          "description": "Ubuntu 24.04 with bash and python3"
+        },
+        {
+          "id": "node-22",
+          "default": false,
+          "description": "base plus Node.js 22"
+        }
+      ],
+      "prices": [
+        {
+          "item": "cpu",
+          "price_usd": "0.000014",
+          "unit": "vcpu_second",
+          "basis": "allocated"
+        },
+        {
+          "item": "memory",
+          "price_usd": "0.0000045",
+          "unit": "gib_second",
+          "basis": "allocated"
+        },
+        {
+          "item": "disk",
+          "price_usd": "0.09",
+          "unit": "gib_month",
+          "basis": "allocated",
+          "states": [
+            "running",
+            "paused",
+            "stopped"
+          ]
+        },
+        {
+          "item": "egress",
+          "price_usd": "0",
+          "unit": "gb",
+          "basis": "used",
+          "included": true
+        }
+      ]
+    }
+  ]
+}

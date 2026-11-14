@@ -27,7 +27,7 @@ def _rule_tree(
         "\n".join(f"<!-- rule: {rule_id} -->" for rule_id in anchors) + "\n",
         encoding="utf-8",
     )
-    for name in ("vocabulary.md", "matching.md", "declarations.md"):
+    for name in ("vocabulary.md", "matching.md", "declarations.md", "provider-api.md"):
         (root / "spec" / name).write_text("", encoding="utf-8")
     (root / "conformance/suite.yaml").write_text(coverage, encoding="utf-8")
     (root / "spec/untested.yaml").write_text(
@@ -184,7 +184,7 @@ def test_rule_accounting_requires_each_result_to_be_classified(
     assert any(expected in error for error in check_rule_accounting(tmp_path))
 
 
-@pytest.mark.parametrize("source", ["vocabulary.md", "matching.md"])
+@pytest.mark.parametrize("source", ["vocabulary.md", "matching.md", "provider-api.md"])
 def test_rule_accounting_requires_coverage_for_reference_rules(tmp_path: Path, source: str) -> None:
     _rule_tree(tmp_path, anchors=(), coverage="tests: []\n", waivers="  {}\n")
     (tmp_path / "spec" / source).write_text("<!-- rule: reference/required -->\n", encoding="utf-8")

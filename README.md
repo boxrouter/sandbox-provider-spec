@@ -47,9 +47,7 @@ declaration. A developer writes a request for a workload. A tool, such as an SDK
 framework or a router, matches requests against declarations before it creates a sandbox.
 
 The contract describes behaviour, not a programming interface. An implementation can call a
-provider's own API or SDK, or speak an optional transport binding. The
-[HTTP binding](spec/binding-http.md) is a draft of one such wire protocol; it is unreleased,
-and existing conformance reports do not prove it. Whichever path an implementation takes,
+provider's own API or SDK. Whichever path an implementation takes,
 requests, declarations and matching stay the same.
 
 ```mermaid
@@ -220,7 +218,7 @@ output streams, read and write files, stream a background process's output, open
 HTTPS, and keep the host's cloud credentials out of reach.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 47 knobs; the conformance suite has 240 tests.
+The vocabulary has 16 gates and 47 knobs; the conformance suite has 250 tests.
 
 ## Principles
 
@@ -261,8 +259,7 @@ The Python package provides:
 - the [reference matcher](tests/matcher/README.md#using-the-python-reference-matcher), with
   test vectors for other implementations;
 - a [provider onboarding kit](docs/how-to/provider-kit.md) that generates a starter
-  declaration, and an [installed HTTP reference](docs/http-binding-reference.md) for the
-  draft binding.
+  declaration.
 
 Installed wheels include the versioned authoring guides. Outside a source checkout,
 read them through the existing public data-directory API:
@@ -274,7 +271,6 @@ guides = spec_dir() / "docs"
 print((guides / "how-to" / "provider-kit.md").read_text(encoding="utf-8"))
 ```
 
-The HTTP backend interface reference is `guides / "http-binding-reference.md"`.
 The guides' relative hyperlinks describe the repository layout; installed schemas
 and normative specification documents live directly under `spec_dir()`.
 
@@ -306,7 +302,6 @@ for the daemon the SDK uses. Cleanup alone does not make the run pass.
 | [vocabulary.md](spec/vocabulary.md) | Look up every gate, knob and fact |
 | [declarations.md](spec/declarations.md), [conformance.md](spec/conformance.md) | Look up declaration, report and driver rules |
 | [matching.md](spec/matching.md) | Implement a matcher using the [test vectors](tests/matcher/README.md) |
-| [binding-http.md](spec/binding-http.md) | Read the draft HTTP transport binding |
 
 ## Providers
 

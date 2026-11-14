@@ -9,10 +9,10 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-13T17:58:28.119273+00:00",
+  "finished_at": "2026-11-14T05:35:09.972578+00:00",
   "provider": "modal",
-  "revision": "cecad7fc8f995d630ab977946b84806a21ec660e",
-  "run_id": "public-f2fb3b67eba7bf85db96",
+  "revision": "fc7c8e13e8bc51e8d851559b25515dfdc614eaf4",
+  "run_id": "public-885ce1ca44e776cb5f34",
   "sdk_versions": {
     "modal": "1.6.1"
   },
@@ -20,8 +20,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-13T17:58:20.296843+00:00",
-  "suite_digest": "sha256:1d410dfb6f824f7f283fb959e2ece62cf52ffadcd2a3620c75f0924f5aae3fbd",
+  "started_at": "2026-11-14T05:34:59.455390+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
       "cleanup": [
@@ -30,7 +30,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7820,
+      "duration_ms": 10515,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -50,7 +50,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.976, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.994, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.964, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 1}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.991, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }

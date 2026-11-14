@@ -1,0 +1,10 @@
+{
+  "method": "PUT",
+  "url": "https://files.example.com/u/abc123?sig=xyz",
+  "headers": {
+    "Content-Type": "application/octet-stream"
+  },
+  "form_field": null,
+  "expires_at": "2026-11-13T11:00:00Z",
+  "reusable": false
+}

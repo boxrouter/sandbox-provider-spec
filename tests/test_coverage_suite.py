@@ -645,7 +645,11 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
     )
     preserved = history["sha256:d229e95a248ef8035340670f82bbeb53a55f4d557050a28c5cbc58decaadf295"]
     suite = read_suite(suite_path().with_name("coverage.yaml"))
-    live = {test.id: list(test.rules) for test in suite.tests}
+    # The provider API's rules (`provider-api/`) were named by tests after the prior suite ran.
+    live = {
+        test.id: [rule for rule in test.rules if not rule.startswith("provider-api/")]
+        for test in suite.tests
+    }
     assert set(live) - set(preserved) == {DISTRO_ROW, DISTRO_CONTEXT_ROW, STANDARD_BASE_ROW}
     for identifier in set(live) & set(preserved):
         assert preserved[identifier] == live[identifier], identifier
