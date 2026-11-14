@@ -45,8 +45,8 @@ from sandbox_provider_spec.v1.tokens import encode
 EXAMPLES = Path(__file__).resolve().parents[2] / "spec" / "provider-api-1.0-examples"
 T = TypeVar("T")
 MIB = 1024 * 1024
-TOKEN = "tok-abcdef"
-KEY = "key-12345678"
+BEARER = "tok-abcdef"
+IDEM = "key-12345678"
 
 
 def example(cls: type[T]) -> T:
@@ -210,7 +210,7 @@ async def call(
     path: str,
     *,
     body: bytes | list[bytes] | AsyncIterator[bytes] = b"",
-    token: str | None = TOKEN,
+    token: str | None = BEARER,
     headers: dict[str, str] | None = None,
     query: str = "",
     length: int | None = None,
@@ -351,7 +351,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
     if path.endswith("/files"):
         query = "path=/work/a.txt"
     if path == "/v1/sandboxes" and method == "POST":
-        headers["Idempotency-Key"] = KEY
+        headers["Idempotency-Key"] = IDEM
     if isinstance(body, bytes):
         return await call(
             app, method, path, body=body, headers=headers, query=query, length=len(body)
@@ -405,7 +405,7 @@ def test_arguments_arrive_as_typed_values() -> None:
             "POST",
             "/v1/sandboxes",
             body=j({"labels": {"a": "b"}, "lifetime_seconds": 60}),
-            headers={"Idempotency-Key": KEY},
+            headers={"Idempotency-Key": IDEM},
         )
     )
     assert created.status == 201
@@ -414,7 +414,7 @@ def test_arguments_arrive_as_typed_values() -> None:
     assert output == ("process_output", ("s1", "p1", "c2", 250))
     request = create[1][0]
     assert isinstance(request, CreateRequest)
-    assert (request.labels, request.lifetime_seconds, create[1][1]) == ({"a": "b"}, 60, KEY)
+    assert (request.labels, request.lifetime_seconds, create[1][1]) == ({"a": "b"}, 60, IDEM)
 
 
 def test_a_repeated_idempotent_create_still_returns_created() -> None:
@@ -422,10 +422,10 @@ def test_a_repeated_idempotent_create_still_returns_created() -> None:
     request = j({"labels": {"team": "test"}, "lifetime_seconds": 60})
 
     first = asyncio.run(
-        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": KEY})
+        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": IDEM})
     )
     repeated = asyncio.run(
-        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": KEY})
+        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": IDEM})
     )
 
     assert (first.status, repeated.status) == (201, 201)
@@ -460,7 +460,7 @@ def test_defaults_for_list_and_process_output() -> None:
 )
 def test_an_unknown_body_field_is_refused(path: str, body: dict[str, Any]) -> None:
     app = create_app(Recorder)
-    reply = asyncio.run(call(app, "POST", path, body=j(body), headers={"Idempotency-Key": KEY}))
+    reply = asyncio.run(call(app, "POST", path, body=j(body), headers={"Idempotency-Key": IDEM}))
     assert reply.status == 400
     error = reply.json()["error"]
     assert (error["code"], error["outcome"]) == ("invalid_request", "failed")
@@ -867,7 +867,7 @@ def test_a_real_uvicorn_server_carries_a_large_round_trip_in_chunks() -> None:
         size = 16 * MIB + 3
         payload = bytes(range(256)) * (size // 256 + 1)
         payload = payload[:size]
-        auth = {"Authorization": f"Bearer {TOKEN}"}
+        auth = {"Authorization": f"Bearer {BEARER}"}
         with httpx.Client(timeout=30) as client:
             put = client.put(
                 f"{base}/v1/sandboxes/s/files", params={"path": "/b"}, content=payload, headers=auth

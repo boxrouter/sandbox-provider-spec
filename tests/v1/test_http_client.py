@@ -27,9 +27,9 @@ from sandbox_provider_spec.v1.http_client import CHUNK_BYTES, HttpProvider
 from sandbox_provider_spec.v1.types import ProcessStartRequest
 
 EXAMPLES = Path(__file__).resolve().parents[2] / "spec" / "provider-api-1.0-examples"
-TOKEN = "tok-SECRET-0123456789"
+BEARER = "tok-SECRET-0123456789"
 BASE = "https://api.example.test/sps"
-KEY = "0123abcd-4567-89ef"
+IDEM = "0123abcd-4567-89ef"
 Handler = Callable[[httpx.Request], httpx.Response]
 
 
@@ -42,7 +42,7 @@ def reply(name: str, status: int = 200) -> httpx.Response:
 
 
 def provider(handler: Handler, **kwargs: Any) -> HttpProvider:
-    return HttpProvider(BASE, TOKEN, transport=httpx.MockTransport(handler), **kwargs)
+    return HttpProvider(BASE, BEARER, transport=httpx.MockTransport(handler), **kwargs)
 
 
 def call(run: Callable[[HttpProvider], Awaitable[Any]], handler: Handler, **kwargs: Any) -> Any:
@@ -65,7 +65,7 @@ OPERATIONS: list[tuple[str, Callable[[HttpProvider], Awaitable[Any]], str, str, 
     ("discovery", lambda p: p.discovery(), "GET", "/v1/discovery", "Discovery", 200),
     (
         "create",
-        lambda p: p.create(CreateRequest(), idempotency_key=KEY),
+        lambda p: p.create(CreateRequest(), idempotency_key=IDEM),
         "POST",
         "/v1/sandboxes",
         "Sandbox",
@@ -203,7 +203,7 @@ def test_method_path_and_token_of_each_operation(
     assert len(seen) == 1, name
     request = seen[0]
     assert (request.method, request.url.path) == (method, "/sps" + path), name
-    assert request.headers["Authorization"] == f"Bearer {TOKEN}"
+    assert request.headers["Authorization"] == f"Bearer {BEARER}"
     assert (result is None) == (body == "EmptyObject"), name
 
 
@@ -222,7 +222,7 @@ def test_files_read_method_and_path() -> None:
     assert call(run, handler) == b"abc"
     assert (seen[0].method, seen[0].url.path) == ("GET", "/sps/v1/sandboxes/sbx-17/files")
     assert seen[0].url.params["path"] == "/tmp/a b"
-    assert seen[0].headers["Authorization"] == f"Bearer {TOKEN}"
+    assert seen[0].headers["Authorization"] == f"Bearer {BEARER}"
 
 
 def test_query_and_idempotency_key() -> None:
@@ -236,14 +236,14 @@ def test_query_and_idempotency_key() -> None:
 
     async def run(client: HttpProvider) -> None:
         await client.list(labels={"a": "1", "b": "2"}, cursor="c1", limit=5)
-        await client.create(CreateRequest(), idempotency_key=KEY)
+        await client.create(CreateRequest(), idempotency_key=IDEM)
         await client.process_output("sbx-17", "proc-1", cursor="k", wait_ms=1500)
 
     call(run, handler)
     listing, create, output = seen
     assert listing.url.params.get_list("label") == ["a=1", "b=2"]
     assert listing.url.params["cursor"] == "c1" and listing.url.params["limit"] == "5"
-    assert create.headers["Idempotency-Key"] == KEY
+    assert create.headers["Idempotency-Key"] == IDEM
     assert json.loads(create.content)["sandbox_class"] == "default"
     assert output.url.params["cursor"] == "k" and output.url.params["wait_ms"] == "1500"
 
@@ -356,13 +356,13 @@ def test_a_redirect_is_not_followed_and_is_provider_error() -> None:
 
 def test_connection_failures() -> None:
     def refuse(request: httpx.Request) -> httpx.Response:
-        raise httpx.ConnectError("boom " + TOKEN, request=request)
+        raise httpx.ConnectError("boom " + BEARER, request=request)
 
     def stall(request: httpx.Request) -> httpx.Response:
-        raise httpx.ReadTimeout("slow " + TOKEN, request=request)
+        raise httpx.ReadTimeout("slow " + BEARER, request=request)
 
     def drop(request: httpx.Request) -> httpx.Response:
-        raise httpx.RemoteProtocolError("closed " + TOKEN, request=request)
+        raise httpx.RemoteProtocolError("closed " + BEARER, request=request)
 
     errors = []
     for handler, code, outcome in (
@@ -375,8 +375,8 @@ def test_connection_failures() -> None:
         assert (raised.value.code, raised.value.outcome) == (code, outcome)
         errors.append(raised.value)
     for error in errors:
-        assert TOKEN not in str(error)
-        assert TOKEN not in "".join(traceback.format_exception(error))
+        assert BEARER not in str(error)
+        assert BEARER not in "".join(traceback.format_exception(error))
 
 
 def test_token_is_absent_from_every_error() -> None:
@@ -397,13 +397,13 @@ def test_token_is_absent_from_every_error() -> None:
         )
 
     def html(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(502, content=f"<html>{TOKEN}</html>".encode())
+        return httpx.Response(502, content=f"<html>{BEARER}</html>".encode())
 
     def redirect(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(302, headers={"Location": f"https://x.example/?t={TOKEN}"})
+        return httpx.Response(302, headers={"Location": f"https://x.example/?t={BEARER}"})
 
     def invalid(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, content=TOKEN.encode())
+        return httpx.Response(200, content=BEARER.encode())
 
     for handler in (echo, html, redirect, invalid):
         with pytest.raises(SpsError) as raised:
@@ -411,11 +411,11 @@ def test_token_is_absent_from_every_error() -> None:
         error = raised.value
         texts.extend([str(error), repr(error), "".join(traceback.format_exception(error))])
     for text in texts:
-        assert TOKEN not in text
+        assert BEARER not in text
     assert "[redacted]" in texts[0]
 
     client = provider(lambda request: reply("Sandbox"))
-    assert TOKEN not in repr(client) and TOKEN not in str(client)
+    assert BEARER not in repr(client) and BEARER not in str(client)
     for bad in ("", "has space", "line\nbreak", "tök"):
         with pytest.raises(SpsError) as raised:
             HttpProvider(BASE, bad)
@@ -550,7 +550,7 @@ def test_ids_that_could_change_the_path_are_refused() -> None:
     with pytest.raises(SpsError):
         call(lambda p: p.process_output("sbx-17", "../x"), handler)
     with pytest.raises(SpsError):
-        call(lambda p: p.create(CreateRequest(), idempotency_key="BAD KEY"), handler)
+        call(lambda p: p.create(CreateRequest(), idempotency_key="BAD IDEM"), handler)
 
 
 def test_unexpected_success_status_is_provider_error() -> None:
