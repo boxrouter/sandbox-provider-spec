@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: vercel
 verified:
-  date: '2026-11-12'
+  date: '2026-11-14'
   sdks:
     vercel-sandbox: 0.9.0
 resources:
@@ -126,7 +126,7 @@ evidence:
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true
-    report: reports/adapter-default-size-ceiling.json
+    report: reports/prober-default-coverage.json
   resources.kernel:
     source: https://vercel.com/docs/sandbox/concepts
     read: '2026-09-30'
@@ -162,7 +162,7 @@ evidence:
   resources.extendable_lifetime:
     tests:
     - facts.extendable_lifetime
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   resources.default_user:
     tests:
     - facts.default_user
@@ -170,27 +170,27 @@ evidence:
   resources.arch:
     tests:
     - coverage.facts.arch.amd64
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.root:
     tests:
     - coverage.facts.root.sudo
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.package_manager:
     tests:
     - coverage.facts.package_manager.apt
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.libc:
     tests:
     - coverage.facts.libc.glibc
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.max_process_seconds:
     tests:
     - coverage.facts.max_process
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.disk_in_memory:
     tests:
     - coverage.facts.disk_in_memory.false
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   resources.needs.max_lifetime_seconds:
     source: https://vercel.com/docs/sandbox/sdk-reference
     read: '2026-09-30'
@@ -204,17 +204,20 @@ evidence:
   lifetime_timer.enforced_by:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   lifetime_timer.counts_paused_time:
     source: https://vercel.com/docs/sandbox/concepts/persistent-sandboxes
     read: '2026-10-04'
     quote: When you stop a persistent sandbox, the SDK automatically snapshots the filesystem. When you
       resume it, a new session boots from that snapshot with a fresh session timeout.
   lifetime_timer.at_end:
-    tests:
-    - lifetime_timer.at_end.destroyed
-    - lifetime_timer.at_end.stopped
-    report: reports/native-default-core.json
+    reports:
+    - tests:
+      - lifetime_timer.at_end.destroyed
+      report: reports/prober-default-core.json
+    - tests:
+      - lifetime_timer.at_end.stopped
+      report: reports/native-default-core.json
   lifetime_timer.adjustable:
     source: https://vercel.com/docs/sandbox/sdk-reference
     read: '2026-10-11'
@@ -230,15 +233,15 @@ evidence:
   gates.pause_resume.0.keeps:
     tests:
     - pause_resume.files_only
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.access:
     tests:
     - previews.access.public
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.revocable:
     tests:
     - previews.revocable.false.public
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.link_lifetime_seconds:
     tests:
     - previews.link_lifetime_seconds.public
@@ -246,19 +249,19 @@ evidence:
   gates.previews.0.max_ports:
     tests:
     - previews.listed_ports
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.websocket:
     tests:
     - coverage.previews.websocket
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.previews.0.loopback:
     tests:
     - coverage.previews.loopback
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.previews.0.survives_pause:
     tests:
     - coverage.previews.survives_pause
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.deny_all
@@ -266,11 +269,11 @@ evidence:
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_only
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.retention_seconds:
     source: https://vercel.com/changelog/vercel-sandbox-snapshots-now-allow-custom-retention-periods
     read: '2026-09-30'
@@ -282,32 +285,32 @@ evidence:
   gates.processes.0.cancel:
     tests:
     - processes.cancel.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.processes.0.reattach:
     tests:
     - processes.reattach.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.hidden_secrets.0.scrubs_responses:
     tests:
     - coverage.hidden_secrets.scrubs_responses.false
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.injection:
     tests:
     - coverage.hidden_secrets.injection.sets_header
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.intercepts:
     tests:
     - coverage.hidden_secrets.intercepts.injected_hosts
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.transparent:
     tests:
     - coverage.hidden_secrets.transparent.true
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.source:
     tests:
     - custom_images.provider_artifact
-    report: reports/adapter-provider-artifact.json
+    report: reports/prober-default-core.json
   gates.terminal.0:
     tests:
     - terminal.interactive
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json

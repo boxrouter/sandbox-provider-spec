@@ -64,44 +64,59 @@ x-boxd:
   usage_records: boxd.machines.usage
 evidence:
   resources.default_user:
-    tests: [facts.default_user]
-    report: reports/adapter-defaults.json
+    tests:
+    - facts.default_user
+    report: reports/prober-default-core.json
   resources.default_cwd:
-    tests: [facts.default_cwd]
-    report: reports/adapter-defaults.json
+    tests:
+    - facts.default_cwd
+    report: reports/prober-default-core.json
   resources.extendable_lifetime:
-    tests: [facts.extendable_lifetime]
-    report: reports/lifetime-extend.json
+    tests:
+    - facts.extendable_lifetime
+    report: reports/prober-default-core.json
   lifetime_timer.enforced_by:
-    tests: [lifetime_timer.at_end.destroyed]
-    report: reports/lifetime-extend.json
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/prober-default-core.json
   lifetime_timer.at_end:
-    tests: [lifetime_timer.at_end.destroyed]
-    report: reports/lifetime-extend.json
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/prober-default-core.json
   gates.pause_resume.0:
-    tests: [pause_resume.files_and_memory]
-    report: reports/default.json
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/prober-default-core.json
   gates.pause_resume.0.keeps:
-    tests: [pause_resume.files_and_memory]
-    report: reports/default.json
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/prober-default-core.json
   gates.processes.0:
-    tests: [processes.input.true, processes.cancel.true, processes.reattach.true]
-    report: reports/default.json
+    tests:
+    - processes.input.true
+    - processes.cancel.true
+    - processes.reattach.true
+    report: reports/prober-default-core.json
   gates.processes.0.input:
-    tests: [processes.input.true]
-    report: reports/default.json
+    tests:
+    - processes.input.true
+    report: reports/prober-default-core.json
   gates.processes.0.cancel:
-    tests: [processes.cancel.true]
-    report: reports/default.json
+    tests:
+    - processes.cancel.true
+    report: reports/prober-default-core.json
   gates.processes.0.reattach:
-    tests: [processes.reattach.true]
-    report: reports/default.json
+    tests:
+    - processes.reattach.true
+    report: reports/prober-default-core.json
   gates.terminal.0:
-    tests: [terminal.interactive]
-    report: reports/adapter-terminal.json
+    tests:
+    - terminal.interactive
+    report: reports/prober-default-core.json
   gates.terminal.0.reattach:
-    tests: [coverage.terminal.reattach]
-    report: reports/adapter-terminal-coverage.json
+    tests:
+    - coverage.terminal.reattach
+    report: reports/prober-default-coverage.json
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.allowlist.names

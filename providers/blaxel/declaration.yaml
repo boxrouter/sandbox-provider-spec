@@ -82,7 +82,7 @@ evidence:
   resources.extendable_lifetime:
     tests:
     - facts.extendable_lifetime
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   resources.paused_retention_seconds:
     source: https://docs.blaxel.ai/Sandboxes/Expiration
     read: '2026-10-04'
@@ -114,7 +114,7 @@ evidence:
   lifetime_timer.enforced_by:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   lifetime_timer.counts_paused_time:
     source: https://docs.blaxel.ai/Sandboxes/Expiration
     read: '2026-10-04'
@@ -122,7 +122,7 @@ evidence:
   lifetime_timer.at_end:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   lifetime_timer.adjustable:
     source: https://docs.blaxel.ai/Sandboxes/Expiration
     read: '2026-10-11'
@@ -139,15 +139,15 @@ evidence:
   gates.processes.0.cancel:
     tests:
     - processes.cancel.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.processes.0.reattach:
     tests:
     - processes.reattach.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.access:
     tests:
     - previews.access.public
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.revocable:
     tests:
     - previews.revocable.true
@@ -155,7 +155,7 @@ evidence:
   gates.previews.0.max_ports:
     tests:
     - previews.listed_ports
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.hidden_secrets.0.scrubs_responses:
     tests:
     - coverage.hidden_secrets.scrubs_responses.false
@@ -179,7 +179,7 @@ evidence:
   gates.terminal.0:
     tests:
     - terminal.interactive
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: true

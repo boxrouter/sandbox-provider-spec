@@ -56,8 +56,9 @@ evidence:
       | 4 | 16 GB | 2-40 GB | $15.48 per month | | 4 | 32 GB | 2-80 GB | $27.76 per month | ...
       Other templates default to 4, 6, 12, or 24 GB disk by shape.
   resources.size_is_ceiling:
-    tests: [coverage.facts.size_is_ceiling.true]
-    report: reports/adapter-default-size-ceiling.json
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/prober-default-coverage.json
   resources.default_size:
     source: https://www.agent37.com/docs/agents-api/instances/create
     read: 2026-11-12
@@ -86,10 +87,13 @@ evidence:
       `"type": "performance"`. A `default` create there returns `400 invalid_request`
   gates.network_lockdown.1.policy:
     reports:
-      - tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]
-        report: reports/network-lockdown.json
-      - tests: [coverage.network_lockdown.open]
-        report: reports/network-lockdown-coverage.json
+    - tests:
+      - network_lockdown.deny_all
+      - network_lockdown.allowlist.names
+      report: reports/network-lockdown.json
+    - tests:
+      - coverage.network_lockdown.open
+      report: reports/prober-default-coverage.json
   gates.network_lockdown.1.entry_kinds:
     tests: [network_lockdown.allowlist.names]
     report: reports/network-lockdown.json
@@ -100,8 +104,9 @@ evidence:
     tests: [network_lockdown.max_allow]
     report: reports/network-lockdown.json
   gates.network_lockdown.1.switchable:
-    tests: [coverage.network_lockdown.switchable.true]
-    report: reports/network-lockdown-coverage.json
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/prober-default-coverage.json
   gates.network_lockdown.0.policy:
     tests: [network_lockdown.allowlist.addresses]
     report: reports/network-lockdown-addresses.json
