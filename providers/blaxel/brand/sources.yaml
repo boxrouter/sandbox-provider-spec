@@ -1,0 +1,20 @@
+owner: Blaxel
+source_page: https://blaxel.ai/brand
+assets:
+  mark.svg:
+    source: https://blaxel.ai/favicon.svg
+    retrieved_at: '2026-11-13'
+    role: The X symbol the live site serves, drawn in one colour (a mask in the page's text colour); the brand page now redirects and its kit returns 404 (archived capture 2026-07-04)
+    modifications: >-
+      Black background rectangle removed, viewBox cropped to the symbol, fill left to the page so it draws in the
+      text colour.
+  logo.svg:
+    source: not recorded
+    role: Blaxel logotype for dark backgrounds
+    modifications: not recorded
+notes:
+  terms: >-
+    "Use the color version whenever possible. Use monochrome variants only when the color logo would not contrast
+    well against a given background." (archived brand page). The kit also offered black and white; the colour mark
+    in it is an older sphere, not the X the live site shows. Recorded 2026-11-13 from the notes of the web
+    benchmarks' former mark registry.
