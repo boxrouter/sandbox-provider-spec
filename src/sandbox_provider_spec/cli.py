@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -26,8 +27,11 @@ from sandbox_provider_spec.check import (
 from sandbox_provider_spec.installed import installed_declaration_path
 from sandbox_provider_spec.load import DuplicateKeyError, load
 from sandbox_provider_spec.matcher import Registry, match
+from sandbox_provider_spec.report import write_report
 from sandbox_provider_spec.rule_accounting import check_rule_accounting
 from sandbox_provider_spec.suite import SPEC
+from sandbox_provider_spec.v1 import tester
+from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.server import run_server
 
@@ -173,19 +177,8 @@ def _check_catalog() -> int:
 
 def _serve(args: argparse.Namespace) -> int:
     """Serve an installed provider over the 1.0 HTTP API."""
-    entries = {entry.name: entry for entry in entry_points(group=PROVIDER_GROUP)}
-    entry = entries.get(args.provider_id)
-    if entry is None:
-        known = ", ".join(sorted(entries)) or "none"
-        print(
-            f"serve: no installed provider {args.provider_id!r} in the entry-point group "
-            f"{PROVIDER_GROUP} (installed: {known})",
-            file=sys.stderr,
-        )
-        return 1
-    provider_class = entry.load()
-    if not (isinstance(provider_class, type) and issubclass(provider_class, Provider)):
-        print(f"serve: {args.provider_id!r} is not a Provider subclass", file=sys.stderr)
+    provider_class = _load_provider_class(args.provider_id, "serve")
+    if provider_class is None:
         return 1
     try:
         run_server(provider_class, host=args.host, port=args.port, socket=args.socket)
@@ -199,6 +192,100 @@ def _serve(args: argparse.Namespace) -> int:
         )
         return 1
     return 0
+
+
+def _load_provider_class(provider_id: str, command: str) -> type[Provider] | None:
+    """The installed `Provider` registered as `provider_id`, or None after saying why not."""
+    entries = {entry.name: entry for entry in entry_points(group=PROVIDER_GROUP)}
+    entry = entries.get(provider_id)
+    if entry is None:
+        known = ", ".join(sorted(entries)) or "none"
+        print(
+            f"{command}: no installed provider {provider_id!r} in the entry-point group "
+            f"{PROVIDER_GROUP} (installed: {known})",
+            file=sys.stderr,
+        )
+        return None
+    provider_class = entry.load()
+    if not (isinstance(provider_class, type) and issubclass(provider_class, Provider)):
+        print(f"{command}: {provider_id!r} is not a Provider subclass", file=sys.stderr)
+        return None
+    return provider_class
+
+
+def _credentials(pairs: list[str]) -> dict[str, str] | None:
+    """Read each `<field>=<ENV_VAR>` from the environment, or print the problem and return None."""
+    values: dict[str, str] = {}
+    for pair in pairs:
+        name, separator, variable = pair.partition("=")
+        if not separator or not name or not variable:
+            print(f"test: --credential needs <field>=<ENV_VAR>, got {pair!r}", file=sys.stderr)
+            return None
+        if variable not in os.environ:
+            print(f"test: environment variable {variable} is not set", file=sys.stderr)
+            return None
+        values[name] = os.environ[variable]
+    return values
+
+
+def _test(args: argparse.Namespace) -> int:
+    """Run the shared tests against an installed provider or a base URL."""
+    credentials = _credentials(args.credential)
+    if credentials is None:
+        return 1
+    target: str = args.target
+    try:
+        if target.startswith(("http://", "https://")):
+            if set(credentials) != {"token"}:
+                print("test: a URL target takes one credential, token=<ENV_VAR>", file=sys.stderr)
+                return 1
+            # The client needs the `http` extra, so it loads only for a URL target.
+            # pylint: disable-next=import-outside-toplevel
+            from sandbox_provider_spec.v1.http_client import HttpProvider  # noqa: PLC0415
+
+            provider: Provider = HttpProvider(target, credentials["token"])
+        else:
+            provider_class = _load_provider_class(target, "test")
+            if provider_class is None:
+                return 1
+            declared = {item.name for item in provider_class.credential_fields}
+            unknown = sorted(set(credentials) - declared)
+            if unknown:
+                print(
+                    f"test: {target} declares no credential field {unknown[0]!r} "
+                    f"(declared: {', '.join(sorted(declared)) or 'none'})",
+                    file=sys.stderr,
+                )
+                return 1
+            provider = provider_class(credentials)
+    except ModuleNotFoundError as error:
+        if error.name != "httpx":
+            raise
+        print(
+            "test: a URL target needs the `http` extra: pip install 'sandbox-provider-spec[http]'",
+            file=sys.stderr,
+        )
+        return 1
+    except SpsError as error:
+        print(f"test: {error}", file=sys.stderr)
+        return 1
+    options = tester.TestOptions(
+        reachable_url=args.reachable_url, tests=args.test, quick=args.quick
+    )
+    try:
+        result = tester.run_tests(provider, options)
+    except ValueError as error:
+        print(f"test: {error}", file=sys.stderr)
+        return 1
+    print("\n".join(result.lines))
+    for row in result["tests"]:
+        if row["result"] not in {"passed", "unsupported"}:
+            print(f"{row['id']}: {row.get('reason', row['result'])}", file=sys.stderr)
+    write_report(Path(args.output), result)
+    print(f"report: {args.output}", file=sys.stderr)
+    if not result.all_passed:
+        return 1
+    return 3 if args.quick else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -282,6 +369,37 @@ def main(argv: list[str] | None = None) -> int:
     where.add_argument("--port", type=int, help="TCP port to listen on")
     where.add_argument("--socket", help="Unix socket path to listen on (plain HTTP)")
     serve.set_defaults(run=_serve)
+    test_cmd = commands.add_parser(
+        "test",
+        help="run the shared tests against an installed provider or a base URL "
+        "(exit 0 pass, 3 pass under --quick, 1 otherwise)",
+    )
+    test_cmd.add_argument("target", help="an installed provider id, or an http(s):// base URL")
+    test_cmd.add_argument(
+        "--credential",
+        action="append",
+        default=[],
+        metavar="FIELD=ENV_VAR",
+        help="a credential field and the environment variable that holds it (repeatable); "
+        "a URL target takes token=<ENV_VAR>",
+    )
+    test_cmd.add_argument(
+        "--reachable-url",
+        default="https://example.com",
+        help="an HTTPS URL that a sandbox can reach (default https://example.com)",
+    )
+    test_cmd.add_argument(
+        "--test", action="append", default=[], help="test id or prefix; repeatable"
+    )
+    test_cmd.add_argument(
+        "--quick", action="store_true", help="skip the slow tests; a pass exits 3, never 0"
+    )
+    test_cmd.add_argument(
+        "--output",
+        default="sps-report.json",
+        help="where to write the report (default sps-report.json)",
+    )
+    test_cmd.set_defaults(run=_test)
     args = parser.parse_args(argv)
     try:
         result: int = args.run(args)
