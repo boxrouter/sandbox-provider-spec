@@ -12,6 +12,11 @@ from pathlib import Path
 
 import pytest
 
+from sandbox_provider_spec.check import spec_dir
+from sandbox_provider_spec.load import load
+from sandbox_provider_spec.matcher import Registry, match
+from sandbox_provider_spec.suite import SPEC
+
 
 @pytest.fixture(scope="module")
 def wheel(tmp_path_factory: pytest.TempPathFactory) -> Path:
@@ -121,12 +126,24 @@ def test_installed_evidence_does_not_depend_on_venv_location(
         capture_output=True,
         text=True,
     )
-    # Historical reports omit the current EOF baseline check; installation must
-    # preserve that refusal in every location instead of manufacturing fresh proof.
-    assert (matched.returncode, matched.stdout, matched.stderr) == (
-        1,
-        "e2b: not eligible\n"
-        "  - baseline_failed: no newest clean baseline-passing report "
-        "for this provider, class and SDK set\n",
-        "",
+    # Installation must not change the verdict: the installed declaration and reports give the
+    # verdict the same files give in this tree. The verdict itself is not fixed here, because the
+    # public export rewrites the prober's reports and E2B is eligible on those but not on
+    # Cloud's, which keep their boxrouter-* SDK entries.
+    source = Path(__file__).resolve().parents[1] / "providers/e2b"
+    registry = Registry.from_documents(
+        load(spec_dir() / "registries/regions.json"),
+        load(spec_dir() / "registries/gpu-models.json"),
+    )
+    reports = [load(path) for path in sorted((source / "reports").glob("*.json"))]
+    expected = match(
+        load(request),
+        [load(source / "declaration.yaml")],
+        reports=[
+            report for report in reports if isinstance(report, dict) and report.get("spec") == SPEC
+        ],
+        registry=registry,
+    )["results"]["e2b"]["eligible"]
+    assert (matched.returncode, matched.stdout.splitlines()[0], matched.stderr) == (
+        (0, "e2b: eligible", "") if expected else (1, "e2b: not eligible", "")
     )

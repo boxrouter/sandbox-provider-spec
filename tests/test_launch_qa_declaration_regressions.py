@@ -54,10 +54,12 @@ def _match_e2b(request: dict[str, Any]) -> MatchResult:
     result = match(
         request,
         [load(provider / "declaration.yaml")],
-        reports=[load(path) for path in sorted((provider / "reports").glob("*.json"))],
+        reports=[load(path) for path in sorted((provider / "reports").glob("e2b-native-*.json"))],
         registry=registry,
     )
-    # These immutable launch reports predate the EOF check. Assert that they
+    # Only the immutable launch reports are loaded: the prober's newer reports are rewritten
+    # by the public export, which makes their SDK set match the declaration's and admits the
+    # provider there but not here. These launch reports predate the EOF check. Assert that they
     # cannot admit the provider, then inspect the independent capability findings.
     assert result["eligible"] == []
     failures = result["results"]["e2b"]["failed"]
