@@ -130,12 +130,14 @@ def test_blaxel_missing_rotation_mapping_is_not_evidence_of_provider_absence() -
 def test_vercel_keeps_both_native_proven_lifetime_end_states() -> None:
     declaration = load(ROOT / "providers/vercel/declaration.yaml")
     assert declaration["lifetime_timer"]["at_end"] == ["destroyed", "stopped"]
-    citation = declaration["evidence"]["lifetime_timer.at_end"]
-    report = load(ROOT / "providers/vercel" / citation["report"])
-    rows = {row["id"]: row for row in report["tests"]}
+    # One citation entry per report; each end state is proved by a test in its own entry's report.
+    entries = declaration["evidence"]["lifetime_timer.at_end"]["reports"]
     for state in declaration["lifetime_timer"]["at_end"]:
         identifier = f"lifetime_timer.at_end.{state}"
-        assert identifier in citation["tests"]
+        cited = [entry for entry in entries if identifier in entry["tests"]]
+        assert len(cited) == 1, identifier
+        report = load(ROOT / "providers/vercel" / cited[0]["report"])
+        rows = {row["id"]: row for row in report["tests"]}
         assert rows[identifier]["result"] == "passed"
         assert {"fact": "lifetime_timer.at_end", "value": state} in rows[identifier]["proves"]
 
