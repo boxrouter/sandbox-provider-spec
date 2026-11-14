@@ -231,10 +231,13 @@ def with_gates(
 def test_driver_creates_labelled_sandboxes_and_destroys_them(driver: ProviderDriver) -> None:
     made = driver.call("create", None, {"environment": {"A": "b"}})
     assert driver.api.created_labels == [{RUN_LABEL: "run-1"}]  # type: ignore[attr-defined]
-    assert driver.call("get", made, {}) == {"state": "active"}
-    assert driver.call("list", None, {})["sandboxes"] == [{"identity": made["identity"]}]
+    assert driver.call("get", made, {}) == {"state": "active", "labels": {}}
+    assert driver.call("list", None, {}) == {
+        "sandboxes": [{"identity": made["identity"]}],
+        "count": 1,
+    }
     driver.call("destroy", made, {})
-    assert driver.call("get", made, {}) == {"state": "destroyed"}
+    assert driver.call("get", made, {})["state"] == "destroyed"
     assert driver.leftovers() == []
     driver.release(resource(made))  # already released: nothing is destroyed twice
 
@@ -255,7 +258,7 @@ def test_driver_maps_unsupported_and_other_errors(driver: ProviderDriver) -> Non
         driver.call("files.read_bytes", {"resource": made["resource"]}, {"path": "/nonexistent/x"})
     assert failure.value.code != "unsupported"  # a plain error is not an absence
     driver.call("destroy", made, {})
-    assert driver.call("get", made, {}) == {"state": "destroyed"}
+    assert driver.call("get", made, {})["state"] == "destroyed"
 
 
 def test_driver_reports_an_sps_error_code(driver: ProviderDriver) -> None:
@@ -466,3 +469,214 @@ def test_the_command_refuses_bad_credentials_and_targets(
     assert "takes one credential" in capsys.readouterr().err
     assert main(["test", "no-such-provider", "--credential", "api_key=SPS_SET"]) == 1
     assert "no installed provider" in capsys.readouterr().err
+
+
+# --- the contract tests ----------------------------------------------------------------------
+
+
+class ContractProvider(LocalProvider, manifest=False):
+    """A provider that keeps every promise of the contract that `contract.` tests check.
+
+    Each flag turns one promise off, so a test can show that its `contract.` test notices.
+    """
+
+    def __init__(self, credentials: Mapping[str, str] | None = None) -> None:
+        super().__init__(credentials)
+        self.keys: dict[str, tuple[str, str]] = {}
+        self.replay_creates = True
+        self.filter_labels = True
+        self.repeat_destroy = True
+        self.kill_group = True
+
+    async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
+        if request.image not in (None, "base") or float(request.resources.get("cpu_min", 0)) > 4:  # type: ignore[arg-type]
+            raise SpsError("unsupported", "no class meets the request")
+        body = json.dumps(
+            [dict(request.env), dict(request.labels), request.image, dict(request.resources)],
+            sort_keys=True,
+        )
+        known = self.keys.get(idempotency_key)
+        if known is not None and self.replay_creates:
+            if known[0] != body:
+                raise SpsError("conflict", "the key was used with another body")
+            return self.boxes[known[1]]
+        box = await super().create(request, idempotency_key=idempotency_key)
+        self.keys[idempotency_key] = (body, box.id)
+        return box
+
+    async def list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SandboxPage:
+        kept = labels if self.filter_labels else {RUN_LABEL: (labels or {})[RUN_LABEL]}
+        return await super().list(labels=kept, cursor=cursor, limit=limit)
+
+    async def destroy(self, sandbox_id: str) -> DestroyResult:
+        if not self.repeat_destroy and (await self.get(sandbox_id)).state == "destroyed":
+            raise SpsError("conflict", "already destroyed")
+        return await super().destroy(sandbox_id)
+
+    async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
+        await self.get(sandbox_id)
+        if request.cwd is not None and not Path(request.cwd).is_dir():
+            raise SpsError("not_found", "no such directory")
+        process = await asyncio.create_subprocess_exec(
+            *request.argv,
+            cwd=request.cwd,
+            env={**os.environ, **self.environment, **request.env},
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            start_new_session=True,
+        )
+        out, err = bytearray(), bytearray()
+
+        async def read(stream: asyncio.StreamReader | None, into: bytearray) -> None:
+            while stream is not None and (chunk := await stream.read(4096)):
+                into.extend(chunk)
+
+        readers = [
+            asyncio.ensure_future(read(process.stdout, out)),
+            asyncio.ensure_future(read(process.stderr, err)),
+        ]
+        try:
+            await asyncio.wait_for(process.wait(), request.timeout_ms / 1000)
+            await asyncio.gather(*readers)
+            timed_out = False
+        except TimeoutError:
+            if self.kill_group:
+                os.killpg(process.pid, 9)
+                await asyncio.gather(*readers)
+            else:
+                process.kill()  # the command's children keep running
+                for reader in readers:
+                    reader.cancel()
+            await process.wait()
+            timed_out = True
+        return RunResult(
+            exit_code=None if timed_out else process.returncode,
+            stdout=out.decode(),
+            stderr=err.decode(),
+            timed_out=timed_out,
+        )
+
+
+CONTRACT_TESTS = (
+    "contract.discovery_valid",
+    "contract.idempotent_create_same_body",
+    "contract.idempotent_create_other_body",
+    "contract.list_label_filter",
+    "contract.not_found_codes",
+    "contract.unsupported_unclaimed",
+    "contract.run_timeout_ends_command",
+    "contract.destroy_repeat",
+    "contract.cost_final",
+)  # every contract test but the 1 GiB transfer, which a live run covers
+
+
+def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict[str, str]:
+    report = run_tests(provider, TestOptions(tests=tests))
+    return {str(row["id"]): str(row["result"]) for row in report["tests"]}
+
+
+def test_there_are_ten_contract_tests_and_the_tester_selects_each_by_default() -> None:
+    suite = shared_suite()
+    ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
+    assert ids == {*CONTRACT_TESTS, "contract.files_1gib_roundtrip"}
+    chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
+    assert ids <= chosen
+    quick = {test.id for test in select_tests(suite, None, TestOptions(quick=True)).tests}
+    assert ids - quick == QUICK_SKIPS
+
+
+def test_a_provider_that_keeps_the_contract_passes_every_contract_test() -> None:
+    provider = ContractProvider()
+    assert results(provider) == {test_id: "passed" for test_id in CONTRACT_TESTS}
+    assert all(box.state == "destroyed" for box in provider.boxes.values())
+
+
+@pytest.mark.parametrize(
+    ("flag", "failing"),
+    [
+        (
+            "replay_creates",
+            ["contract.idempotent_create_same_body", "contract.idempotent_create_other_body"],
+        ),
+        ("filter_labels", ["contract.list_label_filter"]),
+        ("repeat_destroy", ["contract.destroy_repeat"]),
+    ],
+)
+def test_a_provider_that_breaks_a_promise_fails_its_contract_test(
+    flag: str, failing: list[str]
+) -> None:
+    provider = ContractProvider()
+    setattr(provider, flag, False)
+    found = results(provider)
+    assert sorted(test_id for test_id, result in found.items() if result != "passed") == sorted(
+        failing
+    )
+    assert all(found[test_id] in {"differs", "error"} for test_id in failing)
+
+
+def test_a_provider_that_leaves_the_commands_children_running_fails_the_timeout_test() -> None:
+    provider = ContractProvider()
+    provider.kill_group = False
+    try:
+        assert results(provider, ("contract.run_timeout_ends_command",)) == {
+            "contract.run_timeout_ends_command": "differs"
+        }
+    finally:  # the children that the provider left behind
+        child = Path("/tmp/sps-timeout-child")
+        if child.is_file():
+            os.system(f"kill -9 {int(child.read_text())} 2>/dev/null")  # noqa: S605
+
+
+def test_a_provider_that_creates_on_an_unsupported_request_fails_its_test() -> None:
+    class Eager(ContractProvider, manifest=False):
+        async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
+            return await LocalProvider.create(self, request, idempotency_key=idempotency_key)
+
+    assert results(Eager(), ("contract.unsupported_unclaimed",)) == {
+        "contract.unsupported_unclaimed": "differs"
+    }
+
+
+def test_a_provider_that_answers_not_found_with_another_code_fails_its_test() -> None:
+    class Wrong(ContractProvider, manifest=False):
+        async def destroy(self, sandbox_id: str) -> DestroyResult:
+            try:
+                return await super().destroy(sandbox_id)
+            except SpsError:
+                raise SpsError("conflict", "no such sandbox") from None
+
+    found = results(Wrong(), ("contract.not_found_codes", "contract.destroy_repeat"))
+    assert found["contract.not_found_codes"] == "error"
+    assert found["contract.destroy_repeat"] == "error"
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"status": "accruing"},  # never final inside the window
+        {"total_usd": "9.99"},  # does not add up
+    ],
+)
+def test_the_cost_test_needs_a_final_cost_that_adds_up(
+    monkeypatch: pytest.MonkeyPatch, change: dict[str, str]
+) -> None:
+    class Costly(ContractProvider, manifest=False):
+        async def cost(self, sandbox_id: str) -> Cost:
+            base = await super().cost(sandbox_id)
+            return dataclasses.replace(
+                base,
+                **{
+                    key: (value if key == "status" else type(base.total_usd)(value))
+                    for key, value in change.items()
+                },  # type: ignore[arg-type]
+            )
+
+    monkeypatch.setattr("sandbox_provider_spec.v1.suite_driver._COST_WAIT_MS", 1)
+    found = results(Costly(), ("contract.cost_final",))
+    assert found == {"contract.cost_final": "not_run" if "status" in change else "differs"}

@@ -17,6 +17,7 @@ import time
 from collections.abc import AsyncIterator, Awaitable, Iterator, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal
 from importlib.metadata import version
 from typing import Any, TypeVar, cast
 from uuid import uuid4
@@ -36,12 +37,14 @@ from sandbox_provider_spec.driver import (
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
+    Cost,
     CreateRequest,
     FileLinkRequest,
     ProcessStartRequest,
     RunRequest,
     Sandbox,
 )
+from sandbox_provider_spec.v1.wire import WireError, to_json
 
 T = TypeVar("T")
 
@@ -58,8 +61,23 @@ NOT_IN_1_0 = {
 
 # Create inputs that SPS 1.0 maps to a field of `CreateRequest`.
 CREATE_INPUTS = frozenset(
-    {"environment", "requirements", "resources", "lifetime_seconds", "at_end", "image"}
+    {
+        "environment",
+        "requirements",
+        "resources",
+        "lifetime_seconds",
+        "at_end",
+        "image",
+        "labels",
+        "idempotency_key",
+    }
 )
+
+# An id that no provider has issued: it fits the id syntax (contract section 3) and names nothing.
+UNKNOWN_SANDBOX_ID = "sps-test-no-such-sandbox"
+
+_ONE_GIB = 1 << 30
+_COST_WAIT_MS = 120_000  # how long cost.final waits for a final cost when a test names no limit
 
 _OUTPUT_WAIT_MS = 1000
 _WAIT_MS = 60_000  # how long process.wait waits for an exit when a test names no limit
@@ -73,6 +91,8 @@ class SandboxHandle:
     """What a sandbox resource keeps in memory."""
 
     id: str
+    cost: Cost | None = None
+    """The cost that the first destroy returned, when it returned one."""
 
 
 @dataclass
@@ -177,17 +197,29 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods
             image=cast("str | Mapping[str, str] | None", image),
             at_end=cast(Any, inputs.get("at_end", "destroyed")),
             env=strings(inputs, "environment"),
-            labels={RUN_LABEL: self.run_id},
+            labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id},
             lifetime_seconds=cast("int | None", inputs.get("lifetime_seconds", 300)),
         )
-        created = self.wait(self.api.create(request, idempotency_key=str(uuid4())))
+        created = self.wait(self.api.create(request, idempotency_key=self._key(inputs)))
         handle = SandboxHandle(created.id)
-        owned = self.own("sandbox", handle, lambda: self._destroy(handle.id))
+        owned = self.own("sandbox", handle, lambda: self._destroy(handle.id, handle))
         return {"resource": owned, "identity": created.id}
 
-    def _destroy(self, sandbox_id: str) -> Observation:
+    def _key(self, inputs: Inputs) -> str:
+        """The idempotency key of a create: fresh, or derived from the run and a test's name for
+        it, so that two creates of one test share a key and no other test or run does."""
+        name = inputs.get("idempotency_key")
+        if name is None:
+            return str(uuid4())
+        if not isinstance(name, str) or not name:
+            raise ValueError("idempotency_key must name the key")
+        return f"sps-{self.run_id[:20]}-{name}"
+
+    def _destroy(self, sandbox_id: str, handle: SandboxHandle | None = None) -> Observation:
         try:
-            self.wait(self.api.destroy(sandbox_id))
+            result = self.wait(self.api.destroy(sandbox_id))
+            if handle is not None and result.cost is not None and handle.cost is None:
+                handle.cost = result.cost
         except NativeFailure as error:
             if error.code != "not_found":
                 raise
@@ -201,23 +233,91 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods
             if error.code == "not_found":
                 return {"state": "destroyed"}
             raise
-        return {"state": "active" if sandbox.state == "running" else sandbox.state}
+        labels = dict(sandbox.labels)
+        if labels.get(RUN_LABEL) == self.run_id:
+            del labels[RUN_LABEL]  # the tester's own label; a test names only the labels it set
+        return {
+            "state": "active" if sandbox.state == "running" else sandbox.state,
+            "labels": labels,
+        }
 
     def list(self, target: object, inputs: Inputs) -> Observation:
-        del target, inputs
+        del target
+        wanted = {**strings(inputs, "labels"), RUN_LABEL: self.run_id}
         found: builtins.list[Sandbox] = []
         cursor: str | None = None
         while True:
-            page = self.wait(self.api.list(labels={RUN_LABEL: self.run_id}, cursor=cursor))
+            page = self.wait(self.api.list(labels=wanted, cursor=cursor))
             found.extend(page.sandboxes)
             cursor = page.next_cursor
             if cursor is None:
                 break
-        return {"sandboxes": [{"identity": item.id} for item in found]}
+        return {"sandboxes": [{"identity": item.id} for item in found], "count": len(found)}
 
     def destroy(self, target: object, inputs: Inputs) -> Observation:
         del inputs
         return self.release(resource(target))
+
+    def destroy_again(self, target: object, inputs: Inputs) -> Observation:
+        """Destroy a sandbox that an earlier step already destroyed, and report the state."""
+        del inputs
+        return {"state": self.wait(self.api.destroy(self._sandbox(target))).state}
+
+    def destroy_unknown(self, target: object, inputs: Inputs) -> Observation:
+        """Destroy an id that the provider has never issued. The contract answers `not_found`."""
+        del target, inputs
+        return {"state": self.wait(self.api.destroy(UNKNOWN_SANDBOX_ID)).state}
+
+    # Discovery and cost
+
+    def discovery(self, target: object, inputs: Inputs) -> Observation:
+        """Read the discovery document and judge it: a valid 1.0 document, a price on every
+        class, and a file limit of at least 1 GiB (contract section 8)."""
+        del target, inputs
+        found = self.wait(self.api.discovery())
+        try:
+            to_json(found)
+            valid = True
+        except WireError:
+            valid = False
+        return {
+            "valid": valid,
+            "priced": bool(found.classes) and all(item.prices for item in found.classes),
+            "file_limit_floor": found.limits.file_bytes >= _ONE_GIB,
+        }
+
+    def cost_final(self, target: object, inputs: Inputs) -> Observation:
+        """Read the cost of a destroyed sandbox until it is final, and check what a final cost
+        promises: it names the sandbox, a calculated total is the sum of its lines, and a second
+        read states the same total. A provider that returns the final cost in the destroy result
+        may no longer know the sandbox, and then the destroy result is the only read."""
+        native = resource(target).native
+        if not isinstance(native, SandboxHandle):
+            raise ValueError("operation requires a sandbox")
+        deadline = time.monotonic() + number(inputs, "timeout_ms", _COST_WAIT_MS) / 1000
+        cost = native.cost if native.cost is not None and native.cost.status == "final" else None
+        while cost is None:
+            read = self.wait(self.api.cost(native.id))
+            if read.status == "final":
+                cost = read
+            elif time.monotonic() >= deadline:
+                raise NotRun("cost_not_final_in_window")
+            else:
+                time.sleep(2)
+        try:
+            again: Cost | None = self.wait(self.api.cost(native.id))
+        except NativeFailure as error:
+            if error.code != "not_found" or native.cost is None:
+                raise
+            again = None  # the destroy result carried the cost; the provider forgot the sandbox
+        lines = sum((line.amount_usd for line in cost.lines), start=Decimal(0))
+        return {
+            "status": cost.status,
+            "sandbox_matches": cost.sandbox_id == native.id,
+            "total_matches_lines": cost.source == "reported" or lines == cost.total_usd,
+            "stable": again is None
+            or (again.status == "final" and again.total_usd == cost.total_usd),
+        }
 
     # Commands and files
 

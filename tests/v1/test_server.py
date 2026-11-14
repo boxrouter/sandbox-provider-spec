@@ -446,6 +446,7 @@ def test_defaults_for_list_and_process_output() -> None:
 # --- strict requests -------------------------------------------------------------------------
 
 
+@pytest.mark.rule("provider-api/unknown-fields-refused")
 @pytest.mark.parametrize(
     ("path", "body"),
     [
@@ -509,6 +510,7 @@ def test_unknown_routes_and_wrong_methods_are_not_found() -> None:
 # --- errors ----------------------------------------------------------------------------------
 
 
+@pytest.mark.rule("provider-api/no-credential-echo")
 def test_an_unexpected_exception_is_an_opaque_500() -> None:
     Recorder.explode = RuntimeError("secret-xyz")
     app = create_app(Recorder)
@@ -548,6 +550,7 @@ def test_every_error_code_has_its_status() -> None:
 # --- credentials -----------------------------------------------------------------------------
 
 
+@pytest.mark.rule("provider-api/bearer-only")
 def test_a_missing_or_malformed_authorization_is_unauthenticated() -> None:
     app = create_app(Recorder)
     for token, headers in [
@@ -561,6 +564,7 @@ def test_a_missing_or_malformed_authorization_is_unauthenticated() -> None:
     assert Recorder.constructed == []
 
 
+@pytest.mark.rule("provider-api/served-token-encoding")
 def test_a_single_field_provider_takes_the_token_as_the_value() -> None:
     app = create_app(Recorder)
     reply = asyncio.run(call(app, "GET", "/v1/discovery", token="whole-token"))
@@ -568,6 +572,7 @@ def test_a_single_field_provider_takes_the_token_as_the_value() -> None:
     assert Recorder.constructed == [{"api_key": "whole-token"}]
 
 
+@pytest.mark.rule("provider-api/served-token-encoding")
 def test_a_two_field_token_reaches_the_constructor() -> None:
     app = create_app(TwoFields)
     token = encode({"key_id": "kid-1", "secret": "s3cret"})
@@ -576,6 +581,8 @@ def test_a_two_field_token_reaches_the_constructor() -> None:
     assert TwoFields.constructed == [{"key_id": "kid-1", "secret": "s3cret"}]
 
 
+@pytest.mark.rule("provider-api/no-credential-echo")
+@pytest.mark.rule("provider-api/served-token-encoding")
 @pytest.mark.parametrize(
     "token",
     [

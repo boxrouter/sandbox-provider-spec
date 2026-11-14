@@ -147,6 +147,11 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "fixture.volume_visibility": ("volume_visibility.py",),
     "probe.desktop_browser": ("coverage_desktop.py",),
     "probe.ssh": ("coverage_ssh.py",),
+    # Steps that only the 1.0 driver (`v1/suite_driver.py`) implements.
+    "discovery": ("v1/suite_driver.py",),
+    "destroy.again": ("v1/suite_driver.py",),
+    "destroy.unknown": ("v1/suite_driver.py",),
+    "cost.final": ("v1/suite_driver.py",),
     "probe.tcp": ("protocol_probe.py",),
     "probe.websocket": ("protocol_probe.py",),
 }

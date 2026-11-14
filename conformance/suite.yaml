@@ -604,6 +604,7 @@ tests:
   title: The native lifetime timer ends in state destroyed.
   rules:
   - facts/lifetime-timer
+  - provider-api/lifetime-enforced
   proves:
   - fact: lifetime_timer.at_end
     value: destroyed
@@ -4009,4 +4010,359 @@ tests:
         exit_code: 7
   rules:
   - baseline/process-eof-not-exit
+  - provider-api/process-eof-not-exit
+  proves: []
+- id: contract.discovery_valid
+  title: Discovery is a valid 1.0 document, prices every class and states a 1 GiB file limit.
+  steps:
+  - op: discovery
+    expect:
+      equals:
+        valid: true
+        priced: true
+        file_limit_floor: true
+  rules:
+  - provider-api/files-limit-floor
+  proves: []
+- id: contract.idempotent_create_same_body
+  title: A repeated create with the same key and body returns the first sandbox, running.
+  steps:
+  - op: create
+    in:
+      idempotency_key: same-body
+      labels:
+        sps.test.case: idempotent-same-body
+      environment:
+        SPS_PROBE: present
+    as: first
+  - op: get
+    target: first
+    expect:
+      equals:
+        state: active
+  - op: run
+    target: first
+    in:
+      bash_script: printf "$SPS_PROBE"
+    expect:
+      equals:
+        stdout:
+          utf8: present
+  - op: create
+    in:
+      idempotency_key: same-body
+      labels:
+        sps.test.case: idempotent-same-body
+      environment:
+        SPS_PROBE: present
+    as: second
+  - op: bindings.compare
+    in:
+      left: $first.identity
+      right: $second.identity
+    expect:
+      equals:
+        equal: true
+  - op: list
+    in:
+      labels:
+        sps.test.case: idempotent-same-body
+    expect:
+      equals:
+        count: 1
+      eventually_ms: 30000
+  rules:
+  - provider-api/idempotent-create
+  - provider-api/create-returns-running
+  proves: []
+- id: contract.idempotent_create_other_body
+  title: A repeated create with the same key and a different body is refused and makes nothing.
+  steps:
+  - op: create
+    in:
+      idempotency_key: other-body
+      labels:
+        sps.test.case: idempotent-other-body
+      environment:
+        SPS_PROBE: first
+    as: first
+  - op: create
+    in:
+      idempotency_key: other-body
+      labels:
+        sps.test.case: idempotent-other-body
+      environment:
+        SPS_PROBE: second
+    expect:
+      error: conflict
+  - op: list
+    in:
+      labels:
+        sps.test.case: idempotent-other-body
+    expect:
+      equals:
+        count: 1
+      eventually_ms: 30000
+  rules:
+  - provider-api/idempotent-create
+  proves: []
+- id: contract.list_label_filter
+  title: Get and list return labels exactly, and list matches every label filter exactly.
+  steps:
+  - op: create
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: a
+    as: first
+  - op: create
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: b
+    as: second
+  - op: get
+    target: first
+    expect:
+      equals:
+        labels:
+          sps.test.case: label-filter
+          sps.test.which: a
+  - op: list
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: a
+    expect:
+      equals:
+        count: 1
+      contains:
+        sandboxes:
+          identity: $first.identity
+      eventually_ms: 30000
+  - op: list
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: b
+    expect:
+      equals:
+        count: 1
+      contains:
+        sandboxes:
+          identity: $second.identity
+      eventually_ms: 30000
+  - op: list
+    in:
+      labels:
+        sps.test.case: label-filter
+    expect:
+      equals:
+        count: 2
+      eventually_ms: 30000
+  - op: list
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: c
+    expect:
+      equals:
+        count: 0
+  - op: list
+    in:
+      labels:
+        sps.test.case: label-filter
+        sps.test.which: ''
+    expect:
+      equals:
+        count: 0
+  rules:
+  - provider-api/list-labels-exact
+  proves: []
+- id: contract.not_found_codes
+  title: A missing directory, a missing file and an unknown sandbox answer not_found.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: 'true'
+      cwd: /sps-test-no-such-directory
+    expect:
+      error: not_found
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /sps-test-no-such-file
+    expect:
+      error: not_found
+  - op: destroy.unknown
+    expect:
+      error: not_found
+  rules:
+  - provider-api/error-fault-fixed
+  proves: []
+- id: contract.unsupported_unclaimed
+  title: A request that no image or size can meet is refused with unsupported, and nothing is created.
+  steps:
+  - op: create
+    in:
+      image: sps-test-image-that-no-class-lists
+      labels:
+        sps.test.case: unsupported-unclaimed
+    expect:
+      unsupported: true
+  - op: create
+    in:
+      resources:
+        cpu_min: 100000
+      labels:
+        sps.test.case: unsupported-unclaimed
+    expect:
+      unsupported: true
+  - op: list
+    in:
+      labels:
+        sps.test.case: unsupported-unclaimed
+    expect:
+      equals:
+        count: 0
+  rules:
+  - provider-api/error-fault-fixed
+  proves: []
+- id: contract.run_timeout_ends_command
+  title: A command that passes its timeout ends with its children and returns timed_out.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: 'echo before; sleep 1000 & echo $! > /tmp/sps-timeout-child; sleep 1000'
+      timeout_ms: 3000
+    expect:
+      equals:
+        timed_out: true
+        stdout:
+          utf8_contains: before
+  - op: run
+    target: box
+    in:
+      bash_script: |-
+        sleep 2
+        state=$(awk '{print $3}' /proc/$(cat /tmp/sps-timeout-child)/stat 2>/dev/null)
+        if [ -z "$state" ] || [ "$state" = Z ]; then echo gone; else echo alive; fi
+    expect:
+      equals:
+        stdout:
+          utf8: 'gone
+
+            '
+  rules:
+  - provider-api/run-timeout-ends-command
+  proves: []
+- id: contract.files_1gib_roundtrip
+  title: A 1 GiB file streams into a sandbox and back out intact.
+  steps:
+  - op: create
+    as: box
+    in:
+      lifetime_seconds: $runner.file_transfer_lifetime_seconds
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: write
+      size: 1073741824
+    expect:
+      equals:
+        operation: write
+        size: 1073741824
+        passed: true
+  - op: fixture.file_stream
+    target: box
+    in:
+      operation: read
+      size: 1073741824
+    expect:
+      equals:
+        operation: read
+        size: 1073741824
+        passed: true
+  rules:
+  - provider-api/files-whole-or-fail
+  - provider-api/files-limit-floor
+  proves: []
+- id: contract.destroy_repeat
+  title: A repeated destroy succeeds as destroyed, an unknown id is not_found, and ids are not reused.
+  steps:
+  - op: create
+    in:
+      labels:
+        sps.test.case: destroy-repeat
+    as: box
+  - op: destroy
+    target: box
+  - op: destroy.again
+    target: box
+    expect:
+      equals:
+        state: destroyed
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+      eventually_ms: 30000
+  - op: destroy.again
+    target: box
+    expect:
+      equals:
+        state: destroyed
+  - op: destroy.unknown
+    expect:
+      error: not_found
+  - op: create
+    in:
+      labels:
+        sps.test.case: destroy-repeat
+    as: later
+  - op: bindings.compare
+    in:
+      left: $box.identity
+      right: $later.identity
+    expect:
+      equals:
+        equal: false
+  rules:
+  - provider-api/destroy-repeat
+  - provider-api/destroy-on-acceptance
+  - provider-api/ids-not-reused
+  proves: []
+- id: contract.cost_final
+  title: A destroyed sandbox has a final cost that names it, adds up and stays the same when read again.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf ok
+    expect:
+      equals:
+        stdout:
+          utf8: ok
+  - op: destroy
+    target: box
+  - op: cost.final
+    target: box
+    expect:
+      equals:
+        status: final
+        sandbox_matches: true
+        total_matches_lines: true
+        stable: true
+  rules:
+  - provider-api/cost-final-retained
+  - provider-api/cost-provider-records
   proves: []

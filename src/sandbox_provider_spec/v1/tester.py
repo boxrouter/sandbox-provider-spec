@@ -251,7 +251,13 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             driver.provider = discovery.provider.id
             driver.unsupported = {**driver.unsupported, **unsupported_operations(discovery)}
         suite = select_tests(shared_suite(), discovery, options)
-        fixtures = {**options.fixtures, "reachable_url": options.reachable_url}
+        # The 1 GiB transfer of `contract.files_1gib_roundtrip` is a requirement of the contract,
+        # so a run allows it unless the caller says otherwise.
+        fixtures = {
+            "file_stream_large": True,
+            **options.fixtures,
+            "reachable_url": options.reachable_url,
+        }
         results = run_suite(driver, suite, fixtures)
         cost_status = _probe_cost(driver)
         leftovers = driver.sweep_run()
