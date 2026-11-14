@@ -83,6 +83,12 @@ class ApiError(Exception):
         self.message = message
 
 
+def _removing(exc: APIError) -> bool:
+    """Docker answers 500/409 instead of 404 for a container whose removal has begun."""
+    text = str(exc.explanation or "")
+    return "RWLayer" in text or "removal of container" in text
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
@@ -479,6 +485,10 @@ class ExampleCloud:
             _, stat = native.get_archive(path)
         except NotFound:
             raise ApiError(404, "not_found", f"no such file: {path}") from None
+        except APIError as exc:
+            if _removing(exc):
+                raise ApiError(404, "not_found", f"unknown machine {machine_id}") from None
+            raise
         if statmod.S_ISDIR(int(stat.get("mode", 0))):
             raise ApiError(400, "invalid_request", f"{path} is a directory")
         return int(stat.get("size", 0))
@@ -489,6 +499,10 @@ class ExampleCloud:
             chunks, stat = native.get_archive(path)
         except NotFound:
             raise ApiError(404, "not_found", f"no such file: {path}") from None
+        except APIError as exc:
+            if _removing(exc):
+                raise ApiError(404, "not_found", f"unknown machine {machine_id}") from None
+            raise
         if statmod.S_ISDIR(int(stat.get("mode", 0))):
             close = getattr(chunks, "close", None)
             if close is not None:
