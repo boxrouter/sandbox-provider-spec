@@ -9,6 +9,7 @@ import json
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
+from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,10 @@ from sandbox_provider_spec.load import DuplicateKeyError, load
 from sandbox_provider_spec.matcher import Registry, match
 from sandbox_provider_spec.rule_accounting import check_rule_accounting
 from sandbox_provider_spec.suite import SPEC
+from sandbox_provider_spec.v1.provider import Provider
+from sandbox_provider_spec.v1.server import run_server
+
+PROVIDER_GROUP = "sandbox_provider_spec.providers"
 
 
 class _InputError(ValueError):
@@ -166,6 +171,36 @@ def _check_catalog() -> int:
     return 0
 
 
+def _serve(args: argparse.Namespace) -> int:
+    """Serve an installed provider over the 1.0 HTTP API."""
+    entries = {entry.name: entry for entry in entry_points(group=PROVIDER_GROUP)}
+    entry = entries.get(args.provider_id)
+    if entry is None:
+        known = ", ".join(sorted(entries)) or "none"
+        print(
+            f"serve: no installed provider {args.provider_id!r} in the entry-point group "
+            f"{PROVIDER_GROUP} (installed: {known})",
+            file=sys.stderr,
+        )
+        return 1
+    provider_class = entry.load()
+    if not (isinstance(provider_class, type) and issubclass(provider_class, Provider)):
+        print(f"serve: {args.provider_id!r} is not a Provider subclass", file=sys.stderr)
+        return 1
+    try:
+        run_server(provider_class, host=args.host, port=args.port, socket=args.socket)
+    except ModuleNotFoundError as error:
+        if error.name != "uvicorn":
+            raise
+        print(
+            "serve: the HTTP server needs the `http` extra: "
+            "pip install 'sandbox-provider-spec[http]'",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="sandbox-provider-spec",
@@ -236,6 +271,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     conformance.sweep_arguments(sweep)
     sweep.set_defaults(run=conformance.sweep)
+    serve = commands.add_parser(
+        "serve", help="serve an installed provider over the 1.0 HTTP API (needs the http extra)"
+    )
+    serve.add_argument("provider_id", help="the entry-point name of an installed provider")
+    serve.add_argument(
+        "--host", default="127.0.0.1", help="interface for --port (default 127.0.0.1)"
+    )
+    where = serve.add_mutually_exclusive_group(required=True)
+    where.add_argument("--port", type=int, help="TCP port to listen on")
+    where.add_argument("--socket", help="Unix socket path to listen on (plain HTTP)")
+    serve.set_defaults(run=_serve)
     args = parser.parse_args(argv)
     try:
         result: int = args.run(args)
