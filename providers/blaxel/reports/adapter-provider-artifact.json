@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-12T21:21:26.968368+00:00",
+  "finished_at": "2026-11-14T03:29:26.608207+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "61aa3864483df545826461b5d5e76ebe3fedab6e",
-  "run_id": "public-dd876cbd7c7eda9af34c",
+  "revision": "fde7f1b1968dfe8fb95882218aacae0a6070c9c1",
+  "run_id": "public-3dcaccbac70a7b1f4bd1",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -21,7 +21,7 @@
     "custom_images.provider_artifact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-12T21:21:25.209657+00:00",
+  "started_at": "2026-11-14T03:29:25.158385+00:00",
   "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
   "tests": [
     {
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1757,
+      "duration_ms": 1448,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
