@@ -187,11 +187,11 @@ evidence:
   gates.custom_images.0.source:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.prepared:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.image_config:
     reports:
     - tests:
@@ -207,7 +207,7 @@ evidence:
   gates.custom_images.1.prepared:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.tcp_ports.0.tls:
     source: https://modal.com/docs/guide/tunnels
     read: '2026-10-05'
@@ -223,7 +223,7 @@ evidence:
   gates.custom_images.2.prepared:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.allowlist.names

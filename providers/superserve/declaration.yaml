@@ -117,14 +117,16 @@ evidence:
       | `superserve/base` | `ubuntu:24.04` | 2 · 4096 MiB · 8192 MiB | ... A sandbox inherits its
       VM shape (vCPU, memory, disk) from the template it starts from
   resources.size_is_ceiling:
-    tests: [coverage.facts.size_is_ceiling.true]
-    report: reports/adapter-default-size-ceiling.json
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/prober-default-coverage.json
   resources.default_user:
     tests: [facts.default_user]
     report: reports/adapter-defaults.json
   resources.default_cwd:
-    tests: [facts.default_cwd]
-    report: reports/adapter-defaults.json
+    tests:
+    - facts.default_cwd
+    report: reports/prober-default-core.json
   resources.default_size:
     source: https://docs.superserve.ai/templates/overview
     read: 2026-11-13
@@ -144,75 +146,85 @@ evidence:
     tests: [lifetime_timer.at_end.destroyed]
     report: reports/adapter-default.json
   gates.processes.0.input:
-    tests: [processes.input.true]
-    report: reports/adapter-default.json
+    tests:
+    - processes.input.true
+    report: reports/prober-default-core.json
   gates.processes.0.cancel:
-    tests: [processes.cancel.true]
-    report: reports/adapter-default.json
+    tests:
+    - processes.cancel.true
+    report: reports/prober-default-core.json
   gates.processes.0.reattach:
-    tests: [processes.reattach.false]
-    report: reports/adapter-default.json
+    tests:
+    - processes.reattach.false
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.policy:
-    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
-    report: reports/adapter-network-lockdown-default.json
+    tests:
+    - network_lockdown.allowlist.names
+    - network_lockdown.allowlist.addresses
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.entry_kinds:
-    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
-    report: reports/adapter-network-lockdown-default.json
+    tests:
+    - network_lockdown.allowlist.names
+    - network_lockdown.allowlist.addresses
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.allow_wildcards:
-    tests: [network_lockdown.wildcards]
-    report: reports/adapter-network-lockdown-default.json
+    tests:
+    - network_lockdown.wildcards
+    report: reports/prober-default-core.json
   gates.network_lockdown.1.policy:
     reports:
-    - tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
-      report: reports/adapter-network-lockdown-default.json
-    - tests: [coverage.network_lockdown.open]
-      report: reports/adapter-network-lockdown-coverage-default.json
+    - tests:
+      - network_lockdown.allowlist.names
+      - network_lockdown.allowlist.addresses
+      report: reports/prober-default-core.json
+    - tests:
+      - coverage.network_lockdown.open
+      report: reports/prober-default-coverage.json
   gates.network_lockdown.1.entry_kinds:
-    tests: [network_lockdown.allowlist.names, network_lockdown.allowlist.addresses]
-    report: reports/adapter-network-lockdown-default.json
+    tests:
+    - network_lockdown.allowlist.names
+    - network_lockdown.allowlist.addresses
+    report: reports/prober-default-core.json
   gates.network_lockdown.1.allow_wildcards:
-    tests: [network_lockdown.wildcards]
-    report: reports/adapter-network-lockdown-default.json
+    tests:
+    - network_lockdown.wildcards
+    report: reports/prober-default-core.json
   gates.network_lockdown.1.switchable:
-    tests: [coverage.network_lockdown.switchable.true]
-    report: reports/adapter-network-lockdown-coverage-default.json
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.source:
-    tests: [custom_images.oci]
-    report: reports/adapter-custom-images-core-default.json
+    tests:
+    - custom_images.oci
+    report: reports/prober-default-core.json
   gates.custom_images.0.prepared:
-    tests: [coverage.custom_images.prepare.registry]
-    report: reports/adapter-custom-images-default.json
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.runs_entrypoint:
-    tests: [coverage.custom_images.runs_entrypoint.true]
-    report: reports/adapter-custom-images-default.json
+    tests:
+    - coverage.custom_images.runs_entrypoint.true
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.image_config:
-    reports:
-    - tests:
-      - coverage.custom_images.prepare.image_config.env
-      report: reports/adapter-custom-images-default.json
-    - tests:
-      - coverage.custom_images.prepare.image_config.workdir
-      report: reports/adapter-custom-images-default.json
-    - tests:
-      - coverage.custom_images.prepare.image_config.user
-      report: reports/adapter-custom-images-default.json
+    tests:
+    - coverage.custom_images.prepare.image_config.env
+    - coverage.custom_images.prepare.image_config.workdir
+    - coverage.custom_images.prepare.image_config.user
+    report: reports/prober-default-coverage.json
   gates.custom_images.1.source:
-    tests: [custom_images.provider_artifact]
-    report: reports/adapter-custom-images-core-default.json
+    tests:
+    - custom_images.provider_artifact
+    report: reports/prober-default-core.json
   gates.custom_images.1.runs_entrypoint:
-    tests: [coverage.custom_images.runs_entrypoint.true]
-    report: reports/adapter-custom-images-default.json
+    tests:
+    - coverage.custom_images.runs_entrypoint.true
+    report: reports/prober-default-coverage.json
   gates.custom_images.1.image_config:
-    reports:
-    - tests:
-      - coverage.custom_images.prepare.image_config.env
-      report: reports/adapter-custom-images-default.json
-    - tests:
-      - coverage.custom_images.prepare.image_config.workdir
-      report: reports/adapter-custom-images-default.json
-    - tests:
-      - coverage.custom_images.prepare.image_config.user
-      report: reports/adapter-custom-images-default.json
+    tests:
+    - coverage.custom_images.prepare.image_config.env
+    - coverage.custom_images.prepare.image_config.workdir
+    - coverage.custom_images.prepare.image_config.user
+    report: reports/prober-default-coverage.json
   resources.paused_retention_seconds:
     source: https://api.superserve.ai/openapi.yaml
     read: 2026-11-14
@@ -228,63 +240,63 @@ evidence:
   gates.pause_resume.0.keeps:
     tests:
     - pause_resume.files_and_memory
-    report: reports/adapter-pause-default.json
+    report: reports/prober-default-core.json
   gates.idle_shutdown.0.custom_idle_time:
     tests:
     - idle_shutdown.custom_idle_time.true
-    report: reports/adapter-idle-default.json
+    report: reports/prober-default-core.json
   gates.idle_shutdown.0.on_idle:
     tests:
     - idle_shutdown.on_idle.destroyed
-    report: reports/adapter-idle-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.access:
     tests:
     - previews.access.public
-    report: reports/adapter-previews-core-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.revocable:
     tests:
     - previews.revocable.true.public
-    report: reports/adapter-previews-core-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.max_ports:
     tests:
     - previews.listed_ports
-    report: reports/adapter-previews-core-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.link_lifetime_seconds:
     tests:
     - previews.link_lifetime_seconds.public
-    report: reports/adapter-previews-core-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.any_port:
     tests:
     - coverage.previews.any_port
-    report: reports/adapter-previews-default.json
+    report: reports/prober-default-coverage.json
   gates.terminal.0.reattach:
     tests:
     - coverage.terminal.reattach
-    report: reports/adapter-terminal-default.json
+    report: reports/prober-default-coverage.json
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_and_memory
-    report: reports/adapter-snapshots-default.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
-    report: reports/adapter-snapshots-default.json
+    report: reports/prober-default-core.json
   gates.previews.0.websocket:
     tests:
     - coverage.previews.websocket
-    report: reports/adapter-previews-default.json
+    report: reports/prober-default-coverage.json
   gates.previews.0.survives_pause:
     tests:
     - coverage.previews.survives_pause
-    report: reports/adapter-previews-default.json
+    report: reports/prober-default-coverage.json
   gates.docker.0.networking:
     tests:
     - coverage.docker.host
-    report: reports/adapter-docker-default.json
+    report: reports/prober-default-coverage.json
   gates.previews.0.reserved_ports:
     tests:
     - coverage.previews.reserved_ports
-    report: reports/adapter-previews-default.json
+    report: reports/prober-default-coverage.json
   gates.docker.0.conflicts:
     source: providers/superserve/evidence.md
     read: '2026-11-14'

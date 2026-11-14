@@ -16056,6 +16056,7 @@
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver._destroy",
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver._image_selection",
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver._planned",
+      "boxrouter_adapter_kit/spec_driver.py::CoreDriver._reads_idle_stop_as_pause",
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver._run_labels",
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver.chosen_variants",
       "boxrouter_adapter_kit/spec_driver.py::CoreDriver.create",
@@ -28376,7 +28377,7 @@
     "volumes.sharing.one_sandbox.object_store": []
   },
   "format": 3,
-  "report_sha256": "25590b701b399001694d9ebd8a08692d1acaf09097ef8b8c142c744166a6bcb0",
+  "report_sha256": "fc63210a9ea035513658353610c26f3f561e8297927eaf0177b5173ba84a1af9",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -28416,6 +28417,7 @@
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._prepare_selection": "sha256:eecb674182d464836d4606a380bd0cc306a452ee472251768bcb79b0de02e2c4",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._prepared_binding": "sha256:8eb62547f7045052df2d50bcffe3d7aa41866977d6dfe7834832f88848441676",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._prepared_create_request": "sha256:1764cb6ab9a137a75694fa0bda9e536938b4c5bbcaa9bcd66b6734c1541eb165",
+    "boxrouter_adapter_kit/spec_driver.py::CoreDriver._reads_idle_stop_as_pause": "sha256:57b310ad240b8074f03ca47bc98d161e419312765dd47b09fd41ee128306d0aa",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._release_image": "sha256:64e59d7492570938e59a039bb864abacd86c109daa47da21e2c04b98da7aea16",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._release_snapshot_capture": "sha256:cd0f2084fb79194c0ef6f73c91d6df87ee302ca73d0657563ef4b6b0741afe0c",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._require_gate": "sha256:e74dc4d92ddb4c96407d832a4c48ce3f2706a6f302a1e035594b92f933ff85d4",
