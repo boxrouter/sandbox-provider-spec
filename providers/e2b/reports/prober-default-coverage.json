@@ -139,11 +139,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T07:59:54.094407+00:00",
+  "finished_at": "2026-11-14T17:17:54.080995+00:00",
   "implementation": "withheld",
   "provider": "e2b",
-  "revision": "9634a2c73bfa6c119c7b65b77b338e8aa24b743e",
-  "run_id": "public-d3a740320648a0a41f96",
+  "revision": "1f211524d2948ab4a1847015f80315ab3ed28843",
+  "run_id": "public-72552365a7af47d2954b",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
@@ -285,7 +285,7 @@
     "files.regular_write.usability.v1.staging_cleanup"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T07:31:39.475449+00:00",
+  "started_at": "2026-11-14T16:49:45.521151+00:00",
   "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
@@ -295,7 +295,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 30643,
+      "duration_ms": 28082,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -330,7 +330,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 808,
+      "duration_ms": 760,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -365,7 +365,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1097,
+      "duration_ms": 618,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -396,7 +396,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 681,
+      "duration_ms": 680,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -436,7 +436,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 752,
+      "duration_ms": 968,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -471,7 +471,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 882,
+      "duration_ms": 805,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -503,7 +503,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 985,
+      "duration_ms": 927,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -545,7 +545,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 683,
+      "duration_ms": 623,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -580,7 +580,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 821,
+      "duration_ms": 713,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -615,7 +615,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1522,
+      "duration_ms": 1447,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -665,7 +665,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1108,
+      "duration_ms": 1030,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -714,7 +714,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15992,
+      "duration_ms": 16006,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -778,7 +778,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 614,
+      "duration_ms": 791,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -811,7 +811,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 849,
+      "duration_ms": 749,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -844,7 +844,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1500,
+      "duration_ms": 1523,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -889,7 +889,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1591,
+      "duration_ms": 838,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -932,7 +932,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15799,
+      "duration_ms": 12267,
       "id": "guest_user.selectable",
       "proves": [
         {
@@ -1001,7 +1001,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1806,
+      "duration_ms": 1730,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -1032,7 +1032,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1054,
+      "duration_ms": 1507,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",
@@ -1100,7 +1100,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1304,
+      "duration_ms": 1652,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -1138,7 +1138,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1368,
+      "duration_ms": 967,
       "id": "coverage.facts.arch.arm64",
       "proves": [
         {
@@ -1177,7 +1177,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1151,
+      "duration_ms": 1101,
       "id": "coverage.facts.root.by_default",
       "proves": [
         {
@@ -1216,7 +1216,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1412,
+      "duration_ms": 1267,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -1254,7 +1254,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1505,
+      "duration_ms": 1378,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -1292,7 +1292,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 946,
+      "duration_ms": 974,
       "id": "coverage.facts.kernel_features.fuse",
       "proves": [
         {
@@ -1330,7 +1330,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1775,
+      "duration_ms": 1083,
       "id": "coverage.facts.kernel_features.ebpf",
       "proves": [
         {
@@ -1368,7 +1368,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 993,
+      "duration_ms": 1244,
       "id": "coverage.facts.kernel_features.nested_cgroups",
       "proves": [
         {
@@ -1406,7 +1406,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1107,
+      "duration_ms": 1315,
       "id": "coverage.facts.kernel_features.netfilter",
       "proves": [
         {
@@ -1498,7 +1498,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10676,
+      "duration_ms": 43580,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -1534,7 +1534,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1282,
+      "duration_ms": 1431,
       "id": "coverage.facts.package_manager.apk",
       "proves": [
         {
@@ -1571,7 +1571,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1324,
+      "duration_ms": 825,
       "id": "coverage.facts.package_manager.dnf",
       "proves": [
         {
@@ -1608,7 +1608,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1303,
+      "duration_ms": 1466,
       "id": "coverage.facts.package_manager.pacman",
       "proves": [
         {
@@ -1645,7 +1645,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1211,
+      "duration_ms": 1371,
       "id": "coverage.facts.package_manager.none",
       "proves": [
         {
@@ -1682,7 +1682,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1010,
+      "duration_ms": 1062,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -1718,7 +1718,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1302,
+      "duration_ms": 1174,
       "id": "coverage.facts.libc.musl",
       "proves": [
         {
@@ -1759,7 +1759,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 39183,
+      "duration_ms": 43334,
       "id": "coverage.facts.on_memory_exhausted.process_killed",
       "proves": [
         {
@@ -1796,7 +1796,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 11483,
+      "duration_ms": 11575,
       "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
       "proves": [
         {
@@ -1829,7 +1829,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6583,
+      "duration_ms": 6785,
       "id": "coverage.facts.disk_in_memory.true",
       "proves": [
         {
@@ -1867,7 +1867,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6869,
+      "duration_ms": 5636,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -1958,7 +1958,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601038,
+      "duration_ms": 601423,
       "id": "coverage.facts.max_run",
       "proves": [
         {
@@ -2008,7 +2008,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601898,
+      "duration_ms": 602013,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -2064,7 +2064,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 1,
+      "duration_ms": 0,
       "id": "coverage.docker.host",
       "proves": [
         {
@@ -2130,7 +2130,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 8560,
+      "duration_ms": 8956,
       "id": "coverage.desktop.control",
       "proves": [
         {
@@ -2176,7 +2176,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15538,
+      "duration_ms": 12566,
       "id": "coverage.desktop.live_view",
       "proves": [
         {
@@ -2242,7 +2242,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2898,
+      "duration_ms": 3258,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -2293,7 +2293,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2915,
+      "duration_ms": 2529,
       "id": "coverage.previews.loopback",
       "proves": [
         {
@@ -2347,7 +2347,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2397,
+      "duration_ms": 2648,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -2390,7 +2390,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3590,
+      "duration_ms": 3176,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -2489,7 +2489,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2500,
+      "duration_ms": 2552,
       "id": "coverage.terminal.reattach",
       "proves": [
         {
@@ -2682,110 +2682,248 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3044,
       "id": "coverage.network_lockdown.changeable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": true
+        }
+      ],
+      "reason": "invalid_request",
+      "result": "error",
       "rules": [
         "network_lockdown/changeable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_policy_change",
+          "reason": "invalid_request",
+          "result": "error"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4864,
       "id": "coverage.network_lockdown.changeable.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": false
+        }
+      ],
+      "reason": "invalid_request",
+      "result": "error",
       "rules": [
         "network_lockdown/changeable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_policy_change",
+          "reason": "invalid_request",
+          "result": "error"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 48377,
       "id": "coverage.network_lockdown.switchable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2992,
       "id": "coverage.network_lockdown.policy_transition.denylist",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "outcome_unknown",
+      "result": "error",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_policy_change",
+          "reason": "outcome_unknown",
+          "result": "error"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 24789,
       "id": "coverage.network_lockdown.open",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "open"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/open"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
           "operation": "fixture.coverage_network_checks",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 24195,
       "id": "coverage.network_lockdown.switchable.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": false
+        }
+      ],
+      "reason": "policy_changed",
+      "result": "differs",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "differs"
         }
       ]
     },
@@ -2840,7 +2978,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1800,
+      "duration_ms": 1693,
       "id": "coverage.hidden_secrets.rotates.true",
       "proves": [
         {
@@ -2877,7 +3015,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2099,
+      "duration_ms": 1565,
       "id": "coverage.hidden_secrets.rotates.false",
       "proves": [
         {
@@ -2914,7 +3052,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2000,
+      "duration_ms": 1618,
       "id": "coverage.hidden_secrets.scrubs_responses.true",
       "proves": [
         {
@@ -2951,7 +3089,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2399,
+      "duration_ms": 1814,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -2988,7 +3126,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1799,
+      "duration_ms": 1757,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -3025,7 +3163,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1701,
+      "duration_ms": 1669,
       "id": "coverage.hidden_secrets.intercepts.injected_hosts",
       "proves": [
         {
@@ -3062,7 +3200,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1499,
+      "duration_ms": 1744,
       "id": "coverage.hidden_secrets.intercepts.all_https",
       "proves": [
         {
@@ -3153,7 +3291,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1801,
+      "duration_ms": 1771,
       "id": "coverage.hidden_secrets.transparent.true",
       "proves": [
         {
@@ -3190,7 +3328,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1897,
+      "duration_ms": 1920,
       "id": "coverage.hidden_secrets.transparent.false",
       "proves": [
         {
@@ -3223,7 +3361,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 16001,
+      "duration_ms": 19182,
       "id": "coverage.custom_images.build_context",
       "proves": [
         {
@@ -3332,7 +3470,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 31499,
+      "duration_ms": 30663,
       "id": "coverage.custom_images.prepare.image_config.env",
       "proves": [
         {
@@ -3368,7 +3506,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 8603,
+      "duration_ms": 7170,
       "id": "coverage.custom_images.prepare.image_config.workdir",
       "proves": [
         {
@@ -3404,7 +3542,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7453,
+      "duration_ms": 6082,
       "id": "coverage.custom_images.prepare.image_config.user",
       "proves": [
         {
@@ -3444,7 +3582,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 19710,
+      "duration_ms": 14552,
       "id": "coverage.custom_images.prepare.dockerfile_context",
       "proves": [
         {
@@ -3509,7 +3647,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 44397,
+      "duration_ms": 11132,
       "id": "coverage.custom_images.prepare.dockerfile_distro",
       "proves": [
         {
@@ -3568,7 +3706,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 117335,
+      "duration_ms": 16439,
       "id": "coverage.custom_images.prepare.dockerfile_distro_context",
       "proves": [
         {
@@ -4000,7 +4138,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 800,
+      "duration_ms": 580,
       "id": "http.buffered.bytes_and_exit_codes",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4026,7 +4164,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 700,
+      "duration_ms": 760,
       "id": "http.buffered.execution_term",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4052,7 +4190,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 700,
+      "duration_ms": 327,
       "id": "http.buffered.group_kill",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4078,7 +4216,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 399,
+      "duration_ms": 1256,
       "id": "http.buffered.observation_versus_execution",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4104,7 +4242,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 600,
+      "duration_ms": 728,
       "id": "http.buffered.background_survives",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4130,7 +4268,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 600,
+      "duration_ms": 295,
       "id": "http.buffered.output_limit",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4228,11 +4366,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2103,
+      "duration_ms": 2386,
       "id": "files.regular_write.usability.v1.exact_bytes",
       "proves": [],
-      "reason": "outcome_unknown",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "files/regular-write-exact-bytes"
       ],
@@ -4243,9 +4380,17 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "stdout": "{\"case\":\"exact_bytes\",\"written_bytes\":2}"
+          },
           "operation": "fixture.regular_write_usability",
-          "reason": "outcome_unknown",
-          "result": "error"
+          "result": "passed"
         }
       ]
     },
@@ -4256,11 +4401,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1800,
+      "duration_ms": 1189,
       "id": "files.regular_write.usability.v1.create_parents",
       "proves": [],
-      "reason": "outcome_unknown",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "files/regular-write-parents"
       ],
@@ -4271,9 +4415,17 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "stdout": "{\"case\":\"create_parents\"}"
+          },
           "operation": "fixture.regular_write_usability",
-          "reason": "outcome_unknown",
-          "result": "error"
+          "result": "passed"
         }
       ]
     },
@@ -4284,7 +4436,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1496,
+      "duration_ms": 1617,
       "id": "files.regular_write.usability.v1.create_access",
       "proves": [],
       "result": "passed",
@@ -4319,11 +4471,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1401,
+      "duration_ms": 2314,
       "id": "files.regular_write.usability.v1.overwrite_access",
       "proves": [],
-      "reason": "outcome_unknown",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "files/regular-write-overwrite-access"
       ],
@@ -4334,9 +4485,17 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "stdout": "{\"case\":\"overwrite_access\"}"
+          },
           "operation": "fixture.regular_write_usability",
-          "reason": "outcome_unknown",
-          "result": "error"
+          "result": "passed"
         }
       ]
     },
@@ -4347,7 +4506,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1199,
+      "duration_ms": 1092,
       "id": "files.regular_write.usability.v1.authority",
       "proves": [],
       "reason": "authorization",
@@ -4375,7 +4534,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1809,
+      "duration_ms": 1712,
       "id": "files.regular_write.usability.v1.executable_effect",
       "proves": [
         {
@@ -4383,8 +4542,7 @@
           "value": "unverified"
         }
       ],
-      "reason": "outcome_unknown",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "facts/files-write-executable-effect"
       ],
@@ -4395,9 +4553,20 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "files_write_executable_effect": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "stdout": "{\"case\":\"executable_effect\",\"executable_after\":true,\"executable_before\":true,\"files_write_executable_effect\":\"unverified\",\"warning\":\"Writing a file does not guarantee it remains executable. Check or explicitly set executable permission before running it as a program.\"}"
+          },
           "operation": "fixture.regular_write_usability",
-          "reason": "outcome_unknown",
-          "result": "error"
+          "result": "passed"
         }
       ]
     },
@@ -4408,11 +4577,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3090,
+      "duration_ms": 3297,
       "id": "files.regular_write.usability.v1.byte_bound",
       "proves": [],
-      "reason": "outcome_unknown",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "files/regular-write-byte-bound"
       ],
@@ -4423,9 +4591,17 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "case": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "stdout": "{\"bound\":16777216,\"case\":\"byte_bound\"}"
+          },
           "operation": "fixture.regular_write_usability",
-          "reason": "outcome_unknown",
-          "result": "error"
+          "result": "passed"
         }
       ]
     },
@@ -4436,7 +4612,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 799,
+      "duration_ms": 782,
       "id": "files.regular_write.usability.v1.outcome",
       "proves": [],
       "result": "passed",
@@ -4471,7 +4647,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 801,
+      "duration_ms": 773,
       "id": "files.regular_write.usability.v1.staging_cleanup",
       "proves": [],
       "reason": "staging_not_applicable",
