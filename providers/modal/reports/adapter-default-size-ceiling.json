@@ -10,11 +10,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-13T18:02:10.503039+00:00",
+  "implementation": "withheld",
   "provider": "modal",
   "revision": "cecad7fc8f995d630ab977946b84806a21ec660e",
   "run_id": "public-5f7596761a3158eef689",
   "sdk_versions": {
-    "modal": "1.6.1"
+    "modal": "1.6.1",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"

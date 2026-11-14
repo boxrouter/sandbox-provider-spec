@@ -1,0 +1,14 @@
+{
+  "chunks": [
+    {
+      "stream": "stdout",
+      "data": "ready\n"
+    }
+  ],
+  "next_cursor": "c-17",
+  "gap": false,
+  "stdout_closed": false,
+  "stderr_closed": false,
+  "state": "running",
+  "exit_code": null
+}

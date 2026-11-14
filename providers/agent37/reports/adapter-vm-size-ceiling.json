@@ -10,11 +10,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-13T05:51:38.514051+00:00",
+  "implementation": "withheld",
   "provider": "agent37",
   "revision": "d6a95d3d5d851a44ada483331358e3ee79494bfb",
   "run_id": "public-a75b5d241ae9e25c0d43",
   "sdk_versions": {
-    "httpx": "0.28.1"
+    "httpx": "0.28.1",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"

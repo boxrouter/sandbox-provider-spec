@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "sleep",
+    "30"
+  ],
+  "cwd": null,
+  "env": {},
+  "stdin": false
+}

@@ -6320,7 +6320,7 @@
     "processes.reattach.false": []
   },
   "format": 3,
-  "report_sha256": "8d83409d86ecff4e4a1c17f6d8fa8b0b4c04fdfce86a5eb3b0412f32936d1687",
+  "report_sha256": "8e8ca158fbd3de3c16fac252050dc2aebf7117fe6fc9fd760e6792eadd2010bb",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",

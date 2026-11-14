@@ -1,0 +1,8 @@
+{
+  "item": "cpu",
+  "quantity": "240",
+  "unit": "vcpu_second",
+  "amount_usd": "0.00336",
+  "start": "2026-11-13T10:00:00Z",
+  "end": "2026-11-13T10:02:00Z"
+}

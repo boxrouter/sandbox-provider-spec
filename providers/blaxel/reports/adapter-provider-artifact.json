@@ -9,11 +9,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-12T21:21:26.968368+00:00",
+  "implementation": "withheld",
   "provider": "blaxel",
   "revision": "61aa3864483df545826461b5d5e76ebe3fedab6e",
   "run_id": "public-dd876cbd7c7eda9af34c",
   "sdk_versions": {
-    "blaxel": "0.4.8"
+    "blaxel": "0.4.8",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "custom_images.provider_artifact"

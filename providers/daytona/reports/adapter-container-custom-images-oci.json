@@ -10,11 +10,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-12T22:00:42.736213+00:00",
+  "implementation": "withheld",
   "provider": "daytona",
   "revision": "113d6c881d2de29caf181771220f55342f4474d8",
   "run_id": "public-a3f3cda1aa41a85e7a2e",
   "sdk_versions": {
-    "daytona": "0.226.1"
+    "daytona": "0.226.1",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "coverage.custom_images.prepare.registry"

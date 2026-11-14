@@ -10,11 +10,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-10-29T09:27:05.072463+00:00",
+  "implementation": "withheld",
   "provider": "modal",
   "revision": "31c9aaf6496838a4abcfd435d96e8bcef3620386",
   "run_id": "public-88e35ce0eab54cdcaf52",
   "sdk_versions": {
-    "modal": "1.6.1"
+    "modal": "1.6.1",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "previews.listed_ports"

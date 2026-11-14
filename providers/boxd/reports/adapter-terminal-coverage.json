@@ -9,11 +9,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-13T13:19:28.832526+00:00",
+  "implementation": "withheld",
   "provider": "boxd",
   "revision": "0d0eda5109e4144de4d88c218fdb0fdb89b0512b",
   "run_id": "public-4aee0f2e20d21684e52c",
   "sdk_versions": {
-    "boxd": "0.3.0"
+    "boxd": "0.3.0",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "coverage.terminal.reattach"

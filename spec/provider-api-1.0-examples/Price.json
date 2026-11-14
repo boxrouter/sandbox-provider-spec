@@ -1,0 +1,23 @@
+{
+  "item": "machine",
+  "price_usd": "0.0000312",
+  "unit": "machine_second",
+  "basis": "fixed",
+  "states": [
+    "running"
+  ],
+  "increment_seconds": 1,
+  "minimum_seconds": 60,
+  "minimum_quantity": "1",
+  "allowance": {
+    "quantity": "100",
+    "period": "month",
+    "scope": "account"
+  },
+  "size": {
+    "cpu": 2,
+    "memory_mib": 2048
+  },
+  "region": "example:us-east",
+  "variant": "preemptible"
+}

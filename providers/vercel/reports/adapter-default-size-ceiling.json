@@ -9,11 +9,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-05T03:21:09.356724+00:00",
+  "implementation": "withheld",
   "provider": "vercel",
   "revision": "fc3e7088b1875b8b95352b4cb65d364a7eab46aa",
   "run_id": "public-ea75681f63c17afadc6b",
   "sdk_versions": {
-    "vercel-sandbox": "0.9.0"
+    "vercel-sandbox": "0.9.0",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"

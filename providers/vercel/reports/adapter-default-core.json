@@ -25,11 +25,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-10-22T10:29:21.901567+00:00",
+  "implementation": "withheld",
   "provider": "vercel",
   "revision": "381d2d4a3f9c1779619e7884bb7630904521ba86",
   "run_id": "public-7c0ff1b4086c28b216ff",
   "sdk_versions": {
-    "vercel-sandbox": "0.9.0"
+    "vercel-sandbox": "0.9.0",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "processes.input.true",

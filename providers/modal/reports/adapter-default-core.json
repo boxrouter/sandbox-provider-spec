@@ -13,11 +13,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-13T18:03:49.141323+00:00",
+  "implementation": "withheld",
   "provider": "modal",
   "revision": "cecad7fc8f995d630ab977946b84806a21ec660e",
   "run_id": "public-56aece8e76af4f375929",
   "sdk_versions": {
-    "modal": "1.6.1"
+    "modal": "1.6.1",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "network_lockdown.allowlist.names",

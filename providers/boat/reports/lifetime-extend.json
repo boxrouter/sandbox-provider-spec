@@ -9,11 +9,13 @@
     "version": "withheld"
   },
   "finished_at": "2026-11-07T12:14:12.249776+00:00",
+  "implementation": "withheld",
   "provider": "boat",
   "revision": "573fc124a27609df626510c1bcbc443507ff6673",
   "run_id": "public-c2d457a6be4837a52e26",
   "sdk_versions": {
-    "boat-sdk": "1.13.0"
+    "boat-sdk": "1.13.0",
+    "withheld": "withheld"
   },
   "selected_tests": [
     "facts.extendable_lifetime"

@@ -1,0 +1,17 @@
+{
+  "sandbox_class": "default",
+  "resources": {
+    "cpu_min": 2,
+    "memory_min_mib": 2048,
+    "region": "example:us-east"
+  },
+  "requirements": {},
+  "lifetime_seconds": 600,
+  "at_end": "destroyed",
+  "env": {
+    "LANG": "C.UTF-8"
+  },
+  "labels": {
+    "job": "build-42"
+  }
+}

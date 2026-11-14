@@ -1,0 +1,25 @@
+{
+  "sandbox_id": "sbx-17",
+  "status": "final",
+  "total_usd": "0.00390",
+  "source": "calculated",
+  "lines": [
+    {
+      "item": "cpu",
+      "quantity": "240",
+      "unit": "vcpu_second",
+      "amount_usd": "0.00336",
+      "start": "2026-11-13T10:00:00Z",
+      "end": "2026-11-13T10:02:00Z"
+    },
+    {
+      "item": "memory",
+      "quantity": "120",
+      "unit": "gib_second",
+      "amount_usd": "0.00054",
+      "start": "2026-11-13T10:00:00Z",
+      "end": "2026-11-13T10:02:00Z"
+    }
+  ],
+  "as_of": "2026-11-13T10:05:00Z"
+}

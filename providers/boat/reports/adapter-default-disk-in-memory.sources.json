@@ -343,7 +343,7 @@
     ]
   },
   "format": 1,
-  "report_sha256": "e139681074dbc3d3914de4465b315bc2b4434ea88c4992bbef26dd85809feea2",
+  "report_sha256": "de44f2a5550dc0c4d77f1c32865735fcb7f725ada425339be416acafdca80582",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
