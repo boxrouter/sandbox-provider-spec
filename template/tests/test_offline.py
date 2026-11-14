@@ -10,9 +10,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 import threading
 import uuid
 from datetime import UTC, datetime
+from importlib import import_module
+from importlib.resources import files
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -226,6 +230,42 @@ def test_discovery_validates_against_the_openapi_schema() -> None:
     data = to_json(doc)  # raises unless it fits the Discovery schema
     assert data["provider"]["id"] == "example"
     assert data["classes"][0]["prices"][0]["basis"] == "allocated"
+
+
+def test_discovery_uses_identity_from_renamed_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest = (
+        files("sps_provider_example").joinpath("sps-provider.yaml").read_text(encoding="utf-8")
+    )
+    assert manifest.count("provider_id: example\n") == 1
+    assert manifest.count("name: Example Cloud\n") == 1
+    manifest = manifest.replace("provider_id: example\n", "provider_id: example-renamed\n", 1)
+    manifest = manifest.replace("name: Example Cloud\n", "name: Renamed Example Cloud\n", 1)
+
+    package_name = f"sps_provider_renamed_{uuid.uuid4().hex}"
+    package = tmp_path / package_name
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from sps_provider_example import ExampleProvider as _ExampleProvider\n\n"
+        "class RenamedProvider(_ExampleProvider):\n"
+        "    pass\n",
+        encoding="utf-8",
+    )
+    (package / "sps-provider.yaml").write_text(manifest, encoding="utf-8")
+    monkeypatch.syspath_prepend(str(tmp_path))
+
+    try:
+        renamed_package = import_module(package_name)
+        provider = renamed_package.RenamedProvider(
+            {"api_key": "dev", "endpoint": "http://example.test"},
+            transport=httpx.MockTransport(FakeCloud().handler),
+        )
+        discovery = call(provider, "discovery")
+        assert discovery.provider.id == "example-renamed"
+        assert discovery.provider.name == "Renamed Example Cloud"
+    finally:
+        sys.modules.pop(package_name, None)
 
 
 def test_create_translates_to_a_machine_and_returns_a_sandbox() -> None:

@@ -161,7 +161,7 @@ class ExampleProvider(Provider):
     async def discovery(self) -> Discovery:
         # No Example Cloud call returns these facts; listing machines proves the key.
         await self._machines(limit=1)
-        return build_discovery()
+        return build_discovery(provider_id=self.provider_id, provider_name=self.name)
 
     async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
         # GET /machines?tag=sps.idem:<key> finds a replay, then POST /machines.

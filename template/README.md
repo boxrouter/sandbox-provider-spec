@@ -9,9 +9,11 @@ API that runs each sandbox as a local Docker container. The API is deliberately 
 shaped like the standard, so `src/sps_provider_example/__init__.py` shows a real
 translation: a comment above each method names the Example Cloud call it maps.
 
-To ship a real provider, copy this directory, rename the package and provider id in
-`pyproject.toml` and `src/<package>/sps-provider.yaml`, and replace each Example Cloud
-call with your own API's.
+To ship a real provider, copy this directory and rename its Python package and distribution
+in `pyproject.toml`. Set the provider entry-point key there and `provider_id` in
+`src/<package>/sps-provider.yaml` to the same id, and set the display name in that manifest.
+Discovery reads its provider id and name from the manifest. Replace each Example Cloud call
+with your own API's.
 
 ## Run it
 

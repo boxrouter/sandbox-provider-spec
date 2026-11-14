@@ -41,7 +41,7 @@ LIMITS = Limits(
 )
 
 
-def build_discovery() -> Discovery:
+def build_discovery(provider_id: str, provider_name: str) -> Discovery:
     klass = SandboxClass(
         id=CLASS,
         name="Linux container",
@@ -72,7 +72,7 @@ def build_discovery() -> Discovery:
     )
     return Discovery(
         spec_version="1.0",
-        provider=ProviderInfo("example", "Example Cloud", "https://docs.example.test"),
+        provider=ProviderInfo(provider_id, provider_name, "https://docs.example.test"),
         limits=LIMITS,
         classes=(klass,),
     )
