@@ -833,8 +833,10 @@ components:
         - gib
         - gb
         - each
+        - month
       description: >-
-        The unit as the provider states it. A month is 730 hours. GiB is 2^30 bytes and GB is 10^9 bytes; a provider that
+        The unit as the provider states it. A month is 730 hours. `each` is one item, once; `month` is one item per month
+        (a recurring fee, for example the `feature` item). GiB is 2^30 bytes and GB is 10^9 bytes; a provider that
         says "GB" but bills binary gigabytes writes `gib`. A `core` is a physical core.
     EmptyObject:
       type: object

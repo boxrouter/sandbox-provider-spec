@@ -378,6 +378,14 @@ def test_every_added_price_item_validates_and_round_trips(item: str, unit: str, 
     assert item in typing.get_args(v1_types.PriceItem)
 
 
+def test_a_feature_item_priced_per_month_validates_and_round_trips() -> None:
+    data = {"item": "feature", "price_usd": "20", "unit": "month", "basis": "count"}
+    price = from_json(v1_types.Price, data)
+    assert (price.item, price.unit) == ("feature", "month")
+    assert to_json(price) == data
+    assert "month" in OPENAPI["components"]["schemas"]["PriceUnit"]["enum"]
+
+
 def test_price_item_enum_equals_the_python_literal() -> None:
     enum = OPENAPI["components"]["schemas"]["PriceItem"]["enum"]
     assert set(enum) == set(typing.get_args(v1_types.PriceItem))
