@@ -690,7 +690,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "bcbb0d697f2fb1fb1becb1c750bc644a0b235482bed2dada78ca73eebaa5c5f2",
+  "report_sha256": "116a8571de410e3fedb0eef3cfe2ea307217de7c143477a98e6fc076df4ea757",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
@@ -1103,7 +1103,7 @@
     "boxrouter_superserve/provider.py::SuperserveProvider.standard_image": "sha256:1becb66eb21594510b9e7ad5866ebae7d7b8572dd6f597797dd2b6712ed9ba1f",
     "boxrouter_superserve/provider.py::_labels": "sha256:22cb77a3bb196bf9b2d76fba5ede399c62d00cc1bf78bbd72d7dba9886a1afcd",
     "boxrouter_superserve/provider.py::_metadata": "sha256:24671ca46a28a8129ba15d8ed417ea448eca868c1dedf7d6ec5f6b90bb2d2a5f",
-    "boxrouter_superserve/provider_reports.py::": "sha256:37d1805aa57a000253836f430472916e8717fed2d7c35c5f3f75a6b57e16ccba",
+    "boxrouter_superserve/provider_reports.py::": "sha256:415a81f6c744299733616ed16bcc50863732e0fb0b9968c0819ab9ac80012b23",
     "boxrouter_superserve/provider_reports.py::refusal": "sha256:46e07570826025b1e4a3d9e9b7fec509225e59e698e822b0ad30bdad01e703aa",
     "boxrouter_superserve/sandbox.py::": "sha256:d2a5421e404ff5a95f0bf23b155daba289cfbe12ad037bebe0acd4f96212dda0",
     "boxrouter_superserve/sandbox.py::AsyncSuperserveProvider._byte_run": "sha256:5e006a0768577d62ca8f82e303934bc4f635b53574e86d09e55ad3b11ff25b49",

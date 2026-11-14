@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T05:01:05.713521+00:00",
+  "finished_at": "2026-11-14T06:25:12.874694+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "9f357ae6dcf1c6c6c90e45bb4e93871dc90cd4b8",
-  "run_id": "public-baf2c85b924da941f82e",
+  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
+  "run_id": "public-4de89b45d07caf292570",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -21,7 +21,7 @@
     "coverage.terminal.reattach"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T05:01:03.012957+00:00",
+  "started_at": "2026-11-14T06:25:10.125244+00:00",
   "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
@@ -35,7 +35,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2698,
+      "duration_ms": 2747,
       "id": "coverage.terminal.reattach",
       "proves": [
         {

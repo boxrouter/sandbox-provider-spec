@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T03:30:31.329177+00:00",
+  "finished_at": "2026-11-14T06:22:00.211477+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "7a0c8ce07c67ff72d012f754434fd2b9f938786f",
-  "run_id": "public-dc63702ee8b66e28bc4d",
+  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
+  "run_id": "public-236ae81e935a828bee8b",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -23,8 +23,8 @@
     "idle_shutdown.custom_idle_time.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T03:27:00.235236+00:00",
-  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "started_at": "2026-11-14T06:18:29.101575+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
       "cleanup": [
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 90656,
+      "duration_ms": 90636,
       "id": "idle_shutdown.on_idle.destroyed",
       "proves": [
         {
@@ -95,7 +95,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 120436,
+      "duration_ms": 120470,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {

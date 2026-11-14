@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T03:11:37.621734+00:00",
+  "finished_at": "2026-11-14T06:16:37.747073+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "7a0c8ce07c67ff72d012f754434fd2b9f938786f",
-  "run_id": "public-fc215bd222cc1d1419b0",
+  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
+  "run_id": "public-c4b3700453b7bb422b66",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "pause_resume.files_and_memory"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T03:11:35.999274+00:00",
-  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "started_at": "2026-11-14T06:16:36.157927+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
       "cleanup": [
@@ -35,7 +35,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1619,
+      "duration_ms": 1586,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
