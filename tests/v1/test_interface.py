@@ -85,6 +85,7 @@ def test_sps_error_str_and_validation() -> None:
     assert str(error) == "not_found: No sandbox sbx-17"
     assert (error.http_status, error.fault, error.outcome) == (404, "caller", "failed")
     assert SpsError("timeout", "slow", outcome="unknown", retry_after_seconds=3).fault == "provider"
+    assert SpsError("invalid_request", "short upload", outcome="unknown").outcome == "unknown"
     with pytest.raises(ValueError, match="caller fault"):
         SpsError("not_found", "x", outcome="unknown")
     with pytest.raises(ValueError, match="unknown error code"):

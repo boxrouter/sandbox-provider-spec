@@ -54,7 +54,7 @@ A `destroy` sent with an old id can therefore never end a newer sandbox.
 letter or a digit (a UUID fits).
 
 - Within 24 hours, a repeated `create` with the same key **MUST NOT** make a second sandbox: with <!-- rule: provider-api/idempotent-create -->
-  the same body it returns the sandbox that the first create made, with status 200; with a
+  the same body it returns the sandbox that the first create made, with status 201; with a
   different body it is refused with `conflict`; while the first create is still in progress it is
   refused with `conflict` and `retry_after_seconds`.
 
@@ -170,7 +170,9 @@ consumer uses the destroy result's cost when it is present, and otherwise reads 
 An error has an HTTP status and a body with `code`, `message`, `outcome` and
 `retry_after_seconds`. `message` is for people: at most 1024 characters, with no credentials and
 no response bodies from other systems. `outcome` is `failed` when the operation had no effect and
-`unknown` when it may have taken effect. Caller-fault codes always have outcome `failed`.
+`unknown` when it may have taken effect. Caller-fault codes have outcome `failed`, except
+`invalid_request` when a streamed file upload is shorter or longer than its declared size; that
+outcome is `unknown` because some or all bytes may have been written.
 `retry_after_seconds` is set when retrying later can work, and the same value goes in a
 `Retry-After` header. The `code` is authoritative; the HTTP status only mirrors it.
 

@@ -298,7 +298,7 @@ class _Request:
                 return
 
     def _fail(self, message: str) -> None:
-        self.stream_error = SpsError("invalid_request", message)
+        self.stream_error = SpsError("invalid_request", message, outcome="unknown")
         raise self.stream_error
 
 

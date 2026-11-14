@@ -417,6 +417,22 @@ def test_arguments_arrive_as_typed_values() -> None:
     assert (request.labels, request.lifetime_seconds, create[1][1]) == ({"a": "b"}, 60, KEY)
 
 
+def test_a_repeated_idempotent_create_still_returns_created() -> None:
+    app = create_app(Recorder)
+    request = j({"labels": {"team": "test"}, "lifetime_seconds": 60})
+
+    first = asyncio.run(
+        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": KEY})
+    )
+    repeated = asyncio.run(
+        call(app, "POST", "/v1/sandboxes", body=request, headers={"Idempotency-Key": KEY})
+    )
+
+    assert (first.status, repeated.status) == (201, 201)
+    assert first.json() == repeated.json()
+    assert [name for name, _ in Recorder.calls] == ["create", "create"]
+
+
 def test_defaults_for_list_and_process_output() -> None:
     app = create_app(Recorder)
     asyncio.run(call(app, "GET", "/v1/sandboxes"))
@@ -697,9 +713,7 @@ def test_a_256_mib_upload_reaches_the_provider_in_chunks() -> None:
 
 
 @pytest.mark.parametrize(("sent", "declared"), [(10, 20), (30, 20)])
-def test_an_upload_that_is_not_content_length_bytes_is_invalid_request(
-    sent: int, declared: int
-) -> None:
+def test_an_upload_with_a_size_mismatch_has_unknown_outcome(sent: int, declared: int) -> None:
     app = create_app(Recorder)
     reply = asyncio.run(
         call(
@@ -711,7 +725,8 @@ def test_an_upload_that_is_not_content_length_bytes_is_invalid_request(
             length=declared,
         )
     )
-    assert (reply.status, reply.json()["error"]["code"]) == (400, "invalid_request")
+    error = reply.json()["error"]
+    assert (reply.status, error["code"], error["outcome"]) == (400, "invalid_request", "unknown")
 
 
 def test_a_disconnect_during_an_upload_is_invalid_request() -> None:
@@ -725,7 +740,7 @@ def test_a_disconnect_during_an_upload_is_invalid_request() -> None:
     reply = asyncio.run(
         call(app, "PUT", "/v1/sandboxes/s/files", body=short(), query="path=/a", length=20)
     )
-    assert reply.status == 400
+    assert (reply.status, reply.json()["error"]["outcome"]) == (400, "unknown")
 
 
 def test_a_file_read_streams_with_a_declared_length() -> None:

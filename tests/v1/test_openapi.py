@@ -138,7 +138,8 @@ def test_paths_carry_the_version_and_no_binding_prefix() -> None:
 
 def test_create_takes_the_idempotency_key() -> None:
     create = DOCUMENT["paths"]["/v1/sandboxes"]["post"]
-    assert {"201", "200"} <= set(create["responses"])
+    assert "201" in create["responses"]
+    assert "200" not in create["responses"]
     ref = next(p["$ref"] for p in create["parameters"] if "$ref" in p)
     parameter = DOCUMENT["components"]["parameters"][ref.rsplit("/", 1)[1]]
     assert parameter["name"] == "Idempotency-Key"

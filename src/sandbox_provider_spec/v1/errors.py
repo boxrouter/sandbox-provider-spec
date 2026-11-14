@@ -50,7 +50,9 @@ class SpsError(Exception):
     """An operation failed. `str()` is `<code>: <message>`.
 
     `outcome` says whether the operation had any effect: "failed" means none, "unknown" means
-    that it may have taken effect. A caller-fault code always has outcome "failed".
+    that it may have taken effect. Caller-fault codes have outcome "failed", except
+    `invalid_request`, which may be "unknown" when a streamed file upload's size differs
+    from the declared size.
     """
 
     code: ErrorCode
@@ -70,7 +72,7 @@ class SpsError(Exception):
             raise ValueError(f"unknown error code: {code!r}")
         if outcome not in ("failed", "unknown"):
             raise ValueError(f"unknown outcome: {outcome!r}")
-        if outcome == "unknown" and ERROR_TABLE[code][1] == "caller":
+        if outcome == "unknown" and ERROR_TABLE[code][1] == "caller" and code != "invalid_request":
             raise ValueError(f"{code} is a caller fault, so its outcome is always 'failed'")
         if retry_after_seconds is not None and retry_after_seconds < 0:
             raise ValueError("retry_after_seconds cannot be negative")
