@@ -68,6 +68,7 @@ path = [
   "spec/registries/regions.json",
   "spec/report-schema.json",
   "spec/request-schema.json",
+  "spec/sps-provider.schema.json",
   "spec/spec.md",
   "spec/untested.yaml",
   "spec/vocabulary.md",

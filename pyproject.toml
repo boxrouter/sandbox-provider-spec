@@ -36,6 +36,10 @@ blaxel = ["blaxel==0.4.8"]
 browser = [
     "playwright==1.63.0",
 ]
+http = [
+    "httpx==0.28.1",
+    "uvicorn==0.52.4",
+]
 
 [dependency-groups]
 dev = [

@@ -808,10 +808,11 @@ components:
       maximum: 65535
       description: A TCP port inside the sandbox.
     PriceItem:
-      enum: [cpu, memory, disk, gpu, machine, create, egress]
+      enum: [cpu, memory, disk, gpu, machine, create, egress, snapshot, volume, start, request, feature]
       description: >-
-        What is charged: CPU, memory, disk, GPUs, a whole fixed-size machine, each sandbox created, or traffic out of the
-        sandbox.
+        What is charged: CPU, memory, disk, GPUs, a whole fixed-size machine, each sandbox created, traffic out of the
+        sandbox, stored snapshots, persistent volumes, each start or resume, API requests, or a recurring fee for an
+        enabled feature.
     PriceUnit:
       enum:
         - vcpu_second
