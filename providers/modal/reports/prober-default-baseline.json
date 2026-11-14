@@ -1,0 +1,388 @@
+{
+  "baseline": "error",
+  "check_digests": {
+    "baseline.create_env": "sha256:732ca08dff7109705648ffeb79f345d44a3836419f3a351e0e5f0fd11eb1aa6a",
+    "baseline.destroy": "sha256:291b0e85f1ecc602f13e559e59d588538953397af00091f2097c6332861295ae",
+    "baseline.environment_bash": "sha256:e9fd0e4103294d914eb51a5190ac6bde7608ebc2565b36ecbdd51dd01747fafd",
+    "baseline.environment_python3": "sha256:090f4743d48b68937c20d0588873f739f57b42f412334cfb296f1c3a05879928",
+    "baseline.files_read": "sha256:4b4d2ca2c8c7bb36114429286e758c99d5d438dd5e32e6b2f6f017587edff919",
+    "baseline.files_write": "sha256:a409f4e01124617565b2ef538d8ad4592d37357492c4b5f36c6865c8b997ba86",
+    "baseline.files_write_binary": "sha256:911a243cceec7a2022aefc3f7d6706dbd638ee58c03b5abb0160036b70f0e945",
+    "baseline.get": "sha256:6d28b61d99d9eb3b37f7e36734d78e70387fbf725547f95208079f591da2228a",
+    "baseline.list": "sha256:821591de3e549962cb80ce7222017762b2947b7d2fd2e93f09ef848c4ba418d6",
+    "baseline.no_metadata": "sha256:a2a51f603b67535413b013ab9b5e211628f63d8583b20939a1ab83a7633ccf86",
+    "baseline.outbound_network": "sha256:38ca32113212064171208b0711dcf1a48f05cd09706d9ac9be634642502f5d17",
+    "baseline.process_eof_is_not_exit": "sha256:c86a1cf29f480f158dd93e17efe7f95c128ec4e7e5f0e059a9281cf097fdd79c",
+    "baseline.process_stream": "sha256:d403ea58a4a6ba5b5f4a820f247d6a5b3c7309a6468a4221a72b41d8a3f5a687",
+    "baseline.run_cwd": "sha256:8af0928836e4bacfcc8ab15a5597179e06ebc1e72314e5ab3dc2f46543c1eb36",
+    "baseline.run_env": "sha256:bf255525d7aced81bf7776684b174facc7731e9166fca753ef4bb6771c3216cb",
+    "baseline.run_exit_code": "sha256:d373899e85380038755696eb96f28d524fb6936bb4592ae204e17439e401edc0",
+    "baseline.run_output": "sha256:ab77b16e6b548aeed82fdbc35aa5208f5f4a9c688469602bccd7d5b119288f1e",
+    "baseline.run_separate_streams": "sha256:70ecbeeab5010e0a8ab676b2e75518117c626ef025270fb9123516809ab50580"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-14T07:31:12.335958+00:00",
+  "implementation": "withheld",
+  "provider": "modal",
+  "revision": "9634a2c73bfa6c119c7b65b77b338e8aa24b743e",
+  "run_id": "public-7b610e083b4c7c601ee2",
+  "sdk_versions": {
+    "modal": "1.6.1",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "baseline.create_env",
+    "baseline.get",
+    "baseline.list",
+    "baseline.destroy",
+    "baseline.run_output",
+    "baseline.run_exit_code",
+    "baseline.run_separate_streams",
+    "baseline.run_cwd",
+    "baseline.run_env",
+    "baseline.files_write",
+    "baseline.files_read",
+    "baseline.process_stream",
+    "baseline.environment_bash",
+    "baseline.environment_python3",
+    "baseline.outbound_network",
+    "baseline.process_eof_is_not_exit",
+    "baseline.no_metadata",
+    "baseline.files_write_binary"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-14T07:31:11.913231+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "tests": [
+    {
+      "cleanup": [],
+      "duration_ms": 393,
+      "id": "baseline.create_env",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.get",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.list",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.destroy",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.run_output",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "baseline.run_exit_code",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "baseline.run_separate_streams",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "baseline.run_cwd",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "baseline.run_env",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "baseline.files_write",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.files_read",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.process_stream",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/process-output"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.environment_bash",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.environment_python3",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "baseline.outbound_network",
+      "proves": [],
+      "reason": "proof_fixture_invalid",
+      "result": "not_run",
+      "rules": [
+        "baseline/outbound-network"
+      ],
+      "steps": [
+        {
+          "operation": "probe.http",
+          "reason": "proof_fixture_invalid",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.process_eof_is_not_exit",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/process-eof-not-exit",
+        "provider-api/process-eof-not-exit"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.no_metadata",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/no-metadata"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "baseline.files_write_binary",
+      "proves": [],
+      "reason": "capability_unavailable",
+      "result": "error",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "capability_unavailable",
+          "result": "error"
+        }
+      ]
+    }
+  ]
+}
