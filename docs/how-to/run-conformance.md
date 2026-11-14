@@ -7,8 +7,7 @@ and may charge for them. Docker Engine needs a running engine and no provider ac
 Use a source checkout, [uv](https://docs.astral.sh/uv/), and the SDK extra for the chosen
 driver. Read the [fixture tables](../../spec/conformance.md#running-the-tests-against-a-provider)
 and [driver notes](../../spec/conformance.md#driver-notes) before running either suite.
-Missing fixtures yield `not_run`, which is not a pass. An HTTP provider uses
-[the HTTP suite command](run-http-conformance.md) instead of the native CLI below.
+Missing fixtures yield `not_run`, which is not a pass.
 
 For Docker, first check `docker info`. Choose an HTTPS endpoint that both the runner and
 the sandbox can reach directly. `https://example.com/` is an illustration, not a tested

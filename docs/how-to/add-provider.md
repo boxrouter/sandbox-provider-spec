@@ -3,9 +3,8 @@
 You can begin with provider documentation and a source checkout; an account is needed
 only when you run tests against the provider. Keep facts you cannot establish unknown.
 
-This page adds a native SDK driver to this package. A provider that runs its own endpoint
-of the [HTTP binding](../../spec/binding-http.md) needs no driver here: follow the
-[provider onboarding kit](provider-kit.md) instead.
+This page adds a native SDK driver to this package. A provider that ships an adapter needs
+no driver here: follow the [provider onboarding kit](provider-kit.md) instead.
 
 1. **Inspect the SDK and vocabulary.** Find the provider behavior your workload depends
    on in the [vocabulary](../../spec/vocabulary.md). Discuss a missing word through a
