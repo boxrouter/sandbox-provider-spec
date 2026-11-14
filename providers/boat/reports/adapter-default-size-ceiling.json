@@ -1,18 +1,18 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.size_is_ceiling.true": "sha256:740552c869dd024cd8e386854635368dbfa227addda7c14ccd5f0e954e1b233a"
+    "coverage.facts.size_is_ceiling.true": "sha256:00c9ea0e0b8b90d3dfde480a064419d657b3018bfcf36afe1e9fc7114049347f"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-05T10:44:08.196928+00:00",
+  "finished_at": "2026-11-14T09:39:07.246469+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "dddc8b82e40e466c31183dad87d0dbe3ecbe0ad8",
-  "run_id": "public-1fe19ae071ada5197907",
+  "revision": "8b1998df24091d64acd19fcdf037be867f16b063",
+  "run_id": "public-ae66815d5e4a76c84b89",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-05T10:43:54.365517+00:00",
-  "suite_digest": "sha256:7d6d80bccdccf3afeae0e2d8ba47941a200994c7dd3930df3df89e849fb9c840",
+  "started_at": "2026-11-14T09:38:56.616115+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
       "cleanup": [
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 13830,
+      "duration_ms": 10629,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -51,7 +51,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.011, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.00275, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 3.385, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 0.84625, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }

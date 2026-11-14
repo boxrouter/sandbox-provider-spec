@@ -1,18 +1,18 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "lifetime_timer.at_end.destroyed": "sha256:c74763497fdc4d8cebb5c8860a11f353093b92be1a5ffc1d0b092f0298bfdadf"
+    "lifetime_timer.at_end.destroyed": "sha256:39d9cf8723c58607f4f542ba9b2890b7a72a34e9d432bb347c4097435c17672f"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-09T01:54:07.761922+00:00",
+  "finished_at": "2026-11-14T09:12:03.838687+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "cc846c10aa15cb17699b57b79da3e3adb1f82c20",
-  "run_id": "public-626a48a93738bfbf5d82",
+  "revision": "8b1998df24091d64acd19fcdf037be867f16b063",
+  "run_id": "public-bb5307a7074b6cdf9234",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "lifetime_timer.at_end.destroyed"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-09T01:48:50.397037+00:00",
-  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "started_at": "2026-11-14T09:06:52.784161+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
       "cleanup": [
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 317363,
+      "duration_ms": 311053,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -45,7 +45,8 @@
       ],
       "result": "passed",
       "rules": [
-        "facts/lifetime-timer"
+        "facts/lifetime-timer",
+        "provider-api/lifetime-enforced"
       ],
       "steps": [
         {
