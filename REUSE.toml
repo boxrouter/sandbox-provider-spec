@@ -63,6 +63,7 @@ path = [
   "spec/provider-api-1.0-examples/**",
   "spec/provider-api-1.0.openapi.yaml",
   "spec/matching.md",
+  "spec/provider-api.md",
   "spec/registries/gpu-models.json",
   "spec/registries/regions.json",
   "spec/report-schema.json",

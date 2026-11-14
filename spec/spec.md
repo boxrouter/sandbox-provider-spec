@@ -52,10 +52,11 @@ written for one provider would break on another. It has four parts:
 It serves developers choosing a provider, providers stating what they offer, and tools
 that drive many providers, such as routers, agent frameworks and SDKs.
 
-Price, speed and reliability are not declared. They change from day to day, and whoever
-chooses between providers measures and ranks them. The specification defines no
-programming interface either: each provider's own SDK remains the way to drive its
-sandboxes.
+Prices and the cost of each sandbox are part of the [provider API](provider-api.md), which
+a provider publishes in its discovery and reports per sandbox. Speed and reliability are not
+declared. They change from day to day, and whoever chooses between providers measures and
+ranks them. This specification defines no programming interface: the provider API is a
+separate contract, and each provider's own SDK remains a way to drive its sandboxes.
 
 ## 2. Conventions
 
