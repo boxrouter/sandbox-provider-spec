@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T01:47:54.423698+00:00",
+  "finished_at": "2026-11-14T07:19:10.693367+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "2a4526f08548150e5c09e51e83748f0cdf8114b2",
-  "run_id": "public-e0d5735cadc8831e5a77",
+  "revision": "18bc78f28bd1633a64f87ec176d20384fe27b8b0",
+  "run_id": "public-cdc7e7f91309b96afb82",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T01:47:47.907361+00:00",
-  "suite_digest": "sha256:1d410dfb6f824f7f283fb959e2ece62cf52ffadcd2a3620c75f0924f5aae3fbd",
+  "started_at": "2026-11-14T07:19:07.153330+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
       "cleanup": [
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6512,
+      "duration_ms": 3538,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -51,7 +51,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"200000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/8s1oysjp0s\\n6:memory:/8s1oysjp0s\\n5:job:/8s1oysjp0s\\n4:devices:/8s1oysjp0s\\n3:cpuset:/8s1oysjp0s\\n2:cpuacct:/8s1oysjp0s\\n1:cpu:/8s1oysjp0s\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"200000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/j2qbfa004p\\n6:memory:/j2qbfa004p\\n5:job:/j2qbfa004p\\n4:devices:/j2qbfa004p\\n3:cpuset:/j2qbfa004p\\n2:cpuacct:/j2qbfa004p\\n1:cpu:/j2qbfa004p\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
