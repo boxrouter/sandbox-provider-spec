@@ -13,11 +13,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T06:18:44.768704+00:00",
+  "finished_at": "2026-11-14T20:22:13.078278+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "1f09512c914368184b3e5c6d798c8fae64899fa1",
-  "run_id": "public-8907dc1ede18860d1373",
+  "revision": "749297d024f4942b1ba0bf4f7278294482bf6bad",
+  "run_id": "public-6573daa0587746ea14b2",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -31,7 +31,7 @@
     "previews.link_lifetime_seconds.public"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T06:16:35.880836+00:00",
+  "started_at": "2026-11-14T20:20:05.104963+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -49,7 +49,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1620,
+      "duration_ms": 1238,
       "id": "previews.access.public",
       "proves": [
         {
@@ -117,7 +117,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1283,
+      "duration_ms": 1207,
       "id": "previews.credential.header",
       "proves": [
         {
@@ -202,7 +202,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1342,
+      "duration_ms": 1263,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -312,7 +312,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1698,
+      "duration_ms": 1585,
       "id": "previews.credential_scope",
       "proves": [],
       "result": "passed",
@@ -408,7 +408,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1560,
+      "duration_ms": 1333,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -525,7 +525,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 121370,
+      "duration_ms": 121344,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {

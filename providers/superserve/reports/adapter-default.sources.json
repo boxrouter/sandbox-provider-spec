@@ -7049,7 +7049,7 @@
     "processes.reattach.false": []
   },
   "format": 3,
-  "report_sha256": "d1bb128d53552b6ee0ed1e7b6deee5d64040c7ff2ad576e3f14a1001279604eb",
+  "report_sha256": "4fe7bc33b316513225c6850babaecfdfd33328d35144ecb8001380ca7716e4b3",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -7062,7 +7062,7 @@
     "boxrouter_adapter_kit/fixture_lifetime.py::require_request_lifetime": "sha256:efe7f5084e371dcd8c740c578a6e3591280d3a799bc567644c48010ecb518542",
     "boxrouter_adapter_kit/implementation.py::": "sha256:d53aa03363fd690b658c17813704a83b2953b0d06002c62c639268ce0227048c",
     "boxrouter_adapter_kit/implementation.py::implementation_path": "sha256:5c8713088cc9ea2c1ba5bf930c8f48d4c06433ddb764646bec9ddf0c63312576",
-    "boxrouter_adapter_kit/spec_driver.py::": "sha256:7edbdb971dd13d9f195b897dc0955ad06cf22af24babeb98e472070e28073335",
+    "boxrouter_adapter_kit/spec_driver.py::": "sha256:e5ab05d2cb2c005dae80872561f5eba3c76df0948847dcd8699ea1fc3c1c067f",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._absent": "sha256:1482fa9417ea6a0cb33ee5287d7cb8c4569caa2ea13be6fbca8445ebf37c6b01",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._absent.gone": "sha256:2aaec48f1c49fa2bb5264aa4d3e39320c180777340237f594acc94b7dfdf0f77",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._add_custom_image_requirement": "sha256:c82cbb905d75e086680d7b733d9cc0561eb5342f6eea865c60557c6d60f56f8a",
@@ -7080,7 +7080,7 @@
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.chosen_variants": "sha256:3fc895b7bfd901a2e42cb15fdd3fa16c6f2404a1e39fb9228650bbf6cec49dcc",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.create": "sha256:765b083fa71cbf71481f7fdd7e3d6572b7e3fa418ac7c1684c9385d477c56330",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.create_options": "sha256:13b5e5fbcf2f14137cdc790c087511a4e382524c106780a36d60736773b98a96",
-    "boxrouter_adapter_kit/spec_driver.py::CoreDriver.create_request": "sha256:92b9e35356896690c2fbc3b184bda4a9e54c2107ca6e8d3436a40ee5a9c8eab3",
+    "boxrouter_adapter_kit/spec_driver.py::CoreDriver.create_request": "sha256:c15a4c82719fe2cdaa705edf2b789aa90ae9f1d42b95a1ffd87c684956db7448",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.destroy": "sha256:26540deaee4a73c86367caa75ff182097ccf100777a6282f010c4ef4c0024b7e",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.files_exists": "sha256:772c2879774c8d8d29d61b380ea89c8cca486f63b69872f8540e90ca9694905d",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver.files_read_bytes": "sha256:b10c9fdc655fd725fec052ab90f3811101fb3e163af6d06e1740790c4f384070",
