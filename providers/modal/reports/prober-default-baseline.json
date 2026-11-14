@@ -1,5 +1,5 @@
 {
-  "baseline": "error",
+  "baseline": "passed",
   "check_digests": {
     "baseline.create_env": "sha256:732ca08dff7109705648ffeb79f345d44a3836419f3a351e0e5f0fd11eb1aa6a",
     "baseline.destroy": "sha256:291b0e85f1ecc602f13e559e59d588538953397af00091f2097c6332861295ae",
@@ -26,11 +26,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T07:31:12.335958+00:00",
+  "finished_at": "2026-11-14T15:53:51.591635+00:00",
   "implementation": "withheld",
   "provider": "modal",
-  "revision": "9634a2c73bfa6c119c7b65b77b338e8aa24b743e",
-  "run_id": "public-7b610e083b4c7c601ee2",
+  "revision": "248c3a8e33367ccef781eeb88264b1adbb93685c",
+  "run_id": "public-e2c979035c4968f93922",
   "sdk_versions": {
     "modal": "1.6.1",
     "withheld": "withheld"
@@ -56,331 +56,714 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T07:31:11.913231+00:00",
+  "started_at": "2026-11-14T15:49:38.161233+00:00",
   "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
-      "cleanup": [],
-      "duration_ms": 393,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1615,
       "id": "baseline.create_env",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/lifecycle"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "present"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 30604,
       "id": "baseline.get",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/lifecycle"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 177795,
       "id": "baseline.list",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/lifecycle"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1225,
       "id": "baseline.destroy",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/lifecycle"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1484,
       "id": "baseline.run_output",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/run"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "out"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 1,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1547,
       "id": "baseline.run_exit_code",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/run"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 1,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1452,
       "id": "baseline.run_separate_streams",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/run"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stderr": {
+              "actual": {
+                "truncated": false,
+                "utf8": "err\n"
+              },
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "out\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 1,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2317,
       "id": "baseline.run_cwd",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/run"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/tmp\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 1,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1570,
       "id": "baseline.run_env",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/run"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "command"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 1,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1656,
       "id": "baseline.files_write",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/files"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVsbG8=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1815,
       "id": "baseline.files_read",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/files"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AP9maWxl",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 16747,
       "id": "baseline.process_stream",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/process-output"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 14,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2166,
       "id": "baseline.environment_bash",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/environment"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/bin/bash\n"
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1628,
       "id": "baseline.environment_python3",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/environment"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/local/bin/python3\n"
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1774,
       "id": "baseline.outbound_network",
       "proves": [],
-      "reason": "proof_fixture_invalid",
-      "result": "not_run",
+      "result": "passed",
       "rules": [
         "baseline/outbound-network"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
           "operation": "probe.http",
-          "reason": "proof_fixture_invalid",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1998,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/process-eof-not-exit",
         "provider-api/process-eof-not-exit"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            },
+            "exit_code_after_close": {
+              "matches": true
+            },
+            "state_after_close": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_eof",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4019,
       "id": "baseline.no_metadata",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/no-metadata"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "host_metadata_hidden": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 2,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1980,
       "id": "baseline.files_write_binary",
       "proves": [],
-      "reason": "capability_unavailable",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "baseline/files"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "capability_unavailable",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "00ff0080fe6600\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     }

@@ -121,11 +121,11 @@ evidence:
   resources.default_user:
     tests:
     - facts.default_user
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   resources.default_cwd:
     tests:
     - facts.default_cwd
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   resources.default_size:
     source: https://modal.com/docs/guide/sandbox-resources
     read: '2026-10-18'
@@ -135,11 +135,11 @@ evidence:
   lifetime_timer.enforced_by:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   lifetime_timer.at_end:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   lifetime_timer.adjustable:
     source: https://modal.com/docs/guide/sandboxes
     read: '2026-10-11'
@@ -155,15 +155,15 @@ evidence:
   gates.idle_shutdown.0.custom_idle_time:
     tests:
     - idle_shutdown.custom_idle_time.true
-    report: reports/native-default-idle.json
+    report: reports/prober-default-core.json
   gates.previews.0.access:
     tests:
     - previews.access.public
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.revocable:
     tests:
     - previews.revocable.false.public
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.previews.0.link_lifetime_seconds:
     tests:
     - previews.link_lifetime_seconds.public
@@ -171,19 +171,19 @@ evidence:
   gates.previews.0.max_ports:
     tests:
     - previews.listed_ports
-    report: reports/native-default-multiport.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.original_after:
     tests:
     - snapshots.original_after.continues
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_only
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.custom_images.0.source:
     tests:
     - coverage.custom_images.prepare.registry
@@ -203,7 +203,7 @@ evidence:
   gates.custom_images.1.source:
     tests:
     - custom_images.dockerfile
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.custom_images.1.prepared:
     tests:
     - coverage.custom_images.prepare.registry
@@ -215,11 +215,11 @@ evidence:
   gates.processes.0.input:
     tests:
     - processes.input.true
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.terminal.0:
     tests:
     - terminal.interactive
-    report: reports/native-default-core.json
+    report: reports/prober-default-core.json
   gates.custom_images.2.prepared:
     tests:
     - coverage.custom_images.prepare.registry
@@ -227,24 +227,24 @@ evidence:
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.allowlist.names
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.entry_kinds:
     tests:
     - network_lockdown.allowlist.names
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.allow_wildcards:
     tests:
     - network_lockdown.wildcards
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
   gates.network_lockdown.0.max_allow:
     tests:
     - network_lockdown.max_allow
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
   gates.network_lockdown.1.policy:
     tests:
     - network_lockdown.allowlist.addresses
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json
   gates.network_lockdown.1.entry_kinds:
     tests:
     - network_lockdown.allowlist.addresses
-    report: reports/adapter-default-core.json
+    report: reports/prober-default-core.json

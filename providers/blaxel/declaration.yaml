@@ -175,7 +175,7 @@ evidence:
   gates.custom_images.0.source:
     tests:
     - custom_images.provider_artifact
-    report: reports/adapter-provider-artifact.json
+    report: reports/prober-default-core.json
   gates.terminal.0:
     tests:
     - terminal.interactive
