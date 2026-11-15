@@ -5833,7 +5833,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "833a6e44b46601d683a16293a11c98b9b962ceb504419f88f6357309e5370037",
+  "report_sha256": "7a320450e34efc9053f8af431458b79cde9d8988f016746ac9b7dbbc90f86b14",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -5847,7 +5847,7 @@
     "boxrouter_adapter_kit/guest_process.py::": "sha256:55560a90ed4922606df2c8971fd72cbe83bc7617848062949ebba715f9230c85",
     "boxrouter_adapter_kit/guest_process.py::directory": "sha256:05b6468dc07bf3cee45a20ea4615857a636c4cac86d5d605a3230e0f48907113",
     "boxrouter_adapter_kit/guest_process.py::shell": "sha256:86c9912d2a0e932fec07f78ba623f871b81120a83440539ed5db38361484a7e0",
-    "boxrouter_adapter_kit/implementation.py::": "sha256:d53aa03363fd690b658c17813704a83b2953b0d06002c62c639268ce0227048c",
+    "boxrouter_adapter_kit/implementation.py::": "sha256:7372af18dfe3f4e95bd764f429afd93d626d03c42eeeb2b5485f487bb2de8f72",
     "boxrouter_adapter_kit/implementation.py::implementation_path": "sha256:5c8713088cc9ea2c1ba5bf930c8f48d4c06433ddb764646bec9ddf0c63312576",
     "boxrouter_adapter_kit/spec_driver.py::": "sha256:e5ab05d2cb2c005dae80872561f5eba3c76df0948847dcd8699ea1fc3c1c067f",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._absent": "sha256:1482fa9417ea6a0cb33ee5287d7cb8c4569caa2ea13be6fbca8445ebf37c6b01",

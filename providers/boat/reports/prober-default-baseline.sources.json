@@ -5991,7 +5991,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "f891486795da5ae8fc5b6112b32f10a1f9ce96b0814de755aa85758988124ea2",
+  "report_sha256": "9d3aead8852e7fe45e6b92527bb78d1de05311e98bf47d2ec44ee247fb57b2ff",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -6002,7 +6002,7 @@
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
     "boxrouter_adapter_kit/fixture_lifetime.py::require_fixture_lifetime": "sha256:b91f6d39122e3a4d597a5a46861a58a57d6537eace50870aaa419d1a11fc185c",
     "boxrouter_adapter_kit/fixture_lifetime.py::require_request_lifetime": "sha256:efe7f5084e371dcd8c740c578a6e3591280d3a799bc567644c48010ecb518542",
-    "boxrouter_adapter_kit/implementation.py::": "sha256:d53aa03363fd690b658c17813704a83b2953b0d06002c62c639268ce0227048c",
+    "boxrouter_adapter_kit/implementation.py::": "sha256:7372af18dfe3f4e95bd764f429afd93d626d03c42eeeb2b5485f487bb2de8f72",
     "boxrouter_adapter_kit/implementation.py::implementation_path": "sha256:5c8713088cc9ea2c1ba5bf930c8f48d4c06433ddb764646bec9ddf0c63312576",
     "boxrouter_adapter_kit/spec_driver.py::": "sha256:e5ab05d2cb2c005dae80872561f5eba3c76df0948847dcd8699ea1fc3c1c067f",
     "boxrouter_adapter_kit/spec_driver.py::CoreDriver._absent": "sha256:1482fa9417ea6a0cb33ee5287d7cb8c4569caa2ea13be6fbca8445ebf37c6b01",

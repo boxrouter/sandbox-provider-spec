@@ -118,11 +118,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T18:29:25.966734+00:00",
+  "finished_at": "2026-11-15T00:34:56.937278+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "675f4403347d7174b85c1f31b96e265bd7e842fb",
-  "run_id": "public-8cb94a9cfc52ae9fb51e",
+  "revision": "4fe0b39c9a4b78091eeaef3a332e2ecf34c86a7e",
+  "run_id": "public-ce0c0700d6a8e277d317",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -241,7 +241,7 @@
     "contract.cost_final"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T18:04:03.231168+00:00",
+  "started_at": "2026-11-15T00:09:25.432948+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -251,7 +251,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 917,
+      "duration_ms": 959,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -286,7 +286,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 528,
+      "duration_ms": 701,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -321,7 +321,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 950,
+      "duration_ms": 698,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -352,7 +352,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 441,
+      "duration_ms": 600,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -392,7 +392,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 753,
+      "duration_ms": 899,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -427,7 +427,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 645,
+      "duration_ms": 829,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -459,7 +459,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 769,
+      "duration_ms": 758,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -501,7 +501,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 649,
+      "duration_ms": 691,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -536,7 +536,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 725,
+      "duration_ms": 2898,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -571,7 +571,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 765,
+      "duration_ms": 1076,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -621,7 +621,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 768,
+      "duration_ms": 946,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -670,7 +670,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15780,
+      "duration_ms": 15902,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -738,7 +738,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 812,
+      "duration_ms": 1096,
       "id": "processes.input.true",
       "proves": [
         {
@@ -821,7 +821,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1403,
+      "duration_ms": 1500,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -946,7 +946,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1199,
+      "duration_ms": 1400,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -1039,7 +1039,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 724,
+      "duration_ms": 900,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -1089,7 +1089,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1639,
+      "duration_ms": 900,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -1122,7 +1122,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 666,
+      "duration_ms": 800,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -1155,7 +1155,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 613,
+      "duration_ms": 900,
       "id": "facts.default_user",
       "proves": [
         {
@@ -1189,7 +1189,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 678,
+      "duration_ms": 898,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -1223,7 +1223,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 770,
+      "duration_ms": 947,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -1268,7 +1268,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 611919,
+      "duration_ms": 611899,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -1349,7 +1349,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 305666,
+      "duration_ms": 305832,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -1420,7 +1420,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1,
       "id": "lifetime_timer.at_end.paused",
       "proves": [
         {
@@ -1470,7 +1470,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1,
       "id": "lifetime_timer.counts_paused_time.false",
       "proves": [
         {
@@ -1493,7 +1493,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1,
       "id": "pause_resume.files_only",
       "proves": [
         {
@@ -1600,7 +1600,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 120677,
+      "duration_ms": 120766,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {
@@ -1662,7 +1662,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 65,
+      "duration_ms": 101,
       "id": "idle_shutdown.custom_idle_time.false",
       "proves": [
         {
@@ -1684,7 +1684,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -2045,7 +2045,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2299,
+      "duration_ms": 2350,
       "id": "previews.access.public",
       "proves": [
         {
@@ -2109,7 +2109,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1727,
+      "duration_ms": 2398,
       "id": "previews.access.private",
       "proves": [
         {
@@ -2162,7 +2162,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2082,
+      "duration_ms": 1938,
       "id": "previews.credential.link",
       "proves": [
         {
@@ -2219,7 +2219,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2532,
+      "duration_ms": 2660,
       "id": "previews.credential.header",
       "proves": [
         {
@@ -2296,7 +2296,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2218,
+      "duration_ms": 2302,
       "id": "previews.revocable.true",
       "proves": [
         {
@@ -2364,7 +2364,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1964,
+      "duration_ms": 2234,
       "id": "previews.revocable.false",
       "proves": [
         {
@@ -2445,7 +2445,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2980,
+      "duration_ms": 3365,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -2555,7 +2555,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4019,
+      "duration_ms": 3600,
       "id": "previews.credential_scope",
       "proves": [],
       "result": "passed",
@@ -2788,7 +2788,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 49070,
+      "duration_ms": 52759,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -2849,7 +2849,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 48155,
+      "duration_ms": 48274,
       "id": "custom_images.dockerfile",
       "proves": [
         {
@@ -2916,7 +2916,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1252,
+      "duration_ms": 865,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -2989,7 +2989,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4358,
+      "duration_ms": 4999,
       "id": "hidden_secrets.injected",
       "proves": [],
       "result": "passed",
@@ -3025,7 +3025,7 @@
           "observations": {
             "stdout": {
               "actual": {
-                "length": 4138,
+                "length": 4140,
                 "type": "str"
               },
               "matches": true
@@ -3081,7 +3081,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3655,
+      "duration_ms": 4476,
       "id": "hidden_secrets.header_templates",
       "proves": [
         {
@@ -3166,7 +3166,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3703,
+      "duration_ms": 3667,
       "id": "hidden_secrets.unreadable",
       "proves": [],
       "result": "passed",
@@ -3260,7 +3260,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 300825,
+      "duration_ms": 300824,
       "id": "facts.max_lifetime",
       "proves": [
         {
@@ -3354,7 +3354,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 743,
+      "duration_ms": 855,
       "id": "edge.commands.killed",
       "proves": [],
       "result": "passed",
@@ -3384,7 +3384,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 771,
+      "duration_ms": 795,
       "id": "edge.files.missing_parent",
       "proves": [],
       "result": "passed",
@@ -3416,7 +3416,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 828,
+      "duration_ms": 869,
       "id": "edge.files.owner",
       "proves": [],
       "result": "passed",
@@ -3452,7 +3452,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 788,
+      "duration_ms": 748,
       "id": "edge.images.architecture",
       "proves": [],
       "result": "passed",
@@ -3478,7 +3478,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1,
       "id": "edge.lifetime.granularity",
       "proves": [],
       "reason": "capability_unavailable",
@@ -3729,7 +3729,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3320,
+      "duration_ms": 3395,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -3846,7 +3846,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1972,
+      "duration_ms": 1930,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -3933,7 +3933,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1284,
+      "duration_ms": 1287,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -3994,7 +3994,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1112,
+      "duration_ms": 1288,
       "id": "contract.idempotent_create_same_body",
       "proves": [],
       "reason": "equal",
@@ -4062,7 +4062,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 890,
+      "duration_ms": 1011,
       "id": "contract.idempotent_create_other_body",
       "proves": [],
       "reason": "expected_error",
@@ -4098,7 +4098,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 915,
+      "duration_ms": 995,
       "id": "contract.list_label_filter",
       "proves": [],
       "reason": "observation_unmapped",
@@ -4131,7 +4131,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 702,
+      "duration_ms": 754,
       "id": "contract.not_found_codes",
       "proves": [],
       "reason": "expected_error",
@@ -4181,7 +4181,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3663,
+      "duration_ms": 3649,
       "id": "contract.run_timeout_ends_command",
       "proves": [],
       "reason": "observation_unmapped",
@@ -4209,7 +4209,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3216,
+      "duration_ms": 899,
       "id": "contract.files_1gib_roundtrip",
       "proves": [],
       "reason": "capability_unavailable",
@@ -4238,7 +4238,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 458,
+      "duration_ms": 473,
       "id": "contract.destroy_repeat",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4273,7 +4273,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 692,
+      "duration_ms": 680,
       "id": "contract.cost_final",
       "proves": [],
       "reason": "driver_unimplemented",

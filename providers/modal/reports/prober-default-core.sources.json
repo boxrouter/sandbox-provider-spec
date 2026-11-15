@@ -25137,7 +25137,7 @@
     "volumes.sharing.one_sandbox.object_store": []
   },
   "format": 3,
-  "report_sha256": "70440b6f89a5be60cf4332d290c6dd8c947dd955a19004c30693fcb7b0053696",
+  "report_sha256": "1240f5190563d458c64fde446ad8ae4e07b47b17e844d82fc3df8191d7686d8f",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -25151,7 +25151,7 @@
     "boxrouter_adapter_kit/fixture_lifetime.py::require_request_lifetime": "sha256:efe7f5084e371dcd8c740c578a6e3591280d3a799bc567644c48010ecb518542",
     "boxrouter_adapter_kit/image_labels.py::": "sha256:8a762cc0c81ea0f1cbd611e6c361698ed667999071f9e8bf734117709cdaeaf6",
     "boxrouter_adapter_kit/image_labels.py::label_for": "sha256:38f3a0bbd671dcbeeeeeacca10138b2fb1dfda39a46d2bab4116cafc9718490e",
-    "boxrouter_adapter_kit/implementation.py::": "sha256:d53aa03363fd690b658c17813704a83b2953b0d06002c62c639268ce0227048c",
+    "boxrouter_adapter_kit/implementation.py::": "sha256:7372af18dfe3f4e95bd764f429afd93d626d03c42eeeb2b5485f487bb2de8f72",
     "boxrouter_adapter_kit/implementation.py::implementation_path": "sha256:5c8713088cc9ea2c1ba5bf930c8f48d4c06433ddb764646bec9ddf0c63312576",
     "boxrouter_adapter_kit/native_values.py::": "sha256:1224510aa6849d4593fcf16b4e242866358a8881e40bd3ee9fe202d404d7a46b",
     "boxrouter_adapter_kit/native_values.py::text_result": "sha256:a7a003e36bbc3c79fe99da35546bbc3f502dd85fb0f1266df37007f5c32e4b6d",

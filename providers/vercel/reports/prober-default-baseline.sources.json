@@ -4259,6 +4259,8 @@
       "boxrouter_core/faces.py::_hook",
       "boxrouter_core/faces.py::_on_runtime",
       "boxrouter_core/faces.py::sync_handle",
+      "boxrouter_core/first_address.py::",
+      "boxrouter_core/first_address.py::first_address_backends._AsyncBackend.connect_tcp",
       "boxrouter_core/git.py::",
       "boxrouter_core/git.py::AsyncGit.__init__",
       "boxrouter_core/git.py::Git.__init__",
@@ -6892,7 +6894,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "3518c88ad1bf1ee1c27845fbb66a7535d4f672c02e67a9a9293ad3f3751e7a49",
+  "report_sha256": "4b194e4ca418c4b3c3b18dc034599c44a8827b02eb9c1e7bd6c0c101d255837f",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",

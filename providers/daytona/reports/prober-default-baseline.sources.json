@@ -6245,7 +6245,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "eb2a6073050bbe83005e3cffac45dbfdf4e4e4f0c8504a35f549f5101d5fefc1",
+  "report_sha256": "f0dd5a56a05c25fa79c22b5e7b572343bbde080f4a2d07081d0b1bd5e37f0ba8",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:8478fc609e41e4b87490760ef528969b3151a4ceac812f363650cd6a7ec0fdde",
