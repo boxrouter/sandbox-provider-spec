@@ -75,3 +75,21 @@ def test_a_lifetime_refusal_states_the_most_a_route_allows() -> None:
     assert [failure["detail"] for _, failure in failed] == [
         "lifetime_seconds 7,200: the most a route allows is 3,600 s"
     ]
+
+
+@pytest.mark.parametrize(
+    ("has_timer", "declared_max", "detail"),
+    [
+        (True, 86400, "this route ends every sandbox after at most 86,400 s"),
+        (True, "unlimited", "this route ends sandboxes on its own timer"),
+        (False, "unknown", "this route does not say that it never ends a sandbox"),
+    ],
+)
+def test_a_sandbox_with_no_end_names_what_the_route_does_instead(
+    has_timer: bool, declared_max: object, detail: str
+) -> None:
+    from sandbox_provider_spec.matcher.matching import _no_end_detail
+
+    assert _no_end_detail(has_timer, declared_max) == (
+        f"lifetime_seconds: null asks for a sandbox with no end, but {detail}"
+    )

@@ -409,6 +409,16 @@ def _seconds(value: Any) -> str:
     return str(value)
 
 
+def _no_end_detail(has_timer: bool, declared_max: Any) -> str:
+    """Why a route cannot run with no end: what it does instead, in one sentence."""
+    asked = "lifetime_seconds: null asks for a sandbox with no end, but"
+    if isinstance(declared_max, int | float) and not isinstance(declared_max, bool):
+        return f"{asked} this route ends every sandbox after at most {_seconds(declared_max)}"
+    if has_timer:
+        return f"{asked} this route ends sandboxes on its own timer"
+    return f"{asked} this route does not say that it never ends a sandbox"
+
+
 def _largest(sizes: list[Any], field: str, disk_mib: Any) -> float | None:
     """The most of one field any declared size offers, a range counting at its upper end."""
     found = []
@@ -678,9 +688,7 @@ def fit_resources(
             _fail(
                 "resource",
                 "resource_unknown" if unknown else "resource_mismatch",
-                "no lifetime: a provider or router timer ends sandboxes "
-                f"(lifetime_timer {'declared' if has_timer else 'left out'}, "
-                f"max_lifetime_seconds {declared_max})",
+                _no_end_detail(has_timer, declared_max),
                 resource="lifetime_seconds",
                 asked=None,
                 offered=declared_max,
