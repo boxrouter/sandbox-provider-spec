@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.1: the `lifetime_timer` row of `spec/declarations.md` and the matcher's no-lifetime message say "the router" instead of the product name, which the public-neutrality test refuses in distributed prose. Wording only; no rule, declaration, schema or catalog change.
 - 0.3.234: the report tests' `document` helper takes a `Sequence` of results, which is what `report` accepts, so the package's mypy passes again. Test typing only; no rule, test, declaration or catalog change.
 - 0.3.233: Boxd declares native snapshots and queries the adapter-declared regions for account
   inventory. Snapshots retain files and memory, can be deleted, and leave the source's post-capture

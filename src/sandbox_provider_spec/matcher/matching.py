@@ -632,7 +632,7 @@ def fit_resources(
             _fail(
                 "resource",
                 "resource_unknown" if unknown else "resource_mismatch",
-                "no lifetime: a provider or BoxRouter timer ends sandboxes "
+                "no lifetime: a provider or router timer ends sandboxes "
                 f"(lifetime_timer {'declared' if has_timer else 'left out'}, "
                 f"max_lifetime_seconds {declared_max})",
                 resource="lifetime_seconds",
