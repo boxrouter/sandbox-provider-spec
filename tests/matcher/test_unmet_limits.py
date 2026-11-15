@@ -177,3 +177,13 @@ def test_a_disk_ceiling_does_not_admit_a_size_the_class_does_not_offer() -> None
     )
     assert _fit(declaration, disk_min_mib=2048) == []
     assert _fit(declaration, disk_min_mib=4096) == ["resource_mismatch"]
+
+
+def test_a_refused_ceiling_states_the_limit_and_names_no_condition() -> None:
+    declaration = _declaration()
+    request = Request(lifetime_seconds=7200, resources={"disk_min_mib": 20000})
+    _, failed = fit_resources(declaration, request, Registry(), ())
+    assert sorted(failure["detail"] for _, failure in failed) == [
+        "disk_min_mib 20,000: this account allows at most 8,192 MiB of disk",
+        "lifetime_seconds 7,200: this account allows at most 3,600 s",
+    ]

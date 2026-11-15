@@ -397,6 +397,9 @@ _SIZE_UNITS: Final = {
 }
 
 
+_LIMIT_UNITS: Final = {"lifetime_seconds": "s", "disk_min_mib": _SIZE_UNITS["disk_min_mib"]}
+
+
 def _largest(sizes: list[Any], field: str, disk_mib: Any) -> float | None:
     """The most of one field any declared size offers, a range counting at its upper end."""
     found = []
@@ -607,8 +610,8 @@ def fit_resources(
                 _fail(
                     "resource",
                     "resource_mismatch",
-                    f"{ask} {amount}: {fact} is limited to {ceiling} until "
-                    f"{', '.join(sorted(set(needs[fact]) - set(met_needs)))} is met",
+                    f"{ask} {amount:,}: this account allows at most {ceiling:,} "
+                    f"{_LIMIT_UNITS[ask]}",
                     resource=ask if ask == "lifetime_seconds" else "sizes",
                     asked=amount if ask == "lifetime_seconds" else {ask: amount},
                     offered=ceiling,
