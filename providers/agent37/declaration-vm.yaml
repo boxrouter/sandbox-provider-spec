@@ -5,7 +5,7 @@ class: vm
 # kernel. Every value is `unknown` or absent until a committed run report or a dated quote of
 # Agent37's documentation proves it.
 verified:
-  date: 2026-11-14
+  date: 2026-11-15
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
   sdks: {"httpx": "0.28.1"}
 resources:
