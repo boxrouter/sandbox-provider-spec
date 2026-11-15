@@ -1,7 +1,7 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "network_lockdown.allowlist.addresses": "sha256:9c40628b4f28ce3c0700be1e509a76fdef3719baed4699848b4532dde37d2dfd"
+    "network_lockdown.allowlist.addresses": "sha256:28b77b975449fa6feb49b2e5cbce17d064569356caf6e7a8eaab2973162dece3"
   },
   "class": "vm",
   "clean": true,
@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T23:40:20.844589+00:00",
+  "finished_at": "2026-11-15T17:01:52.572263+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "3cdd715e8c1b5482d7a890dd1465e07894d00d67",
-  "run_id": "public-a9052c7ff85c44e16a0d",
+  "revision": "268de087108e483860ce5fc7b8bc34514b29c7db",
+  "run_id": "public-be415e249d05a7a40817",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -22,7 +22,7 @@
     "network_lockdown.allowlist.addresses"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T23:40:17.101518+00:00",
+  "started_at": "2026-11-15T17:01:49.619129+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -32,7 +32,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3741,
+      "duration_ms": 2946,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {

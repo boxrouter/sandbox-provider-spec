@@ -1,8 +1,8 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.network_lockdown.open": "sha256:63333d5008af7824859cd7abd726b10dbadc6e94956ffc30d496789738e62b84",
-    "coverage.network_lockdown.switchable.true": "sha256:9c4efba9493dbf85cdf0b237cd56d46eac16b18e5d6cd49718577d5ba1366c4b"
+    "coverage.network_lockdown.open": "sha256:ba1ba8951c8e090d2560a163c0c224ef79328495827935e2136b6ccd4bc640bf",
+    "coverage.network_lockdown.switchable.true": "sha256:93652cfc245b256d574d58e5aa6fef8bf9c80aa4a10f294b3654a59767984a4c"
   },
   "class": "vm",
   "clean": true,
@@ -10,11 +10,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T23:41:09.073692+00:00",
+  "finished_at": "2026-11-15T17:04:09.401986+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "3cdd715e8c1b5482d7a890dd1465e07894d00d67",
-  "run_id": "public-700ba90d5a6d7d6f3458",
+  "revision": "268de087108e483860ce5fc7b8bc34514b29c7db",
+  "run_id": "public-ebe2b682194fdbd18872",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -24,8 +24,8 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T23:40:30.365334+00:00",
-  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "started_at": "2026-11-15T17:03:36.757790+00:00",
+  "suite_digest": "sha256:21b4d667b0c24e67ede787543042fcc629ba1806684ed19685e239acbafde947",
   "tests": [
     {
       "cleanup": [
@@ -34,7 +34,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 24273,
+      "duration_ms": 19057,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -86,7 +86,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 14432,
+      "duration_ms": 13578,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
