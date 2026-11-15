@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from importlib.metadata import version
 from pathlib import Path
@@ -40,7 +40,7 @@ def fixture_results(suite: Suite) -> list[dict[str, object]]:
     ]
 
 
-def document(suite: Suite, results: list[Mapping[str, object]]) -> dict[str, object]:
+def document(suite: Suite, results: Sequence[Mapping[str, object]]) -> dict[str, object]:
     driver = Driver()
     driver.provider = "example"
     driver.sdk_versions = {"example-sdk": "1.0.0"}
