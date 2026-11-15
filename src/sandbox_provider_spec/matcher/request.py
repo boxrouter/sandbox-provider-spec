@@ -177,7 +177,7 @@ def not_unknown(where: str, value: Any) -> None:
             "unknown_as_value",
             f'{where}: "unknown" is what a declaration says, not something to ask for',
             path=where,
-            fix="leave it out",
+            fix=f"Leave {where} out, or name a value.",
         )
 
 
@@ -190,7 +190,7 @@ def _knob_values(gate: str, knob: str, raw: Any) -> list[Any] | str:
             "one_value",
             f"{where} takes exactly one value",
             path=where,
-            fix=f'"{knob}": "{definition.values[0]}"',
+            fix=f'Set {where} to "{definition.values[0]}".',
         )
     if raw == ANY:
         if not definition.must_be_named:
@@ -198,7 +198,7 @@ def _knob_values(gate: str, knob: str, raw: Any) -> list[Any] | str:
                 "any_misplaced",
                 f'{where}: "any" is only for a knob that must be named',
                 path=where,
-                fix="leave it out",
+                fix=f'Name a value for {where} instead of "any", or leave it out.',
             )
         return ANY
     not_unknown(where, raw)
@@ -223,7 +223,7 @@ def _knob_values(gate: str, knob: str, raw: Any) -> list[Any] | str:
                 "any_misplaced",
                 f'{where}: "any" is the whole answer or none of it, never one of a list',
                 path=where,
-                fix="leave it out",
+                fix=f'Name the values for {where}, or send "any" alone.',
             )
         not_unknown(where, item)
         if not isinstance(item, str):
@@ -258,7 +258,7 @@ def entry_kind(entry: Any, name: str = "allow") -> str:
             "setting",
             f"{where}: {entry!r} is a wildcard, and deny takes none",
             path=where,
-            fix=f'"{entry[2:]}"',
+            fix=f'Name the host without the wildcard: "{entry[2:]}".',
         )
     host = entry[2:] if entry.startswith("*.") else entry
     if not HOSTNAME.fullmatch(host) or host.replace(".", "").isdigit():
@@ -281,7 +281,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 "setting",
                 f"{gate} needs the ports to open",
                 path=f"{where}.ports",
-                fix='"ports": [3000]',
+                fix=f"Add the ports to open to {where}.ports, for example [3000].",
             )
         normalized_ports = [_whole_number(port) for port in ports]
         if any(port is None or not 1 <= port <= 65535 for port in normalized_ports):
@@ -303,14 +303,14 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                         "setting",
                         f"{name} is used only with an {listing}, not {policy}",
                         path=f"{where}.{name}",
-                        fix=f"remove {name}",
+                        fix=f"Remove {name}.",
                     )
             elif not entries:
                 raise Rejected(
                     "setting",
                     f"an {listing} with nothing in it",
                     path=f"{where}.{name}",
-                    fix=f'"{name}": ["example.com"]',
+                    fix=f'Add at least one entry to {where}.{name}, for example "example.com".',
                 )
             else:
                 if any(entry in entries[:index] for index, entry in enumerate(entries)):
@@ -328,7 +328,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 "setting",
                 "open without switchable",
                 path=f"{where}.switchable",
-                fix='"switchable": true',
+                fix=f"Set {where}.switchable to true.",
             )
         if (switchable == [True] and not has_switches_to) or (
             has_switches_to and switchable is None
@@ -387,7 +387,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 "setting",
                 "idle_seconds without custom_idle_time",
                 path=f"{where}.idle_seconds",
-                fix='"custom_idle_time": true',
+                fix=f"Set {where}.custom_idle_time to true.",
             )
     if gate == "volumes" and "mounts" in settings:
         mounts = settings["mounts"]
@@ -421,7 +421,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                     "setting",
                     "read_only on a mount unless read_only_mounts is true",
                     path=f"{path}.read_only",
-                    fix='"read_only_mounts": true',
+                    fix=f"Set {where}.read_only_mounts to true.",
                 )
             if not PROVIDER_NAME.fullmatch(mount["provider"]):
                 raise Rejected("wrong_type", "mount provider is a provider name", path=path)
@@ -465,14 +465,14 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 "setting",
                 "hidden_secrets.headers needs header_templates: true",
                 path=f"{where}.header_templates",
-                fix='"header_templates": true',
+                fix=f"Set {where}.header_templates to true.",
             )
         if declares_templates and not selected_headers:
             raise Rejected(
                 "setting",
                 "hidden_secrets.header_templates needs headers",
                 path=f"{where}.headers",
-                fix='"headers": [{"name": "Authorization"}]',
+                fix=f'Add {where}.headers, for example [{{"name": "Authorization"}}].',
             )
         if selected_headers:
             if knobs.get("injection") != ["sets_header"]:
@@ -480,7 +480,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                     "setting",
                     "hidden_secrets.headers needs injection: sets_header",
                     path=f"{where}.injection",
-                    fix='"injection": "sets_header"',
+                    fix=f'Set {where}.injection to "sets_header".',
                 )
             normalized, error = normalize_header_templates(settings["headers"])
             if error is not None:
@@ -501,7 +501,7 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 "setting",
                 f"image is one image, and {source} are different kinds of name",
                 path=f"{where}.image",
-                fix=f'"source": "{source[0]}"',
+                fix=f'Set {where}.source to "{source[0]}".',
             )
 
 
@@ -532,7 +532,7 @@ def _gate_ask(gate: str, body: Any) -> GateAsk:
             "knob_not_named",
             f"{gate}.{required} must be named",
             path=f"requirements.{gate}.{required}",
-            fix=f'"{gate}": {{"{required}": "{example}"}}',
+            fix=f'Name {gate}.{required}: set requirements.{gate}.{required} to "{example}".',
             details={"gate": gate, "knob": required},
         )
     for knob, definition_of in GATES[gate].knobs.items():
@@ -554,7 +554,7 @@ def _gate_ask(gate: str, body: Any) -> GateAsk:
                 "setting",
                 f"{gate}.{knob} without {other}: {json.dumps(needed)}",
                 path=f"requirements.{gate}.{knob}",
-                fix=f'"{other}": {json.dumps(example)}',
+                fix=f"Set requirements.{gate}.{other} to {json.dumps(example)}.",
             )
     for knob, definition_of in GATES[gate].knobs.items():
         conditions = definition_of.only_when_any
@@ -731,7 +731,7 @@ def validate_request(
             "setting",
             "at_end with a null lifetime_seconds",
             path="at_end",
-            fix="leave at_end out: nothing ends a sandbox with no lifetime",
+            fix="Leave at_end out: nothing ends a sandbox with no lifetime.",
         )
 
     requirements = raw.get("requirements", {})
@@ -764,7 +764,7 @@ def validate_request(
                         f"custom_images.{key} under requirements: the request's top-level image "
                         "gives it",
                         path=f"requirements.custom_images.{key}",
-                        fix=f"remove {key}",
+                        fix=f"Remove {key}.",
                     )
             image_body = dict(body) if isinstance(body, dict) else body
             if isinstance(image_body, dict) and "build_context" in image_body:
@@ -791,7 +791,7 @@ def validate_request(
             "setting",
             "at_end: paused without pause_resume",
             path="at_end",
-            fix='"pause_resume": {}',
+            fix='Add "pause_resume": {} to requirements.',
         )
     previews = gates.get("previews")
     if (
@@ -803,7 +803,7 @@ def validate_request(
             "setting",
             "survives_pause in a request that names neither pause_resume nor idle_shutdown",
             path="requirements.previews.survives_pause",
-            fix='"pause_resume": {}',
+            fix='Add "pause_resume": {} or "idle_shutdown" to requirements.',
         )
 
     asked = raw.get("resources", {})
@@ -864,7 +864,7 @@ def validate_request(
                 f"{', '.join(named)} describe a sandbox created without an image; an image "
                 "decides them itself",
                 path=f"resources.{named[0]}",
-                fix=f"remove {', '.join(named)}",
+                fix=f"Remove {', '.join(named)}, or name an image.",
             )
         gates["custom_images"] = GateAsk(
             {"source": [source], "prepared": [False], **(image_knobs or {})},
@@ -875,7 +875,7 @@ def validate_request(
             "setting",
             "custom_images under requirements without an image",
             path="requirements.custom_images",
-            fix='"image": "debian:stable"',
+            fix='Add an image, for example "image": "debian:stable".',
         )
     if "hidden_secrets" in gates and "network_lockdown" in gates:
         # An allowlist must name each destination; a denylist must not cover it. open lets every
@@ -930,7 +930,7 @@ def validate_request(
                 "setting",
                 "restores_need without snapshots: nothing would take the snapshots it describes",
                 path="restores_need",
-                fix='"snapshots": {"original_after": "any"}',
+                fix='Add "snapshots": {"original_after": "any"} to requirements.',
             )
         try:
             restores_need = validate_request(
