@@ -415,6 +415,47 @@ def fake_report(passed: bool) -> Report:
 
 
 @pytest.mark.parametrize(
+    ("cost_fails", "cost_status", "code"),
+    [(False, "passed", 0), (True, "error", 1)],
+)
+def test_the_command_exit_code_includes_the_cost_probe(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    cost_fails: bool,
+    cost_status: str,
+    code: int,
+) -> None:
+    class CostFailure(LocalProvider, manifest=False):
+        async def cost(self, sandbox_id: str) -> Cost:
+            raise SpsError("unavailable", "cost is unavailable")
+
+    provider_class = CostFailure if cost_fails else LocalProvider
+    monkeypatch.setattr(
+        "sandbox_provider_spec.cli._load_provider_class",
+        lambda _provider_id, _command: provider_class,
+    )
+    monkeypatch.setenv("SPS_TEST_TOKEN", "test-token")
+    output = tmp_path / "report.json"
+
+    result = main(
+        [
+            "test",
+            "local",
+            "--credential",
+            "api_key=SPS_TEST_TOKEN",
+            "--test",
+            "baseline.create_env",
+            "--output",
+            str(output),
+        ]
+    )
+
+    assert result == code
+    assert f"operation cost {cost_status}" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
     ("passed", "extra", "code"),
     [(True, [], 0), (True, ["--quick"], 3), (False, [], 1), (False, ["--quick"], 1)],
 )

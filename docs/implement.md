@@ -250,10 +250,10 @@ The tester runs the baseline and contract tests, then the tests of every optiona
 your discovery claims, and deletes every sandbox that it created. It prints one line per test, then
 one per required operation and per claimed section, such as `operation create passed`; a status is
 `passed`, `differs`, `unsupported`, `not_run`, or `error`. It writes a JSON report
-(`sps-report.json`) and exits 0 only when every test that it ran passed. `--quick` skips the 1 GiB
-round trip and the wait for a final cost while you iterate; a quick pass exits 3, never 0. A consumer
-runs the same tester. To state that you conform, name the spec version, the class, and the passing
-report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).
+(`sps-report.json`) and exits 0 only when every test that it ran and the required `cost` operation passed.
+`--quick` skips the 1 GiB round trip and the wait for a final cost while you iterate; a quick pass
+exits 3, never 0. A consumer runs the same tester. To state that you conform, name the spec version,
+the class, and the passing report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).
 
 ## Optional Sections
 

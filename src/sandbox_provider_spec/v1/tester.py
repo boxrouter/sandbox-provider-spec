@@ -268,8 +268,10 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         )
         gates = claimed_gates(discovery) if discovery is not None else {}
         document.lines = _summary(results, discovery_status, cost_status, gates)
-        document.all_passed = discovery_status == "passed" and all(
-            row["result"] == "passed" for row in results
+        document.all_passed = (
+            discovery_status == "passed"
+            and cost_status == "passed"
+            and all(row["result"] == "passed" for row in results)
         )
         return document
     finally:
