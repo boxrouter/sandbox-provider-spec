@@ -137,3 +137,17 @@ def test_historical_registry_is_read_fresh(monkeypatch: pytest.MonkeyPatch, tmp_
     for rule in ["old", "new"]:
         path.write_text(json.dumps({"historical": {"sample": [rule]}}))
         assert evidence._source_suite_rules("historical") == ({"sample": [rule]}, [])
+
+
+def test_previous_guest_user_suite_digest_keeps_its_original_test_id() -> None:
+    rules, errors = evidence._source_suite_rules(
+        "sha256:21b4d667b0c24e67ede787543042fcc629ba1806684ed19685e239acbafde947"
+    )
+
+    assert errors == []
+    assert rules is not None
+    assert rules["guest_user.selectable"] == [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start",
+    ]

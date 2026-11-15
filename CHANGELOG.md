@@ -5,6 +5,10 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.20: Prefix `guest_user.selectable` as `coverage.guest_user.selectable` so adapter evidence
+  planning selects the coverage suite. Record the previous suite digest in
+  `conformance/historical-suite-rules.json` so its existing reports remain recognized. No rule
+  or catalog changed.
 - 0.4.18: the specification is distributed from its GitHub repository only. The unused package-index
   publishing workflow, its test and the README build hook for it are removed; every install command in
   the README, the guides and the `serve` and `test` hints is `uvx --from git+https://github.com/boxrouter/sandbox-provider-spec`

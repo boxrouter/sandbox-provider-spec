@@ -1,6 +1,6 @@
 spec: sandbox-provider-spec/0.1
 tests:
-- id: guest_user.selectable
+- id: coverage.guest_user.selectable
   title: Commands, file writes and processes can select a named guest user.
   rules:
   - user-selection/commands
