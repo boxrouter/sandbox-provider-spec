@@ -400,6 +400,15 @@ _SIZE_UNITS: Final = {
 _LIMIT_UNITS: Final = {"lifetime_seconds": "s", "disk_min_mib": _SIZE_UNITS["disk_min_mib"]}
 
 
+def _seconds(value: Any) -> str:
+    """A declared lifetime for a sentence: "3,600 s", or the word the declaration gives."""
+    if isinstance(value, int | float) and not isinstance(value, bool):
+        return f"{value:,} s"
+    if isinstance(value, dict) and "at_least" in value:
+        return f"at least {value['at_least']:,} s"
+    return str(value)
+
+
 def _largest(sizes: list[Any], field: str, disk_mib: Any) -> float | None:
     """The most of one field any declared size offers, a range counting at its upper end."""
     found = []
@@ -423,7 +432,10 @@ def _no_size_detail(
             largest = _largest(sizes, field, disk_mib)
             if largest is None or largest < asks[ask]:
                 shown = "none" if largest is None else f"{largest:,}"
-                return f"needs {asks[ask]:,} {_SIZE_UNITS[ask]}; the largest size offers {shown}."
+                return (
+                    f"The request needs {asks[ask]:,} {_SIZE_UNITS[ask]}; "
+                    f"the largest size offers {shown}."
+                )
     wanted = ", ".join(f"{asks[ask]:,} {_SIZE_UNITS[ask]}" for ask in SIZE_ASKS if ask in asks)
     return f"No single size holds all of: {wanted}."
 
@@ -632,8 +644,8 @@ def fit_resources(
             _fail(
                 "resource",
                 "resource_unknown" if unknown else "resource_mismatch",
-                f"lifetime {request.lifetime_seconds} s: declared max_lifetime_seconds "
-                f"{resources.get('max_lifetime_seconds', UNKNOWN)}",
+                f"lifetime_seconds {request.lifetime_seconds:,}: the most a route allows is "
+                f"{_seconds(resources.get('max_lifetime_seconds', UNKNOWN))}",
                 resource="lifetime_seconds",
                 asked=request.lifetime_seconds,
                 offered=resources.get("max_lifetime_seconds", UNKNOWN),
@@ -650,8 +662,8 @@ def fit_resources(
             _fail(
                 "resource",
                 "resource_mismatch",
-                f"lifetime {request.lifetime_seconds} s: declared lifetime_timer min_seconds "
-                f"{minimum}",
+                f"lifetime_seconds {request.lifetime_seconds:,}: the least a route allows is "
+                f"{minimum:,} s",
                 resource="lifetime_seconds",
                 asked=request.lifetime_seconds,
                 offered=minimum,

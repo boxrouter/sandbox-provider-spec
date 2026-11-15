@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.7: a size refusal reads 'The request needs 1,000 CPU; the largest size offers 8.', and a lifetime refusal states the most (or least) a route allows in seconds instead of 'declared max_lifetime_seconds' and 'lifetime_timer min_seconds'. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.6: a refused account limit says what the account allows ('this account allows at most 3,600 s') and no longer names the declaration's condition. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.5: the matcher's size refusal names the ask no size can hold and the most a size offers ("needs 1,000 CPU; the largest size offers 8."), or says that no single size holds all asks, instead of printing the asks as a Python dict. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.4: Boat’s verification date advances to 2026-11-15 for the committed local prober reports; declared capability values are unchanged.

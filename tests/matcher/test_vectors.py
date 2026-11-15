@@ -620,7 +620,7 @@ def test_lifetime_below_the_timer_minimum_does_not_match() -> None:
             if failure.get("resource") == "lifetime_seconds"
         ]
 
-    assert lifetime_failures(120) == ["lifetime 120 s: declared lifetime_timer min_seconds 300"]
+    assert lifetime_failures(120) == ["lifetime_seconds 120: the least a route allows is 300 s"]
     assert lifetime_failures(300) == []
 
 
