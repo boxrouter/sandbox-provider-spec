@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T06:53:58.031231+00:00",
+  "finished_at": "2026-11-15T16:54:55.818237+00:00",
   "implementation": "withheld",
   "provider": "modal",
-  "revision": "f9575f030e571a35c9b80946da4084e2842a7795",
-  "run_id": "public-21cb5e91cc504222178d",
+  "revision": "eff463599fc59db3f41f66ca0f296c37c3f9e3c4",
+  "run_id": "public-120450189aa35ecdc7f8",
   "sdk_versions": {
     "modal": "1.6.1",
     "withheld": "withheld"
@@ -22,8 +22,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T06:53:55.723114+00:00",
-  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "started_at": "2026-11-15T16:54:53.951312+00:00",
+  "suite_digest": "sha256:21b4d667b0c24e67ede787543042fcc629ba1806684ed19685e239acbafde947",
   "tests": [
     {
       "cleanup": [
@@ -32,7 +32,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2306,
+      "duration_ms": 1863,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -52,7 +52,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n6:memory:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n5:job:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n4:devices:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n3:cpuset:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n2:cpuacct:/ta-01M7CDB3EX99619VDEN5SYHCEV\\n1:cpu:/ta-01M7CDB3EX99619VDEN5SYHCEV\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n6:memory:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n5:job:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n4:devices:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n3:cpuset:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n2:cpuacct:/ta-01M7G246XB3043GGFQ1RCEKR1V\\n1:cpu:/ta-01M7G246XB3043GGFQ1RCEKR1V\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
