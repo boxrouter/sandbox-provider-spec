@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from sandbox_provider_spec.matcher.declaration import build_declaration
-from sandbox_provider_spec.matcher.matching import fit_resources
+from sandbox_provider_spec.matcher.matching import _no_end_detail, fit_resources
 from sandbox_provider_spec.matcher.registry import Registry
 from sandbox_provider_spec.matcher.request import Request
 
@@ -88,8 +88,6 @@ def test_a_lifetime_refusal_states_the_most_a_route_allows() -> None:
 def test_a_sandbox_with_no_end_names_what_the_route_does_instead(
     has_timer: bool, declared_max: object, detail: str
 ) -> None:
-    from sandbox_provider_spec.matcher.matching import _no_end_detail
-
     assert _no_end_detail(has_timer, declared_max) == (
         f"lifetime_seconds: null asks for a sandbox with no end, but {detail}"
     )
