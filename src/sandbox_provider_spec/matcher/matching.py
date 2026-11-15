@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import itertools
 from collections.abc import Iterable, Sequence
-from typing import Any, NamedTuple, TypedDict
+from typing import Any, Final, NamedTuple, TypedDict
 
 from sandbox_provider_spec.check import UNMET_LIMIT_ASKS
 from sandbox_provider_spec.matcher.catalog import (
@@ -390,6 +390,41 @@ def size_asks(declaration: Declaration, request: Request) -> tuple[Document, fro
     return {**asks, "memory_min_mib": memory}, uncompared
 
 
+_SIZE_UNITS: Final = {
+    "cpu_min": "CPU",
+    "memory_min_mib": "MiB of memory",
+    "disk_min_mib": "MiB of disk",
+}
+
+
+def _largest(sizes: list[Any], field: str, disk_mib: Any) -> float | None:
+    """The most of one field any declared size offers, a range counting at its upper end."""
+    found = []
+    for size in sizes:
+        if isinstance(size, dict):
+            declared = {"disk_mib": disk_mib, **size}.get(field)
+            top = number(
+                declared[1] if isinstance(declared, list) and len(declared) == 2 else declared
+            )
+            if top is not None:
+                found.append(top[1])
+    return max(found, default=None)
+
+
+def _no_size_detail(
+    asks: Document, uncompared: frozenset[str], sizes: list[Any], disk_mib: Any
+) -> str:
+    """Why no size fits: the ask no size is large enough for, else that no one size holds all."""
+    for ask, field in SIZE_ASKS.items():
+        if ask in asks and ask not in uncompared:
+            largest = _largest(sizes, field, disk_mib)
+            if largest is None or largest < asks[ask]:
+                shown = "none" if largest is None else f"{largest:,}"
+                return f"needs {asks[ask]:,} {_SIZE_UNITS[ask]}; the largest size offers {shown}."
+    wanted = ", ".join(f"{asks[ask]:,} {_SIZE_UNITS[ask]}" for ask in SIZE_ASKS if ask in asks)
+    return f"No single size holds all of: {wanted}."
+
+
 def _fit_size(
     declaration: Declaration, request: Request
 ) -> tuple[Document, list[tuple[str, Failure]]]:
@@ -434,12 +469,8 @@ def _fit_size(
         _fail(
             "resource",
             "resource_mismatch",
-            f"no size offers {asks}"
-            + (
-                " (memory holds the disk: disk_in_memory is not false)"
-                if asks != request.size_asks
-                else ""
-            ),
+            _no_size_detail(asks, uncompared, sizes, resources.get("disk_mib"))
+            + (" The memory ask includes the disk." if asks != request.size_asks else ""),
             resource="sizes",
             asked=asks,
             offered=sizes,

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.5: the matcher's size refusal names the ask no size can hold and the most a size offers ("needs 1,000 CPU; the largest size offers 8."), or says that no single size holds all asks, instead of printing the asks as a Python dict. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.4: Boat’s verification date advances to 2026-11-15 for the committed local prober reports; declared capability values are unchanged.
 
 - 0.4.3: Boxd declares native deny-all egress (`none`) after a Cloud API probe through the
