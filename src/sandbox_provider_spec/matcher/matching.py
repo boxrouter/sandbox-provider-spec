@@ -253,8 +253,7 @@ def fit_variant(
             return {}, {
                 "reason": "knob_mismatch",
                 "detail": (
-                    f"{knob}: asked {plain(wanted)}, "
-                    f"offers {plain(sorted(offered, key=str))}"
+                    f"{knob}: asked {plain(wanted)}, offers {plain(sorted(offered, key=str))}"
                 ),
                 "gate": gate,
                 "knob": knob,
