@@ -17,19 +17,20 @@ tests:
     knob: process_start
     value: true
   steps:
-  - op: image.prepare
-    as: image
-    in:
-      source: dockerfile
-      dockerfile: |
-        FROM public.ecr.aws/docker/library/python:3.12-slim
-        RUN useradd --create-home --uid 10001 --shell /bin/bash runner
   - op: create
     as: box
+  - op: run
+    target: box
     in:
-      image: $image
-      requirements:
-        custom_images: {source: dockerfile}
+      bash_script: |
+        if [ "$(id -u)" = 0 ]; then
+          useradd --create-home --uid 10001 --shell /bin/bash runner
+        else
+          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+        fi
+    expect:
+      equals:
+        exit_code: 0
   - op: run
     target: box
     in:
