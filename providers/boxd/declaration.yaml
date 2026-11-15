@@ -57,8 +57,10 @@ gates:
   # counts suspended time, so pause and lifetime behavior remain separate guarantees.
   pause_resume:
   - keeps: files_and_memory
-  # Snapshots remain undeclared until the provider exposes a completed snapshot that
-  # can be restored with the advertised behavior.
+  snapshots:
+  - keeps: files_and_memory
+    original_after: unknown
+    deletable: true
 x-boxd:
   isolated: true
   usage_records: boxd.machines.usage
@@ -91,6 +93,14 @@ evidence:
     tests:
     - pause_resume.files_and_memory
     report: reports/prober-default-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_and_memory
+    report: reports/snapshot.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/snapshot.json
   gates.processes.0:
     tests:
     - processes.input.true

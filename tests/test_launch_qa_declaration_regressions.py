@@ -13,7 +13,7 @@ from sandbox_provider_spec.matcher import MatchResult, Registry, match
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_boxd_regional_offer_matches_registry_countries_without_expanding_gates() -> None:
+def test_boxd_regional_offer_matches_registry_countries_and_snapshot_declaration() -> None:
     declaration = load(ROOT / "providers/boxd/declaration.yaml")
     registry = load(ROOT / "spec/registries/regions.json")
     regions = declaration["resources"]["regions"]
@@ -21,7 +21,9 @@ def test_boxd_regional_offer_matches_registry_countries_without_expanding_gates(
     assert registry["regions"]["boxd:eu-fra"]["countries"] == ["DE"]
     assert registry["regions"]["boxd:us-nyc"]["countries"] == ["US"]
     assert declaration["resources"]["located_in"] == ["DE", "US"]
-    assert "snapshots" not in declaration["gates"]
+    assert declaration["gates"]["snapshots"] == [
+        {"keeps": "files_and_memory", "original_after": "unknown", "deletable": True}
+    ]
     assert "custom_images" not in declaration["gates"]
 
 

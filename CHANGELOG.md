@@ -5,6 +5,9 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.3.233: Boxd declares native snapshots and queries the adapter-declared regions for account
+  inventory. Snapshots retain files and memory, can be deleted, and leave the source's post-capture
+  state unknown. No catalog or conformance change.
 - 0.3.228: the daily switched-off run of `publish-pypi.yml` starts no GitHub-hosted job: its gate runs on the BoxRouter runner selector (`CI_RUNNER`) and is skipped without one; only the `publish` job, which PyPI Trusted Publishing needs hosted, stays on `ubuntu-latest` and starts only when both switches are on. No rule, test, declaration or catalog change.
 - 0.3.227: prepares the package for PyPI, switched off. `.github/workflows/publish-pypi.yml` promotes a published release wheel to PyPI with Trusted Publishing (no stored token): it checks the wheel against `SHA256SUMS`, `SOURCE.json`, its release attestation and the distribution manifest, uploads that exact file, then reads it back from PyPI. It runs only when a repository variable and the organization switch are both enabled; a manual run defaults to a dry run. The wheel's metadata gains the alpha classifier and project links, and its README relative links point at the public repository (`hatch-fancy-pypi-readme`). No rule, test, declaration or catalog change.
 - 0.3.226: adds `docs/implement.md`, "Implement SPS 1.0", the one page that takes a provider from nothing to a passing tester: the two ways to conform (an adapter or a native API), the eleven required operations, discovery and prices, cost, errors, the template adapter, the manifest, the tester, the optional sections and versioning. The README is rewritten to lead with it and is 150 lines. No rule, test, declaration or catalog change.
