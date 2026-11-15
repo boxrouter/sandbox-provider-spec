@@ -1528,6 +1528,30 @@ def _with_timer(**extra: Any) -> dict[str, Any]:
     return document
 
 
+def test_a_router_lifetime_is_destroy_only_and_counts_paused_time() -> None:
+    document = _with_timer(enforced_by="router", counts_paused_time=True, at_end="destroyed")
+    assert sandbox_provider_spec.schema_errors(document, "declaration-schema.json") == []
+    errors = sandbox_provider_spec.check_declaration(document).errors
+    assert not any(
+        "lifetime_timer." in error and "missing a citation" not in error for error in errors
+    )
+
+
+@pytest.mark.parametrize(
+    ("counts_paused_time", "at_end"),
+    [(False, "destroyed"), (True, "paused")],
+)
+def test_a_router_lifetime_rejects_provider_only_timer_semantics(
+    counts_paused_time: bool, at_end: str
+) -> None:
+    document = _with_timer(
+        enforced_by="router",
+        counts_paused_time=counts_paused_time,
+        at_end=at_end,
+    )
+    assert sandbox_provider_spec.schema_errors(document, "declaration-schema.json")
+
+
 def _after_resume_errors(value: object) -> list[str]:
     """Errors naming the fact, other than the citation every declared value needs."""
     errors = sandbox_provider_spec.check_declaration(_with_timer(after_resume=value)).errors

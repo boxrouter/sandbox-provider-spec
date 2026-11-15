@@ -10,14 +10,13 @@ verified:
   sdks: {"httpx": "0.28.1"}
 resources:
   kernel: dedicated
-  # The default class's four shapes; each size's disk is the default a create that sends no
-  # `disk` gets on a template other than Agent37's two VM templates.
+  # VM instances accept 2-100 GB disk on each of the four CPU/memory shapes.
   sizes:
-  - {cpu: 2, memory_mib: 4096, disk_mib: 4096}
-  - {cpu: 4, memory_mib: 8192, disk_mib: 6144}
-  - {cpu: 4, memory_mib: 16384, disk_mib: 12288}
-  - {cpu: 4, memory_mib: 32768, disk_mib: 24576}
-  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 4096}
+  - {cpu: 2, memory_mib: 4096, disk_mib: [2048, 102400]}
+  - {cpu: 4, memory_mib: 8192, disk_mib: [2048, 102400]}
+  - {cpu: 4, memory_mib: 16384, disk_mib: [2048, 102400]}
+  - {cpu: 4, memory_mib: 32768, disk_mib: [2048, 102400]}
+  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 12288}
   size_is_ceiling: true
   # This class's own default image (template agent37-ubuntu), proven by the cited adapter report.
   default_user: root
@@ -25,14 +24,17 @@ resources:
   gpus: unknown
   regions: ["agent37:us", "agent37:eu", "agent37:ap-south"]
   located_in: ["US"]
-  # An instance has no lifetime timer, so this declaration has no `lifetime_timer` block: it
-  # serves only requests that ask for no lifetime (`lifetime_seconds: null`).
+  # Agent37 supplies no timer; the selected BoxRouter benchmark lease enforces finite lifetimes.
   max_lifetime_seconds: unlimited
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
+lifetime_timer:
+  enforced_by: router
+  counts_paused_time: true
+  at_end: destroyed
 gates:
   # Agent37's `network` field, as on a default instance (see declaration.yaml), proven again on VMs.
   network_lockdown:
@@ -55,8 +57,8 @@ evidence:
     source: https://www.agent37.com/docs/agents-api/instance-sizing
     read: 2026-11-12
     quote: >-
-      A VM instance takes the same four shapes, and its compute is 2.5x the default rate. A VM or
-      `performance` instance takes 2-100 GB of disk on every shape.
+      A VM instance takes the same four CPU/memory shapes, and its compute is 2.5x the default
+      rate. A VM or `performance` instance takes 2-100 GB of disk on every shape.
   resources.default_size:
     source: https://www.agent37.com/docs/agents-api/instances/create
     read: 2026-11-12
@@ -91,6 +93,19 @@ evidence:
     quote: >-
       An isolated, persistent computer for code, services, or an agent harness. Built from a
       template. Lives until you delete it, metered per minute for what it holds
+  lifetime_timer.enforced_by:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: >-
+      `router` when BoxRouter's bounded lease and sweeper do.
+  lifetime_timer.counts_paused_time:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: A router-enforced lifetime counts paused time.
+  lifetime_timer.at_end:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: A router-enforced lifetime destroys the sandbox.
   gates.network_lockdown.1.policy:
     reports:
       - tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]

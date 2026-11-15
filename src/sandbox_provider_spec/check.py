@@ -951,7 +951,8 @@ def _check_lifetime_timer(timer: Any, errors: list[str]) -> None:
     for key in timer:
         if key not in LIFETIME_TIMER_KEYS:
             errors.append(f"{UNKNOWN_KEY}: lifetime_timer.{key}")
-    if timer.get("enforced_by") != "provider":
+    enforced_by = timer.get("enforced_by")
+    if enforced_by not in {"provider", "router"}:
         errors.append(f"{UNKNOWN_WORD}: lifetime_timer.enforced_by")
     paused = timer.get("counts_paused_time")
     if not isinstance(paused, bool) and paused != "unknown":
@@ -983,6 +984,11 @@ def _check_lifetime_timer(timer: Any, errors: list[str]) -> None:
         not isinstance(value, str) or value not in allowed | {"unknown"} for value in values
     ):
         errors.append(f"{UNKNOWN_WORD}: lifetime_timer.at_end")
+    if enforced_by == "router":
+        if paused is not True:
+            errors.append("lifetime_timer.counts_paused_time must be true for a router lifetime")
+        if values != ["destroyed"]:
+            errors.append("lifetime_timer.at_end must be destroyed for a router lifetime")
 
 
 def _condition(gate: str, variant: dict[str, Any], spec: dict[str, Any], errors: list[str]) -> None:

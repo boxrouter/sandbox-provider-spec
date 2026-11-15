@@ -9,13 +9,13 @@ verified:
   sdks: {"httpx": "0.28.1"}
 resources:
   kernel: unknown
-  # Agent37's four shapes (instance sizing page). Each size's disk is the default a create that
-  # sends no `disk` gets on a non-VM template; the adapter never sends `disk`.
+  disk_in_memory: false
+  # Agent37's four CPU/memory shapes and their configurable standard-template disk ranges.
   sizes:
-  - {cpu: 2, memory_mib: 4096, disk_mib: 4096}
-  - {cpu: 4, memory_mib: 8192, disk_mib: 6144}
-  - {cpu: 4, memory_mib: 16384, disk_mib: 12288}
-  - {cpu: 4, memory_mib: 32768, disk_mib: 24576}
+  - {cpu: 2, memory_mib: 4096, disk_mib: [2048, 12288]}
+  - {cpu: 4, memory_mib: 8192, disk_mib: [2048, 20480]}
+  - {cpu: 4, memory_mib: 16384, disk_mib: [2048, 40960]}
+  - {cpu: 4, memory_mib: 32768, disk_mib: [2048, 81920]}
   default_size: {cpu: 2, memory_mib: 4096, disk_mib: 4096}
   size_is_ceiling: true
   # Agent37's own default image (template agent37-base), proven by the cited adapter report.
@@ -24,14 +24,17 @@ resources:
   gpus: unknown
   regions: unknown
   located_in: ["US"]
-  # An instance has no lifetime timer, so this declaration has no `lifetime_timer` block: it
-  # serves only requests that ask for no lifetime (`lifetime_seconds: null`).
+  # Agent37 supplies no timer; the selected BoxRouter benchmark lease enforces finite lifetimes.
   max_lifetime_seconds: unlimited
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   max_process_seconds: unknown
   long_running: unknown
   extendable_lifetime: unknown
+lifetime_timer:
+  enforced_by: router
+  counts_paused_time: true
+  at_end: destroyed
 gates:
   # Agent37's `network` field (instance network page): "deny-all", "allow-all" or an allow list of
   # domains (HTTPS on 443, `*.` wildcards) and IPv4 addresses or ranges, set at create or changed
@@ -48,6 +51,9 @@ gates:
       max_allow: {at_least: 32}
       switchable: true
 evidence:
+  resources.disk_in_memory:
+    tests: [coverage.facts.disk_in_memory.false]
+    report: reports/prober-default-coverage.json
   resources.sizes:
     source: https://www.agent37.com/docs/agents-api/instance-sizing
     read: 2026-11-12
@@ -78,6 +84,19 @@ evidence:
     quote: >-
       An isolated, persistent computer for code, services, or an agent harness. Built from a
       template. Lives until you delete it, metered per minute for what it holds
+  lifetime_timer.enforced_by:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: >-
+      `router` when BoxRouter's bounded lease and sweeper do.
+  lifetime_timer.counts_paused_time:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: A router-enforced lifetime counts paused time.
+  lifetime_timer.at_end:
+    source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
+    read: 2026-11-14
+    quote: A router-enforced lifetime destroys the sandbox.
   resources.located_in:
     source: https://www.agent37.com/docs/agents-api/instances/create
     read: 2026-11-11

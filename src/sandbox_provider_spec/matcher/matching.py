@@ -584,8 +584,13 @@ def fit_resources(
                 )
             )
 
-    lifetime: Number | None = number(resources.get("max_lifetime_seconds"))
-    if request.lifetime_seconds is not None and not offers(lifetime, request.lifetime_seconds):
+    declared_lifetime = resources.get("max_lifetime_seconds")
+    lifetime: Number | None = number(declared_lifetime)
+    if (
+        request.lifetime_seconds is not None
+        and declared_lifetime != "unlimited"
+        and not offers(lifetime, request.lifetime_seconds)
+    ):
         # Above an `{at_least: N}` floor nothing is established, as it is for a number knob:
         # "asking for more is unknown" (the format), `resource_unknown` (the reference).
         unknown = lifetime is None or lifetime[0] == "at_least"
@@ -618,17 +623,17 @@ def fit_resources(
                 offered=minimum,
             )
         )
-    if request.no_lifetime and (
-        declaration.lifetime_timer or resources.get("max_lifetime_seconds") != "unlimited"
-    ):
+    timer_enforcer = declaration.lifetime_timer.get("enforced_by")
+    has_timer = timer_enforcer in {"provider", "router"}
+    if request.no_lifetime and (has_timer or resources.get("max_lifetime_seconds") != "unlimited"):
         declared_max = resources.get("max_lifetime_seconds", UNKNOWN)
-        unknown = not declaration.lifetime_timer and declared_max == UNKNOWN
+        unknown = not has_timer and declared_max == UNKNOWN
         failed.append(
             _fail(
                 "resource",
                 "resource_unknown" if unknown else "resource_mismatch",
-                "no lifetime: the provider ends sandboxes "
-                f"(lifetime_timer {'declared' if declaration.lifetime_timer else 'left out'}, "
+                "no lifetime: a provider or BoxRouter timer ends sandboxes "
+                f"(lifetime_timer {'declared' if has_timer else 'left out'}, "
                 f"max_lifetime_seconds {declared_max})",
                 resource="lifetime_seconds",
                 asked=None,
@@ -639,9 +644,12 @@ def fit_resources(
         requested_end = request.at_end
         offered_ends = declaration.lifetime_timer.get("at_end", UNKNOWN)
         offered_ends = offered_ends if isinstance(offered_ends, list) else [offered_ends]
+        enforced_by = declaration.lifetime_timer.get("enforced_by")
+        ends_as_requested = requested_end in offered_ends
         if (
-            declaration.lifetime_timer.get("enforced_by") != "provider"
-            or requested_end not in offered_ends
+            enforced_by not in {"provider", "router"}
+            or not ends_as_requested
+            or (enforced_by == "router" and requested_end != "destroyed")
         ):
             failed.append(
                 _fail(

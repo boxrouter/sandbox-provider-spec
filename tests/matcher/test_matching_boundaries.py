@@ -40,6 +40,45 @@ def _declaration(sdks: dict[str, str]) -> dict[str, Any]:
     }
 
 
+def test_router_lifetime_only_matches_finite_destroy_requests() -> None:
+    sdks = {"audit-sdk": "1.0.0"}
+    declaration = _declaration(sdks)
+    declaration["resources"] = {"max_lifetime_seconds": "unlimited"}
+    declaration["lifetime_timer"] = {
+        "enforced_by": "router",
+        "counts_paused_time": True,
+        "at_end": "destroyed",
+    }
+    declaration["gates"]["pause_resume"] = [{"keeps": "files_only"}]
+    report = _report(sdks)
+
+    finite = match(
+        {"lifetime_seconds": 300, "at_end": "destroyed"},
+        [declaration],
+        reports=[report],
+    )
+    unbounded = match({"lifetime_seconds": None}, [declaration], reports=[report])
+    paused = match(
+        {
+            "lifetime_seconds": 300,
+            "at_end": "paused",
+            "requirements": {"pause_resume": {}},
+        },
+        [declaration],
+        reports=[report],
+    )
+
+    assert finite["eligible"] == ["audit"]
+    assert unbounded["eligible"] == []
+    unbounded_failures = unbounded["results"]["audit"]["failed"]
+    assert [failure["reason"] for failure in unbounded_failures] == ["resource_mismatch"]
+    assert unbounded_failures[0].get("resource") == "lifetime_seconds"
+    assert paused["eligible"] == []
+    paused_failures = paused["results"]["audit"]["failed"]
+    assert [failure["reason"] for failure in paused_failures] == ["resource_mismatch"]
+    assert paused_failures[0].get("resource") == "at_end"
+
+
 @pytest.mark.parametrize(
     ("gate", "body", "knob", "available"),
     [
