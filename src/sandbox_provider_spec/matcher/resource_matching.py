@@ -12,6 +12,7 @@ from sandbox_provider_spec.matcher.catalog import (
     PER_OPERATION_RESOURCES,
     UNKNOWN,
     Document,
+    plain,
 )
 from sandbox_provider_spec.matcher.declaration import number, offers
 
@@ -42,7 +43,8 @@ def fit_all_of_resources(
                 fail(
                     "resource",
                     failure,
-                    f"{fact}: asked {request_values}, declared {resources.get(fact, UNKNOWN)}",
+                    f"{fact}: asked {plain(request_values)}, "
+                    f"declared {plain(resources.get(fact, UNKNOWN))}",
                     resource=fact,
                     asked=request_values,
                     offered=resources.get(fact, UNKNOWN),
@@ -73,7 +75,8 @@ def fit_per_operation_resources(
                 fail(
                     "resource",
                     "resource_unknown" if unknown else "resource_mismatch",
-                    f"{ask}.{operation}: asked {amount}, {fact}.{operation} declared {raw}",
+                    f"{ask}.{operation}: asked {plain(amount)}, "
+                    f"{fact}.{operation} declared {plain(raw)}",
                     resource=f"{ask}.{operation}",
                     asked=amount,
                     offered=raw,

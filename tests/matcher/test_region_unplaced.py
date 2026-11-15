@@ -38,3 +38,10 @@ def test_nothing_is_added_when_every_offered_region_lists_countries() -> None:
     declaration = _Declaration({"regions": ["daytona:us"]})
     ((_, failure),) = _fit_region(declaration, "EU", _registry())[1]  # type: ignore[arg-type]
     assert "lists no countries" not in failure["detail"]
+
+
+def test_a_region_miss_reads_as_plain_words_not_python_lists() -> None:
+    """QA-425: the detail printed `regions ['e2b:us'], located_in ['US']`."""
+    declaration = _Declaration({"regions": ["daytona:us"], "located_in": ["US"]})
+    ((_, failure),) = _fit_region(declaration, "EU", _registry())[1]  # type: ignore[arg-type]
+    assert failure["detail"] == "region: asked EU, regions daytona:us, located_in US"

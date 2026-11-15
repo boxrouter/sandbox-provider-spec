@@ -99,7 +99,7 @@ def test_e2b_prepared_snapshot_does_not_prove_per_create_entrypoint(entrypoint: 
     assert result["rejected"] is None
     assert result["eligible"] == []
     assert (
-        f"runs_entrypoint: asked [{entrypoint}], declared unknown"
+        f"runs_entrypoint: asked {entrypoint}, declared unknown"
         in result["results"]["e2b"]["failed"][0]["detail"]
     )
 

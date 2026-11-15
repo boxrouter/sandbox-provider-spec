@@ -15,6 +15,17 @@ Document = dict[str, Any]
 
 ANY: Final = "any"
 UNKNOWN: Final = "unknown"
+
+
+def plain(value: Any) -> str:
+    """A value as plain words for a refusal: a list reads `a, b`, a mapping `key value`."""
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return ", ".join(plain(item) for item in value)
+    if isinstance(value, dict):
+        return ", ".join(f"{key} {plain(item)}" for key, item in value.items())
+    return str(value)
+
+
 UNLIMITED: Final = "unlimited"
 
 Kind = Literal["pick", "all_of", "flag", "number"]

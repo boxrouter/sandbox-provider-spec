@@ -34,6 +34,7 @@ from sandbox_provider_spec.matcher.catalog import (
     STAGES,
     UNKNOWN,
     Document,
+    plain,
 )
 from sandbox_provider_spec.matcher.conditions import KnobGrant, _any_granted, _granted
 from sandbox_provider_spec.matcher.declaration import (
@@ -204,7 +205,10 @@ def fit_variant(
                 unknown = declared is None or declared[0] == "at_least"
                 return {}, {
                     "reason": "knob_unknown" if unknown else "knob_mismatch",
-                    "detail": f"{knob}: asked {asked}, declared {variant.raw.get(knob, UNKNOWN)}",
+                    "detail": (
+                        f"{knob}: asked {plain(asked)}, "
+                        f"declared {plain(variant.raw.get(knob, UNKNOWN))}"
+                    ),
                     "gate": gate,
                     "knob": knob,
                     "asked": asked,
@@ -216,7 +220,7 @@ def fit_variant(
             if named:
                 return {}, {
                     "reason": "knob_unknown",
-                    "detail": f"{knob}: asked {wanted}, declared unknown",
+                    "detail": f"{knob}: asked {plain(wanted)}, declared unknown",
                     "gate": gate,
                     "knob": knob,
                     "asked": wanted,
@@ -235,7 +239,10 @@ def fit_variant(
             if missing:
                 return {}, {
                     "reason": "knob_mismatch",
-                    "detail": f"{knob}: asked all of {wanted}, offers {sorted(offered, key=str)}",
+                    "detail": (
+                        f"{knob}: asked all of {plain(wanted)}, "
+                        f"offers {plain(sorted(offered, key=str))}"
+                    ),
                     "gate": gate,
                     "knob": knob,
                     "asked": wanted,
@@ -245,7 +252,10 @@ def fit_variant(
         if not accepted:
             return {}, {
                 "reason": "knob_mismatch",
-                "detail": f"{knob}: asked {wanted}, offers {sorted(offered, key=str)}",
+                "detail": (
+                    f"{knob}: asked {plain(wanted)}, "
+                    f"offers {plain(sorted(offered, key=str))}"
+                ),
                 "gate": gate,
                 "knob": knob,
                 "asked": wanted,
@@ -534,8 +544,8 @@ def _fit_region(
     # countries: say which, because the registry never infers a country from a name.
     unplaced = [r for r in pinnable if registry.within(r) is None] if inside is not None else []
     detail = (
-        f"region: asked {want}, regions {resources.get('regions', UNKNOWN)}, "
-        f"located_in {resources.get('located_in', UNKNOWN)}"
+        f"region: asked {want}, regions {plain(resources.get('regions', UNKNOWN))}, "
+        f"located_in {plain(resources.get('located_in', UNKNOWN))}"
     )
     if unplaced:
         names = ", ".join(unplaced)
@@ -740,7 +750,8 @@ def fit_resources(
                 _fail(
                     "resource",
                     "resource_unknown" if unknown else "resource_mismatch",
-                    f"{ask}: asked {asked[ask]}, {fact} declared {resources.get(fact, UNKNOWN)}",
+                    f"{ask}: asked {plain(asked[ask])}, "
+                    f"{fact} declared {plain(resources.get(fact, UNKNOWN))}",
                     resource=ask,
                     asked=asked[ask],
                     offered=resources.get(fact, UNKNOWN),
