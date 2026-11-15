@@ -6,9 +6,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import replace
+from importlib.metadata import version
+from pathlib import Path
 
 import pytest
 
+from sandbox_provider_spec import report as report_module
 from sandbox_provider_spec.check import check_document
 from sandbox_provider_spec.driver import Driver
 from sandbox_provider_spec.report import report
@@ -92,3 +95,42 @@ def test_unrecognized_report_metadata_is_rejected() -> None:
     receipt = document(suite, list(fixture_results(suite)))
     receipt["debug_metadata"] = "test-only"
     assert check_document(receipt).errors
+
+
+def declared(tmp_path: Path, sdks: Mapping[str, str]) -> Path:
+    path = tmp_path / "declaration.yaml"
+    lines = [
+        "verified:",
+        "  date: '2026-01-01'",
+        "  sdks:",
+        *(f"    {k}: '{v}'" for k, v in sdks.items()),
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def test_a_report_records_every_installed_sdk_its_declaration_verifies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Whichever operations ran, the report states the environment: an SDK the run did not load
+    is recorded at its installed version, one that is not installed is left out, and a version the
+    driver recorded is never replaced."""
+    path = declared(
+        tmp_path, {"example-sdk": "9.9.9", "pytest": "0", "a-sdk-nobody-installed": "1"}
+    )
+    monkeypatch.setattr(report_module, "installed_declaration_path", lambda *_args: path)
+    suite = fixture_suite()
+    result = document(suite, fixture_results(suite))
+    assert result["sdk_versions"] == {"example-sdk": "1.0.0", "pytest": version("pytest")}
+    assert check_document(result).errors == []
+
+
+def test_a_report_with_no_installed_declaration_records_only_the_drivers_versions(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def missing(*_args: object) -> Path:
+        raise FileNotFoundError("no installed package registers a declaration")
+
+    monkeypatch.setattr(report_module, "installed_declaration_path", missing)
+    suite = fixture_suite()
+    assert document(suite, fixture_results(suite))["sdk_versions"] == {"example-sdk": "1.0.0"}

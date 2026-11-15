@@ -7,18 +7,20 @@ from __future__ import annotations
 import json
 import subprocess
 from collections.abc import Mapping, Sequence
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import cast
 
 from sandbox_provider_spec.check_digests import check_digests
+from sandbox_provider_spec.document_cache import cached_load
 from sandbox_provider_spec.driver import Driver
 from sandbox_provider_spec.evidence import DEVELOPMENT_REVISION
+from sandbox_provider_spec.installed import installed_declaration_path
 from sandbox_provider_spec.run_id import run_id
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import SPEC, Suite
 
-__all__ = ["DEVELOPMENT_REVISION", "report", "revision", "write_report"]
+__all__ = ["DEVELOPMENT_REVISION", "recorded_sdk_versions", "report", "revision", "write_report"]
 
 
 def revision(root: Path) -> str:
@@ -34,6 +36,34 @@ def revision(root: Path) -> str:
     return subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True
     ).stdout.strip()
+
+
+def recorded_sdk_versions(driver: Driver) -> dict[str, str]:
+    """The driver's `sdk_versions` plus the installed version of every SDK the declaration verifies.
+
+    A report states the environment it ran in, whichever operations the run reached: an SDK that
+    only some operations load (a desktop SDK, say) is recorded by a baseline run as truthfully as
+    by a coverage run. The declaration is the provider's installed one for the driver's class;
+    when none is installed the driver's own versions are all that is known. An SDK of the
+    declaration that is not installed is left out, and a version the driver recorded is never
+    replaced.
+    """
+    recorded = dict(driver.sdk_versions)
+    try:
+        declaration = cached_load(
+            installed_declaration_path(driver.provider, driver.execution_class)
+        )
+    except (FileNotFoundError, ValueError, OSError):
+        return recorded
+    verified = declaration.get("verified") if isinstance(declaration, dict) else None
+    sdks = verified.get("sdks") if isinstance(verified, dict) else None
+    for name in sdks if isinstance(sdks, dict) else ():
+        if isinstance(name, str) and name not in recorded:
+            try:
+                recorded[name] = version(name)
+            except PackageNotFoundError:
+                continue
+    return recorded
 
 
 # Provenance fields have independent sources and are deliberately explicit.
@@ -70,7 +100,7 @@ def report(
         "spec": SPEC,
         "provider": driver.provider,
         "driver": {"name": type(driver).__name__, "version": version("sandbox-provider-spec")},
-        "sdk_versions": dict(driver.sdk_versions),
+        "sdk_versions": recorded_sdk_versions(driver),
         "started_at": started_at,
         "finished_at": now(),
         "revision": spec_revision,
