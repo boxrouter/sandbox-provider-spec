@@ -24,9 +24,12 @@ for suite in core coverage; do
 done
 ```
 
-On a cold daemon, Docker Hub can refuse anonymous image pulls with HTTP 429. Authenticate
-with `docker login` or use a cached registry mirror for that daemon before running the
-suites; the [README describes the symptoms and remedies](../../README.md#run-docker-conformance).
+On a cold daemon, Docker Hub can refuse anonymous image pulls with HTTP 429. The symptoms are
+an `APIError` and image-dependent tests marked `not_run`; cleanup alone does not make the run
+pass. Authenticate with `docker login`, or configure a
+[cached registry mirror](https://docs.docker.com/docker-hub/image-library/mirror/) for the daemon
+that the SDK uses, before running the suites. An unreachable fixture URL can produce
+`baseline.outbound_network: probe_connection_failed`.
 
 The runner resolves documented unsupported operations and runs checks without explicit
 elapsed-time waits first. Independent single-sandbox timer checks can share elapsed

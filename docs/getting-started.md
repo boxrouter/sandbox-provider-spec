@@ -54,7 +54,7 @@ provider satisfies it.
 
 The package includes declarations and their cited reports. Find a declaration using
 `sandbox-provider-spec installed-declaration docker-engine`; the command prints its absolute path.
-Use that path with `match`, as in the [checked README transcript](../README.md#the-matching-result).
+Use that path with `match`, as in the [checked README transcript](../README.md#for-tools-that-choose-a-sandbox).
 Paths discovered this way work with both a source install and a wheel install.
 
 `match` prints `eligible` or `not eligible` for each provider or execution class, followed

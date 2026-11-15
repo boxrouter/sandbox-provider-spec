@@ -10,6 +10,8 @@ from pathlib import Path
 
 import sandbox_provider_spec
 from sandbox_provider_spec.suite import read_suite
+from sandbox_provider_spec.v1 import Cost, Discovery
+from sandbox_provider_spec.v1.wire import error_from_json, from_json
 
 ROOT = Path(__file__).resolve().parents[1]
 FENCE = re.compile(r"```(yaml|yml|json)\s*\n(.*?)\n```", re.DOTALL | re.IGNORECASE)
@@ -71,6 +73,16 @@ def test_every_documented_yaml_and_json_example_passes_its_format(
                 assert _cited_tests(document) <= _suite_ids(), label
             elif "driver" in document and "tests" in document:
                 assert sandbox_provider_spec.check_report(document).errors == [], label
+            elif "spec_version" in document and "classes" in document:  # a 1.0 discovery result
+                from_json(Discovery, document)
+            elif "sandbox_id" in document and "lines" in document:  # a 1.0 cost result
+                from_json(Cost, document)
+            elif "error" in document:  # a 1.0 error body
+                error_from_json(document)
+            elif "credential_fields" in document:  # an adapter manifest
+                assert (
+                    sandbox_provider_spec.schema_errors(document, "sps-provider.schema.json") == []
+                ), label
             else:
                 assert sandbox_provider_spec.schema_errors(document, "request-schema.json") == [], (
                     label

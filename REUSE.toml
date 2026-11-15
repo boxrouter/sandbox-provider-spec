@@ -32,6 +32,7 @@ path = [
   "docs/README.md",
   "docs/explanation/evidence-and-unknown.md",
   "docs/getting-started.md",
+  "docs/implement.md",
   "docs/how-to/add-provider.md",
   "docs/how-to/compare-providers.md",
   "docs/how-to/provider-kit.md",
