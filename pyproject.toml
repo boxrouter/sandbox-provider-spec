@@ -1,16 +1,17 @@
 [build-system]
-requires = ["hatchling==1.32.4"]
+requires = ["hatchling==1.32.4", "hatch-fancy-pypi-readme==25.1.0"]
 build-backend = "hatchling.build"
 
 [project]
 name = "sandbox-provider-spec"
-version = "0.3.226"
+version = "0.3.227"
 description = "The Sandbox Provider Specification: what a sandbox provider guarantees, how it declares it, and how conformance proves it"
-readme = "README.md"
+dynamic = ["readme"]
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
 classifiers = [
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Typing :: Typed",
 ]
@@ -18,6 +19,11 @@ dependencies = [
     "jsonschema>=4.23,<5",
     "pyyaml>=6.0.1,<7",
 ]
+
+[project.urls]
+Homepage = "https://github.com/boxrouter/sandbox-provider-spec"
+Issues = "https://github.com/boxrouter/sandbox-provider-spec/issues"
+Changelog = "https://github.com/boxrouter/sandbox-provider-spec/blob/main/CHANGELOG.md"
 
 [project.scripts]
 sandbox-provider-spec = "sandbox_provider_spec.cli:main"
@@ -57,6 +63,15 @@ docs = [
     "markdown-it-py==4.2.0",
     "pymarkdownlnt==0.9.41",
 ]
+
+# The package page shows the README, so its relative links must point at the public repository.
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+fragments = [{ path = "README.md" }]
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '(\]\()(?!https?://|#|mailto:)(?:\./)?([^)\s]+)'
+replacement = '\1https://github.com/boxrouter/sandbox-provider-spec/blob/main/\2'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sandbox_provider_spec"]

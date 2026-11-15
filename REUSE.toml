@@ -10,6 +10,7 @@ path = [
   ".github/PULL_REQUEST_TEMPLATE.md",
   ".github/workflows/checks.yml",
   ".github/workflows/dco.yml",
+  ".github/workflows/publish-pypi.yml",
   ".github/workflows/release.yml",
   ".gitignore",
   ".pymarkdown.json",
