@@ -8,11 +8,12 @@ import base64
 import json
 import re
 import ssl
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections.abc import Mapping
-from typing import Any, cast
+from collections.abc import Callable, Mapping
+from typing import Any, TypeVar, cast
 from uuid import uuid4
 
 from sandbox_provider_spec.driver import Driver, NativeFailure, NotRun
@@ -25,6 +26,11 @@ HTTP_WORKER_REQUEST_ENV = "SPS_COVERAGE_V2_HTTP_WORKER_REQUEST_B64"
 HTTP_REQUEST_DEADLINE_SECONDS = 30
 HTTP_RUN_TIMEOUT_MARGIN_MS = 10_000
 RESPONSE_LIMIT = 64 * 1024
+RETRY_PAUSES_SECONDS = (1.0, 3.0)
+"""The pauses before the second and third try of a runner request to a receiver: the runner's own
+link can drop a TLS handshake now and then, which says nothing about the sandbox's network."""
+
+_T = TypeVar("_T")
 
 HTTP_WORKER_SCRIPT = r"""import base64, json, os, ssl, urllib.error, urllib.request
 item = json.loads(base64.b64decode(os.environ["SPS_COVERAGE_V2_HTTP_WORKER_REQUEST_B64"]))
@@ -115,15 +121,66 @@ def guest_json(result: Mapping[str, object], *, max_length: int) -> object:
         raise NativeFailure("network_guest_probe_invalid") from None
 
 
-def _request(url: str, method: str, token: str) -> bool:
-    request = urllib.request.Request(url, method=method, headers={"X-SPS-Probe": token})
+def _transient(error: BaseException) -> bool:
+    """Whether a later try may succeed: a timeout, a TLS handshake failure, a connection reset or
+    a 5xx. A 4xx, a certificate that does not verify and every other failure are final."""
+    if isinstance(error, urllib.error.HTTPError):
+        return error.code >= 500
+    cause = error.reason if isinstance(error, urllib.error.URLError) else error
+    if isinstance(cause, ssl.SSLCertVerificationError):
+        return False
+    return isinstance(cause, TimeoutError | ssl.SSLError | ConnectionResetError)
+
+
+def _tries(count: int) -> str:
+    return "1 try" if count == 1 else f"{count} tries"
+
+
+def _retried(call: Callable[[], _T]) -> _T:
+    """`call`, tried again after each transient failure (`_transient`) while pauses remain.
+
+    Only the runner's own requests to the receivers go through here, never the sandbox's: inside
+    the sandbox a timeout is what a lockdown check measures.
+    """
+    for pause in (*RETRY_PAUSES_SECONDS, None):
+        try:
+            return call()
+        except (urllib.error.URLError, TimeoutError, OSError) as error:
+            if pause is None or not _transient(error):
+                raise
+            time.sleep(pause)
+    raise AssertionError("unreachable")  # pragma: no cover
+
+
+def _control(url: str, method: str) -> str:
+    """Send one runner control request; the token of the try the receiver answered with a 2xx.
+
+    Each try sends a fresh token, so a try that reached the receiver but lost its answer cannot
+    leave a second record under the token the recorder check reads.
+    """
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
-    try:
+    tokens: list[str] = []
+
+    def send() -> str:
+        tokens.append(uuid4().hex)
+        request = urllib.request.Request(url, method=method, headers={"X-SPS-Probe": tokens[-1]})
         with opener.open(request, timeout=8) as response:
             response.read(1)
-            return 200 <= cast(int, response.status) < 300
-    except (urllib.error.URLError, TimeoutError, OSError):
-        return False
+            if not 200 <= cast(int, response.status) < 300:
+                raise NotRun(
+                    "network_control_unavailable",
+                    detail=f"runner control request: HTTP status {response.status}",
+                )
+        return tokens[-1]
+
+    try:
+        return _retried(send)
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
+        raise NotRun(
+            "network_control_unavailable",
+            detail=f"runner control request ({_tries(len(tokens))}): "
+            + _observer_detail(error, tokens[-1]),
+        ) from None
 
 
 def _records_url(url: str, token: str) -> str:
@@ -160,21 +217,25 @@ def records(url: str, token: str, *, ca_pem: str | None = None) -> list[tuple[st
             urllib.request.HTTPSHandler(context=ssl.create_default_context(cadata=ca_pem))
         )
     opener = urllib.request.build_opener(*handlers)
-    try:
+    tries = 0
+
+    def read() -> bytes:
+        nonlocal tries
+        tries += 1
         with opener.open(request, timeout=8) as response:
             if not 200 <= cast(int, response.status) < 300:
                 raise NotRun(
                     "network_receiver_observer_unavailable",
-                    detail=f"HTTP status {response.status}",
+                    detail=f"runner observer request: HTTP status {response.status}",
                 )
-            payload = response.read(RESPONSE_LIMIT + 1)
-    except urllib.error.HTTPError as error:
-        raise NotRun(
-            "network_receiver_observer_unavailable", detail=_observer_detail(error, token)
-        ) from None
+            return cast(bytes, response.read(RESPONSE_LIMIT + 1))
+
+    try:
+        payload = _retried(read)
     except (urllib.error.URLError, TimeoutError, OSError) as error:
         raise NotRun(
-            "network_receiver_observer_unavailable", detail=_observer_detail(error, token)
+            "network_receiver_observer_unavailable",
+            detail=f"runner observer request ({_tries(tries)}): " + _observer_detail(error, token),
         ) from None
     if len(payload) > RESPONSE_LIMIT:
         raise NativeFailure("network_receiver_response_invalid")
@@ -204,10 +265,7 @@ def record_row(row: object, failure: str) -> tuple[str, str]:
 
 def runner_controls(urls: list[str], methods: list[str]) -> None:
     """Prove each receiver and its recorder from outside the sandbox."""
-    tokens = [uuid4().hex for _ in urls]
-    for url, method, token in zip(urls, methods, tokens, strict=True):
-        if not _request(url, method, token):
-            raise NotRun("network_control_unavailable")
+    tokens = [_control(url, method) for url, method in zip(urls, methods, strict=True)]
     for url, method, token in zip(urls, methods, tokens, strict=True):
         if records(url, token) != [(method, path(url))]:
             raise NotRun("network_receiver_control_unavailable")

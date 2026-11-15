@@ -122,16 +122,20 @@ def test_receiver_records_accepts_deployed_and_legacy_payload_shapes(field: str)
 @pytest.mark.parametrize(
     ("failure", "expected_detail"),
     [
-        ("http", "HTTP status 404"),
-        ("url", "URLError: collector unavailable"),
-        ("url_exception", "OSError: collector unavailable"),
-        ("timeout", "TimeoutError: timeout for <url>"),
-        ("os", "OSError: socket unavailable at /records/<namespace>"),
+        ("http", "runner observer request (1 try): HTTP status 404"),
+        ("url", "runner observer request (1 try): URLError: collector unavailable"),
+        ("url_exception", "runner observer request (1 try): OSError: collector unavailable"),
+        ("timeout", "runner observer request (3 tries): TimeoutError: timeout for <url>"),
+        (
+            "os",
+            "runner observer request (1 try): OSError: socket unavailable at /records/<namespace>",
+        ),
     ],
 )
 def test_records_observer_failure_detail_is_specific_and_redacted(
     monkeypatch: pytest.MonkeyPatch, failure: str, expected_detail: str
 ) -> None:
+    monkeypatch.setattr(network_probe, "RETRY_PAUSES_SECONDS", (0.0, 0.0))
     token = "private-namespace-token"
 
     class FailingOpener:
@@ -156,6 +160,116 @@ def test_records_observer_failure_detail_is_specific_and_redacted(
     assert detail == expected_detail
     assert detail is not None
     assert token not in detail
+
+
+class _Answer:
+    """A 200 response with a recorder payload, as `urlopen` returns one."""
+
+    status = 200
+
+    def __init__(self, payload: bytes) -> None:
+        self.payload = payload
+
+    def __enter__(self) -> _Answer:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        pass
+
+    def read(self, _limit: int = -1) -> bytes:
+        return self.payload
+
+
+class _ScriptedOpener:
+    """Raises each scripted failure in turn, then answers 200; records every request it gets."""
+
+    def __init__(self, failures: list[BaseException], payload: bytes = b"[]") -> None:
+        self.failures = failures
+        self.payload = payload
+        self.requests: list[urllib.request.Request] = []
+
+    def open(self, request: urllib.request.Request, timeout: float = 8) -> _Answer:
+        del timeout
+        self.requests.append(request)
+        if self.failures:
+            raise self.failures.pop(0)
+        return _Answer(self.payload)
+
+
+def _scripted(monkeypatch: pytest.MonkeyPatch, opener: _ScriptedOpener) -> list[float]:
+    """Install `opener` for the probe's runner requests; the pauses the retries took."""
+    pauses: list[float] = []
+    monkeypatch.setattr(urllib.request, "build_opener", lambda *_args: opener)
+    monkeypatch.setattr(time, "sleep", pauses.append)
+    return pauses
+
+
+def _handshake_timeout() -> urllib.error.URLError:
+    return urllib.error.URLError(TimeoutError("_ssl.c:1064: The handshake operation timed out"))
+
+
+def test_a_runner_request_that_fails_transiently_succeeds_on_a_later_try(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = json.dumps([{"method": "GET", "path": "/health"}]).encode()
+    observer = _ScriptedOpener([_handshake_timeout(), ssl.SSLError("handshake failed")], payload)
+    pauses = _scripted(monkeypatch, observer)
+    assert network_probe.records("https://receiver.example/health", "token") == [("GET", "/health")]
+    assert len(observer.requests) == 3
+    assert pauses == list(network_probe.RETRY_PAUSES_SECONDS)
+
+    control = _ScriptedOpener([ConnectionResetError("reset by peer")])
+    _scripted(monkeypatch, control)
+    token = network_probe._control("https://receiver.example/health", "GET")
+    sent = [request.get_header("X-sps-probe") for request in control.requests]
+    # Every try sends its own token: a lost answer cannot leave a second record under it.
+    assert len(sent) == 2 and len(set(sent)) == 2 and token == sent[-1]
+
+
+def test_a_runner_request_that_never_recovers_is_not_run_naming_the_call_and_cause(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    tries = len(network_probe.RETRY_PAUSES_SECONDS) + 1
+    observer = _ScriptedOpener([_handshake_timeout() for _ in range(tries)])
+    pauses = _scripted(monkeypatch, observer)
+    with pytest.raises(NotRun, match="^network_receiver_observer_unavailable$") as observed:
+        network_probe.records("https://receiver.example/health", "token")
+    assert observed.value.detail == (
+        f"runner observer request ({tries} tries): "
+        "TimeoutError: _ssl.c:1064: The handshake operation timed out"
+    )
+    assert len(observer.requests) == tries
+    assert pauses == list(network_probe.RETRY_PAUSES_SECONDS)
+
+    control = _ScriptedOpener([ssl.SSLError("handshake failed") for _ in range(tries)])
+    _scripted(monkeypatch, control)
+    with pytest.raises(NotRun, match="^network_control_unavailable$") as controlled:
+        network_probe.runner_controls(["https://receiver.example/health"], ["GET"])
+    assert str(controlled.value.detail).startswith(f"runner control request ({tries} tries): ")
+    assert len(control.requests) == tries
+
+
+def test_a_4xx_from_a_receiver_fails_at_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    def denied() -> urllib.error.HTTPError:
+        url = "https://receiver.example/health"
+        return urllib.error.HTTPError(url, 403, "forbidden", Message(), None)
+
+    for call, reason in (
+        (
+            lambda: network_probe.records("https://receiver.example/health", "token"),
+            "network_receiver_observer_unavailable",
+        ),
+        (
+            lambda: network_probe.runner_controls(["https://receiver.example/health"], ["GET"]),
+            "network_control_unavailable",
+        ),
+    ):
+        opener = _ScriptedOpener([denied(), denied()])
+        pauses = _scripted(monkeypatch, opener)
+        with pytest.raises(NotRun, match=f"^{reason}$") as failed:
+            call()
+        assert len(opener.requests) == 1 and pauses == []
+        assert str(failed.value.detail).endswith("(1 try): HTTP status 403")
 
 
 def test_runner_keeps_not_run_detail_on_the_step(

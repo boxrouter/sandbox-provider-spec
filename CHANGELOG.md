@@ -5,6 +5,15 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.13: the network checks' runner-side requests to the receivers (the control request and the
+  recorder read in `coverage_network_probe.py`) are tried up to three times, pausing 1 s and then
+  3 s, after a timeout, a TLS handshake failure, a connection reset or a 5xx. A 4xx, a certificate
+  that does not verify and any other failure end at once. Each control try sends its own token. The
+  sandbox's own reach probes are never retried, because there a timeout is the result. After the
+  last try the row is still `not_run` with the same reason (`network_control_unavailable` or
+  `network_receiver_observer_unavailable`), and its detail names the call, the number of tries and
+  the cause, for example `runner observer request (3 tries): TimeoutError: ...`. No declaration,
+  catalog or suite change.
 - 0.4.12: `guest_user.selectable` starts from the provider's default image and creates its user there (`useradd`, under `sudo -n` when the guest user is not root), instead of building a `python:3.12-slim` Dockerfile. A provider that takes no Dockerfile, or only its own base image, can now reach the user-selection checks; the three knobs and their rules are unchanged. The check's digest changes, so earlier reports of it no longer count for it; the coverage suite that this replaces is recorded in `conformance/historical-suite-rules.json` so reports of every other coverage test stay recognized.
 - 0.4.11: a gate the declaration does not list is refused with 'previews: this route does not list it, so it is not offered' instead of 'not declared; nobody has looked'. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.10: test-only. The locked-create store test no longer depends on a 50 ms scheduling window: a worker thread that a starved host schedules after its request's deadline frees its slot without touching the store, so `pending` fell below 8 (seen as 7, 5 and 4 on a one-core starvation repro, and in the SPS mirror export's standalone check). It uses a 1 s deadline and keeps its blocked store calls blocked for the nine seconds that takes (a 300 s sqlite busy timeout for that endpoint instead of 10 s). No rule, declaration, schema or catalog change.
