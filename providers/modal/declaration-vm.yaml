@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: vm
 verified:
-  date: '2026-11-14'
+  date: '2026-11-15'
   sdks:
     modal: 1.6.1
 resources:
@@ -113,11 +113,11 @@ evidence:
   gates.previews.0.access:
     tests:
     - previews.access.public
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
   gates.previews.0.revocable:
     tests:
     - previews.revocable.false.public
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
   gates.previews.0.link_lifetime_seconds:
     tests:
     - previews.link_lifetime_seconds.public
@@ -125,11 +125,11 @@ evidence:
   gates.previews.0.max_ports:
     tests:
     - previews.listed_ports
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_only
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
   gates.tcp_ports.0.tls:
     source: https://modal.com/docs/guide/tunnels
     read: '2026-10-05'
@@ -137,8 +137,8 @@ evidence:
   gates.processes.0.input:
     tests:
     - processes.input.true
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
   gates.terminal.0:
     tests:
     - terminal.interactive
-    report: reports/native-vm-core.json
+    report: reports/prober-vm-core.json
