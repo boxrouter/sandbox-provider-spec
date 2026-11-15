@@ -36,6 +36,11 @@ from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.server import run_server
 
 PROVIDER_GROUP = "sandbox_provider_spec.providers"
+# The specification is distributed from its GitHub repository only.
+HTTP_EXTRA_INSTALL = (
+    "pip install 'sandbox-provider-spec[http] @ "
+    "git+https://github.com/boxrouter/sandbox-provider-spec'"
+)
 
 
 class _InputError(ValueError):
@@ -186,8 +191,7 @@ def _serve(args: argparse.Namespace) -> int:
         if error.name != "uvicorn":
             raise
         print(
-            "serve: the HTTP server needs the `http` extra: "
-            "pip install 'sandbox-provider-spec[http]'",
+            f"serve: the HTTP server needs the `http` extra: {HTTP_EXTRA_INSTALL}",
             file=sys.stderr,
         )
         return 1
@@ -262,7 +266,7 @@ def _test(args: argparse.Namespace) -> int:
         if error.name != "httpx":
             raise
         print(
-            "test: a URL target needs the `http` extra: pip install 'sandbox-provider-spec[http]'",
+            f"test: a URL target needs the `http` extra: {HTTP_EXTRA_INSTALL}",
             file=sys.stderr,
         )
         return 1

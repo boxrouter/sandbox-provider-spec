@@ -166,8 +166,10 @@ valid error body, counts as `provider_error` with outcome `unknown`.
 
 ### 1. Copy The Template Or Start Your Endpoint
 
-The tester and a reference server ship in the `sandbox-provider-spec` package. The template is in
-the repository.
+The tester and a reference server ship in the `sandbox-provider-spec` package. The package and the
+template are in the [GitHub repository](https://github.com/boxrouter/sandbox-provider-spec); the
+commands below run the package straight from it, so there is nothing else to install. Add `@` and
+a release tag after the URL (`git+https://github.com/boxrouter/sandbox-provider-spec@<tag>`) to pin a release.
 
 **Adapter.** The template is a complete adapter for Example Cloud, a small fake provider API that
 runs each sandbox as a local Docker container. Example Cloud is deliberately not shaped like SPS,
@@ -203,7 +205,7 @@ To see a working server, serve the template adapter over the HTTP API. The `serv
 any installed adapter, and it needs the `http` extra:
 
 ```console
-uvx --with ./my_adapter --from 'sandbox-provider-spec[http]' sandbox-provider-spec serve example --port 18431
+uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandbox-provider-spec' --with ./my_adapter sandbox-provider-spec serve example --port 18431
 ```
 
 Use your own provider id in place of `example` after you rename the template.
@@ -239,10 +241,10 @@ variable that you name, never from the command line.
 
 ```console
 # Adapter: the provider id from your manifest
-uvx --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
+uvx --from git+https://github.com/boxrouter/sandbox-provider-spec --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
 
 # Native API: your base URL (the URL form needs the http extra)
-uvx --from 'sandbox-provider-spec[http]' sandbox-provider-spec test \
+uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandbox-provider-spec' sandbox-provider-spec test \
   https://api.example.com/sps --credential token=EXAMPLE_TOKEN
 ```
 

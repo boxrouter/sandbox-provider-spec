@@ -20,7 +20,7 @@ and the tester.
 git clone https://github.com/boxrouter/sandbox-provider-spec
 cp -r sandbox-provider-spec/template my_adapter
 # Replace the template's Example Cloud calls with calls to your API, then run the tester:
-uvx --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
+uvx --from git+https://github.com/boxrouter/sandbox-provider-spec --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
 ```
 
 The tester runs the same tests that any consumer runs. It prints one line per required operation
@@ -90,11 +90,11 @@ $ sandbox-provider-spec match coding-agent.yaml --met-need pro_plan \
     "$(sandbox-provider-spec installed-declaration vercel)"
 e2b: not eligible
   - baseline_failed: no newest clean baseline-passing report for this provider, class and SDK set
-  - limit_exceeded: variant 1: entry_kinds ['addresses'] does not cover ['names']; variant 2: policy: asked ['allowlist'], offers ['deny_all']
+  - limit_exceeded: variant 1: entry_kinds ['addresses'] does not cover ['names']; variant 2: policy: asked allowlist, offers deny_all
 vercel: not eligible
   - baseline_failed: no newest clean baseline-passing report for this provider, class and SDK set
-  - knob_mismatch: variant 1: keeps: asked ['files_and_memory'], offers ['files_only']
-  - knob_mismatch: variant 1: policy: asked ['allowlist'], offers ['deny_all']
+  - knob_mismatch: variant 1: keeps: asked files_and_memory, offers files_only
+  - knob_mismatch: variant 1: policy: asked allowlist, offers deny_all
   - resource_mismatch: at_end: asked paused, declared ['destroyed', 'stopped']
 ```
 
@@ -135,8 +135,7 @@ vulnerabilities through [SECURITY.md](SECURITY.md). Follow the [Code of Conduct]
 Python 3.11 or newer with `venv` and `pip` is required. To install the command from source,
 start in a [checkout](docs/getting-started.md#install):
 
-<!-- At launch, change only the install argument below from . to sandbox-provider-spec.
-     The tutorial links here so there is one installation entry point. -->
+<!-- The tutorial links here so there is one installation entry point. -->
 <!-- sps:install -->
 
 ```sh

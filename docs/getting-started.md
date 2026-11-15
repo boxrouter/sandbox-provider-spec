@@ -7,17 +7,15 @@ Docker daemon, or sandbox is needed. After installation, these commands work off
 ## Install
 
 Use Python 3.11 or newer and the [README installation block](../README.md#development).
-Before publication, run that block from the root of a source checkout. You can obtain the
-source with Git:
+Run that block from the root of a source checkout. You can obtain the source with Git:
 
 ```sh
 git clone https://github.com/boxrouter/sandbox-provider-spec.git
 cd sandbox-provider-spec
 ```
 
-Until the repository is public, use a checkout or source archive supplied by a maintainer.
-Installation uses only the public Python index for dependencies. It does not need any
-provider credentials.
+Installation fetches only the package's two dependencies from the Python package index. It
+does not need any provider credentials.
 
 If Python reports that `ensurepip` is unavailable, install your system's `python3-venv`
 package, or use [uv](https://docs.astral.sh/uv/) to replace the incomplete environment left
