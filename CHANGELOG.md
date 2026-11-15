@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.10: test-only. The locked-create store test no longer depends on a 50 ms scheduling window: a worker thread that a starved host schedules after its request's deadline frees its slot without touching the store, so `pending` fell below 8 (seen as 7, 5 and 4 on a one-core starvation repro, and in the SPS mirror export's standalone check). It uses a 1 s deadline and keeps its blocked store calls blocked for the nine seconds that takes (a 300 s sqlite busy timeout for that endpoint instead of 10 s). No rule, declaration, schema or catalog change.
 - 0.4.9: every refusal fix the matcher's request check gives is now an instruction with a verb ('Set requirements.tcp_ports.tls to "any".'), where it was a JSON fragment (a quoted key and value) or a bare 'leave it out'. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.8: a request with no lifetime (lifetime_seconds: null) that a route cannot honor says what the route does instead ('this route ends every sandbox after at most 86,400 s') in place of the 'lifetime_timer declared, max_lifetime_seconds unlimited' sentence. Wording only; no rule, declaration, schema or catalog change.
 - 0.4.7: a size refusal reads 'The request needs 1,000 CPU; the largest size offers 8.', and a lifetime refusal states the most (or least) a route allows in seconds instead of 'declared max_lifetime_seconds' and 'lifetime_timer min_seconds'. Wording only; no rule, declaration, schema or catalog change.

@@ -8,9 +8,12 @@ import base64
 import copy
 import hashlib
 import json
+import sqlite3
 import threading
 import time
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing, contextmanager
 from pathlib import Path
 from typing import Any, cast
 
@@ -1065,9 +1068,23 @@ def test_locked_identity_store_times_out_without_later_native_dispatch(harness: 
 
 
 def test_locked_create_store_keeps_slots_and_reservations_without_late_dispatch(
-    harness: Harness,
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    harness.endpoint.settings.operation_timeout_ms = 50
+    # A worker thread scheduled after its request's deadline does not touch the store and frees
+    # its slot at once (see `Endpoint.observe`). A 50 ms deadline lets a starved host do that
+    # before the assertion below, so `pending` fell below 8 (seen as 7, 5 and 4); 1 s is enough
+    # for the thread to reach the locked store.
+    harness.endpoint.settings.operation_timeout_ms = 1000
+
+    # The nine requests then take about nine seconds, which is the endpoint's own 10 s sqlite busy
+    # timeout: the blocked store calls must stay blocked until this test releases the lock.
+    @contextmanager
+    def patient_connect() -> Iterator[sqlite3.Connection]:
+        with closing(sqlite3.connect(harness.endpoint.database, timeout=300)) as db:
+            with db:
+                yield db
+
+    monkeypatch.setattr(harness.endpoint, "connect", patient_connect)
     requests = [harness.create_request() for _ in range(8)]
     with harness.endpoint.connect() as lock, ThreadPoolExecutor(max_workers=1) as pool:
         lock.execute("BEGIN EXCLUSIVE")
