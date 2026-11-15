@@ -1,0 +1,92 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "network_lockdown.deny_all": "sha256:87e3ed331e30ddf507518d6cccd6fb58f3b662247a88f936b1541b280eb18f72"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-15T04:21:42Z",
+  "implementation": "withheld",
+  "provider": "boxd",
+  "revision": "9f214bc00ca82d205dd4884f4dd6fd12d6790680",
+  "run_id": "public-21ab668587c888783778",
+  "sdk_versions": {
+    "boxd": "0.3.0",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "network_lockdown.deny_all"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-15T04:21:23Z",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19000,
+      "id": "network_lockdown.deny_all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "deny_all"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/deny-all"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "execution_class": "default",
+            "http_status": 200,
+            "provider": "boxd",
+            "requirements": {
+              "cpu_min": 4,
+              "memory_min_mib": 8192,
+              "network_lockdown": {
+                "policy": "deny_all"
+              }
+            }
+          },
+          "operation": "cloud.match",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "adapter_native_egress": [
+              "none"
+            ],
+            "execution_class": "default",
+            "http_status": 201,
+            "provider": "boxd",
+            "run_label": "public-21ab668587c888783778"
+          },
+          "operation": "cloud.create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "controlled_host_dns_blocked": true,
+            "controlled_host_exit_code": 6,
+            "controlled_host_url": "https://unlisted.sps-fx.boxrouter.ai/health",
+            "direct_ip_blocked": true,
+            "direct_ip_exit_code": 35,
+            "direct_ip_url": "https://1.1.1.1/cdn-cgi/trace"
+          },
+          "operation": "guest.curl_outbound",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

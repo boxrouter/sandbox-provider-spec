@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-14
+  date: 2026-11-15
   sdks: {boxd: 0.3.0}
 resources:
   kernel: dedicated
@@ -53,6 +53,7 @@ gates:
     entry_kinds: [names]
     allow_wildcards: true
     max_allow: {at_least: 32}
+  - policy: deny_all
   # A new inbound connection wakes a suspended machine. The provider's delete timer
   # counts suspended time, so pause and lifetime behavior remain separate guarantees.
   pause_resume:
@@ -143,6 +144,10 @@ evidence:
     tests:
     - network_lockdown.max_allow
     report: reports/default.json
+  gates.network_lockdown.1.policy:
+    tests:
+    - network_lockdown.deny_all
+    report: reports/network-lockdown-deny-all.json
   x-boxd.usage_records:
     source: boxd Python SDK 0.2.22 machines.usage() docstring
     read: '2026-11-02'

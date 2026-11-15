@@ -1,0 +1,39 @@
+{
+  "ambient": [],
+  "checks": {
+    "network_lockdown.deny_all": [
+      "boxrouter_boxd/egress.py::",
+      "boxrouter_boxd/egress.py::egress_entries",
+      "boxrouter_boxd/provider.py::",
+      "boxrouter_boxd/provider.py::BoxdProvider._ready_handle",
+      "boxrouter_boxd/provider.py::BoxdProvider._translate_create_native",
+      "boxrouter_boxd/provider.py::BoxdProvider.native_for_region",
+      "boxrouter_boxd/provider.py::BoxdProvider.planned",
+      "boxrouter_boxd/provider.py::_planned_labels",
+      "boxrouter_boxd/sandbox.py::",
+      "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._destroy",
+      "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._exec",
+      "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._run",
+      "boxrouter_boxd/sizes.py::",
+      "boxrouter_boxd/sizes.py::machine_size"
+    ]
+  },
+  "format": 3,
+  "report_sha256": "21aea69e20c5f048a86671061669fb14bd83e18f1a486dbdca31b57884f2df65",
+  "units": {
+    "boxrouter_boxd/egress.py::": "sha256:41dbc4957396ef399997bfb68d4e2f85cf22f67e8f681be084d6e0ce14ddcfcf",
+    "boxrouter_boxd/egress.py::egress_entries": "sha256:e822ea730a0117f0be5a0e0cd58809f151267fdd73abad6862e0b07bfa363da4",
+    "boxrouter_boxd/provider.py::": "sha256:ddc91b4195e57a5f30d4f70a7d56b244071c6bb034b0994489a69b09dd0aed58",
+    "boxrouter_boxd/provider.py::BoxdProvider._ready_handle": "sha256:76a207f6f0bdeb0df94371d005987c5b06d54461fea572f14d02c90373386b4d",
+    "boxrouter_boxd/provider.py::BoxdProvider._translate_create_native": "sha256:a14333f3d4cc62aadee1a0f0de920381aa2f3251e1bfcce1c9e181314fab425e",
+    "boxrouter_boxd/provider.py::BoxdProvider.native_for_region": "sha256:db7cd0905990112a26f9d34dbd083ea0f95e00f79ffc1bc3788852db9659d11e",
+    "boxrouter_boxd/provider.py::BoxdProvider.planned": "sha256:c76810e66776425f6d6c0beab7d889409afb0014f00184330d7b16be82567183",
+    "boxrouter_boxd/provider.py::_planned_labels": "sha256:f8394bdf70c5b9e04d9ba3a44565460e5a896bc6e8e75549f2064a7b888c4fe6",
+    "boxrouter_boxd/sandbox.py::": "sha256:a3261b276555bb5d8d1a5fc5deae680e72b018853c22ba0bc5c5291eaeeb10b8",
+    "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._destroy": "sha256:0d7f9e384740e5e83283553542fc3246ea005e20b4ba19f9c8583e64aa67a67c",
+    "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._exec": "sha256:8e98eddcd108e9b80a370a761a6be3e51e262ec9535abe3bf7abb7a23a373fe6",
+    "boxrouter_boxd/sandbox.py::AsyncBoxdProvider._run": "sha256:9a462e89bcf906067a7397185818f10c6dbb181f8cd50589ed822de469e2d975",
+    "boxrouter_boxd/sizes.py::": "sha256:7ce7b2bbda5290a8472309ab26c1a6d6708e79bc14be497556f1fbb444d004d4",
+    "boxrouter_boxd/sizes.py::machine_size": "sha256:ee68552a70c7a228dd2b7c4f11a8a094fe362c5b2b61f034c70aedd9771e929a"
+  }
+}
