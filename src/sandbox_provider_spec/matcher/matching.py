@@ -1073,7 +1073,10 @@ def match_provider(
         if declared is None:
             found.append(
                 _fail(
-                    "gate", "gate_not_listed", f"{gate}: not declared; nobody has looked", gate=gate
+                    "gate",
+                    "gate_not_listed",
+                    f"{gate}: this route does not list it, so it is not offered",
+                    gate=gate,
                 )
             )
             continue

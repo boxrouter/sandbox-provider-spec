@@ -29,7 +29,7 @@ def test_prints_every_reason_a_declaration_is_not_eligible(
         "docker-engine: not eligible",
         "  - baseline_failed: no newest clean baseline-passing report for this provider, "
         "class and SDK set",
-        "  - gate_not_listed: previews: not declared; nobody has looked",
+        "  - gate_not_listed: previews: this route does not list it, so it is not offered",
     ]
 
 
