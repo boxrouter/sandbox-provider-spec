@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.4: Boat’s verification date advances to 2026-11-15 for the committed local prober reports; declared capability values are unchanged.
+
 - 0.4.3: Boxd declares native deny-all egress (`none`) after a Cloud API probe through the
   adapter blocked direct-IP HTTPS and an unlisted host and confirmed deletion. No catalog or
   suite change.
