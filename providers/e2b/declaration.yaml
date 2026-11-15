@@ -15,6 +15,10 @@ resources:
     memory_mib:
     - 128
     - 8192
+  default_size:
+    cpu: 2
+    memory_mib: 512
+    disk_mib: 20480
   default_user: user
   default_cwd: /home/user
   located_in:
@@ -109,6 +113,10 @@ evidence:
     source: https://docs.e2b.dev/billing
     read: '2026-10-22'
     quote: 'Max vCPUs | 8 | 8+ | Custom; Max memory | 8 GiB | 8+ GiB | Custom'
+  resources.default_size:
+    source: https://docs.e2b.dev/billing
+    read: '2026-11-15'
+    quote: 'Start with default resources (2 vCPU, 512 MiB RAM) and increase only if necessary; Disk size | 10 GiB | 20+ GiB | Custom'
   resources.default_user:
     tests:
     - facts.default_user

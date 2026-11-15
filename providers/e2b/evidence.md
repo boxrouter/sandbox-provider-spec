@@ -42,6 +42,14 @@ and 8-GiB memory ceilings. Higher Pro and custom Enterprise limits do not establ
 an unrestricted range. Pro disk is documented as 20+ GiB, so `disk_mib` declares
 a lower bound of 20480 MiB with the existing `pro_plan` condition.
 
+`default_size` is what a create with no size gives (recert-040, 2026-11-15, label
+`recert-040-e2b-size-20261115T1259Z`, E2B INTERNAL key, AWS test server, SDK `e2b` 2.59.0): the
+[billing page](https://docs.e2b.dev/billing) says "Start with default resources (2 vCPU, 512 MiB
+RAM)", and a sandbox created with no size and read in the guest showed `nproc` 2, `MemTotal`
+484432 kB (the 512 MiB allocation less kernel use) and `df` of `/` at 22054 MiB with 20481 MiB
+available, so `disk_mib` is 20480, the Pro disk (the Hobby plan's 10 GiB is the `unmet_limits` value).
+The sandbox was killed in the run and no running or paused sandbox with the label remained.
+
 Timer granularity remains `unknown`. The native core report marks
 `edge.lifetime.granularity` passed, but that row has no `proves` value for
 `lifetime_timer.step_seconds`; the checker rejects it as evidence of one second.
