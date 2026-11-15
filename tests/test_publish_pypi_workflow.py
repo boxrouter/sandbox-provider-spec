@@ -37,7 +37,13 @@ def test_publishing_is_off_unless_both_switches_are_enabled() -> None:
     triggers = {str(key): value for key, value in _workflow().items()}["True"]
     assert set(triggers) == {"schedule", "workflow_dispatch"}
     assert triggers["workflow_dispatch"]["inputs"]["dry_run"]["default"] is True
-    assert _jobs()["gate"]["if"] == "github.repository == 'boxrouter/sandbox-provider-spec'"
+    assert (
+        _jobs()["gate"]["if"]
+        == "github.repository == 'boxrouter/sandbox-provider-spec' && vars.CI_RUNNER != ''"
+    )
+    # The daily switched-off run starts no GitHub-hosted job: the gate runs on the BoxRouter
+    # selector and is skipped when no runner is configured.
+    assert _jobs()["gate"]["runs-on"] == "${{ vars.CI_RUNNER || 'ubuntu-latest' }}"
     [step] = _steps("gate")
     assert step["env"]["REPO_SWITCH"] == "${{ vars.PYPI_PUBLISH_SANDBOX_PROVIDER_SPEC }}"
     assert step["env"]["ORG_SWITCH"] == "${{ vars.BOXROUTER_PUBLIC_RELEASES }}"

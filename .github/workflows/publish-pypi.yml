@@ -35,8 +35,11 @@ env:
 jobs:
   gate:
     # Only the public repository publishes; the private source mirror carries this file too.
-    if: github.repository == 'boxrouter/sandbox-provider-spec'
-    runs-on: ubuntu-latest
+    # While publishing is off nothing here is GitHub-hosted: the daily gate needs the BoxRouter
+    # runner selector (CI_RUNNER) and is skipped without it. Only `publish` is hosted (PyPI
+    # Trusted Publishing refuses self-hosted runners) and it starts only once both switches are on.
+    if: github.repository == 'boxrouter/sandbox-provider-spec' && vars.CI_RUNNER != ''
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     outputs:
       run: ${{ steps.switch.outputs.run }}
     steps:
