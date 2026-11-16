@@ -21,11 +21,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T01:21:29.293801+00:00",
+  "finished_at": "2026-11-16T07:45:15.993775+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "e6ca22d39d4e9171d5b5630f0be124a01c54cbce",
-  "run_id": "public-aa2c94ef7faaa3bce26d",
+  "revision": "573bd0a52fd2a98f0aadb2be411087b5f8cf0f05",
+  "run_id": "public-f5f11784d7bd1310f84a",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -47,8 +47,8 @@
     "coverage.custom_images.prepare.image_config.user"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T01:18:45.882388+00:00",
-  "suite_digest": "sha256:8c12bd00983b29fb43e844893b0d56336835a37caa24d8245d55d020477c9231",
+  "started_at": "2026-11-16T07:42:38.404246+00:00",
+  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
       "cleanup": [
@@ -57,7 +57,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7336,
+      "duration_ms": 7397,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -77,7 +77,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.013, \"burn_threads\": 4, \"burn_wall_seconds\": 4.002, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0027486256871565, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.009, \"burn_threads\": 4, \"burn_wall_seconds\": 4.001, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0019995001249689, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
@@ -94,7 +94,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3736,
+      "duration_ms": 3586,
       "id": "coverage.docker.host",
       "proves": [
         {
@@ -146,7 +146,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 957,
+      "duration_ms": 1103,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -201,7 +201,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 952,
+      "duration_ms": 907,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -259,7 +259,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1615,
+      "duration_ms": 1576,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -384,7 +384,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5013,
+      "duration_ms": 4293,
       "id": "coverage.previews.reserved_ports",
       "proves": [
         {
@@ -425,7 +425,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1554,
+      "duration_ms": 1512,
       "id": "coverage.terminal.reattach",
       "proves": [
         {
@@ -499,7 +499,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 19754,
+      "duration_ms": 21830,
       "id": "coverage.custom_images.runs_entrypoint.true",
       "proves": [
         {
@@ -546,7 +546,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 21746,
+      "duration_ms": 20979,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -598,7 +598,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 11402,
+      "duration_ms": 11440,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
@@ -656,7 +656,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17852,
+      "duration_ms": 17834,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -708,7 +708,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 24003,
+      "duration_ms": 19670,
       "id": "coverage.custom_images.prepare.image_config.env",
       "proves": [
         {
@@ -764,7 +764,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23742,
+      "duration_ms": 21700,
       "id": "coverage.custom_images.prepare.image_config.workdir",
       "proves": [
         {
@@ -820,7 +820,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23738,
+      "duration_ms": 23749,
       "id": "coverage.custom_images.prepare.image_config.user",
       "proves": [
         {
