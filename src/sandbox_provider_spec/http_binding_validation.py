@@ -13,10 +13,11 @@ from datetime import datetime, timedelta
 from typing import Any
 from urllib.parse import urlsplit
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 from sandbox_provider_spec.check import check_request, spec_dir
+from sandbox_provider_spec.format_checker import sps_format_checker
 from sandbox_provider_spec.matcher import declared_fit
 from sandbox_provider_spec.matcher.registry import Registry as MatcherRegistry
 from sandbox_provider_spec.matcher.request import Request
@@ -204,7 +205,7 @@ def validate_message(name: str, value: Any) -> None:
     validator = Draft202012Validator(
         {"$ref": SCHEMA["$id"] + "#/$defs/" + name},
         registry=REGISTRY,
-        format_checker=FormatChecker(),
+        format_checker=sps_format_checker(),
     )
     require(validator.is_valid(value), "Message does not match " + name)
     _scalars(value)

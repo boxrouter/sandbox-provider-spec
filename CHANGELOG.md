@@ -5,6 +5,9 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.64: Enforce only explicit `date` and `date-time` formats through the same stable checker in
+  declaration and HTTP binding validation. Optional URI validators no longer affect SPS results.
+  No vocabulary or conformance-suite change.
 - 0.4.63: Agent37's VM declares `disk_in_memory: false` from its existing passing
   `coverage.facts.disk_in_memory.false` row. No vocabulary or conformance-suite change.
 - 0.4.60: Boxd publication back to hidden until tonight's full run ends (founder 2026-11-16, approvals founder-2026-11-16-boxd-hide-until-run and founder-2026-11-16-boxd-default-hide-until-run); it is republished with graduation receipts from that run. No vocabulary or conformance-suite change.

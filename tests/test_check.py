@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,7 @@ import pytest
 import sandbox_provider_spec
 from sandbox_provider_spec import check, cli
 from sandbox_provider_spec.check import UNKNOWN_WORD, _check_declared_limit
+from sandbox_provider_spec.format_checker import sps_format_checker
 from sandbox_provider_spec.load import DuplicateKeyError, load
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1586,16 +1589,89 @@ def test_the_catalog_lists_after_resume_as_a_timer_fact() -> None:
     assert "after_resume" in catalog["lifetime_timer"]
 
 
-def test_text_evidence_source_is_not_a_uri_check() -> None:
-    """A plain-text evidence `source` validates whether or not an optional URI validator is installed."""
-    document = declaration()
-    document["evidence"] = {
-        "resources.kernel": {
-            "source": "providers/acme/evidence.md",
-            "read": "2026-11-14",
-            "quote": "the provider's own words",
-        }
+def test_sps_formats_are_fixed_and_dates_remain_checked() -> None:
+    checker = sps_format_checker()
+
+    assert set(checker.checkers) == {"date", "date-time"}
+    assert checker.conforms("2026-11-16", "date")
+    assert not checker.conforms("2026-02-30", "date")
+    assert checker.conforms("2026-11-16T12:34:56Z", "date-time")
+    assert not checker.conforms("2026-02-30T12:34:56Z", "date-time")
+
+
+def test_schema_and_http_date_validation_ignore_optional_uri_validators() -> None:
+    script = r"""import json, sys, types
+mode = sys.argv[1]
+optional = ("rfc3986_validator", "rfc3987", "rfc3987_syntax")
+for name in optional:
+    sys.modules[name] = None
+if mode == "rfc3986_validator":
+    module = types.ModuleType(mode)
+    module.validate_rfc3986 = lambda value, rule: False
+    sys.modules[mode] = module
+elif mode == "rfc3987":
+    module = types.ModuleType(mode)
+    def parse(value, rule):
+        raise ValueError("optional URI parser rejects this text")
+    module.parse = parse
+    sys.modules[mode] = module
+from sandbox_provider_spec.check import schema_errors
+from sandbox_provider_spec.format_checker import sps_format_checker
+from sandbox_provider_spec.http_binding_validation import BindingValidationError, validate_message
+
+document = {
+    "spec": "sandbox-provider-spec/0.1",
+    "provider": "acme",
+    "verified": {"date": "2026-11-16", "sdks": {"acme": "1.0.0"}},
+    "resources": {"kernel": "unknown"},
+    "gates": {},
+    "evidence": {"resources.kernel": {
+        "source": "not a URI @ all", "read": "2026-11-16", "quote": "provider words"
+    }},
+}
+invalid_date = json.loads(json.dumps(document))
+invalid_date["evidence"]["resources.kernel"]["read"] = "2026-02-30"
+result = {
+    "formats": sorted(sps_format_checker().checkers),
+    "plain_text_source": not schema_errors(document, "declaration-schema.json"),
+    "bad_date_rejected": bool(schema_errors(invalid_date, "declaration-schema.json")),
+}
+validate_message("LifetimeObservation", {"ready_at": "2026-11-16T12:34:56Z", "ends_at": None})
+try:
+    validate_message("LifetimeObservation", {"ready_at": "2026-02-30T12:34:56Z", "ends_at": None})
+except BindingValidationError:
+    result["bad_date_time_rejected"] = True
+else:
+    result["bad_date_time_rejected"] = False
+print(json.dumps(result, sort_keys=True))
+"""
+    states = [
+        subprocess.run(
+            [sys.executable, "-c", script, mode],
+            check=True,
+            capture_output=True,
+            text=True,
+            cwd=ROOT.parents[1],
+        ).stdout
+        for mode in ("absent", "rfc3986_validator", "rfc3987")
+    ]
+
+    assert states[0] == states[1] == states[2]
+    assert json.loads(states[0]) == {
+        "bad_date_rejected": True,
+        "bad_date_time_rejected": True,
+        "formats": ["date", "date-time"],
+        "plain_text_source": True,
     }
-    assert sandbox_provider_spec.schema_errors(document, "declaration-schema.json") == []
-    assert "uri" not in check._format_checker().checkers
-    assert "date" in check._format_checker().checkers
+
+
+def test_every_shipped_declaration_passes_schema_validation() -> None:
+    declarations = sorted((ROOT / "providers").glob("*/declaration*.yaml"))
+    assert declarations
+    failures = {
+        str(path.relative_to(ROOT)): sandbox_provider_spec.schema_errors(
+            load(path), "declaration-schema.json"
+        )
+        for path in declarations
+    }
+    assert {name: errors for name, errors in failures.items() if errors} == {}
