@@ -20,6 +20,26 @@
       "granted_by": "founder",
       "granted_on": "2026-11-16",
       "quote": "boxd is not intended to be hidden"
+    },
+    {
+      "id": "founder-2026-11-16-boxd-hide-until-run",
+      "provider": "boxd",
+      "class": null,
+      "from": "published",
+      "to": "hidden",
+      "granted_by": "founder",
+      "granted_on": "2026-11-16",
+      "quote": "Hide until run ends (Recommended): set Boxd back to hidden now, deploy and launch all 7; after the run, republish Boxd with real graduation receipts from tonight's results"
+    },
+    {
+      "id": "founder-2026-11-16-boxd-default-hide-until-run",
+      "provider": "boxd",
+      "class": "default",
+      "from": "published",
+      "to": "hidden",
+      "granted_by": "founder",
+      "granted_on": "2026-11-16",
+      "quote": "Hide until run ends (Recommended): set Boxd back to hidden now, deploy and launch all 7; after the run, republish Boxd with real graduation receipts from tonight's results"
     }
   ]
 }
