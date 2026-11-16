@@ -1,11 +1,12 @@
 spec: sandbox-provider-spec/0.1
 provider: blaxel
 verified:
-  date: '2026-11-15'
+  date: '2026-11-16'
   sdks:
     blaxel: 0.4.8
 resources:
   kernel: dedicated
+  disk_in_memory: true
   sizes:
   - cpu: 2
     memory_mib: 4096
@@ -62,6 +63,10 @@ evidence:
     source: https://blaxel.ai/platform/sandboxes
     read: '2026-10-16'
     quote: Every sandbox runs in its own microVM with no shared kernel.
+  resources.disk_in_memory:
+    tests:
+    - coverage.facts.disk_in_memory.true
+    report: reports/prober-disk-in-memory-20261115.json
   resources.sizes:
     source: https://docs.blaxel.ai/Get-started
     read: '2026-10-22'

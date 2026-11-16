@@ -44,6 +44,21 @@ sandbox-provider-spec match examples/requests/coding-agent.yaml providers/blaxel
 Interpret that result with the current request, declaration and native reports;
 do not append a `baseline_failed` reason that the matcher did not return.
 
+## Disk
+
+The [sandbox overview](https://docs.blaxel.ai/Sandboxes/Overview) and
+[troubleshooting guide](https://docs.blaxel.ai/knowledge-base/troubleshooting/resolve-enospc-no-space-left-on-device-errors)
+say the sandbox filesystem lives in memory: "Sandbox filesystem storage is in memory by
+default for optimal speed, so storage needs count against the memory allocation" and "A
+sandbox's memory allocation covers both runtime memory and filesystem storage." The
+[storage guide](https://docs.blaxel.ai/Sandboxes/best-practices) sizes the filesystem at
+about half the memory allocation by default. The declaration therefore claims
+`disk_in_memory: true` and no separate `disk_mib`: a request naming memory and disk is
+matched against memory covering both. The cited same-change report
+`reports/prober-disk-in-memory-20261115.json` (blaxel 0.4.8) passes
+`coverage.facts.disk_in_memory.true`: writing 256 MiB to the root filesystem raised cgroup
+shared-memory use by the written amount and returned to baseline after cleanup.
+
 ## Custom images
 
 The `custom_images` gate declares one variant, `source: provider_artifact`: a sandbox starts

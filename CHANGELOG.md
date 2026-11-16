@@ -5,6 +5,14 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.30: Blaxel declares `disk_in_memory: true`, proved by a clean same-change
+  `coverage.facts.disk_in_memory.true` report (writing 256 MiB to the root filesystem
+  raised cgroup shmem by the written amount). Blaxel's documentation states sandbox
+  filesystem storage is in memory by default, sized at about half the memory
+  allocation. A request naming memory and disk is matched against memory covering
+  both: an Actions runner ask for 8,192 MiB of memory and 8,192 MiB of disk now
+  fits the declared 6-CPU/16,384-MiB size instead of refusing `resource_mismatch`.
+  No vocabulary or conformance-suite change.
 - 0.4.29: Preserve a requested `size_is_ceiling` fact in the matcher output so adapter planners can honor the validated size ceiling. No vocabulary or conformance-suite change.
 - 0.4.28: Preserve a requested `size_is_ceiling` fact in the matcher output so adapter planners can honor the validated size ceiling. No vocabulary or conformance-suite change.
 - 0.4.26: Daytona's container class declares `user_selection` (commands, files_write, process_start), proved by `coverage.guest_user.selectable` in a same-change report. No vocabulary or conformance-suite change.

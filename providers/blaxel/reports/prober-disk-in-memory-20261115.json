@@ -1,0 +1,65 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.disk_in_memory.true": "sha256:35561e1aaf6f85a9bde228024129a69894de291d0678189322731069061d19f0"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-16T00:12:21.392734+00:00",
+  "implementation": "withheld",
+  "provider": "blaxel",
+  "revision": "fa9e9ad407287c4f6bf12f5d8b818d3e334c26d1",
+  "run_id": "public-659b9e0f31a6eba9ce5e",
+  "sdk_versions": {
+    "blaxel": "0.4.8",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "coverage.facts.disk_in_memory.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-16T00:12:15.898158+00:00",
+  "suite_digest": "sha256:8c12bd00983b29fb43e844893b0d56336835a37caa24d8245d55d020477c9231",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5436,
+      "id": "coverage.facts.disk_in_memory.true",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": true
+            },
+            "stdout": "{\"disk_in_memory\": true, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1384448, \"memory_during_bytes\": 269819904, \"memory_after_bytes\": 1384448}\n"
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
