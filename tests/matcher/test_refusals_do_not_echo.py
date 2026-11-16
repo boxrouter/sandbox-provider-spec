@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """A refusal of an unrecognised word never repeats the submitted word; it lists the allowed ones.
 
-A caller may paste a credential into any field, so the message and `details` carry the field
-and the words it accepts, not the value (QA-255, QA-306).
+A caller may paste a credential into any field, so the message, `details`, fix and path carry the
+field (or its parent object) and the words it accepts, not the value or the key (QA-255, QA-306).
 """
 
 from typing import Any
@@ -46,4 +46,5 @@ def test_the_refusal_lists_the_allowed_words_and_not_the_submitted_one(site: str
     assert SENTINEL not in refusal.message
     assert SENTINEL not in repr(refusal.details)
     assert SENTINEL not in str(refusal.fix)
+    assert SENTINEL not in str(refusal.path)
     assert refusal.details["known"]

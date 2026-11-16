@@ -520,7 +520,7 @@ def _gate_ask(gate: str, body: Any) -> GateAsk:
             raise Rejected(
                 "unrecognised_word",
                 f"{gate}: unrecognised knob or setting",
-                path=f"requirements.{gate}.{key}",
+                path=f"requirements.{gate}",
                 details={"known": [*definition.knobs, *definition.settings]},
             )
     required = must_be_named(gate)
@@ -644,7 +644,7 @@ def _per_operation(key: str, raw: Any) -> dict[str, int]:
             raise Rejected(
                 "unrecognised_word",
                 f"{key}: unrecognised direction",
-                path=f"{where}.{operation}",
+                path=where,
                 details={"known": list(FILE_OPERATIONS)},
             )
         not_unknown(f"{where}.{operation}", value)
@@ -700,7 +700,6 @@ def validate_request(
             raise Rejected(
                 "unrecognised_word",
                 "unrecognised request key",
-                path=key,
                 details={"known": sorted(allowed)},
             )
     lifetime = raw.get("lifetime_seconds")
@@ -783,7 +782,7 @@ def validate_request(
             raise Rejected(
                 "unrecognised_word",
                 "unrecognised gate",
-                path=f"requirements.{name}",
+                path="requirements",
                 details={"known": list(GATES)},
             )
     if at_end == "paused" and "pause_resume" not in gates:
@@ -815,7 +814,7 @@ def validate_request(
             raise Rejected(
                 "unrecognised_word",
                 "unrecognised resource",
-                path=f"resources.{key}",
+                path="resources",
                 details={"known": list(RESOURCE_ASKS)},
             )
         resources[key] = _resource(key, value)
