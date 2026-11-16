@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.33: Blaxel declares `user_selection` for commands, file writes and process starts, with a clean same-PR report. No vocabulary or conformance-suite change.
 - 0.4.32: Vercel declares `user_selection` (commands, files_write, process_start) with a same-PR report that certifies the adapter behavior. No vocabulary or conformance-suite change.
 - 0.4.31: E2B declares `user_selection` (commands, files_write, process_start) with a same-PR report that certifies the adapter behavior. No vocabulary or conformance-suite change.
 - 0.4.30: Blaxel declares `disk_in_memory: true`, proved by a clean same-change

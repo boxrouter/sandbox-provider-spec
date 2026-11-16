@@ -38,3 +38,32 @@ def test_blaxel_actions_runner_ask_fits_the_16384_size() -> None:
     fit = result["results"]["blaxel"]
     assert fit["compatible"] is True, fit["failed"]
     assert fit["resources"]["size"] == {"cpu": 6, "memory_mib": 16384, "disk_mib": None}
+
+
+def test_blaxel_actions_runner_labels_never_exceed_the_largest_declared_shape() -> None:
+    """Disk-backed memory must fit in the selected shape for each runner label."""
+    native = load(ROOT / "providers" / "blaxel" / "declaration.yaml")
+    expected_shape = {"cpu": 6, "memory_mib": 16384, "disk_mib": None}
+    cases = (
+        (2, 4096, True),
+        (4, 8192, True),
+        (8, 8192, False),
+        (16, 32768, False),
+        (None, 4096, True),
+    )
+
+    for cpu, memory_mib, expected_to_fit in cases:
+        request = {
+            "resources": {
+                **({} if cpu is None else {"cpu_min": cpu}),
+                "memory_min_mib": memory_mib,
+                "disk_min_mib": 8192,
+                "size_is_ceiling": True,
+            },
+            "requirements": {"processes": {"reattach": True}},
+        }
+        fit = declared_fit(request, [native])["results"]["blaxel"]
+
+        assert fit["compatible"] is expected_to_fit, (cpu, memory_mib, fit["failed"])
+        if expected_to_fit:
+            assert fit["resources"]["size"] == expected_shape

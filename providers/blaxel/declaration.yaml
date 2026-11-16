@@ -36,6 +36,10 @@ resources:
       tier_2_or_higher: 604800
   default_cwd: /blaxel
 gates:
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
   processes:
   - cancel: true
     reattach: true
@@ -67,6 +71,18 @@ evidence:
     tests:
     - coverage.facts.disk_in_memory.true
     report: reports/prober-disk-in-memory-20261115.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-user-selection-20261116.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-user-selection-20261116.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-user-selection-20261116.json
   resources.sizes:
     source: https://docs.blaxel.ai/Get-started
     read: '2026-10-22'

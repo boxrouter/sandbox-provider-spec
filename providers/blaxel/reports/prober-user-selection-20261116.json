@@ -1,0 +1,180 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.guest_user.selectable": "sha256:32203b63b83085252dca44c670b89112cb77dc653e6e970649aa1efa0f5c7f91"
+  },
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-16T01:45:13.010836+00:00",
+  "implementation": "withheld",
+  "provider": "blaxel",
+  "revision": "0e63056b139ccd0fa4da4d14cda6e5aab9c43ed0",
+  "run_id": "public-e052ad9bfa321d916935",
+  "sdk_versions": {
+    "blaxel": "0.4.8",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "coverage.guest_user.selectable"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-16T01:45:09.401440+00:00",
+  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3606,
+      "id": "coverage.guest_user.selectable",
+      "proves": [
+        {
+          "gate": "user_selection",
+          "knob": "commands",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "files_write",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "process_start",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "runner\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "runner 600\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "conformance\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "runner\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
