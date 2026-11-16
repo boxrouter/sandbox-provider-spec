@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.53: Boxd's default benchmark class is published under the 2026-11-16 founder approval. No vocabulary or conformance-suite change.
 - 0.4.51: Boxd's SPS reports (default, size ceiling, prober core and coverage, snapshot) rerun live on adapter-boxd 0.1.107. No vocabulary or conformance-suite change.
 - 0.4.48: Boat's five SPS reports (processes, size ceiling, user selection, prober core and coverage) rerun live on adapter-boat 0.3.87. No vocabulary or conformance-suite change.
 - 0.4.40: Agent37 declares `processes` (input, cancel, reattach) from same-change core reports; its VM class declares `user_selection` (commands, files_write, process_start) from `coverage.guest_user.selectable`. No vocabulary or conformance-suite change.
