@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T05:03:15.683292+00:00",
+  "finished_at": "2026-11-14T08:03:09.816101+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "96891f323bef061f07d8a04d171120d0b82fa357",
-  "run_id": "public-0d4196b03456041c6c63",
+  "revision": "ebaad02913f4f7495b544b793ecefadfd5921274",
+  "run_id": "public-46d20cd4e3dfc5de9144",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T05:03:05.518916+00:00",
-  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
+  "started_at": "2026-11-14T08:02:59.714960+00:00",
+  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
   "tests": [
     {
       "cleanup": [
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10160,
+      "duration_ms": 10099,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -51,7 +51,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.011, \"burn_threads\": 2, \"burn_wall_seconds\": 4.001, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0024993751562108, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.013, \"burn_threads\": 2, \"burn_wall_seconds\": 4.002, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0027486256871565, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
