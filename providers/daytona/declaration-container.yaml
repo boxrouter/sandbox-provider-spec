@@ -243,15 +243,15 @@ evidence:
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-container-user-selection.json
+    report: reports/prober-default-coverage.json
   gates.user_selection.0.files_write:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-container-user-selection.json
+    report: reports/prober-default-coverage.json
   gates.user_selection.0.process_start:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-container-user-selection.json
+    report: reports/prober-default-coverage.json
   gates.terminal.0.reattach:
     tests:
     - coverage.terminal.reattach
