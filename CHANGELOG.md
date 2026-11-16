@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.59: Daytona's `adapter-container-user-selection.json` rerun live on adapter-daytona 0.5.317. No vocabulary or conformance-suite change.
 - 0.4.57: Refresh Blaxel's size-ceiling, default coverage, disk-in-memory, and user-selection reports from the clean spec runs in certification run 43820005571. The default-core report was not adopted because its terminal cleanup failed. No vocabulary or conformance-suite change.
 - 0.4.56: Boxd declares `resources.disk_in_memory: false` and named runner-user capabilities with cited evidence. No vocabulary or conformance-suite change.
 - 0.4.55: Superserve's SPS reports (adapter copies of the packaged runs, adapter-defaults, size ceiling, prober core and coverage) rerun live on adapter-superserve 0.1.17; the prober core report now passes `idle_shutdown.on_idle.destroyed`. No vocabulary or conformance-suite change.
