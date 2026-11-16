@@ -1,0 +1,15 @@
+{
+  "schema": "boxrouter.publication-approvals/1",
+  "approvals": [
+    {
+      "id": "founder-2026-11-16-boxd-publish",
+      "provider": "boxd",
+      "class": null,
+      "from": "hidden",
+      "to": "published",
+      "granted_by": "founder",
+      "granted_on": "2026-11-16",
+      "quote": "boxd is not intended to be hidden"
+    }
+  ]
+}
