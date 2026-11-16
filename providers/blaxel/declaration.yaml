@@ -72,7 +72,7 @@ evidence:
   resources.disk_in_memory:
     tests:
     - coverage.facts.disk_in_memory.true
-    report: reports/prober-disk-in-memory-20261115.json
+    report: reports/prober-disk-in-memory-20261116.json
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
