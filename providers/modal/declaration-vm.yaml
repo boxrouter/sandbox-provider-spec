@@ -89,7 +89,7 @@ evidence:
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true
-    report: reports/adapter-vm-size-ceiling.json
+    report: reports/prober-vm-coverage.json
   resources.regions:
     source: https://modal.com/docs/guide/region-selection
     read: '2026-10-04'
