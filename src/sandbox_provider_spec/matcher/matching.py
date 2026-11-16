@@ -741,6 +741,9 @@ def fit_resources(
                     offered=declared,
                 )
             )
+        elif flag == "size_is_ceiling" and asked.get(flag):
+            # Preserve the validated fact so an adapter can apply it to its native plan.
+            provisioned[flag] = True
     for ask, fact in SECONDS_RESOURCES.items():
         declared_seconds: Number | None = number(resources.get(fact))
         if ask in asked and not offers(declared_seconds, asked[ask]):
