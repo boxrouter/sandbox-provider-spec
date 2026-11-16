@@ -10,6 +10,7 @@ verified:
   sdks: {"httpx": "0.28.1"}
 resources:
   kernel: dedicated
+  disk_in_memory: false
   # VM instances accept 2-100 GB disk on each of the four CPU/memory shapes.
   sizes:
   - {cpu: 2, memory_mib: 4096, disk_mib: [2048, 102400]}
@@ -54,6 +55,9 @@ gates:
     files_write: true
     process_start: true
 evidence:
+  resources.disk_in_memory:
+    tests: [coverage.facts.disk_in_memory.false]
+    report: reports/prober-vm-coverage.json
   resources.kernel:
     source: https://www.agent37.com/docs/agents-api/vm-instances
     read: 2026-11-12
