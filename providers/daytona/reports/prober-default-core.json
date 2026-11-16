@@ -67,13 +67,13 @@
     "lifetime_timer.at_end.stopped": "sha256:3d12e13b66ab91e77b995cbbe1072d8f878dee470abecf8b4f730b168f342521",
     "lifetime_timer.counts_paused_time.false": "sha256:927ac94a28057e1dd0dea46ebe275470c90774e53ad7b71b2391bde01a621003",
     "lifetime_timer.counts_paused_time.true": "sha256:42bc3239a3971fee3d69be084a0c646bf8e5ffcd17fc2a038abeda02b6dc2ee3",
-    "network_lockdown.after_resume": "sha256:8cf545915e44452b22be3ca87d7b3e8de44c370c7d355caa849abacf8b065791",
-    "network_lockdown.allowlist.addresses": "sha256:28b77b975449fa6feb49b2e5cbce17d064569356caf6e7a8eaab2973162dece3",
-    "network_lockdown.allowlist.names": "sha256:7194395b1b53eca69117558779346fe18787eb7e217f00a60be6f20050176489",
-    "network_lockdown.deny_all": "sha256:965bf0f2d99832ce9334cb7fc957bfe2f968db3b66f6ab0a9e761a271b93eb68",
-    "network_lockdown.max_allow": "sha256:7853299076fc3333ba3add7cd5cd6d333fa570116acd783de42c094f9315334d",
-    "network_lockdown.root_cannot_lift": "sha256:5262f811a6941471e1a4285f8cf6f0eddb6dd88cd3f3e56aedbec4be630fd129",
-    "network_lockdown.wildcards": "sha256:e87336bd6f3ea5d8ee04c361fc6eb33420a35fe37082f53ad7141babf3f24294",
+    "network_lockdown.after_resume": "sha256:2fa5ee3e3ea3f69e5c3c1625d04cffae77b9e2dac21f838c639e6c5de26d8cb7",
+    "network_lockdown.allowlist.addresses": "sha256:9c40628b4f28ce3c0700be1e509a76fdef3719baed4699848b4532dde37d2dfd",
+    "network_lockdown.allowlist.names": "sha256:66d279c6f7da3e0cd6cf4c6819440efda31d11be59d5ef2d7dac89d77dc4fcd4",
+    "network_lockdown.deny_all": "sha256:87e3ed331e30ddf507518d6cccd6fb58f3b662247a88f936b1541b280eb18f72",
+    "network_lockdown.max_allow": "sha256:cbc88f31496179af098e8f78798cc33156b95ecca38047c9cbf4146542f9afee",
+    "network_lockdown.root_cannot_lift": "sha256:bb40b11186a46e5687c7ef11a6b7afd32127e85aea4699a81f2ef59a0bc260f8",
+    "network_lockdown.wildcards": "sha256:fc08bcb4a23b67f88b1fb2fc74dee398f978bdb08b44a43944b1da92c051f725",
     "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce",
     "pause_resume.files_only": "sha256:6154c8f90d1ace5d6eeee08c7531e0d178b54008bb14111002c0a1dea3350b1a",
     "previews.access.private": "sha256:234f3ac6ecbc281d1a9949b8d6f2ef77fea7655b46c1e238e62fa97f907c4097",
@@ -114,16 +114,16 @@
     "volumes.sharing.one_sandbox.object_store": "sha256:205135802a705d5e894bb89e891ef80bb9240c8d9b2f47a5903fbd00dc8002b4"
   },
   "class": "container",
-  "clean": false,
+  "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T04:17:21.229005+00:00",
+  "finished_at": "2026-11-15T01:22:43.138324+00:00",
   "implementation": "withheld",
   "provider": "daytona",
-  "revision": "2d0ceb6afde48e66f39c02f9d0f53dd277ecfd1c",
-  "run_id": "public-c309f1bec115fd9408bd",
+  "revision": "4fe0b39c9a4b78091eeaef3a332e2ecf34c86a7e",
+  "run_id": "public-462975523624d603295e",
   "sdk_versions": {
     "daytona": "0.226.1",
     "withheld": "withheld"
@@ -242,7 +242,7 @@
     "contract.cost_final"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T03:30:43.219116+00:00",
+  "started_at": "2026-11-15T00:30:53.709569+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -252,7 +252,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1471,
+      "duration_ms": 1392,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -287,7 +287,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1499,
+      "duration_ms": 1192,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -322,7 +322,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2401,
+      "duration_ms": 1621,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -353,7 +353,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1799,
+      "duration_ms": 1292,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -393,7 +393,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1202,
+      "duration_ms": 1429,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -428,7 +428,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1200,
+      "duration_ms": 1521,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -460,7 +460,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1735,
+      "duration_ms": 1201,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -502,7 +502,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1064,
+      "duration_ms": 1131,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -537,7 +537,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1600,
+      "duration_ms": 1252,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -572,7 +572,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1299,
+      "duration_ms": 1748,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -622,7 +622,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2701,
+      "duration_ms": 1271,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -671,7 +671,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17100,
+      "duration_ms": 16674,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -739,7 +739,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1512,
+      "duration_ms": 1254,
       "id": "processes.input.true",
       "proves": [
         {
@@ -810,7 +810,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2087,
+      "duration_ms": 1891,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -935,7 +935,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2903,
+      "duration_ms": 1782,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -1028,7 +1028,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1497,
+      "duration_ms": 1226,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -1078,7 +1078,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1701,
+      "duration_ms": 1170,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -1111,7 +1111,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1200,
+      "duration_ms": 972,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -1144,7 +1144,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1198,
+      "duration_ms": 1040,
       "id": "facts.default_user",
       "proves": [
         {
@@ -1178,7 +1178,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1902,
+      "duration_ms": 1024,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -1212,7 +1212,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2299,
+      "duration_ms": 1292,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -1257,7 +1257,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 623937,
+      "duration_ms": 632474,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -1338,7 +1338,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 319792,
+      "duration_ms": 310863,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -1441,7 +1441,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 66874,
+      "duration_ms": 67139,
       "id": "lifetime_timer.counts_paused_time.true",
       "proves": [
         {
@@ -1483,7 +1483,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 66683,
+      "duration_ms": 66860,
       "id": "lifetime_timer.counts_paused_time.false",
       "proves": [
         {
@@ -1529,7 +1529,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 5404,
+      "duration_ms": 4001,
       "id": "pause_resume.files_only",
       "proves": [
         {
@@ -1605,7 +1605,7 @@
           "observations": {
             "stdout": {
               "actual": {
-                "length": 0,
+                "length": 1511,
                 "type": "str"
               },
               "matches": true
@@ -1627,7 +1627,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2797,
+      "duration_ms": 2510,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
@@ -1705,7 +1705,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 121311,
+      "duration_ms": 121427,
       "id": "idle_shutdown.on_idle.stopped",
       "proves": [
         {
@@ -1767,7 +1767,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 121099,
+      "duration_ms": 121217,
       "id": "idle_shutdown.on_idle.destroyed",
       "proves": [
         {
@@ -1829,7 +1829,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 121501,
+      "duration_ms": 121188,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {
@@ -1891,7 +1891,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1300,
+      "duration_ms": 869,
       "id": "idle_shutdown.custom_idle_time.false",
       "proves": [
         {
@@ -1919,6 +1919,10 @@
     {
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "snapshot",
           "result": "deleted"
         },
@@ -1931,7 +1935,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2500,
+      "duration_ms": 18334,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -1940,8 +1944,7 @@
           "value": "files_only"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "snapshots/files-only"
       ],
@@ -1972,9 +1975,40 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 0,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
@@ -1993,7 +2027,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2199,
+      "duration_ms": 12920,
       "id": "snapshots.keeps.files_and_memory",
       "proves": [
         {
@@ -2002,8 +2036,8 @@
           "value": "files_and_memory"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+      "result": "unsupported",
       "rules": [
         "snapshots/files-and-memory"
       ],
@@ -2035,8 +2069,8 @@
         },
         {
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+          "result": "unsupported"
         }
       ]
     },
@@ -2055,7 +2089,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 5399,
+      "duration_ms": 27366,
       "id": "snapshots.original_after.continues",
       "proves": [
         {
@@ -2064,8 +2098,8 @@
           "value": "continues"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "original_after",
+      "result": "differs",
       "rules": [
         "snapshots/original-after"
       ],
@@ -2081,9 +2115,25 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "baseline_gap_ms": 100,
+            "capture": "native_default",
+            "longest_gap_ms": 417,
+            "original_after": {
+              "actual": {
+                "truncated": false,
+                "utf8": "briefly_paused"
+              },
+              "matches": false
+            }
+          },
+          "operation": "fixture.snapshot_ticker_observe",
+          "result": "differs"
         }
       ]
     },
@@ -2102,7 +2152,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4301,
+      "duration_ms": 19387,
       "id": "snapshots.original_after.briefly_paused",
       "proves": [
         {
@@ -2111,8 +2161,7 @@
           "value": "briefly_paused"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "snapshots/original-after"
       ],
@@ -2128,9 +2177,42 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "advancing": {
+              "actual": true,
+              "matches": true
+            },
+            "baseline_gap_ms": 100,
+            "capture": "native_default",
+            "longest_gap_ms": 413,
+            "original_after": {
+              "actual": {
+                "truncated": false,
+                "utf8": "briefly_paused"
+              },
+              "matches": true
+            }
+          },
+          "operation": "fixture.snapshot_ticker_observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
         }
       ]
     },
@@ -2145,7 +2227,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1601,
+      "duration_ms": 19807,
       "id": "snapshots.original_after.terminated",
       "proves": [
         {
@@ -2154,8 +2236,8 @@
           "value": "terminated"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "state",
+      "result": "differs",
       "rules": [
         "snapshots/original-after"
       ],
@@ -2166,9 +2248,22 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": false
+            }
+          },
+          "operation": "get",
+          "result": "differs"
         }
       ]
     },
@@ -2176,14 +2271,14 @@
       "cleanup": [
         {
           "kind": "snapshot",
-          "result": "deleted"
+          "result": "already_released"
         },
         {
           "kind": "sandbox",
           "result": "deleted"
         }
       ],
-      "duration_ms": 1605,
+      "duration_ms": 29550,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -2192,8 +2287,7 @@
           "value": true
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "snapshots/deletable"
       ],
@@ -2204,9 +2298,14 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
         }
       ]
     },
@@ -2221,7 +2320,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1293,
+      "duration_ms": 31398,
       "id": "snapshots.deletable.false",
       "proves": [
         {
@@ -2230,8 +2329,8 @@
           "value": false
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+      "result": "unsupported",
       "rules": [],
       "steps": [
         {
@@ -2241,13 +2340,21 @@
         },
         {
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+          "result": "unsupported"
         }
       ]
     },
     {
       "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
         {
           "kind": "snapshot",
           "result": "deleted"
@@ -2257,11 +2364,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1767,
+      "duration_ms": 27748,
       "id": "snapshots.restores_many_times",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "snapshots/restores-many-times"
       ],
@@ -2277,14 +2383,99 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "Zmlyc3Q=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
         }
       ]
     },
     {
       "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
         {
           "kind": "snapshot",
           "result": "deleted"
@@ -2294,11 +2485,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1233,
+      "duration_ms": 21009,
       "id": "snapshots.restore_options",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "snapshots/restore-takes-its-own-options"
       ],
@@ -2309,9 +2499,27 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "new"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
@@ -2322,7 +2530,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1695,
+      "duration_ms": 970,
       "id": "snapshots.resizes_on_restore",
       "proves": [
         {
@@ -2356,7 +2564,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3502,
+      "duration_ms": 1202,
       "id": "network_lockdown.deny_all",
       "proves": [
         {
@@ -2385,7 +2593,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 100,
+      "duration_ms": 92,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -2422,7 +2630,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1802,
+      "duration_ms": 1374,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -2464,7 +2672,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4197,
+      "duration_ms": 3148,
       "id": "network_lockdown.after_resume",
       "proves": [],
       "reason": "network_receiver_observer_unavailable",
@@ -2489,7 +2697,7 @@
           "result": "passed"
         },
         {
-          "detail": "runner observer request (1 try): HTTP status 404",
+          "detail": "HTTP status 404",
           "operation": "fixture.coverage_network_checks",
           "reason": "network_receiver_observer_unavailable",
           "result": "not_run"
@@ -2503,7 +2711,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1999,
+      "duration_ms": 1254,
       "id": "network_lockdown.root_cannot_lift",
       "proves": [],
       "reason": "network_unrestricted_control_unavailable",
@@ -2543,7 +2751,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 303,
+      "duration_ms": 90,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -2602,7 +2810,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2297,
+      "duration_ms": 4782,
       "id": "previews.access.public",
       "proves": [
         {
@@ -2670,7 +2878,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4403,
+      "duration_ms": 2119,
       "id": "previews.access.private",
       "proves": [
         {
@@ -2747,7 +2955,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2610,
+      "duration_ms": 2097,
       "id": "previews.credential.link",
       "proves": [
         {
@@ -2820,7 +3028,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2286,
+      "duration_ms": 4211,
       "id": "previews.credential.header",
       "proves": [
         {
@@ -2885,7 +3093,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3300,
+      "duration_ms": 2535,
       "id": "previews.revocable.true",
       "proves": [
         {
@@ -3002,7 +3210,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3899,
+      "duration_ms": 3097,
       "id": "previews.revocable.false",
       "proves": [
         {
@@ -3075,7 +3283,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 302469,
+      "duration_ms": 302390,
       "id": "previews.link_lifetime_seconds",
       "proves": [
         {
@@ -3155,7 +3363,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3711,
+      "duration_ms": 1985,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -3257,7 +3465,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3094,
+      "duration_ms": 1950,
       "id": "previews.credential_scope",
       "proves": [],
       "reason": "adapter_preview_unavailable",
@@ -3319,7 +3527,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 67596,
+      "duration_ms": 67036,
       "id": "idle_shutdown.auto_wake.true",
       "proves": [
         {
@@ -3398,7 +3606,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 68469,
+      "duration_ms": 66938,
       "id": "idle_shutdown.auto_wake.false",
       "proves": [
         {
@@ -3590,11 +3798,15 @@
     {
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "image",
-          "result": "already_released"
+          "result": "deleted"
         }
       ],
-      "duration_ms": 899,
+      "duration_ms": 20239,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -3603,28 +3815,59 @@
           "value": "oci"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "custom_images/oci"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "image.prepare",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n<HOME>\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 286,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "image",
-          "reason": "NativeFailure",
-          "result": "error"
+          "result": "deleted"
         }
       ],
-      "duration_ms": 806,
+      "duration_ms": 38003,
       "id": "custom_images.dockerfile",
       "proves": [
         {
@@ -3633,8 +3876,7 @@
           "value": "dockerfile"
         }
       ],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [
         "custom_images/dockerfile"
       ],
@@ -3645,9 +3887,43 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "create",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n<HOME>\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVyZWRvYw==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
         }
       ]
     },
@@ -3658,7 +3934,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1191,
+      "duration_ms": 1183,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -3723,7 +3999,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2400,
+      "duration_ms": 2055,
       "id": "hidden_secrets.injected",
       "proves": [],
       "reason": "the adapter does not declare hidden-secret injection support",
@@ -3773,7 +4049,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3003,
+      "duration_ms": 2095,
       "id": "hidden_secrets.header_templates",
       "proves": [
         {
@@ -3829,7 +4105,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2502,
+      "duration_ms": 1834,
       "id": "hidden_secrets.unreadable",
       "proves": [],
       "reason": "the adapter does not declare hidden-secret injection support",
@@ -3871,7 +4147,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1499,
+      "duration_ms": 787,
       "id": "facts.sizes",
       "proves": [
         {
@@ -3909,7 +4185,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 302295,
+      "duration_ms": 301361,
       "id": "facts.max_lifetime",
       "proves": [
         {
@@ -3967,7 +4243,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 66402,
+      "duration_ms": 66279,
       "id": "facts.long_running",
       "proves": [
         {
@@ -4020,7 +4296,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1602,
+      "duration_ms": 1099,
       "id": "facts.gpus",
       "proves": [
         {
@@ -4055,7 +4331,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1198,
+      "duration_ms": 1355,
       "id": "edge.commands.killed",
       "proves": [],
       "result": "passed",
@@ -4085,7 +4361,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1270,
+      "duration_ms": 1731,
       "id": "edge.files.missing_parent",
       "proves": [],
       "result": "passed",
@@ -4117,7 +4393,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1329,
+      "duration_ms": 1549,
       "id": "edge.files.owner",
       "proves": [],
       "result": "passed",
@@ -4153,7 +4429,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1321,
+      "duration_ms": 1095,
       "id": "edge.images.architecture",
       "proves": [],
       "result": "passed",
@@ -4184,7 +4460,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1680,
+      "duration_ms": 1261,
       "id": "edge.lifetime.granularity",
       "proves": [],
       "result": "passed",
@@ -4249,7 +4525,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 67596,
+      "duration_ms": 76441,
       "id": "edge.idle.command_activity",
       "proves": [],
       "result": "passed",
@@ -4271,7 +4547,7 @@
         },
         {
           "observations": {
-            "state": "active"
+            "state": "stopped"
           },
           "operation": "get",
           "result": "passed"
@@ -4293,7 +4569,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2499,
+      "duration_ms": 4508,
       "id": "edge.previews.public_under_lockdown",
       "proves": [],
       "result": "passed",
@@ -4366,7 +4642,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3302,
+      "duration_ms": 2337,
       "id": "edge.previews.old_link_after_resume",
       "proves": [],
       "reason": "BoxRouter Core's pause has no keeps selector; the adapter kept files_only",
@@ -4436,18 +4712,17 @@
       "cleanup": [
         {
           "kind": "snapshot",
-          "result": "deleted"
+          "result": "already_released"
         },
         {
           "kind": "sandbox",
           "result": "deleted"
         }
       ],
-      "duration_ms": 1293,
+      "duration_ms": 26531,
       "id": "edge.snapshots.delete_again",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "result": "passed",
       "rules": [],
       "steps": [
         {
@@ -4456,9 +4731,23 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "native_delete_attempted": {
+              "matches": true
+            }
+          },
+          "operation": "snapshot.delete_again",
+          "result": "passed"
         }
       ]
     },
@@ -4473,11 +4762,11 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1503,
+      "duration_ms": 19154,
       "id": "edge.snapshots.delete_during_restore",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "native_restore_progress_unobservable",
+      "result": "not_run",
       "rules": [],
       "steps": [
         {
@@ -4486,9 +4775,14 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.restore_begin",
+          "reason": "native_restore_progress_unobservable",
+          "result": "not_run"
         }
       ]
     },
@@ -4503,11 +4797,11 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1298,
+      "duration_ms": 20545,
       "id": "edge.snapshots.retention",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "native_snapshot_retention_unobservable",
+      "result": "not_run",
       "rules": [],
       "steps": [
         {
@@ -4516,9 +4810,14 @@
           "result": "passed"
         },
         {
+          "observations": {},
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.retention",
+          "reason": "native_snapshot_retention_unobservable",
+          "result": "not_run"
         }
       ]
     },
@@ -4537,11 +4836,11 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1899,
+      "duration_ms": 19966,
       "id": "edge.snapshots.memory_pty",
       "proves": [],
-      "reason": "quota_exceeded",
-      "result": "error",
+      "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+      "result": "unsupported",
       "rules": [
         "snapshots/files-and-memory"
       ],
@@ -4578,14 +4877,14 @@
         },
         {
           "operation": "snapshot.take",
-          "reason": "quota_exceeded",
-          "result": "error"
+          "reason": "BoxRouter Core's snapshot has no keeps selector; the adapter kept files_only",
+          "result": "unsupported"
         }
       ]
     },
     {
       "cleanup": [],
-      "duration_ms": 1,
+      "duration_ms": 0,
       "id": "edge.lifetime.files_after_expiry",
       "proves": [],
       "reason": "the adapter's declared lifetime timer cannot end this lifetime as requested",
@@ -4662,7 +4961,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4502,
+      "duration_ms": 4827,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -4758,7 +5057,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2298,
+      "duration_ms": 1913,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -4822,7 +5121,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 302198,
+      "duration_ms": 307076,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {
@@ -4898,7 +5197,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1899,
+      "duration_ms": 1260,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -4959,7 +5258,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2798,
+      "duration_ms": 2377,
       "id": "contract.idempotent_create_same_body",
       "proves": [],
       "reason": "equal",
@@ -5027,7 +5326,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2603,
+      "duration_ms": 1989,
       "id": "contract.idempotent_create_other_body",
       "proves": [],
       "reason": "expected_error",
@@ -5063,7 +5362,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2397,
+      "duration_ms": 2229,
       "id": "contract.list_label_filter",
       "proves": [],
       "reason": "observation_unmapped",
@@ -5096,7 +5395,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1301,
+      "duration_ms": 1358,
       "id": "contract.not_found_codes",
       "proves": [],
       "reason": "expected_error",
@@ -5123,7 +5422,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 8,
+      "duration_ms": 0,
       "id": "contract.unsupported_unclaimed",
       "proves": [],
       "reason": "ValueError",
@@ -5146,7 +5445,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4390,
+      "duration_ms": 4877,
       "id": "contract.run_timeout_ends_command",
       "proves": [],
       "reason": "observation_unmapped",
@@ -5174,7 +5473,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1001,
+      "duration_ms": 1165,
       "id": "contract.files_1gib_roundtrip",
       "proves": [],
       "reason": "fixture_missing",
@@ -5203,7 +5502,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 939,
+      "duration_ms": 1129,
       "id": "contract.destroy_repeat",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -5238,7 +5537,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1128,
+      "duration_ms": 1070,
       "id": "contract.cost_final",
       "proves": [],
       "reason": "driver_unimplemented",
