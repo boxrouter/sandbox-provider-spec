@@ -365,7 +365,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "c472c056bffa32160f4ed90516c57cbeac7ed5748ac46b18d06651317c5ef23c",
+  "report_sha256": "4b78c71b45c1ba4329192004d82e8b5638b5038b2962a30f00216c5531adef34",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:19e3f0300d716366e63ab1902f06a2b77c24ca2a3257ed310dda70f2569c2c0d",
@@ -641,7 +641,7 @@
     "boxrouter_modal/ownership.py::": "sha256:82535ad5aedbbc92a74619c165d1eb0e64731b2179e657d29e127e2a3c4e7ceb",
     "boxrouter_modal/ownership.py::recovered_receipt": "sha256:b338691bb2a07440cc4125f193cce467e088d3b467069128ff85559611f74f4c",
     "boxrouter_modal/ownership.py::shared_app": "sha256:acac554d23ec6254d52a2ee344c9600642d06779a19b69e8cddd422b97ae0c4f",
-    "boxrouter_modal/planning.py::": "sha256:1611fd35a6ddb9ecbc97c9addda478cf6423a8931bf302d99d80d5bf79084083",
+    "boxrouter_modal/planning.py::": "sha256:795895c42fffa2fec8cc34dc9fe477161830333fefff5a8566a814440e31ea45",
     "boxrouter_modal/planning.py::_disk": "sha256:13a1e39f5056d5538871ee275df59d8e2fd6954df31b4e9cc7d0de27b0d6aad4",
     "boxrouter_modal/planning.py::_kernel": "sha256:ebc53ac43c292ff1e7ca3a8f22fb5edbb9cfcb75d80eed5c8e4d020c249338a2",
     "boxrouter_modal/planning.py::_resources": "sha256:55943cd8c45af177a10994b2020fcc8ea41f44d57b2af4450fecf4e0ee56600d",

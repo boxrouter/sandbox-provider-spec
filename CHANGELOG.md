@@ -9,6 +9,7 @@ says what each kind of release may change.
 - 0.4.48: Boat's five SPS reports (processes, size ceiling, user selection, prober core and coverage) rerun live on adapter-boat 0.3.87. No vocabulary or conformance-suite change.
 - 0.4.40: Agent37 declares `processes` (input, cancel, reattach) from same-change core reports; its VM class declares `user_selection` (commands, files_write, process_start) from `coverage.guest_user.selectable`. No vocabulary or conformance-suite change.
 - 0.4.37: Boat declares `processes` (input false, cancel, reattach) and `user_selection` (commands, files_write, process_start) with same-PR reports that certify the adapter behavior; the adapter no longer adds `processes` on its own. No vocabulary or conformance-suite change.
+- 0.4.52: Modal declares certified process reattachment for its default and VM classes, and the VM class declares named-user command, file-write, and process-start support using `coverage.guest_user.selectable`. No vocabulary or conformance-suite change.
 - 0.4.33: Blaxel declares `user_selection` for commands, file writes and process starts, with a clean same-PR report. No vocabulary or conformance-suite change.
 - 0.4.32: Vercel declares `user_selection` (commands, files_write, process_start) with a same-PR report that certifies the adapter behavior. No vocabulary or conformance-suite change.
 - 0.4.31: E2B declares `user_selection` (commands, files_write, process_start) with a same-PR report that certifies the adapter behavior. No vocabulary or conformance-suite change.

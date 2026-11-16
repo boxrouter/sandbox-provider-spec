@@ -58,6 +58,11 @@ gates:
   - tls: none
   processes:
   - input: true
+    reattach: true
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
   terminal:
   - {}
 evidence:
@@ -138,6 +143,22 @@ evidence:
     tests:
     - processes.input.true
     report: reports/prober-vm-core.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/adapter-vm-process-reattach.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-vm-user-selection.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-vm-user-selection.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-vm-user-selection.json
   gates.terminal.0:
     tests:
     - terminal.interactive

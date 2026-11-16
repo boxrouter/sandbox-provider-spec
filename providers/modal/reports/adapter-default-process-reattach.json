@@ -1,0 +1,94 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "processes.reattach.true": "sha256:7e0249a1b14e19f75f0dcd2dc813eecc54bf1fee8c6235902685320c153d7b2b"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "withheld",
+    "version": "withheld"
+  },
+  "finished_at": "2026-11-16T05:56:00.697726+00:00",
+  "implementation": "withheld",
+  "provider": "modal",
+  "revision": "6b0ab6746f7223b9d87632a204ea264de5349ad9",
+  "run_id": "public-5ba94cffa0aa3d24cd33",
+  "sdk_versions": {
+    "modal": "1.6.1",
+    "withheld": "withheld"
+  },
+  "selected_tests": [
+    "processes.reattach.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-16T05:55:57.620798+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3070,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 11,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
