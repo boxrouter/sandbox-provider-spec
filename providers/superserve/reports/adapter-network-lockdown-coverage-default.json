@@ -1,19 +1,19 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.network_lockdown.open": "sha256:63333d5008af7824859cd7abd726b10dbadc6e94956ffc30d496789738e62b84",
-    "coverage.network_lockdown.switchable.true": "sha256:9c4efba9493dbf85cdf0b237cd56d46eac16b18e5d6cd49718577d5ba1366c4b"
+    "coverage.network_lockdown.open": "sha256:ba1ba8951c8e090d2560a163c0c224ef79328495827935e2136b6ccd4bc640bf",
+    "coverage.network_lockdown.switchable.true": "sha256:93652cfc245b256d574d58e5aa6fef8bf9c80aa4a10f294b3654a59767984a4c"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-14T20:28:03.964102+00:00",
+  "finished_at": "2026-11-16T00:41:33.176852+00:00",
   "implementation": "withheld",
   "provider": "superserve",
-  "revision": "749297d024f4942b1ba0bf4f7278294482bf6bad",
-  "run_id": "public-763acbdb737e983ad870",
+  "revision": "e6ca22d39d4e9171d5b5630f0be124a01c54cbce",
+  "run_id": "public-ff3da68d6b2217fa3805",
   "sdk_versions": {
     "superserve": "0.12.0",
     "withheld": "withheld"
@@ -23,8 +23,8 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-14T20:27:31.133192+00:00",
-  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "started_at": "2026-11-16T00:40:59.879109+00:00",
+  "suite_digest": "sha256:8c12bd00983b29fb43e844893b0d56336835a37caa24d8245d55d020477c9231",
   "tests": [
     {
       "cleanup": [
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 21422,
+      "duration_ms": 21720,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -85,7 +85,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 11406,
+      "duration_ms": 11568,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
