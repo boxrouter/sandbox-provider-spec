@@ -40,7 +40,8 @@ def _failed_order(hash_seed: int) -> list[str]:
         text=True,
         check=True,
     )
-    return json.loads(run.stdout)
+    order: list[str] = json.loads(run.stdout)
+    return order
 
 
 @pytest.mark.parametrize("hash_seed", range(6))
