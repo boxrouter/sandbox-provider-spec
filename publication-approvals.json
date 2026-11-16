@@ -10,6 +10,16 @@
       "granted_by": "founder",
       "granted_on": "2026-11-16",
       "quote": "boxd is not intended to be hidden"
+    },
+    {
+      "id": "founder-2026-11-16-boxd-default-publish",
+      "provider": "boxd",
+      "class": "default",
+      "from": "hidden",
+      "to": "published",
+      "granted_by": "founder",
+      "granted_on": "2026-11-16",
+      "quote": "boxd is not intended to be hidden"
     }
   ]
 }
