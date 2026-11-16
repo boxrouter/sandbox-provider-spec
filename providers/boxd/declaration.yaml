@@ -23,6 +23,7 @@ resources:
     memory_mib: 4096
     disk_mib: 102400
   size_is_ceiling: true
+  disk_in_memory: false
   max_lifetime_seconds: 315360000
   gpus: unknown
   disk_mib: 102400
@@ -40,6 +41,10 @@ lifetime_timer:
   counts_paused_time: unknown
   at_end: [destroyed]
 gates:
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
   processes:
   - input: true
     cancel: true
@@ -97,11 +102,11 @@ evidence:
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_and_memory
-    report: reports/prober-default-core.json
+    report: reports/snapshot.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
-    report: reports/prober-default-core.json
+    report: reports/snapshot.json
   gates.processes.0:
     tests:
     - processes.input.true
@@ -120,6 +125,22 @@ evidence:
     tests:
     - processes.reattach.true
     report: reports/prober-default-core.json
+  gates.user_selection.0:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-default-user-selection.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-default-user-selection.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-default-user-selection.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-default-user-selection.json
   gates.terminal.0:
     tests:
     - terminal.interactive
@@ -159,6 +180,9 @@ evidence:
   resources.size_is_ceiling:
     tests: [coverage.facts.size_is_ceiling.true]
     report: reports/adapter-default-size-ceiling.json
+  resources.disk_in_memory:
+    tests: [coverage.facts.disk_in_memory.false]
+    report: reports/prober-disk-in-memory-20261116.json
   resources.default_size:
     source: boxd Python SDK 0.2.22 README (Machines) and MachineResources.disk_bytes docstring
     read: '2026-11-02'

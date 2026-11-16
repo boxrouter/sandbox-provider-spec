@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.56: Boxd declares `resources.disk_in_memory: false` and named runner-user capabilities with cited evidence. No vocabulary or conformance-suite change.
 - 0.4.55: Superserve's SPS reports (adapter copies of the packaged runs, adapter-defaults, size ceiling, prober core and coverage) rerun live on adapter-superserve 0.1.17; the prober core report now passes `idle_shutdown.on_idle.destroyed`. No vocabulary or conformance-suite change.
 - 0.4.53: Boxd's default benchmark class is published under the 2026-11-16 founder approval. No vocabulary or conformance-suite change.
 - 0.4.51: Boxd's SPS reports (default, size ceiling, prober core and coverage, snapshot) rerun live on adapter-boxd 0.1.107. No vocabulary or conformance-suite change.
