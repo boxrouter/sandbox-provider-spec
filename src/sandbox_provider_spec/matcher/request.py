@@ -231,9 +231,9 @@ def _knob_values(gate: str, knob: str, raw: Any) -> list[Any] | str:
         if item not in definition.values:
             raise Rejected(
                 "unrecognised_word",
-                f"{where}: unrecognised value {item!r}",
+                f"{where}: unrecognised value",
                 path=where,
-                details={"word": item, "known": list(definition.values)},
+                details={"known": list(definition.values)},
             )
     if len(set(items)) != len(items):
         raise Rejected("setting", f"{where} repeats a value", path=where)
@@ -358,9 +358,9 @@ def _check_settings(gate: str, knobs: dict[str, list[Any] | str], settings: Docu
                 if item not in POLICIES:
                     raise Rejected(
                         "unrecognised_word",
-                        f"switches_to: unrecognised policy {item!r}",
+                        "switches_to: unrecognised policy",
                         path=f"{where}.switches_to",
-                        details={"word": item, "known": list(POLICIES)},
+                        details={"known": list(POLICIES)},
                     )
             if len(set(switches_to)) != len(switches_to):
                 raise Rejected(
@@ -519,9 +519,9 @@ def _gate_ask(gate: str, body: Any) -> GateAsk:
         else:
             raise Rejected(
                 "unrecognised_word",
-                f"{gate}.{key} is not one of its knobs or settings",
+                f"{gate}: unrecognised knob or setting",
                 path=f"requirements.{gate}.{key}",
-                details={"word": key, "known": [*definition.knobs, *definition.settings]},
+                details={"known": [*definition.knobs, *definition.settings]},
             )
     required = must_be_named(gate)
     if required and required not in knobs:
@@ -622,9 +622,9 @@ def _resource(key: str, raw: Any) -> Any:
         if allowed is not None and item not in allowed:
             raise Rejected(
                 "unrecognised_word",
-                f"{key}: unrecognised value {item!r}",
+                f"{key}: unrecognised value",
                 path=where,
-                details={"word": item, "known": list(allowed)},
+                details={"known": list(allowed)},
             )
     if len(set(items)) != len(items):
         raise Rejected("setting", f"{key} repeats a value", path=where)
@@ -643,9 +643,9 @@ def _per_operation(key: str, raw: Any) -> dict[str, int]:
         if operation not in FILE_OPERATIONS:
             raise Rejected(
                 "unrecognised_word",
-                f"{key}: unrecognised direction {operation!r}",
+                f"{key}: unrecognised direction",
                 path=f"{where}.{operation}",
-                details={"word": operation, "known": list(FILE_OPERATIONS)},
+                details={"known": list(FILE_OPERATIONS)},
             )
         not_unknown(f"{where}.{operation}", value)
         whole = _whole_number(value)
@@ -699,9 +699,9 @@ def validate_request(
         if key not in allowed:
             raise Rejected(
                 "unrecognised_word",
-                f"unrecognised request key {key!r}",
+                "unrecognised request key",
                 path=key,
-                details={"word": key, "known": sorted(allowed)},
+                details={"known": sorted(allowed)},
             )
     lifetime = raw.get("lifetime_seconds")
     no_lifetime = mode != "restores_need" and "lifetime_seconds" in raw and lifetime is None
@@ -722,9 +722,9 @@ def validate_request(
             raise Rejected("wrong_type", f"at_end: {at_end!r} is not an ending", path="at_end")
         raise Rejected(
             "unrecognised_word",
-            f"unrecognised at_end {at_end!r}",
+            "unrecognised at_end",
             path="at_end",
-            details={"word": at_end, "known": list(AT_END)},
+            details={"known": list(AT_END)},
         )
     if no_lifetime and at_end is not None:
         raise Rejected(
@@ -782,9 +782,9 @@ def validate_request(
         else:
             raise Rejected(
                 "unrecognised_word",
-                f"unrecognised gate {name!r}",
+                "unrecognised gate",
                 path=f"requirements.{name}",
-                details={"word": name, "known": list(GATES)},
+                details={"known": list(GATES)},
             )
     if at_end == "paused" and "pause_resume" not in gates:
         raise Rejected(
@@ -814,9 +814,9 @@ def validate_request(
         if key not in RESOURCE_ASKS:
             raise Rejected(
                 "unrecognised_word",
-                f"unrecognised resource {key!r}",
+                "unrecognised resource",
                 path=f"resources.{key}",
-                details={"word": key, "known": list(RESOURCE_ASKS)},
+                details={"known": list(RESOURCE_ASKS)},
             )
         resources[key] = _resource(key, value)
     if resources.get("long_running") and "idle_shutdown" in gates:
