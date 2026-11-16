@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T03:06:30.993134+00:00",
+  "finished_at": "2026-11-16T05:54:29.014945+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "867347620153d7e2c7f5785895e51034a76864e7",
-  "run_id": "public-4a62541a6fcc78bcf9fb",
+  "revision": "c8b429a6cdb60080518870e43df3f72dd64424b4",
+  "run_id": "public-674a6a795b42096a299b",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -21,7 +21,7 @@
     "coverage.guest_user.selectable"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T03:06:06.197964+00:00",
+  "started_at": "2026-11-16T05:54:10.723712+00:00",
   "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
@@ -35,7 +35,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 24792,
+      "duration_ms": 18288,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
