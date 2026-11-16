@@ -62,13 +62,15 @@ tests:
       equals:
         exit_code: 0
         stdout: {utf8: "runner 600\n"}
-  - op: files.read_bytes
+  - op: run
     target: box
     in:
-      path: /tmp/sps-user-selection-file
+      bash_script: cat /tmp/sps-user-selection-file
+      run_as: runner
     expect:
       equals:
-        data: {utf8: "conformance\n"}
+        exit_code: 0
+        stdout: {utf8: "conformance\n"}
   - op: process.start
     target: box
     as: process
@@ -82,13 +84,15 @@ tests:
     expect:
       equals:
         exit_code: 0
-  - op: files.read_bytes
+  - op: run
     target: box
     in:
-      path: /tmp/sps-user-selection-process
+      bash_script: cat /tmp/sps-user-selection-process
+      run_as: runner
     expect:
       equals:
-        data: {utf8: "runner\n"}
+        exit_code: 0
+        stdout: {utf8: "runner\n"}
 - id: coverage.facts.max_lifetime.active
   title: A sandbox kept active survives the observed lifetime window.
   rules:
