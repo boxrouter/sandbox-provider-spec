@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: vercel
 verified:
-  date: '2026-11-15'
+  date: '2026-11-16'
   sdks:
     vercel-sandbox: 0.9.0
 resources:
@@ -122,6 +122,10 @@ gates:
   - source: provider_artifact
   terminal:
   - {}
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
 evidence:
   resources.size_is_ceiling:
     tests:
@@ -314,3 +318,15 @@ evidence:
     tests:
     - terminal.interactive
     report: reports/prober-default-core.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
