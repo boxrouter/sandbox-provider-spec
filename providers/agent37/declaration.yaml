@@ -50,6 +50,10 @@ gates:
       allow_wildcards: true
       max_allow: {at_least: 32}
       switchable: true
+  processes:
+  - input: true
+    cancel: true
+    reattach: true
 evidence:
   resources.disk_in_memory:
     tests: [coverage.facts.disk_in_memory.false]
@@ -132,3 +136,12 @@ evidence:
   gates.network_lockdown.0.entry_kinds:
     tests: [network_lockdown.allowlist.addresses]
     report: reports/network-lockdown-addresses.json
+  gates.processes.0.input:
+    tests: [processes.input.true]
+    report: reports/processes-default-core.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.true]
+    report: reports/processes-default-core.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/processes-default-core.json

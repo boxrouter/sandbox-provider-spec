@@ -504,7 +504,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "23bf22d61bf539ba0e78a35ff15371e598b76c2f891e0a95e4746c3ed07cb6cf",
+  "report_sha256": "db7adccca9b094f126ec162985179217b5994ab8dec59cb8abcb9c8a7dcb53a7",
   "units": {
     "boxrouter_adapter_kit/fixture_lifetime.py::": "sha256:129d5eb2d980c02aed9bedf6f4b96c7ea1ba105ef93cadfdc2fa491c15ff8779",
     "boxrouter_adapter_kit/fixture_lifetime.py::create_body": "sha256:19e3f0300d716366e63ab1902f06a2b77c24ca2a3257ed310dda70f2569c2c0d",
@@ -541,7 +541,7 @@
     "boxrouter_adapter_kit/spec_driver.py::unwrapped": "sha256:8e298f35dc95ae34280270d5a4cc786cf84fa03c54890e5a74bd5d2b4b917e0e",
     "boxrouter_agent37/errors.py::": "sha256:ea2f76ad8221092e13373aab7e13a37bd16b9d095e70926660a5597b1b22f30d",
     "boxrouter_agent37/errors.py::_facts": "sha256:2416be4381b9caaa1a30e879f4ad1bdf9f3d60792222b0e8167c67b0a6a6e662",
-    "boxrouter_agent37/guest.py::": "sha256:a268bb91d178105b4742169a32ef0e609eabd6116896be64faaa581edc5537a2",
+    "boxrouter_agent37/guest.py::": "sha256:9989232edbd7fe1f5a8f810a0a27c07b53d2c1d17b0c06d5f488f17f216e8360",
     "boxrouter_agent37/guest.py::Guest.__init__": "sha256:0ed839e161ebcf182d9e213d56708cd79abbd099a26d209baebfb8f15fd7bad6",
     "boxrouter_agent37/guest.py::Guest.execute": "sha256:e48b9b8dc339f29b06687d88639a400b61c4fdd26a463f746e60d1c91bf78435",
     "boxrouter_agent37/guest.py::Guest.run": "sha256:2f552ada71ddd0313c56073037a502d67d11a7e05bfb376a81eb9b3534e43888",
@@ -558,7 +558,7 @@
     "boxrouter_agent37/provider.py::Agent37Provider.planned": "sha256:c739ca3a9670a03b7250901b75d88087466e8e4ad872e14f7f527c9305fb30c8",
     "boxrouter_agent37/provider.py::_environment": "sha256:2ec7c8dde39902b5a86ea2fd44dc249e023e285b44f8c968f300cb3578913a34",
     "boxrouter_agent37/provider.py::_labels": "sha256:22cb77a3bb196bf9b2d76fba5ede399c62d00cc1bf78bbd72d7dba9886a1afcd",
-    "boxrouter_agent37/sandbox.py::": "sha256:e4ccf67b60546b973b52205d32975086417b064a94541d87e8d63a19be062156",
+    "boxrouter_agent37/sandbox.py::": "sha256:c9cdc8d16d548a1a7fd7cc44767fc262114a22cb9c4b7ecc82791b5c0e82df63",
     "boxrouter_agent37/sandbox.py::AsyncAgent37Provider._byte_run_within": "sha256:428b960ef9764a64fdf2d2ad36109fc096d50c0ca30f84b7e6012433d6f63e16",
     "boxrouter_agent37/sandbox.py::AsyncAgent37Provider._destroy": "sha256:0ef286dc0b532e937692bfb54621f84c06d26a786f3fb68028b9c6ed9d7de6e8",
     "boxrouter_agent37/sandbox.py::AsyncAgent37Provider._initialize_native": "sha256:e3723fd909bed8aea90c189e3ae13a3cc943cb54b46efca6473ac83206b49acb",

@@ -45,6 +45,14 @@ gates:
       allow_wildcards: true
       max_allow: {at_least: 32}
       switchable: true
+  processes:
+  - input: true
+    cancel: true
+    reattach: true
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
 evidence:
   resources.kernel:
     source: https://www.agent37.com/docs/agents-api/vm-instances
@@ -130,3 +138,21 @@ evidence:
   gates.network_lockdown.0.entry_kinds:
     tests: [network_lockdown.allowlist.addresses]
     report: reports/network-lockdown-addresses-vm.json
+  gates.processes.0.input:
+    tests: [processes.input.true]
+    report: reports/processes-vm-core.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.true]
+    report: reports/processes-vm-core.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/processes-vm-core.json
+  gates.user_selection.0.commands:
+    tests: [coverage.guest_user.selectable]
+    report: reports/adapter-vm-user-selection.json
+  gates.user_selection.0.files_write:
+    tests: [coverage.guest_user.selectable]
+    report: reports/adapter-vm-user-selection.json
+  gates.user_selection.0.process_start:
+    tests: [coverage.guest_user.selectable]
+    report: reports/adapter-vm-user-selection.json

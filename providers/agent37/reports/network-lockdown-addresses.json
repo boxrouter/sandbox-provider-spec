@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T02:48:02.527131+00:00",
+  "finished_at": "2026-11-16T03:58:36.995005+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "ff3ce2f8d649b67c51284250a16a3d95d624179b",
-  "run_id": "public-ce84e25095f7fca526e1",
+  "revision": "b2ea03eba0bb5e252038b91e8da576c368d03596",
+  "run_id": "public-432b44c28bb3e3473915",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -21,7 +21,7 @@
     "network_lockdown.allowlist.addresses"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T02:47:59.037355+00:00",
+  "started_at": "2026-11-16T03:58:33.690733+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3486,
+      "duration_ms": 3299,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
