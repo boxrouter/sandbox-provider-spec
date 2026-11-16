@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.31: E2B declares `user_selection` (commands, files_write, process_start) with a same-PR report that certifies the adapter behavior. No vocabulary or conformance-suite change.
 - 0.4.30: Blaxel declares `disk_in_memory: true`, proved by a clean same-change
   `coverage.facts.disk_in_memory.true` report (writing 256 MiB to the root filesystem
   raised cgroup shmem by the written amount). Blaxel's documentation states sandbox

@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: e2b
 verified:
-  date: '2026-11-15'
+  date: '2026-11-16'
   sdks:
     e2b: 2.59.0
     e2b-code-interpreter: 2.11.3
@@ -100,6 +100,10 @@ gates:
   - operations:
     - read
     - write
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
 evidence:
   resources.size_is_ceiling:
     tests:
@@ -327,6 +331,18 @@ evidence:
     - file_links.v1.read_exact
     - file_links.v1.write_exact
     report: reports/adapter-file-links.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: false
