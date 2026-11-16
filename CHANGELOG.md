@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.26: Daytona's container class declares `user_selection` (commands, files_write, process_start), proved by `coverage.guest_user.selectable` in a same-change report. No vocabulary or conformance-suite change.
 - 0.4.21: `coverage.guest_user.selectable` reads the two files it made back by running `cat` as the named user, where it read them through the file API as the default user. The file is private to the named user (mode 0600) and a provider whose file API runs as a non-root default user cannot read it; the check proves the bytes written, not that the file API is root. The knobs and rules are unchanged. The check's digest changes, so earlier reports of it need a rerun; the coverage suite this replaces is recorded in `conformance/historical-suite-rules.json`.
 - 0.4.20: Prefix `guest_user.selectable` as `coverage.guest_user.selectable` so adapter evidence
   planning selects the coverage suite. Record the previous suite digest in
