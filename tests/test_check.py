@@ -1584,3 +1584,18 @@ def test_lifetime_timer_after_resume_refuses_other_values(value: object) -> None
 def test_the_catalog_lists_after_resume_as_a_timer_fact() -> None:
     catalog = sandbox_provider_spec.load_catalog()
     assert "after_resume" in catalog["lifetime_timer"]
+
+
+def test_text_evidence_source_is_not_a_uri_check() -> None:
+    """A plain-text evidence `source` validates whether or not an optional URI validator is installed."""
+    document = declaration()
+    document["evidence"] = {
+        "resources.kernel": {
+            "source": "providers/acme/evidence.md",
+            "read": "2026-11-14",
+            "quote": "the provider's own words",
+        }
+    }
+    assert sandbox_provider_spec.schema_errors(document, "declaration-schema.json") == []
+    assert "uri" not in check._format_checker().checkers
+    assert "date" in check._format_checker().checkers

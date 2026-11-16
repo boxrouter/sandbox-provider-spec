@@ -132,9 +132,23 @@ def _schema(name: str) -> dict[str, Any]:
     return schema
 
 
+def _format_checker() -> FormatChecker:
+    """The formats this checker enforces, the same in every environment.
+
+    `FormatChecker()` enforces `uri` only when `rfc3986-validator` happens to be installed, so
+    adding an unrelated dependency to the workspace venv refused every declaration whose evidence
+    `source` is plain text rather than a URL and left those providers unserved. The vocabulary
+    here does not require resolvable URIs, so the optional URI formats are never enforced.
+    """
+    checker = FormatChecker()
+    for name in ("uri", "uri-reference", "iri", "iri-reference"):
+        checker.checkers.pop(name, None)
+    return checker
+
+
 def schema_errors(document: Any, schema_name: str) -> list[str]:
     """JSON Schema messages for one document. Empty when it validates."""
-    validator = Draft202012Validator(_schema(schema_name), format_checker=FormatChecker())
+    validator = Draft202012Validator(_schema(schema_name), format_checker=_format_checker())
     messages: list[str] = []
     for error in sorted(validator.iter_errors(document), key=lambda item: list(item.path)):
         loc = ".".join(str(part) for part in error.path) or "(root)"
