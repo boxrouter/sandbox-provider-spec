@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sandbox-provider-spec"
-version = "0.4.65"
+version = "0.4.66"
 description = "The Sandbox Provider Specification: what a sandbox provider guarantees, how it declares it, and how conformance proves it"
 readme = "README.md"
 license = "Apache-2.0"
@@ -33,7 +33,7 @@ docker = ["docker==7.2.0"]
 e2b = [
     "e2b==2.59.0",
     "e2b-code-interpreter==2.11.3",
-    "e2b-desktop==2.6.0",
+    "e2b-desktop==2.7.2",
 ]
 modal = ["modal==1.6.1"]
 daytona = ["daytona==0.226.1"]
