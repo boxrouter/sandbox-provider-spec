@@ -273,7 +273,7 @@
       "oneOf": [
         {"$ref": "#/$defs/report_evidence"},
         {"type": "object", "additionalProperties": false, "required": ["reports"], "properties": {"reports": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/report_evidence"}}}},
-        {"type": "object", "additionalProperties": false, "required": ["source", "read", "quote"], "properties": {"source": {"type": "string", "format": "uri"}, "read": {"type": "string", "format": "date"}, "quote": {"type": "string", "minLength": 1, "maxLength": 1000}}}
+        {"type": "object", "additionalProperties": false, "required": ["source", "read", "quote"], "properties": {"source": {"type": "string", "format": "uri-reference"}, "read": {"type": "string", "format": "date"}, "quote": {"type": "string", "minLength": 1, "maxLength": 1000}}}
       ]
     },
     "report_evidence": {"type": "object", "additionalProperties": false, "required": ["tests", "report"], "properties": {"tests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}, "report": {"type": "string", "pattern": "^reports/[^/]+\\.json$"}}}
