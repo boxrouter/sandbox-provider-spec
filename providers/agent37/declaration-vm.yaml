@@ -74,8 +74,9 @@ evidence:
       Omitted, most templates use 2 vCPU / 4 GB. ... When omitted, it defaults to 12 GB for these
       two VM templates, or 4, 6, 12, or 24 GB by shape for other templates.
   resources.size_is_ceiling:
-    tests: [coverage.facts.size_is_ceiling.true]
-    report: reports/adapter-vm-size-ceiling.json
+    tests:
+    - coverage.facts.size_is_ceiling.true
+    report: reports/prober-vm-coverage.json
   resources.default_user:
     tests: [facts.default_user]
     report: reports/adapter-vm-defaults.json
@@ -116,10 +117,13 @@ evidence:
     quote: A router-enforced lifetime destroys the sandbox.
   gates.network_lockdown.1.policy:
     reports:
-      - tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]
-        report: reports/network-lockdown-vm.json
-      - tests: [coverage.network_lockdown.open]
-        report: reports/network-lockdown-coverage-vm.json
+    - tests:
+      - network_lockdown.deny_all
+      - network_lockdown.allowlist.names
+      report: reports/network-lockdown-vm.json
+    - tests:
+      - coverage.network_lockdown.open
+      report: reports/prober-vm-coverage.json
   gates.network_lockdown.1.entry_kinds:
     tests: [network_lockdown.allowlist.names]
     report: reports/network-lockdown-vm.json
@@ -130,8 +134,9 @@ evidence:
     tests: [network_lockdown.max_allow]
     report: reports/network-lockdown-vm.json
   gates.network_lockdown.1.switchable:
-    tests: [coverage.network_lockdown.switchable.true]
-    report: reports/network-lockdown-coverage-vm.json
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/prober-vm-coverage.json
   gates.network_lockdown.0.policy:
     tests: [network_lockdown.allowlist.addresses]
     report: reports/network-lockdown-addresses-vm.json
@@ -148,11 +153,14 @@ evidence:
     tests: [processes.reattach.true]
     report: reports/processes-vm-core.json
   gates.user_selection.0.commands:
-    tests: [coverage.guest_user.selectable]
-    report: reports/adapter-vm-user-selection.json
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-vm-coverage.json
   gates.user_selection.0.files_write:
-    tests: [coverage.guest_user.selectable]
-    report: reports/adapter-vm-user-selection.json
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-vm-coverage.json
   gates.user_selection.0.process_start:
-    tests: [coverage.guest_user.selectable]
-    report: reports/adapter-vm-user-selection.json
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/prober-vm-coverage.json

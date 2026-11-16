@@ -35,8 +35,6 @@
     "edge.files.owner": "sha256:1d2ec75585e72125318cbb4ad6042b3df8803160d34fcbcb37a45831e6e0e30c",
     "edge.idle.command_activity": "sha256:30e0a512af38c4d4464b4e6e4aad7d0a8e801b590294f849d7170dd007fbb1c6",
     "edge.images.architecture": "sha256:8e35c086949a70f0e1753961583b33d6b7816cb6b0969c2f8ddc659c406a44f7",
-    "edge.lifetime.files_after_expiry": "sha256:c62b2f25d526e23761e9cd37de9f938689356a85e5bd0087ac8a10bbbec66ec1",
-    "edge.lifetime.granularity": "sha256:5f6ce0c3fac5bc7836dacc82b449a299fa52b64ee9cf56f8750030d958ab1e52",
     "edge.previews.old_link_after_resume": "sha256:7adb8307459fe58ec48325b140a84101f6470515a91e235d37e8bdaaf7288d34",
     "edge.previews.public_under_lockdown": "sha256:8b1e627254830cdc792776f02ac34b0bb168f3e2eae554a7f8191ad6f531f0d2",
     "edge.snapshots.delete_again": "sha256:226ae78f2fedeabf2f3ecf77ddf95e4567c272bf96f25b8a7c1ace7aaa1f9ac4",
@@ -47,10 +45,7 @@
     "edge.volumes.default_user": "sha256:2fc421b206d22025bf4f5a62923ac1707621f7f0bac844e9190706d90b18a65f",
     "facts.default_cwd": "sha256:4770954ea1c1ba78f194445298fc6c511a73285f220a2c045c5ed33d47f5a566",
     "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2",
-    "facts.extendable_lifetime": "sha256:598a5c76f1e19a3c4c154606b5cda0e21a436e09f6e9e4fecbf201b2665acbe7",
     "facts.gpus": "sha256:6e7c5899ea3fc9dcea93c6fc4d6d1d2ed42ddbfbc0d0a054a2e9959ff9aee36a",
-    "facts.long_running": "sha256:0e9e6bef53cd052caf811ac1d6ecd26fc7672b45740a5587d5f4ddd9bf61b258",
-    "facts.max_lifetime": "sha256:ee4db1f6ae9db89ea99c0a481c90557883c1e2738f15203cb961c6d01bcacc5f",
     "facts.sizes": "sha256:c7cac3efbb3c95b45501528756da3c2d12d32381807435b06d1593eed472be1a",
     "hidden_secrets.header_templates": "sha256:409ce00f2491586c86f98ec8c59c4530b7b7e865defe688e40f5a8fb2faefd68",
     "hidden_secrets.injected": "sha256:854566634e032e959c741a1f91e90bedc94bb9c826e94899c584c54bb4879215",
@@ -62,18 +57,13 @@
     "idle_shutdown.on_idle.destroyed": "sha256:6961b022f30a84d64adf5a25e85a64b254f14926d6ec4c0f37b9a4d79e26fc60",
     "idle_shutdown.on_idle.paused": "sha256:f3215434d77a4c9bc5ab5a38a359200f438e4577dc61551a11b45bc84f0377f6",
     "idle_shutdown.on_idle.stopped": "sha256:3b249c14107f06b1256d276d7877dea57972212931254ef7a10d61c97ecd7e68",
-    "lifetime_timer.at_end.destroyed": "sha256:39d9cf8723c58607f4f542ba9b2890b7a72a34e9d432bb347c4097435c17672f",
-    "lifetime_timer.at_end.paused": "sha256:8c73fb5b93ac000563192fd696a954fee4ccd5363a56db37430e4410c8236371",
-    "lifetime_timer.at_end.stopped": "sha256:3d12e13b66ab91e77b995cbbe1072d8f878dee470abecf8b4f730b168f342521",
-    "lifetime_timer.counts_paused_time.false": "sha256:927ac94a28057e1dd0dea46ebe275470c90774e53ad7b71b2391bde01a621003",
-    "lifetime_timer.counts_paused_time.true": "sha256:42bc3239a3971fee3d69be084a0c646bf8e5ffcd17fc2a038abeda02b6dc2ee3",
-    "network_lockdown.after_resume": "sha256:2fa5ee3e3ea3f69e5c3c1625d04cffae77b9e2dac21f838c639e6c5de26d8cb7",
-    "network_lockdown.allowlist.addresses": "sha256:9c40628b4f28ce3c0700be1e509a76fdef3719baed4699848b4532dde37d2dfd",
-    "network_lockdown.allowlist.names": "sha256:66d279c6f7da3e0cd6cf4c6819440efda31d11be59d5ef2d7dac89d77dc4fcd4",
-    "network_lockdown.deny_all": "sha256:87e3ed331e30ddf507518d6cccd6fb58f3b662247a88f936b1541b280eb18f72",
-    "network_lockdown.max_allow": "sha256:cbc88f31496179af098e8f78798cc33156b95ecca38047c9cbf4146542f9afee",
-    "network_lockdown.root_cannot_lift": "sha256:bb40b11186a46e5687c7ef11a6b7afd32127e85aea4699a81f2ef59a0bc260f8",
-    "network_lockdown.wildcards": "sha256:fc08bcb4a23b67f88b1fb2fc74dee398f978bdb08b44a43944b1da92c051f725",
+    "network_lockdown.after_resume": "sha256:8cf545915e44452b22be3ca87d7b3e8de44c370c7d355caa849abacf8b065791",
+    "network_lockdown.allowlist.addresses": "sha256:28b77b975449fa6feb49b2e5cbce17d064569356caf6e7a8eaab2973162dece3",
+    "network_lockdown.allowlist.names": "sha256:7194395b1b53eca69117558779346fe18787eb7e217f00a60be6f20050176489",
+    "network_lockdown.deny_all": "sha256:965bf0f2d99832ce9334cb7fc957bfe2f968db3b66f6ab0a9e761a271b93eb68",
+    "network_lockdown.max_allow": "sha256:7853299076fc3333ba3add7cd5cd6d333fa570116acd783de42c094f9315334d",
+    "network_lockdown.root_cannot_lift": "sha256:5262f811a6941471e1a4285f8cf6f0eddb6dd88cd3f3e56aedbec4be630fd129",
+    "network_lockdown.wildcards": "sha256:e87336bd6f3ea5d8ee04c361fc6eb33420a35fe37082f53ad7141babf3f24294",
     "pause_resume.files_and_memory": "sha256:a3e5b5d9eae9762c2aae892bcbd887a93758e2d136facd75e097a875bf110dce",
     "pause_resume.files_only": "sha256:6154c8f90d1ace5d6eeee08c7531e0d178b54008bb14111002c0a1dea3350b1a",
     "previews.access.private": "sha256:234f3ac6ecbc281d1a9949b8d6f2ef77fea7655b46c1e238e62fa97f907c4097",
@@ -81,8 +71,6 @@
     "previews.credential.header": "sha256:d1d6ffb2bc66f9a239170c5ee80cb6f912686bde57d980e9f63d8b691fee5ee3",
     "previews.credential.link": "sha256:82ad247c09d3bffcd81868cfd2cc40343fe73cc1cc13c70939d5951e290c9380",
     "previews.credential_scope": "sha256:368ce2c27a19af75596b0d431f7831da83652eab2f1513a18b1cdc760ef58e37",
-    "previews.link_lifetime_seconds": "sha256:3b7332a3de39ad42da5b8e1623f1c2355a53759f0e1873d099f8f780eeb112c0",
-    "previews.link_lifetime_seconds.public": "sha256:c4f3fbd9e79d04da92ae655d64d5012b90d5d7c8df50933c7c1537c0c26564c6",
     "previews.listed_ports": "sha256:bc8677b50e85c6a057e7f4cd8a738a12c53901b51bc099c4dd8c6d148bfc7ecf",
     "previews.revocable.false": "sha256:dae6e9256945cb9fadf91d46e6c39141debd4d594a58fecebd59d8254e40c661",
     "previews.revocable.false.public": "sha256:93b0b8abdc61086eef3fc23a404471e81450dbfae9971bbd0d8c8e7d1a8af535",
@@ -119,11 +107,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T05:02:32.161032+00:00",
+  "finished_at": "2026-11-16T07:11:49.558077+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "97daa4954697cc780a47e2613cb503070e7dc0a7",
-  "run_id": "public-ddd00c93aa71164210fc",
+  "revision": "0e4b082a1a3f666e364b7048b78a64935fb67df6",
+  "run_id": "public-a7e30d09044de2ae0849",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -153,12 +141,6 @@
     "facts.default_user",
     "facts.default_cwd",
     "baseline.outbound_network",
-    "facts.extendable_lifetime",
-    "lifetime_timer.at_end.destroyed",
-    "lifetime_timer.at_end.stopped",
-    "lifetime_timer.at_end.paused",
-    "lifetime_timer.counts_paused_time.true",
-    "lifetime_timer.counts_paused_time.false",
     "pause_resume.files_only",
     "pause_resume.files_and_memory",
     "idle_shutdown.on_idle.paused",
@@ -189,7 +171,6 @@
     "previews.credential.header",
     "previews.revocable.true",
     "previews.revocable.false",
-    "previews.link_lifetime_seconds",
     "previews.listed_ports",
     "previews.credential_scope",
     "idle_shutdown.auto_wake.true",
@@ -206,14 +187,11 @@
     "hidden_secrets.header_templates",
     "hidden_secrets.unreadable",
     "facts.sizes",
-    "facts.max_lifetime",
-    "facts.long_running",
     "facts.gpus",
     "edge.commands.killed",
     "edge.files.missing_parent",
     "edge.files.owner",
     "edge.images.architecture",
-    "edge.lifetime.granularity",
     "edge.volumes.default_user",
     "edge.volumes.after_resume",
     "edge.idle.command_activity",
@@ -223,12 +201,10 @@
     "edge.snapshots.delete_during_restore",
     "edge.snapshots.retention",
     "edge.snapshots.memory_pty",
-    "edge.lifetime.files_after_expiry",
     "volumes.sharing.one_sandbox.object_store",
     "volumes.sharing.many_writers.object_store",
     "previews.revocable.true.public",
     "previews.revocable.false.public",
-    "previews.link_lifetime_seconds.public",
     "baseline.process_eof_is_not_exit",
     "contract.discovery_valid",
     "contract.idempotent_create_same_body",
@@ -242,7 +218,7 @@
     "contract.cost_final"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T04:59:31.653198+00:00",
+  "started_at": "2026-11-16T07:06:23.949701+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -252,7 +228,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1635,
+      "duration_ms": 1561,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -287,7 +263,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1301,
+      "duration_ms": 1068,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -322,7 +298,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1075,
+      "duration_ms": 1085,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -353,7 +329,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1067,
+      "duration_ms": 1241,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -393,7 +369,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1551,
+      "duration_ms": 1348,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -428,7 +404,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1360,
+      "duration_ms": 1324,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -460,7 +436,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1350,
+      "duration_ms": 1352,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -502,7 +478,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1341,
+      "duration_ms": 1738,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -537,7 +513,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1373,
+      "duration_ms": 1326,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -572,7 +548,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1669,
+      "duration_ms": 1682,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -622,7 +598,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1587,
+      "duration_ms": 3518,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -671,7 +647,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17151,
+      "duration_ms": 16952,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -739,7 +715,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1873,
+      "duration_ms": 2489,
       "id": "processes.input.true",
       "proves": [
         {
@@ -812,8 +788,22 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2856,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -822,16 +812,80 @@
           "value": true
         }
       ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
+      "result": "passed",
       "rules": [
         "processes/cancel"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stopped": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.cancel",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stopped": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_state",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
         }
       ]
     },
@@ -864,8 +918,22 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2223,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -874,16 +942,48 @@
           "value": true
         }
       ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
+      "result": "passed",
       "rules": [
         "processes/reattach"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 5,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
         }
       ]
     },
@@ -922,7 +1022,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1457,
+      "duration_ms": 1184,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -955,7 +1055,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1372,
+      "duration_ms": 1593,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -988,7 +1088,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2488,
+      "duration_ms": 1274,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -1021,7 +1121,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1346,
+      "duration_ms": 1359,
       "id": "facts.default_user",
       "proves": [
         {
@@ -1055,7 +1155,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1392,
+      "duration_ms": 1365,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -1089,7 +1189,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3130,
+      "duration_ms": 1400,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -1124,157 +1224,6 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "facts.extendable_lifetime",
-      "proves": [
-        {
-          "fact": "resources.extendable_lifetime",
-          "value": true
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/extendable-lifetime"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "lifetime_timer.at_end.destroyed",
-      "proves": [
-        {
-          "fact": "lifetime_timer.at_end",
-          "value": "destroyed"
-        },
-        {
-          "fact": "lifetime_timer.enforced_by",
-          "value": "provider"
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/lifetime-timer",
-        "provider-api/lifetime-enforced"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "lifetime_timer.at_end.stopped",
-      "proves": [
-        {
-          "fact": "lifetime_timer.at_end",
-          "value": "stopped"
-        },
-        {
-          "fact": "lifetime_timer.enforced_by",
-          "value": "provider"
-        }
-      ],
-      "reason": "BoxRouter Core's create request ends a lifetime by destroy or pause only",
-      "result": "unsupported",
-      "rules": [
-        "facts/lifetime-timer"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "BoxRouter Core's create request ends a lifetime by destroy or pause only",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "lifetime_timer.at_end.paused",
-      "proves": [
-        {
-          "fact": "lifetime_timer.at_end",
-          "value": "paused"
-        },
-        {
-          "fact": "lifetime_timer.enforced_by",
-          "value": "provider"
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/lifetime-timer"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "lifetime_timer.counts_paused_time.true",
-      "proves": [
-        {
-          "fact": "lifetime_timer.counts_paused_time",
-          "value": true
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/lifetime-timer"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "lifetime_timer.counts_paused_time.false",
-      "proves": [
-        {
-          "fact": "lifetime_timer.counts_paused_time",
-          "value": false
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/lifetime-timer"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
       "cleanup": [
         {
           "kind": "process",
@@ -1285,7 +1234,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2381,
+      "duration_ms": 5032,
       "id": "pause_resume.files_only",
       "proves": [
         {
@@ -1343,7 +1292,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2921,
+      "duration_ms": 2682,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
@@ -1445,8 +1394,18 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 600,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 121343,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {
@@ -1455,22 +1414,66 @@
           "value": true
         }
       ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
+      "reason": "state",
+      "result": "differs",
       "rules": [
         "idle_shutdown/custom-idle-time"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "length": 6,
+                "type": "str"
+              },
+              "matches": false
+            }
+          },
+          "operation": "get",
+          "result": "differs"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 180,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1090,
       "id": "idle_shutdown.custom_idle_time.false",
       "proves": [
         {
@@ -1479,13 +1482,18 @@
           "value": false
         }
       ],
-      "reason": "adapter_lifetime_timer_undeclared",
+      "reason": "core_selects_idle_time_at_creation_only",
       "result": "not_run",
       "rules": [],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
+          "result": "passed"
+        },
+        {
+          "operation": "idle.select_duration",
+          "reason": "core_selects_idle_time_at_creation_only",
           "result": "not_run"
         }
       ]
@@ -1506,7 +1514,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2445,
+      "duration_ms": 2535,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -1569,7 +1577,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3164,
+      "duration_ms": 3039,
       "id": "snapshots.keeps.files_and_memory",
       "proves": [
         {
@@ -1632,7 +1640,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4204,
+      "duration_ms": 4491,
       "id": "snapshots.original_after.continues",
       "proves": [
         {
@@ -1680,7 +1688,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4396,
+      "duration_ms": 5051,
       "id": "snapshots.original_after.briefly_paused",
       "proves": [
         {
@@ -1724,7 +1732,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1140,
+      "duration_ms": 903,
       "id": "snapshots.original_after.terminated",
       "proves": [
         {
@@ -1763,7 +1771,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1116,
+      "duration_ms": 1089,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -1802,7 +1810,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 979,
+      "duration_ms": 980,
       "id": "snapshots.deletable.false",
       "proves": [
         {
@@ -1828,19 +1836,44 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "reason": "NativeFailure",
+          "result": "error"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1343,
       "id": "snapshots.restores_many_times",
       "proves": [],
-      "reason": "adapter_lifetime_timer_undeclared",
+      "reason": "adapter_snapshot_unavailable",
       "result": "not_run",
       "rules": [
         "snapshots/restores-many-times"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "operation": "snapshot.take",
+          "reason": "adapter_snapshot_unavailable",
           "result": "not_run"
         }
       ]
@@ -1857,7 +1890,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 927,
+      "duration_ms": 1004,
       "id": "snapshots.restore_options",
       "proves": [],
       "reason": "adapter_snapshot_unavailable",
@@ -1903,7 +1936,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7293,
+      "duration_ms": 7398,
       "id": "network_lockdown.deny_all",
       "proves": [
         {
@@ -1940,7 +1973,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2511,
+      "duration_ms": 2698,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -1985,7 +2018,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1856,
+      "duration_ms": 2503,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -2030,7 +2063,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 964,
+      "duration_ms": 996,
       "id": "network_lockdown.after_resume",
       "proves": [],
       "reason": "not_named",
@@ -2062,7 +2095,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 10859,
+      "duration_ms": 12107,
       "id": "network_lockdown.root_cannot_lift",
       "proves": [],
       "result": "passed",
@@ -2146,7 +2179,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17209,
+      "duration_ms": 20893,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -2185,7 +2218,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2410,
+      "duration_ms": 2913,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
@@ -2226,7 +2259,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2196,
+      "duration_ms": 2821,
       "id": "previews.access.public",
       "proves": [
         {
@@ -2279,7 +2312,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2229,
+      "duration_ms": 2566,
       "id": "previews.access.private",
       "proves": [
         {
@@ -2332,7 +2365,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2294,
+      "duration_ms": 2300,
       "id": "previews.credential.link",
       "proves": [
         {
@@ -2385,7 +2418,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2601,
+      "duration_ms": 2501,
       "id": "previews.credential.header",
       "proves": [
         {
@@ -2442,7 +2475,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3390,
+      "duration_ms": 3521,
       "id": "previews.revocable.true",
       "proves": [
         {
@@ -2510,7 +2543,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2172,
+      "duration_ms": 2678,
       "id": "previews.revocable.false",
       "proves": [
         {
@@ -2551,24 +2584,6 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "previews.link_lifetime_seconds",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "previews/link-lifetime"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
       "cleanup": [
         {
           "kind": "process",
@@ -2583,7 +2598,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3571,
+      "duration_ms": 4325,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -2657,7 +2672,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3944,
+      "duration_ms": 3579,
       "id": "previews.credential_scope",
       "proves": [],
       "reason": "adapter_preview_unavailable",
@@ -2877,7 +2892,7 @@
     },
     {
       "cleanup": [],
-      "duration_ms": 24,
+      "duration_ms": 107,
       "id": "custom_images.dockerfile",
       "proves": [
         {
@@ -2920,14 +2935,27 @@
     {
       "cleanup": [
         {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 2689,
       "id": "hidden_secrets.injected",
       "proves": [],
-      "reason": "adapter_lifetime_timer_undeclared",
+      "reason": "adapter_preview_unavailable",
       "result": "not_run",
       "rules": [
         "hidden_secrets/injected"
@@ -2940,14 +2968,28 @@
         },
         {
           "operation": "fixture.secret_receiver",
-          "reason": "adapter_lifetime_timer_undeclared",
+          "reason": "adapter_preview_unavailable",
           "result": "not_run"
         }
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3355,
       "id": "hidden_secrets.header_templates",
       "proves": [
         {
@@ -2956,7 +2998,7 @@
           "value": true
         }
       ],
-      "reason": "adapter_lifetime_timer_undeclared",
+      "reason": "adapter_preview_unavailable",
       "result": "not_run",
       "rules": [
         "hidden_secrets/injected"
@@ -2964,7 +3006,7 @@
       "steps": [
         {
           "operation": "fixture.secret_receiver",
-          "reason": "adapter_lifetime_timer_undeclared",
+          "reason": "adapter_preview_unavailable",
           "result": "not_run"
         }
       ]
@@ -2972,14 +3014,27 @@
     {
       "cleanup": [
         {
+          "kind": "process",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "lifetime_withheld": {
+            "asked_seconds": 300,
+            "passed_to_core": false,
+            "reason": "the adapter's Core timer is enforced_by router"
+          },
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 3129,
       "id": "hidden_secrets.unreadable",
       "proves": [],
-      "reason": "adapter_lifetime_timer_undeclared",
+      "reason": "adapter_preview_unavailable",
       "result": "not_run",
       "rules": [
         "hidden_secrets/unreadable"
@@ -2992,7 +3047,7 @@
         },
         {
           "operation": "fixture.secret_receiver",
-          "reason": "adapter_lifetime_timer_undeclared",
+          "reason": "adapter_preview_unavailable",
           "result": "not_run"
         }
       ]
@@ -3004,7 +3059,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1066,
+      "duration_ms": 943,
       "id": "facts.sizes",
       "proves": [
         {
@@ -3038,49 +3093,6 @@
     {
       "cleanup": [],
       "duration_ms": 0,
-      "id": "facts.max_lifetime",
-      "proves": [
-        {
-          "fact": "resources.max_lifetime_seconds",
-          "value": {
-            "at_least": 300
-          }
-        }
-      ],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [
-        "facts/max-lifetime"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "facts.long_running",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "facts/long-running"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
       "id": "facts.gpus",
       "proves": [],
       "reason": "fixture_missing",
@@ -3103,7 +3115,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1287,
+      "duration_ms": 1342,
       "id": "edge.commands.killed",
       "proves": [],
       "result": "passed",
@@ -3133,7 +3145,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1699,
+      "duration_ms": 1737,
       "id": "edge.files.missing_parent",
       "proves": [],
       "result": "passed",
@@ -3165,7 +3177,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1539,
+      "duration_ms": 1499,
       "id": "edge.files.owner",
       "proves": [],
       "result": "passed",
@@ -3201,7 +3213,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1352,
+      "duration_ms": 1357,
       "id": "edge.images.architecture",
       "proves": [],
       "result": "passed",
@@ -3222,22 +3234,6 @@
           },
           "operation": "run",
           "result": "passed"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "edge.lifetime.granularity",
-      "proves": [],
-      "reason": "adapter_lifetime_timer_undeclared",
-      "result": "not_run",
-      "rules": [],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "adapter_lifetime_timer_undeclared",
-          "result": "not_run"
         }
       ]
     },
@@ -3306,7 +3302,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4535,
+      "duration_ms": 3800,
       "id": "edge.previews.public_under_lockdown",
       "proves": [],
       "reason": "adapter_preview_unavailable",
@@ -3372,7 +3368,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4124,
+      "duration_ms": 3184,
       "id": "edge.previews.old_link_after_resume",
       "proves": [],
       "reason": "adapter_preview_unavailable",
@@ -3433,7 +3429,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 928,
+      "duration_ms": 885,
       "id": "edge.snapshots.delete_again",
       "proves": [],
       "reason": "adapter_snapshot_unavailable",
@@ -3464,7 +3460,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 959,
+      "duration_ms": 932,
       "id": "edge.snapshots.delete_during_restore",
       "proves": [],
       "reason": "adapter_snapshot_unavailable",
@@ -3495,7 +3491,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 967,
+      "duration_ms": 885,
       "id": "edge.snapshots.retention",
       "proves": [],
       "reason": "adapter_snapshot_unavailable",
@@ -3521,7 +3517,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1288,
+      "duration_ms": 1346,
       "id": "edge.snapshots.memory_pty",
       "proves": [],
       "reason": "adapter_operation_unmapped",
@@ -3543,22 +3539,6 @@
         {
           "operation": "terminal.open",
           "reason": "adapter_operation_unmapped",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "edge.lifetime.files_after_expiry",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "fixture_missing",
           "result": "not_run"
         }
       ]
@@ -3626,7 +3606,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4255,
+      "duration_ms": 3144,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -3694,7 +3674,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2175,
+      "duration_ms": 2257,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -3735,24 +3715,6 @@
       ]
     },
     {
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "previews.link_lifetime_seconds.public",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "previews/link-lifetime"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
       "cleanup": [
         {
           "kind": "process",
@@ -3763,7 +3725,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2633,
+      "duration_ms": 2542,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -3824,7 +3786,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2323,
+      "duration_ms": 2652,
       "id": "contract.idempotent_create_same_body",
       "proves": [],
       "reason": "equal",
@@ -3892,7 +3854,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1920,
+      "duration_ms": 1966,
       "id": "contract.idempotent_create_other_body",
       "proves": [],
       "reason": "expected_error",
@@ -3928,7 +3890,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2125,
+      "duration_ms": 2147,
       "id": "contract.list_label_filter",
       "proves": [],
       "reason": "observation_unmapped",
@@ -3961,7 +3923,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1401,
+      "duration_ms": 1374,
       "id": "contract.not_found_codes",
       "proves": [],
       "reason": "expected_error",
@@ -4011,7 +3973,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5343,
+      "duration_ms": 4486,
       "id": "contract.run_timeout_ends_command",
       "proves": [],
       "reason": "observation_unmapped",
@@ -4039,7 +4001,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1128,
+      "duration_ms": 1069,
       "id": "contract.files_1gib_roundtrip",
       "proves": [],
       "reason": "fixture_missing",
@@ -4068,7 +4030,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1394,
+      "duration_ms": 1035,
       "id": "contract.destroy_repeat",
       "proves": [],
       "reason": "driver_unimplemented",
@@ -4103,7 +4065,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1339,
+      "duration_ms": 1348,
       "id": "contract.cost_final",
       "proves": [],
       "reason": "driver_unimplemented",

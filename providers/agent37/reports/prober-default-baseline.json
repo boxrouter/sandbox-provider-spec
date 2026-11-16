@@ -25,11 +25,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T04:55:12.595280+00:00",
+  "finished_at": "2026-11-16T06:33:09.895824+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "97daa4954697cc780a47e2613cb503070e7dc0a7",
-  "run_id": "public-46618e43fa9ab242a9f6",
+  "revision": "0e4b082a1a3f666e364b7048b78a64935fb67df6",
+  "run_id": "public-7d09861e5e6d7ca40c39",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -55,8 +55,8 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T04:54:23.641755+00:00",
-  "suite_digest": "sha256:d75be8f5cf8b19277c890c61c039812d2edc867b67baa4f2f8622264f419b360",
+  "started_at": "2026-11-16T06:32:23.446123+00:00",
+  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
       "cleanup": [
@@ -65,7 +65,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1818,
+      "duration_ms": 1946,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -100,7 +100,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1417,
+      "duration_ms": 1202,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -135,7 +135,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1165,
+      "duration_ms": 1397,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -166,7 +166,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1108,
+      "duration_ms": 1104,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -206,7 +206,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1616,
+      "duration_ms": 1602,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -241,7 +241,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1317,
+      "duration_ms": 1293,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -273,7 +273,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1419,
+      "duration_ms": 2901,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -315,7 +315,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1465,
+      "duration_ms": 1601,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -350,7 +350,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1456,
+      "duration_ms": 1099,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -385,7 +385,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1873,
+      "duration_ms": 1699,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -435,7 +435,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2138,
+      "duration_ms": 1792,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -484,7 +484,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17060,
+      "duration_ms": 16407,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -548,7 +548,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1508,
+      "duration_ms": 1400,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -581,7 +581,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1478,
+      "duration_ms": 1072,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -614,7 +614,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2515,
+      "duration_ms": 1726,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -659,7 +659,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3016,
+      "duration_ms": 2701,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -698,7 +698,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4666,
+      "duration_ms": 3905,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -729,7 +729,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1913,
+      "duration_ms": 1596,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",

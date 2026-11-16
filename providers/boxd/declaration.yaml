@@ -97,11 +97,11 @@ evidence:
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_and_memory
-    report: reports/snapshot.json
+    report: reports/prober-default-core.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
-    report: reports/snapshot.json
+    report: reports/prober-default-core.json
   gates.processes.0:
     tests:
     - processes.input.true
