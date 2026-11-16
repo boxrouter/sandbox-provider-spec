@@ -595,24 +595,34 @@ def fit_resources(
     failed: list[tuple[str, Failure]] = []
 
     needs = resources.get("needs", {})
-    asked_facts: set[str] = set()
+    # An ordered set (a dict's keys): the facts are checked, and refused, in the order listed here,
+    # never in string-hash order, so a request's `failed` list reads the same on every run.
+    asked_facts: dict[str, None] = {}
     if request.lifetime_seconds is not None or request.no_lifetime:
-        asked_facts.add("max_lifetime_seconds")
+        asked_facts["max_lifetime_seconds"] = None
     if any(key in asked for key in ("cpu_min", "memory_min_mib")):
-        asked_facts.add("sizes")
+        asked_facts["sizes"] = None
     if "disk_min_mib" in asked:
-        asked_facts.update({"sizes", "disk_mib"})
+        asked_facts.update(dict.fromkeys(("sizes", "disk_mib")))
     if "region" in asked:
-        asked_facts.update({"regions", "located_in"})
+        asked_facts.update(dict.fromkeys(("regions", "located_in")))
     if "gpu_model" in asked or "gpu_count" in asked:
-        asked_facts.update({"gpus", "max_gpus"})
+        asked_facts.update(dict.fromkeys(("gpus", "max_gpus")))
     asked_facts.update(
-        key for key in ("long_running", "size_is_ceiling", "extendable_lifetime") if asked.get(key)
+        dict.fromkeys(
+            key
+            for key in ("long_running", "size_is_ceiling", "extendable_lifetime")
+            if asked.get(key)
+        )
     )
-    asked_facts.update(key for key in PICK_RESOURCES if key in asked)
-    asked_facts.update(key for key in ALL_OF_RESOURCES if key in asked)
-    asked_facts.update(fact for ask, fact in SECONDS_RESOURCES.items() if ask in asked)
-    asked_facts.update(fact for ask, fact in PER_OPERATION_RESOURCES.items() if ask in asked)
+    asked_facts.update(dict.fromkeys(key for key in PICK_RESOURCES if key in asked))
+    asked_facts.update(dict.fromkeys(key for key in ALL_OF_RESOURCES if key in asked))
+    asked_facts.update(
+        dict.fromkeys(fact for ask, fact in SECONDS_RESOURCES.items() if ask in asked)
+    )
+    asked_facts.update(
+        dict.fromkeys(fact for ask, fact in PER_OPERATION_RESOURCES.items() if ask in asked)
+    )
     ceilings: dict[str, int] = {}
     for fact in asked_facts:
         conditions = needs.get(fact, []) if isinstance(needs, dict) else []
