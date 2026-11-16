@@ -38,7 +38,15 @@ lifetime_timer:
   enforced_by: provider
   counts_paused_time: unknown
   at_end: [destroyed]
-gates: {}
+gates:
+  processes:
+  - input: false
+    cancel: true
+    reattach: true
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
 evidence:
   resources.extendable_lifetime:
     tests:
@@ -92,3 +100,27 @@ evidence:
     source: https://docs.boat.dev/long-running-tasks/auto-stop
     read: '2026-11-01'
     quote: On the free trial, you cannot turn off auto-stop, and the TTL cannot be more than 2 hours.
+  gates.processes.0.input:
+    tests:
+    - processes.input.false
+    report: reports/adapter-default-processes.json
+  gates.processes.0.cancel:
+    tests:
+    - processes.cancel.true
+    report: reports/adapter-default-processes.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/adapter-default-processes.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/adapter-default-user-selection.json
