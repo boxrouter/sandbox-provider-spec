@@ -8,7 +8,7 @@ verified:
   # export strips BoxRouter packages, so only the provider SDK is named here).
   sdks: {"superserve": "0.12.0"}
 resources:
-  kernel: unknown
+  kernel: dedicated
   # A sandbox inherits its shape from the template it starts from and cannot override it, so each
   # size is a template's: the default template `superserve/base` (templates page; live check
   # 2026-11-13 in evidence.md) and the standard-image template the adapter builds itself
@@ -110,6 +110,10 @@ gates:
   - keeps: files_and_memory
     deletable: true
 evidence:
+  resources.kernel:
+    source: https://docs.superserve.ai/sandbox/create.md
+    read: 2026-11-16
+    quote: Spin up an isolated Firecracker MicroVM in seconds, ready to run commands immediately.
   resources.sizes:
     source: https://docs.superserve.ai/templates/overview
     read: 2026-11-13

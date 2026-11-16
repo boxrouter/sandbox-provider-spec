@@ -45,7 +45,9 @@ proves. Values without supporting evidence remain `unknown`.
   lifetime extended to 420 s was still running 305 s on, and the control with no extension had ended), but Core's live row
   `extend.ends_at_extended_end` fails (see "Core contract rows that fail"), so the extension is not claimed. The handle still
   implements `ensure_lifetime` and `lifetime.set`, because a hosted resume calls it.
-- `kernel`, `gpus`, `regions`, `located_in`, `max_run_seconds`, `max_process_seconds`, `long_running`: `unknown` or
+- `kernel: dedicated`: Superserve's create page calls a sandbox "an isolated Firecracker MicroVM" (read 2026-11-16), and a live
+  check the same day agreed: the guest ran its own Linux 6.1.158 as root with every capability, `CONFIG_FUSE_FS=y` and `/dev/fuse`.
+- `gpus`, `regions`, `located_in`, `max_run_seconds`, `max_process_seconds`, `long_running`: `unknown` or
   absent; the documentation states none of them (`long_running` is also not offered: `facts.long_running` ended
   `capability_unavailable` at the create, run `ss-cert018-C-021732`, so it is not claimed). `located_in` is absent
   because Superserve names no country for a default placement.
