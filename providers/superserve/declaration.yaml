@@ -3,7 +3,7 @@ provider: superserve
 # Every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed adapter
 # report (see evidence.md).
 verified:
-  date: 2026-11-15
+  date: 2026-11-16
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
   sdks: {"superserve": "0.12.0"}
