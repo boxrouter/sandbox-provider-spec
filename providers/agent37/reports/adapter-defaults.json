@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T03:58:20.531747+00:00",
+  "finished_at": "2026-11-16T05:35:43.956716+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "b2ea03eba0bb5e252038b91e8da576c368d03596",
-  "run_id": "public-227db3400eb4d19e951e",
+  "revision": "44b8a6a13e7f942c33b621983d9b0c2695264014",
+  "run_id": "public-b2aaf36011d301b77344",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -23,7 +23,7 @@
     "facts.default_cwd"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T03:58:16.005511+00:00",
+  "started_at": "2026-11-16T05:35:34.866077+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -33,15 +33,11 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2795,
+      "duration_ms": 7353,
       "id": "facts.default_user",
-      "proves": [
-        {
-          "fact": "resources.default_user",
-          "value": "node"
-        }
-      ],
-      "result": "passed",
+      "proves": [],
+      "reason": "timeout",
+      "result": "error",
       "rules": [
         "facts/default-environment"
       ],
@@ -52,11 +48,9 @@
           "result": "passed"
         },
         {
-          "observations": {
-            "default_user": "node"
-          },
           "operation": "environment.observe",
-          "result": "passed"
+          "reason": "timeout",
+          "result": "error"
         }
       ]
     },
@@ -67,7 +61,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1728,
+      "duration_ms": 1733,
       "id": "facts.default_cwd",
       "proves": [
         {

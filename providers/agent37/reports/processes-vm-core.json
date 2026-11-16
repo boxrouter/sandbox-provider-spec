@@ -11,11 +11,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T03:58:03.710849+00:00",
+  "finished_at": "2026-11-16T05:35:26.067330+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "b2ea03eba0bb5e252038b91e8da576c368d03596",
-  "run_id": "public-98a0f888d6830f1a6903",
+  "revision": "44b8a6a13e7f942c33b621983d9b0c2695264014",
+  "run_id": "public-3b91342200dcf5393bda",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -26,7 +26,7 @@
     "processes.reattach.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T03:57:55.437822+00:00",
+  "started_at": "2026-11-16T05:35:16.095135+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -40,7 +40,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2768,
+      "duration_ms": 2831,
       "id": "processes.input.true",
       "proves": [
         {
@@ -100,7 +100,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3197,
+      "duration_ms": 3908,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -202,7 +202,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2303,
+      "duration_ms": 3228,
       "id": "processes.reattach.true",
       "proves": [
         {
