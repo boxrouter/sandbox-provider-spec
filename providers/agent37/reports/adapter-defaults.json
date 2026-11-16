@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T16:50:39.525510+00:00",
+  "finished_at": "2026-11-16T00:06:48.770260+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "268de087108e483860ce5fc7b8bc34514b29c7db",
-  "run_id": "public-b9e8229c7d09b779a05a",
+  "revision": "eb959216452ee02fb536c075f33c9820876ad439",
+  "run_id": "public-c74514ee29010e8175c9",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -23,7 +23,7 @@
     "facts.default_cwd"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T16:50:35.419056+00:00",
+  "started_at": "2026-11-16T00:06:42.858293+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -33,7 +33,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2967,
+      "duration_ms": 3861,
       "id": "facts.default_user",
       "proves": [
         {
@@ -67,7 +67,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1133,
+      "duration_ms": 2045,
       "id": "facts.default_cwd",
       "proves": [
         {

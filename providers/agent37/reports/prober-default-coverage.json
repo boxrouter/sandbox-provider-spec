@@ -11,11 +11,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T16:58:09.327506+00:00",
+  "finished_at": "2026-11-16T00:11:32.381609+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "268de087108e483860ce5fc7b8bc34514b29c7db",
-  "run_id": "public-60a30e8797ed24bc5015",
+  "revision": "eb959216452ee02fb536c075f33c9820876ad439",
+  "run_id": "public-314a36df73ce79888cb3",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -27,8 +27,8 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T16:57:22.217934+00:00",
-  "suite_digest": "sha256:21b4d667b0c24e67ede787543042fcc629ba1806684ed19685e239acbafde947",
+  "started_at": "2026-11-16T00:10:45.172172+00:00",
+  "suite_digest": "sha256:8c12bd00983b29fb43e844893b0d56336835a37caa24d8245d55d020477c9231",
   "tests": [
     {
       "cleanup": [
@@ -37,7 +37,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6860,
+      "duration_ms": 6737,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -74,7 +74,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2116,
+      "duration_ms": 1992,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -94,7 +94,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"200000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/t5532w01f4\\n6:memory:/t5532w01f4\\n5:job:/t5532w01f4\\n4:devices:/t5532w01f4\\n3:cpuset:/t5532w01f4\\n2:cpuacct:/t5532w01f4\\n1:cpu:/t5532w01f4\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_bound\": \"2\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 4294967296, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"200000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"4294967296\"}, \"membership\": \"7:pids:/uwvnfdo3jc\\n6:memory:/uwvnfdo3jc\\n5:job:/uwvnfdo3jc\\n4:devices:/uwvnfdo3jc\\n3:cpuset:/uwvnfdo3jc\\n2:cpuacct:/uwvnfdo3jc\\n1:cpu:/uwvnfdo3jc\"}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
@@ -111,7 +111,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 24298,
+      "duration_ms": 24201,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -163,7 +163,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 13824,
+      "duration_ms": 14272,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
