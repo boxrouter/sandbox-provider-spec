@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T16:56:58.985787+00:00",
+  "finished_at": "2026-11-16T00:14:08.350953+00:00",
   "implementation": "withheld",
   "provider": "modal",
-  "revision": "eff463599fc59db3f41f66ca0f296c37c3f9e3c4",
-  "run_id": "public-8249795146384ebf50b8",
+  "revision": "d5804f062a75be554b357f544166da53620ff865",
+  "run_id": "public-b2c7f6c8940f1c514ac9",
   "sdk_versions": {
     "modal": "1.6.1",
     "withheld": "withheld"
@@ -22,8 +22,8 @@
     "coverage.custom_images.prepare.registry"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T16:56:19.250207+00:00",
-  "suite_digest": "sha256:21b4d667b0c24e67ede787543042fcc629ba1806684ed19685e239acbafde947",
+  "started_at": "2026-11-16T00:13:29.319671+00:00",
+  "suite_digest": "sha256:8c12bd00983b29fb43e844893b0d56336835a37caa24d8245d55d020477c9231",
   "tests": [
     {
       "cleanup": [
@@ -36,7 +36,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 39731,
+      "duration_ms": 39027,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {

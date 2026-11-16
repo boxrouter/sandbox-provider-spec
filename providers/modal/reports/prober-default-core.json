@@ -25,11 +25,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-15T17:01:42.714947+00:00",
+  "finished_at": "2026-11-16T00:18:01.470311+00:00",
   "implementation": "withheld",
   "provider": "modal",
-  "revision": "eff463599fc59db3f41f66ca0f296c37c3f9e3c4",
-  "run_id": "public-ae3f070a202e6816fdb0",
+  "revision": "d5804f062a75be554b357f544166da53620ff865",
+  "run_id": "public-f7b8f12dfadb81b38f63",
   "sdk_versions": {
     "modal": "1.6.1",
     "withheld": "withheld"
@@ -54,7 +54,7 @@
     "previews.revocable.false.public"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-15T16:53:13.645119+00:00",
+  "started_at": "2026-11-16T00:09:22.203613+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -68,7 +68,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2764,
+      "duration_ms": 4272,
       "id": "processes.input.true",
       "proves": [
         {
@@ -123,7 +123,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1355,
+      "duration_ms": 1787,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -155,7 +155,7 @@
           "observations": {
             "terminal": {
               "actual": {
-                "length": 47,
+                "length": 92,
                 "type": "bytes"
               },
               "matches": true
@@ -173,7 +173,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1376,
+      "duration_ms": 1327,
       "id": "facts.default_user",
       "proves": [
         {
@@ -207,7 +207,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1632,
+      "duration_ms": 1375,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -241,7 +241,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 305106,
+      "duration_ms": 305087,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -290,7 +290,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 120120,
+      "duration_ms": 120103,
       "id": "idle_shutdown.custom_idle_time.true",
       "proves": [
         {
@@ -364,7 +364,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4468,
+      "duration_ms": 4706,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -456,7 +456,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4554,
+      "duration_ms": 10679,
       "id": "snapshots.original_after.continues",
       "proves": [
         {
@@ -531,7 +531,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1909,
+      "duration_ms": 2018,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -569,7 +569,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2127,
+      "duration_ms": 2753,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -614,7 +614,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2154,
+      "duration_ms": 2320,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -659,7 +659,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17878,
+      "duration_ms": 20521,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -698,7 +698,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2210,
+      "duration_ms": 2538,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
@@ -739,7 +739,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2295,
+      "duration_ms": 1702,
       "id": "previews.access.public",
       "proves": [
         {
@@ -807,7 +807,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1777,
+      "duration_ms": 1721,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -905,7 +905,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 35705,
+      "duration_ms": 34575,
       "id": "custom_images.dockerfile",
       "proves": [
         {
@@ -976,7 +976,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1630,
+      "duration_ms": 1771,
       "id": "previews.revocable.false.public",
       "proves": [
         {
