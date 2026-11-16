@@ -48,6 +48,8 @@ gates:
     revocable: true
     max_ports:
       at_least: 2
+    reserved_ports:
+    - 8080
   hidden_secrets:
   - rotates: unknown
     scrubs_responses: false
@@ -177,6 +179,10 @@ evidence:
     tests:
     - previews.listed_ports
     report: reports/prober-default-core.json
+  gates.previews.0.reserved_ports:
+    tests:
+    - coverage.previews.reserved_ports
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.scrubs_responses:
     tests:
     - coverage.hidden_secrets.scrubs_responses.false
