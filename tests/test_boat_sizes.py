@@ -22,6 +22,9 @@ def test_boat_offers_small_beside_the_documented_default() -> None:
     assert resources["default_size"] == {"cpu": 4, "memory_mib": 8192, "disk_mib": 48637}
     assert resources["disk_in_memory"] is False
     assert resources["size_is_ceiling"] is True
-    assert native["gates"] == {}
+    assert native["gates"] == {
+        "processes": [{"input": False, "cancel": True, "reattach": True}],
+        "user_selection": [{"commands": True, "files_write": True, "process_start": True}],
+    }
     assert sandbox_provider_spec.schema_errors(native, "declaration-schema.json") == []
     assert sandbox_provider_spec.check_declaration(native).errors == []

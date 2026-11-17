@@ -639,6 +639,9 @@ def test_shipped_base64_commands_run_verbatim_on_a_host_root(tmp_path: Path) -> 
             assert missing.returncode != 0
 
 
+GUEST_USER_ROW = "coverage.guest_user.selectable"
+
+
 def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
     history = json.loads(
         (suite_path().parent / "historical-suite-rules.json").read_text(encoding="utf-8")
@@ -650,6 +653,11 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
         test.id: [rule for rule in test.rules if not rule.startswith("provider-api/")]
         for test in suite.tests
     }
-    assert set(live) - set(preserved) == {DISTRO_ROW, DISTRO_CONTEXT_ROW, STANDARD_BASE_ROW}
+    assert set(live) - set(preserved) == {
+        DISTRO_ROW,
+        DISTRO_CONTEXT_ROW,
+        STANDARD_BASE_ROW,
+        GUEST_USER_ROW,
+    }
     for identifier in set(live) & set(preserved):
         assert preserved[identifier] == live[identifier], identifier
