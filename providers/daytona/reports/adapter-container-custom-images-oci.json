@@ -1,6 +1,9 @@
 {
   "baseline": "not_run",
   "check_digests": {
+    "coverage.custom_images.prepare.image_config.env": "sha256:5998cea75401814471291486ac5fed39be3870e9c9cb825b58180dd45a773481",
+    "coverage.custom_images.prepare.image_config.user": "sha256:91eaa617c30e4afa49934f8ed35e7997defad84500251be500685b94e7e6da19",
+    "coverage.custom_images.prepare.image_config.workdir": "sha256:150b41f6fef9f5c13714071ea1c8611819bdb608c0e2b03b14801a5a98b2a6d5",
     "coverage.custom_images.prepare.registry": "sha256:478827a2f000a987aa4d266a1c5a42980bfc45195d944cd9bc3d7c08b542e305"
   },
   "class": "container",
@@ -9,21 +12,24 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-12T22:00:42.736213+00:00",
+  "finished_at": "2026-11-17T17:59:41.554206+00:00",
   "implementation": "withheld",
   "provider": "daytona",
-  "revision": "113d6c881d2de29caf181771220f55342f4474d8",
-  "run_id": "public-a3f3cda1aa41a85e7a2e",
+  "revision": "4ee9083208010359e6a25a01a9100e7fcd1caf51",
+  "run_id": "public-67c3c90ef4d314f21bc0",
   "sdk_versions": {
     "daytona": "0.226.1",
     "withheld": "withheld"
   },
   "selected_tests": [
-    "coverage.custom_images.prepare.registry"
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.image_config.env",
+    "coverage.custom_images.prepare.image_config.workdir",
+    "coverage.custom_images.prepare.image_config.user"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-12T22:00:11.739651+00:00",
-  "suite_digest": "sha256:3756d9777d53b2efbdcb0154e402e81ee9655613830e7547c19234b60e71f0fc",
+  "started_at": "2026-11-17T17:58:24.643514+00:00",
+  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
       "cleanup": [
@@ -36,7 +42,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 30995,
+      "duration_ms": 6902,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -69,6 +75,174 @@
           "observations": {
             "exit_code": {
               "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 20044,
+      "id": "coverage.custom_images.prepare.image_config.env",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "env"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/usr/share/grafana\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 19916,
+      "id": "coverage.custom_images.prepare.image_config.workdir",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "workdir"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "/usr/share/grafana\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 30044,
+      "id": "coverage.custom_images.prepare.image_config.user",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "image_config",
+          "value": [
+            "user"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "472\n"
+              },
               "matches": true
             }
           },

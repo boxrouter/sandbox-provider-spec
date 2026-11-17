@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.4.77: Daytona's container class declares `custom_images` `image_config` (env, workdir, user) on its prepared OCI image variant, proved by `coverage.custom_images.prepare.image_config.{env,workdir,user}` in a clean live run on adapter-daytona 0.5.325. No vocabulary or conformance-suite change.
 - 0.4.64: Enforce only explicit `date` and `date-time` formats through the same stable checker in
   declaration and HTTP binding validation. Optional URI validators no longer affect SPS results.
   No vocabulary or conformance-suite change.

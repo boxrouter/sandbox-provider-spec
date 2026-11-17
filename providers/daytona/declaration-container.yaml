@@ -46,6 +46,10 @@ gates:
   - source: dockerfile
   - source: oci
     prepared: true
+    image_config:
+    - env
+    - workdir
+    - user
   processes:
   - cancel: true
     reattach: true
@@ -175,11 +179,17 @@ evidence:
   gates.custom_images.1.source:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/prober-default-coverage.json
+    report: reports/adapter-container-custom-images-oci.json
   gates.custom_images.1.prepared:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/prober-default-coverage.json
+    report: reports/adapter-container-custom-images-oci.json
+  gates.custom_images.1.image_config:
+    tests:
+    - coverage.custom_images.prepare.image_config.env
+    - coverage.custom_images.prepare.image_config.workdir
+    - coverage.custom_images.prepare.image_config.user
+    report: reports/adapter-container-custom-images-oci.json
   gates.processes.0.cancel:
     tests:
     - processes.cancel.true
