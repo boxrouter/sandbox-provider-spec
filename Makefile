@@ -3,12 +3,7 @@ UV := uv
 RUN := $(UV) run --all-extras --group docs
 
 # Every check CI runs. It needs no provider account or secret; uv fetches packages.
-check:
-	$(RUN) ruff format --check .
-	$(RUN) ruff check .
-	$(RUN) mypy
-	$(RUN) pyright
-	$(RUN) pylint src
+check: lint
 	$(RUN) pytest
 	$(RUN) sandbox-provider-spec check-catalog
 	$(MAKE) check-declarations
