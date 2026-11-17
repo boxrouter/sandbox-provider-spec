@@ -179,11 +179,11 @@ evidence:
   gates.custom_images.1.source:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/adapter-container-custom-images-oci.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.1.prepared:
     tests:
     - coverage.custom_images.prepare.registry
-    report: reports/adapter-container-custom-images-oci.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.1.image_config:
     tests:
     - coverage.custom_images.prepare.image_config.env
