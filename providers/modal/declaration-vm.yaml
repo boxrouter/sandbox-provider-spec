@@ -54,6 +54,7 @@ gates:
       at_least: 2
   snapshots:
   - keeps: files_only
+    deletable: true
   tcp_ports:
   - tls: none
   processes:
@@ -134,6 +135,10 @@ evidence:
   gates.snapshots.0.keeps:
     tests:
     - snapshots.keeps.files_only
+    report: reports/prober-vm-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
     report: reports/prober-vm-core.json
   gates.tcp_ports.0.tls:
     source: https://modal.com/docs/guide/tunnels

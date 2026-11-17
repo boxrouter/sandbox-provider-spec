@@ -156,3 +156,49 @@ def test_modal_vm_keeps_non_native_proofs_out_of_provider_declaration() -> None:
 
     native = ROOT / "providers/modal/reports"
     assert not list(native.glob("qa218-modal-vm-*.json"))
+
+
+def _match_modal_vm(request: dict[str, Any]) -> MatchResult:
+    provider = ROOT / "providers/modal"
+    registry = Registry.from_documents(
+        load(ROOT / "spec/registries/regions.json"),
+        load(ROOT / "spec/registries/gpu-models.json"),
+    )
+    return match(
+        request,
+        [load(provider / "declaration-vm.yaml")],
+        reports=[load(path) for path in sorted((provider / "reports").glob("*-vm-*.json"))],
+        registry=registry,
+    )
+
+
+def _snapshot_failures(result: MatchResult) -> list[str]:
+    return [
+        row["detail"]
+        for row in result["results"]["modal/vm"]["failed"]
+        if row.get("gate") == "snapshots"
+    ]
+
+
+def test_modal_vm_declares_snapshot_deletion_its_report_passed() -> None:
+    """The VM report passes `snapshots.deletable.true`; the declaration must say so.
+
+    The VM declaration once listed only `keeps`, so an explicit `deletable: true` answered
+    `declared unknown` and the VM class was refused (no_eligible_route) for a workload that
+    deletes its snapshots."""
+    declaration = load(ROOT / "providers/modal/declaration-vm.yaml")
+    assert declaration["gates"]["snapshots"] == [{"keeps": "files_only", "deletable": True}]
+    report = load(ROOT / "providers/modal/reports/prober-vm-core.json")
+    assert {test["id"]: test["result"] for test in report["tests"]}[
+        "snapshots.deletable.true"
+    ] == "passed"
+    request = {"requirements": {"snapshots": {"deletable": True, "original_after": "any"}}}
+    assert _snapshot_failures(_match_modal_vm(request)) == []
+
+
+def test_modal_vm_does_not_claim_what_its_report_did_not_prove() -> None:
+    """`original_after` stays unknown on the VM class (its report never ran those rows)."""
+    request = {"requirements": {"snapshots": {"deletable": True, "original_after": "continues"}}}
+    failures = _snapshot_failures(_match_modal_vm(request))
+    assert any("original_after: asked continues, declared unknown" in row for row in failures)
+    assert not any("deletable" in row for row in failures)
