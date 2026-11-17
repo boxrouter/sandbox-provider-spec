@@ -3,9 +3,9 @@
   "check_digests": {
     "facts.default_user": "sha256:70a3ce5c836d053dbe358643b179bfb2255c9f4e41369e79416ee866b016b1b2",
     "facts.extendable_lifetime": "sha256:598a5c76f1e19a3c4c154606b5cda0e21a436e09f6e9e4fecbf201b2665acbe7",
-    "lifetime_timer.at_end.destroyed": "sha256:c74763497fdc4d8cebb5c8860a11f353093b92be1a5ffc1d0b092f0298bfdadf",
+    "lifetime_timer.at_end.destroyed": "sha256:39d9cf8723c58607f4f542ba9b2890b7a72a34e9d432bb347c4097435c17672f",
     "lifetime_timer.at_end.stopped": "sha256:3d12e13b66ab91e77b995cbbe1072d8f878dee470abecf8b4f730b168f342521",
-    "network_lockdown.deny_all": "sha256:06d455dae14a2d8adcc41c1475ebb3669140a4c5740396ce81d4c6cf16536076",
+    "network_lockdown.deny_all": "sha256:965bf0f2d99832ce9334cb7fc957bfe2f968db3b66f6ab0a9e761a271b93eb68",
     "pause_resume.files_only": "sha256:6154c8f90d1ace5d6eeee08c7531e0d178b54008bb14111002c0a1dea3350b1a",
     "previews.access.public": "sha256:1ff07a1479a21982f5e8a59abbd35b5c2b910bd62a1b76495d7f18cb1b9c77f4",
     "previews.link_lifetime_seconds.public": "sha256:c4f3fbd9e79d04da92ae655d64d5012b90d5d7c8df50933c7c1537c0c26564c6",
@@ -20,12 +20,12 @@
   "clean": true,
   "driver": {
     "name": "VercelDriver",
-    "version": "0.3.179"
+    "version": "0.4.80"
   },
-  "finished_at": "2026-11-12T11:12:45.689426+00:00",
+  "finished_at": "2026-11-17T23:11:45.181708+00:00",
   "provider": "vercel",
-  "revision": "89be27b16c418f90b6088c06cf7ce39bb874e16c",
-  "run_id": "public-db880d06a4cb3685ace0",
+  "revision": "46775da91433a074ad8cef23a056610ab53f193f",
+  "run_id": "public-8d15c395377f0237a3e6",
   "sdk_versions": {
     "vercel-sandbox": "0.9.0"
   },
@@ -47,8 +47,8 @@
     "previews.link_lifetime_seconds.public"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-12T10:50:49.604710+00:00",
-  "suite_digest": "sha256:151ae887b8785b7728a38f27489d8b7a8d49e369ee60546265cd0623f9f5ec48",
+  "started_at": "2026-11-17T22:49:53.877742+00:00",
+  "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
       "cleanup": [],
@@ -88,7 +88,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1529,
+      "duration_ms": 1399,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -189,7 +189,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 969,
+      "duration_ms": 754,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -250,7 +250,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 581,
+      "duration_ms": 540,
       "id": "facts.default_user",
       "proves": [
         {
@@ -288,7 +288,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 611925,
+      "duration_ms": 611430,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -369,7 +369,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 305591,
+      "duration_ms": 305549,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -383,7 +383,8 @@
       ],
       "result": "passed",
       "rules": [
-        "facts/lifetime-timer"
+        "facts/lifetime-timer",
+        "provider-api/lifetime-enforced"
       ],
       "steps": [
         {
@@ -417,7 +418,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 65945,
+      "duration_ms": 65586,
       "id": "lifetime_timer.at_end.stopped",
       "proves": [
         {
@@ -469,7 +470,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4459,
+      "duration_ms": 3124,
       "id": "pause_resume.files_only",
       "proves": [
         {
@@ -575,7 +576,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4427,
+      "duration_ms": 3285,
       "id": "snapshots.keeps.files_only",
       "proves": [
         {
@@ -663,7 +664,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2087,
+      "duration_ms": 1860,
       "id": "snapshots.deletable.true",
       "proves": [
         {
@@ -701,7 +702,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 9309,
+      "duration_ms": 10926,
       "id": "network_lockdown.deny_all",
       "proves": [
         {
@@ -742,7 +743,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1587,
+      "duration_ms": 1727,
       "id": "previews.access.public",
       "proves": [
         {
@@ -810,7 +811,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4139,
+      "duration_ms": 2084,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -908,7 +909,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1728,
+      "duration_ms": 1388,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -972,7 +973,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 301806,
+      "duration_ms": 301645,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {
