@@ -35,7 +35,10 @@ The native `network_lockdown.deny_all` test passed on 2026-11-01
 `allow_internet_access=false` is equivalent to `network.deny_out=['0.0.0.0/0']`. The run's
 literal-IP control `allowed_ip_url` was a plain-HTTP endpoint, because a blocked HTTPS connection
 to an unrecorded address fails in the TLS handshake and the test treats that as ambiguous. The
-earlier `not_run` rows came from that fixture shape.
+earlier `not_run` rows came from that fixture shape. The 2026-11-17 rerun on e2b-desktop 2.7.2 used
+`allowed_ip_url: http://142.251.156.119/robots.txt`, a Google address that answers a bare 2xx with
+no redirect. It is a third-party address: the runner fetches it first as its unrestricted control on
+every run, and the row ends `network_unrestricted_control_unavailable` if it stops answering.
 
 The [plan table](https://docs.e2b.dev/billing) establishes the self-serve 8-vCPU
 and 8-GiB memory ceilings. Higher Pro and custom Enterprise limits do not establish

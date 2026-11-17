@@ -9,15 +9,15 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-16T02:49:15.363415+00:00",
+  "finished_at": "2026-11-17T21:15:32.176200+00:00",
   "implementation": "withheld",
   "provider": "e2b",
-  "revision": "9280167b77338044e216f9d4892267b6931cfd09",
-  "run_id": "public-21472d553f1a58d5d471",
+  "revision": "a8ec150378fd4e6fdbe1ffeea46e8c8a349adc9b",
+  "run_id": "public-cb2da6b37367ce63e435",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
-    "e2b-desktop": "2.6.0",
+    "e2b-desktop": "2.7.2",
     "withheld": "withheld"
   },
   "selected_tests": [
@@ -25,7 +25,7 @@
     "file_links.v1.write_exact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-16T02:48:39.075084+00:00",
+  "started_at": "2026-11-17T21:15:00.853237+00:00",
   "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
@@ -35,7 +35,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 33694,
+      "duration_ms": 28697,
       "id": "file_links.v1.read_exact",
       "proves": [
         {
@@ -77,7 +77,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2587,
+      "duration_ms": 2617,
       "id": "file_links.v1.write_exact",
       "proves": [
         {
