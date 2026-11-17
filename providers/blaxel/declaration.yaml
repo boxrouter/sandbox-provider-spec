@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: blaxel
 verified:
-  date: '2026-11-16'
+  date: '2026-11-17'
   sdks:
     blaxel: 0.4.8
 resources:
@@ -72,19 +72,19 @@ evidence:
   resources.disk_in_memory:
     tests:
     - coverage.facts.disk_in_memory.true
-    report: reports/prober-disk-in-memory-20261116.json
+    report: reports/prober-default-coverage.json
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
-    report: reports/prober-user-selection-20261116.json
+    report: reports/prober-default-coverage.json
   gates.user_selection.0.files_write:
     tests:
     - coverage.guest_user.selectable
-    report: reports/prober-user-selection-20261116.json
+    report: reports/prober-default-coverage.json
   gates.user_selection.0.process_start:
     tests:
     - coverage.guest_user.selectable
-    report: reports/prober-user-selection-20261116.json
+    report: reports/prober-default-coverage.json
   resources.sizes:
     source: https://docs.blaxel.ai/Get-started
     read: '2026-10-22'
@@ -186,19 +186,19 @@ evidence:
   gates.hidden_secrets.0.scrubs_responses:
     tests:
     - coverage.hidden_secrets.scrubs_responses.false
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.injection:
     tests:
     - coverage.hidden_secrets.injection.sets_header
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.intercepts:
     tests:
     - coverage.hidden_secrets.intercepts.all_https
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.hidden_secrets.0.transparent:
     tests:
     - coverage.hidden_secrets.transparent.false
-    report: reports/native-default-coverage.json
+    report: reports/prober-default-coverage.json
   gates.custom_images.0.source:
     tests:
     - custom_images.provider_artifact

@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: default
 verified:
-  date: '2026-11-16'
+  date: '2026-11-17'
   sdks:
     modal: 1.6.1
 resources:
@@ -220,7 +220,7 @@ evidence:
   gates.processes.0.reattach:
     tests:
     - processes.reattach.true
-    report: reports/adapter-default-process-reattach.json
+    report: reports/prober-default-core.json
   gates.terminal.0:
     tests:
     - terminal.interactive

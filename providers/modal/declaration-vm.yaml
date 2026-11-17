@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: vm
 verified:
-  date: '2026-11-16'
+  date: '2026-11-17'
   sdks:
     modal: 1.6.1
 resources:
@@ -151,19 +151,19 @@ evidence:
   gates.processes.0.reattach:
     tests:
     - processes.reattach.true
-    report: reports/adapter-vm-process-reattach.json
+    report: reports/prober-vm-core.json
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-vm-user-selection.json
+    report: reports/prober-vm-coverage.json
   gates.user_selection.0.files_write:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-vm-user-selection.json
+    report: reports/prober-vm-coverage.json
   gates.user_selection.0.process_start:
     tests:
     - coverage.guest_user.selectable
-    report: reports/adapter-vm-user-selection.json
+    report: reports/prober-vm-coverage.json
   gates.terminal.0:
     tests:
     - terminal.interactive
