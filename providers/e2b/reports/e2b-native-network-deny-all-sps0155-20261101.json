@@ -5,25 +5,23 @@
   },
   "clean": true,
   "driver": {
-    "name": "withheld",
-    "version": "withheld"
+    "name": "E2BDriver",
+    "version": "0.4.80"
   },
-  "finished_at": "2026-11-17T21:19:08.510364+00:00",
-  "implementation": "withheld",
+  "finished_at": "2026-11-17T22:04:34.508280+00:00",
   "provider": "e2b",
-  "revision": "a8ec150378fd4e6fdbe1ffeea46e8c8a349adc9b",
-  "run_id": "public-e1dc6463949ae3c6cff8",
+  "revision": "64b3296c0d3e868b21a0f68e494ee89e5611ab7b",
+  "run_id": "public-f24052a90afe682c734c",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
-    "e2b-desktop": "2.7.2",
-    "withheld": "withheld"
+    "e2b-desktop": "2.7.2"
   },
   "selected_tests": [
     "network_lockdown.deny_all"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-17T21:18:12.745922+00:00",
+  "started_at": "2026-11-17T22:04:11.778881+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -33,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 55757,
+      "duration_ms": 22724,
       "id": "network_lockdown.deny_all",
       "proves": [
         {

@@ -19,19 +19,17 @@
   },
   "clean": true,
   "driver": {
-    "name": "withheld",
-    "version": "withheld"
+    "name": "E2BDriver",
+    "version": "0.4.80"
   },
-  "finished_at": "2026-11-17T20:58:20.299514+00:00",
-  "implementation": "withheld",
+  "finished_at": "2026-11-17T22:03:12.089519+00:00",
   "provider": "e2b",
-  "revision": "83617059617db9e7b9a058d174c7a0c12322b906",
-  "run_id": "public-f86a2f1a5c13768290b8",
+  "revision": "64b3296c0d3e868b21a0f68e494ee89e5611ab7b",
+  "run_id": "public-7b6b94116a325cadf612",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
-    "e2b-desktop": "2.7.2",
-    "withheld": "withheld"
+    "e2b-desktop": "2.7.2"
   },
   "selected_tests": [
     "coverage.facts.arch.amd64",
@@ -51,7 +49,7 @@
     "coverage.custom_images.prepare.dockerfile_context"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-17T20:45:39.729031+00:00",
+  "started_at": "2026-11-17T21:51:46.403143+00:00",
   "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
   "tests": [
     {
@@ -61,7 +59,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 29356,
+      "duration_ms": 1041,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -99,7 +97,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1287,
+      "duration_ms": 692,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -137,7 +135,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1299,
+      "duration_ms": 631,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -175,7 +173,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 44120,
+      "duration_ms": 3813,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -211,7 +209,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1355,
+      "duration_ms": 674,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -247,7 +245,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4825,
+      "duration_ms": 4946,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -270,7 +268,7 @@
             "disk_in_memory": {
               "matches": true
             },
-            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1064960, \"memory_during_bytes\": 1064960, \"memory_after_bytes\": 1064960}\n"
+            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1097728, \"memory_during_bytes\": 1097728, \"memory_after_bytes\": 1097728}\n"
           },
           "operation": "fixture.coverage_fact",
           "result": "passed"
@@ -288,7 +286,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601557,
+      "duration_ms": 600578,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -353,7 +351,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 17273,
+      "duration_ms": 11968,
       "id": "coverage.desktop.live_view",
       "proves": [
         {
@@ -419,7 +417,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2126,
+      "duration_ms": 1456,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -470,7 +468,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2213,
+      "duration_ms": 999,
       "id": "coverage.previews.loopback",
       "proves": [
         {
@@ -517,14 +515,14 @@
       "cleanup": [
         {
           "kind": "process",
-          "result": "already_released"
+          "result": "deleted"
         },
         {
           "kind": "sandbox",
-          "result": "already_released"
+          "result": "deleted"
         }
       ],
-      "duration_ms": 2496,
+      "duration_ms": 1625,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -633,7 +631,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 8760,
+      "duration_ms": 6054,
       "id": "coverage.previews.reserved_ports",
       "proves": [
         {
@@ -666,6 +664,10 @@
     {
       "cleanup": [
         {
+          "kind": "observer",
+          "result": "deleted"
+        },
+        {
           "kind": "terminal",
           "result": "deleted"
         },
@@ -674,7 +676,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2107,
+      "duration_ms": 1520,
       "id": "coverage.terminal.reattach",
       "proves": [
         {
@@ -744,11 +746,11 @@
           "result": "deleted"
         },
         {
-          "kind": "image",
+          "kind": "template",
           "result": "deleted"
         }
       ],
-      "duration_ms": 29780,
+      "duration_ms": 34665,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -796,11 +798,11 @@
           "result": "deleted"
         },
         {
-          "kind": "image",
+          "kind": "template",
           "result": "deleted"
         }
       ],
-      "duration_ms": 12006,
+      "duration_ms": 15018,
       "id": "coverage.custom_images.prepare.dockerfile_context",
       "proves": [
         {
