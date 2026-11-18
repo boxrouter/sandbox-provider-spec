@@ -15,11 +15,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T09:04:29.731228+00:00",
+  "finished_at": "2026-11-18T10:24:57.125964+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "803a6694a648bf05c9d5bc08d1ee30b615539dc4",
-  "run_id": "public-4ad34795be8eeb850d70",
+  "revision": "1fc2b9a6fc5d24c9bda09e80562ca4ee9caa3d69",
+  "run_id": "public-5af7fb997e86288feb41",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -35,7 +35,7 @@
     "custom_images.provider_artifact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T08:48:59.099921+00:00",
+  "started_at": "2026-11-18T10:09:21.312045+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -49,7 +49,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2571,
+      "duration_ms": 2493,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -146,7 +146,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1804,
+      "duration_ms": 2145,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -211,7 +211,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1429,
+      "duration_ms": 1579,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -243,7 +243,7 @@
           "observations": {
             "terminal": {
               "actual": {
-                "length": 199,
+                "length": 187,
                 "type": "bytes"
               },
               "matches": true
@@ -265,7 +265,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 612210,
+      "duration_ms": 615018,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -346,7 +346,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 306555,
+      "duration_ms": 307638,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -403,7 +403,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2046,
+      "duration_ms": 2575,
       "id": "previews.access.public",
       "proves": [
         {
@@ -479,7 +479,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3135,
+      "duration_ms": 3511,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -573,7 +573,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 875,
+      "duration_ms": 848,
       "id": "custom_images.provider_artifact",
       "proves": [
         {

@@ -4052,7 +4052,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "e56b68b1cc4eee5e7ceb3c283bdd4801db021a23a5903089ab3d2e41bfd7c064",
+  "report_sha256": "f1c7b33435cfe800df1c97ff4e5267b684117cc564964e2e2ee3d83194d821a3",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -4193,11 +4193,11 @@
     "boxrouter_blaxel/hidden_secrets.py::attach": "sha256:78bc230c69e539bf7486248e5c2617cfb99f031e423de2fc60af57bfcb385db7",
     "boxrouter_blaxel/hidden_secrets.py::is_exact_host": "sha256:b2c5f4ad5e78284ccc41255098678e32d4b3489fa1651f756600a8c97b0f0c3e",
     "boxrouter_blaxel/image/options.py::": "sha256:0e1c4a631d7aa46bfffa73a6645394170ce5e117c948674183417983f88e8c0c",
-    "boxrouter_blaxel/image/preparation.py::": "sha256:5601db6780399e13954cb2d6af1c02a143136cb6416786d02f8d81a9bdc0514a",
+    "boxrouter_blaxel/image/preparation.py::": "sha256:b37c5d9a690e6b800b826d312a9542bcb9e4d400bbbb4a432eb8bbf91c0d48b6",
     "boxrouter_blaxel/image/preparation.py::_DeadlineAccount.__getattr__": "sha256:6bb4f925f63d87e9478dc9c8487799808964da2a89eaafcdcd0c9a856809bdc7",
     "boxrouter_blaxel/image/preparation.py::_DeadlineAccount.__init__": "sha256:34daf9e81a700935406509f976cd5a5b1b0cfa87031b43ac33c7ad0fc70b4d82",
     "boxrouter_blaxel/image/preparation.py::_DeadlineAccount._inventory_account": "sha256:7fc9de9b7dd1596d1ee70dd8b5a866b0074f1d6d44738ece62d9bf632ac5b232",
-    "boxrouter_blaxel/image/preparation.py::_Images.lookup": "sha256:ed0191c2cec57531e14bbd6118f540abe490bc48b80e56a181bc0e4a57cd544e",
+    "boxrouter_blaxel/image/preparation.py::_Images.lookup": "sha256:789a99305ace19ce2f4a792dc0b3422769b0e3de93cbcea6065b7ee82647630e",
     "boxrouter_blaxel/image/preparation.py::_Images.prepared": "sha256:a34c0d7bb02d0821cbc8c9f1c40057fd338aebc2835337a385dfaf7ddbff5ef8",
     "boxrouter_blaxel/image/preparation.py::_Images.state": "sha256:157f2db0eacc8205598fb84249ad94d034d1b305ebd9a51ad5f165206bb0c890",
     "boxrouter_blaxel/image/preparation.py::_acleanup_stale_build_sandboxes": "sha256:7d751e2e7e1498372605b6a76543c8868eef4dad1c0871f559c32736a18e7243",
