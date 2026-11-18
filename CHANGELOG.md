@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.11: The shared-digest record for 0.5.10 names its pull request (#7983). No claim, vocabulary or conformance-suite change.
 - 0.5.10: `load` parses YAML with libyaml's parser when PyYAML has it (the duplicate-key refusal is unchanged), so reading the two Core suites on a process's first create drops from about 0.8 s to 0.15 s. No claim, vocabulary or conformance-suite change.
 - 0.5.9: Agent37's SPS reports (adapter defaults, network lockdown, processes and prober coverage, for the default and vm classes) rerun live on adapter-agent37 0.1.57. No claim, vocabulary or conformance-suite change.
 - 0.5.8: Boxd's SPS reports (prober core, coverage, user-selection, disk-in-memory, snapshot, default and the size-ceiling copy) rerun live on adapter-boxd 0.1.123. No claim, vocabulary or conformance-suite change.

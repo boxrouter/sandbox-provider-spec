@@ -13,7 +13,7 @@ from typing import Any, cast
 
 import pytest
 
-from sandbox_provider_spec.check_digests import check_digests
+from sandbox_provider_spec.check_digests import check_digest_stands, check_digests
 from sandbox_provider_spec.driver import Driver, Inputs, Observation
 from sandbox_provider_spec.fuse_mount import controller_digest
 from sandbox_provider_spec.fuse_mount_handover import handover_scope_errors
@@ -426,11 +426,16 @@ def test_sps123_source_and_check_digest_are_unchanged() -> None:
         "6744080b44d0d8757fec62ecc30af6e12914823f8a986a9bce14eb5f548fe368"
     )
     tests = {test.id: test for test in read_suite(suite_path().with_name("coverage.yaml")).tests}
-    assert check_digests((tests["fuse_mount.provider_terminal_handover"],)) == {
+    test = tests["fuse_mount.provider_terminal_handover"]
+    assert check_digests((test,)) == {
         "fuse_mount.provider_terminal_handover": (
-            "sha256:bad431fde9cac10cfd9cdff1ddee2f72d990d720eb73a8b953ac03467de93df5"
+            "sha256:266798e569eec7bfc42bad161da340a1e981639ecc136b356239fe8f25522790"
         )
     }
+    # SPS 0.5.10 changed the shared digest (libyaml); the digest recorded before it stands.
+    assert check_digest_stands(
+        test, "sha256:bad431fde9cac10cfd9cdff1ddee2f72d990d720eb73a8b953ac03467de93df5", None
+    )
 
 
 def test_mode_rows_have_locked_id_rule_operation_and_distinct_new_check_digests() -> None:
