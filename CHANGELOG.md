@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.7: Modal's two declarations (default and vm) are re-dated to 2026-11-18 for the rerun of its reports on adapter-modal 0.4.280, which claims `custom_images` `image_defaults` in its own adds. No claim, vocabulary or conformance-suite change in the declarations.
 - 0.5.6: E2B's declaration claims `custom_images` `image_defaults` on its Dockerfile variant and on its provider-artifact variant (a prepared image reaches create as an artifact), proved by `coverage.custom_images.defaults.dockerfile` in a clean live run on adapter-e2b 0.4.312, and is re-dated to 2026-11-18. No vocabulary or conformance-suite change.
 - 0.5.4: Vercel's declaration is re-dated to 2026-11-18 for the rerun of its prober reports on adapter-vercel 0.5.269. No claim, vocabulary or conformance-suite change.
 - 0.5.2: Daytona's container class declares `custom_images` `image_defaults` on its Dockerfile variant and on its provider-artifact variant (a prepared image reaches create as an artifact) and its prepared OCI variant, proved by `coverage.custom_images.defaults.dockerfile` and `coverage.custom_images.defaults.registry` in a clean live run on adapter-daytona 0.5.331. No vocabulary or conformance-suite change.
