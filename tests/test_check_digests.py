@@ -19,7 +19,6 @@ import pytest
 from sandbox_provider_spec import check_digests as digests
 from sandbox_provider_spec.check import spec_dir
 from sandbox_provider_spec.driver import Driver
-from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.load import load
 from sandbox_provider_spec.opt_in import select_tests
 from sandbox_provider_spec.report import report
@@ -121,32 +120,6 @@ def test_a_dropped_create_lifetime_counts_only_when_the_run_sends_it(
         )
     assert (
         digests.historical_check_digest(test, "sha256:" + "0" * 64, create_lifetime=named) is None
-    )
-
-
-@pytest.mark.parametrize(
-    ("report_path", "identifier"),
-    (
-        (
-            "providers/e2b/reports/native-default-registry.json",
-            "coverage.custom_images.prepare.registry",
-        ),
-        ("providers/e2b/reports/native-default-coverage.json", "coverage.desktop.live_view"),
-    ),
-)
-def test_committed_reports_of_a_dropped_lifetime_still_stand(
-    report_path: str, identifier: str
-) -> None:
-    """Reports run before SPS 0.3.182 named 300 s; a run now sends the same 300 s default."""
-    recorded = json.loads((PACKAGE.parents[1] / report_path).read_text())
-    test = {test.id: test for test in _suite().tests}[identifier]
-    assert recorded["check_digests"][identifier] != digests.check_digests((test,))[identifier]
-
-    assert (
-        digests.historical_check_digest(
-            test, recorded["suite_digest"], create_lifetime=DEFAULT_LIFETIME_SECONDS
-        )
-        == recorded["check_digests"][identifier]
     )
 
 

@@ -2092,7 +2092,7 @@ tests:
           utf8: |
             c54b18b26d3b516decb1dc6fc46c86a78dd2ec82148f80893f22d5a241b79d2e  /opt/sps-copy
             f40721feb30df2bd31c6fc8fc852bc684932e80b660ad6d4c1f656736b55f3d9  /opt/sps-binary
-- id: coverage.custom_images.prepare.dockerfile_defaults
+- id: coverage.custom_images.defaults.dockerfile
   title: An ordinary prepared Dockerfile image runs commands with its own ENV, WORKDIR and USER.
   rules: [custom_images/prepared, custom_images/image-defaults]
   proves:
@@ -2124,7 +2124,7 @@ tests:
       equals:
         exit_code: 0
         stdout: {utf8: "ready\n/opt/sps-workdir\n1001\n"}
-- id: coverage.custom_images.prepare.dockerfile_distro_defaults
+- id: coverage.custom_images.defaults.distro_dockerfile
   title: An ordinary prepared Dockerfile image on a named distribution base runs commands with its own ENV, WORKDIR and USER.
   rules: [custom_images/prepared, custom_images/image-defaults]
   proves:
@@ -2156,7 +2156,7 @@ tests:
       equals:
         exit_code: 0
         stdout: {utf8: "ready\n/opt/sps-workdir\n1001\n"}
-- id: coverage.custom_images.prepare.registry_defaults
+- id: coverage.custom_images.defaults.registry
   title: An ordinary prepared registry image runs commands with its own environment, working directory and user.
   rules: [custom_images/prepared, custom_images/image-defaults]
   proves:

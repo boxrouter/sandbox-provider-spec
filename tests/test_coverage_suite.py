@@ -641,9 +641,9 @@ def test_shipped_base64_commands_run_verbatim_on_a_host_root(tmp_path: Path) -> 
 
 GUEST_USER_ROW = "coverage.guest_user.selectable"
 IMAGE_DEFAULTS_ROWS = (
-    "coverage.custom_images.prepare.dockerfile_defaults",
-    "coverage.custom_images.prepare.dockerfile_distro_defaults",
-    "coverage.custom_images.prepare.registry_defaults",
+    "coverage.custom_images.defaults.dockerfile",
+    "coverage.custom_images.defaults.distro_dockerfile",
+    "coverage.custom_images.defaults.registry",
 )
 
 
@@ -673,19 +673,19 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
     ("identifier", "source", "dockerfile_base", "output"),
     [
         (
-            "coverage.custom_images.prepare.dockerfile_defaults",
+            "coverage.custom_images.defaults.dockerfile",
             "dockerfile",
             "public.ecr.aws/docker/library/python:3.12-slim",
             "ready\n/opt/sps-workdir\n1001\n",
         ),
         (
-            "coverage.custom_images.prepare.dockerfile_distro_defaults",
+            "coverage.custom_images.defaults.distro_dockerfile",
             "dockerfile",
             "ubuntu:24.04",
             "ready\n/opt/sps-workdir\n1001\n",
         ),
         (
-            "coverage.custom_images.prepare.registry_defaults",
+            "coverage.custom_images.defaults.registry",
             "oci",
             None,
             "/usr/share/grafana\n/usr/share/grafana\n472\n",
