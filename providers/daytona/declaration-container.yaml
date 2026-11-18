@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: daytona
 class: container
 verified:
-  date: '2026-11-17'
+  date: '2026-11-18'
   sdks:
     daytona: 0.226.1
 resources:
@@ -44,12 +44,14 @@ resources:
 gates:
   custom_images:
   - source: dockerfile
+    image_defaults: true
   - source: oci
     prepared: true
     image_config:
     - env
     - workdir
     - user
+    image_defaults: true
   processes:
   - cancel: true
     reattach: true
@@ -183,6 +185,14 @@ evidence:
   gates.custom_images.1.prepared:
     tests:
     - coverage.custom_images.prepare.registry
+    report: reports/prober-default-coverage.json
+  gates.custom_images.0.image_defaults:
+    tests:
+    - coverage.custom_images.defaults.dockerfile
+    report: reports/prober-default-coverage.json
+  gates.custom_images.1.image_defaults:
+    tests:
+    - coverage.custom_images.defaults.registry
     report: reports/prober-default-coverage.json
   gates.custom_images.1.image_config:
     tests:
