@@ -10,21 +10,11 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
-import yaml
-
-from sandbox_provider_spec.load import _json_pairs, _plain, _UniqueKeyLoader
+from sandbox_provider_spec.load import _json_pairs, _plain, parse_yaml
 
 _DOCUMENT_TEXTS = 4
 _document_texts: OrderedDict[tuple[str, str], str] = OrderedDict()
 _document_texts_lock = threading.Lock()
-
-_FastLoader: type[_UniqueKeyLoader] = _UniqueKeyLoader
-if yaml.__with_libyaml__:
-
-    class _CUniqueKeyLoader(yaml.CSafeLoader, _UniqueKeyLoader):
-        """libyaml's parser with the strict loader's constructors and duplicate-key refusal."""
-
-    _FastLoader = _CUniqueKeyLoader
 
 
 def _parse(suffix: str, content: bytes) -> Any:
@@ -32,11 +22,7 @@ def _parse(suffix: str, content: bytes) -> Any:
     text = content.decode("utf-8")
     if suffix == ".json":
         return json.loads(text, object_pairs_hook=_json_pairs)
-    try:
-        document = yaml.load(text, Loader=_FastLoader)
-    except yaml.YAMLError:
-        # libyaml words syntax errors differently; raise the pure-Python parser's error.
-        document = yaml.load(text, Loader=_UniqueKeyLoader)
+    document = parse_yaml(text)
     return json.loads(json.dumps(document, default=_plain))
 
 

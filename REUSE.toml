@@ -26,6 +26,7 @@ path = [
   "conformance/fixtures/endpoints-worker/wrangler.toml",
   "conformance/fixtures/endpoints/inventory.md",
   "conformance/historical-create-lifetimes.json",
+  "conformance/historical-shared-digests.json",
   "conformance/historical-suite-rules.json",
   "conformance/suite.yaml",
   "distribution-manifest.json",

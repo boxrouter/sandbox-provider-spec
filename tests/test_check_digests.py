@@ -571,3 +571,48 @@ def test_refusals_match_the_strict_loader(monkeypatch: pytest.MonkeyPatch, tmp_p
             digests.check_digests(_suite().tests[:1])
         assert str(cached.value) == str(direct.value)
         assert len(loader._document_texts) == 0
+
+
+SHARED_BEFORE_0_5_10 = "sha256:857eed51f2b715399c2b8e69a6b61303ff7e8e17f1e39a5fcf858434d12fae6e"
+
+
+def test_only_the_one_recorded_previous_shared_digest_counts() -> None:
+    """SPS 0.5.10 changed load.py with no change to any check result (libyaml).
+
+    A digest recorded under the shared digest of 0.5.9 stands; one recorded under any other
+    shared digest stays stale.
+    """
+    history = json.loads((suite_path().parent / "historical-shared-digests.json").read_text())
+    assert list(history) == [SHARED_BEFORE_0_5_10]
+    assert all(isinstance(reason, str) and "\n" not in reason for reason in history.values())
+    assert digests.shared_digest() != SHARED_BEFORE_0_5_10
+
+    catalog = load(spec_dir() / "catalog.yaml")
+    suite = read_suite()
+    for test in suite.tests[:5]:
+        current = digests.check_digest(test, catalog, digests.shared_digest())
+        old = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_10)
+        unknown = digests.check_digest(test, catalog, "sha256:" + "0" * 64)
+        assert old != current
+        assert digests.check_digest_stands(test, current, suite.digest)
+        assert digests.check_digest_stands(test, old, suite.digest)
+        assert not digests.check_digest_stands(test, unknown, suite.digest)
+        assert not digests.check_digest_stands(test, None, suite.digest)
+
+
+def test_an_earlier_run_of_a_changed_check_stands_under_the_previous_shared_digest() -> None:
+    test = {test.id: test for test in _suite().tests}["coverage.facts.size_is_ceiling.true"]
+    history = json.loads((suite_path().parent / "historical-suite-rules.json").read_text())
+    earlier = _named_lifetime(
+        replace(test, rules=tuple(history[SUITE_BEFORE_0_3_182][test.id])), 300
+    )
+    catalog = load(spec_dir() / "catalog.yaml")
+    recorded = digests.check_digest(earlier, catalog, SHARED_BEFORE_0_5_10)
+
+    assert digests.check_digest_stands(test, recorded, SUITE_BEFORE_0_3_182, create_lifetime=300)
+    assert not digests.check_digest_stands(
+        test, recorded, SUITE_BEFORE_0_3_182, create_lifetime=120
+    )
+    assert not digests.check_digest_stands(
+        test, recorded, "sha256:" + "0" * 64, create_lifetime=300
+    )

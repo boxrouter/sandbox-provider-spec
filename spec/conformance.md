@@ -435,6 +435,11 @@ A check whose create steps stopped naming `lifetime_seconds` records the number 
 the earlier definition keeps standing for the check only where a run of the new definition
 sends the same create: on a provider with a lifetime timer, when the recorded number is the
 default lifetime (300 seconds) that every driver sends for a create that names none.
+A change to the shared runner, proof and suite code (`SHARED_MODULES` in
+`check_digests.py`) changes every check digest. When it changes no check result, the previous
+shared digest is recorded, with the reason and evidence, in
+[historical-shared-digests.json](../conformance/historical-shared-digests.json), and a report
+recorded under that exact digest keeps standing; no other shared digest does.
 
 In a Git checkout, each cited source report must be committed in `HEAD` and have no staged or
 unstaged changes. A source archive without Git uses the reports it ships. An installed

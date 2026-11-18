@@ -345,7 +345,11 @@ def _history(name: str) -> Mapping[str, Any]:
 
 
 def historical_check_digest(
-    test: Test, suite_digest: object, *, create_lifetime: int | None = None
+    test: Test,
+    suite_digest: object,
+    *,
+    create_lifetime: int | None = None,
+    shared: str | None = None,
 ) -> str | None:
     """Digest this check as a recognized earlier suite ran it, where that run still counts.
 
@@ -358,6 +362,7 @@ def historical_check_digest(
       the caller's driver sends for a create that names none. The earlier run then sent the
       request a run of this definition sends, so its result stands.
 
+    `shared` names the shared digest the earlier run recorded; it defaults to the current one.
     Equality with a recorded check digest still proves every other input, including
     executable code, catalog entries, steps and proof targets, is unchanged.
     """
@@ -382,7 +387,36 @@ def historical_check_digest(
     if earlier == test:
         return None
     catalog = cached_load(spec_dir() / "catalog.yaml")
-    return check_digest(earlier, catalog, shared_digest())
+    return check_digest(earlier, catalog, shared or shared_digest())
+
+
+def check_digest_stands(
+    test: Test, recorded: object, suite_digest: object, *, create_lifetime: int | None = None
+) -> bool:
+    """Whether a report's `recorded` digest for `test` still counts.
+
+    It counts when it equals the current digest, or a digest of an earlier run that
+    `historical_check_digest` recognizes, or either of those computed under a previous shared
+    digest listed in `historical-shared-digests.json`. That file names one exact digest per
+    change to the shared modules that changed no check result, with its reason and evidence; a
+    digest not listed there, and any other change, stays stale.
+    """
+    catalog = cached_load(spec_dir() / "catalog.yaml")
+    current = shared_digest()
+    previous = [
+        digest for digest in _history("historical-shared-digests.json") if digest != current
+    ]
+    if check_digest(test, catalog, current) == recorded:
+        return True
+    for shared in (current, *previous):
+        if shared != current and check_digest(test, catalog, shared) == recorded:
+            return True
+        earlier = historical_check_digest(
+            test, suite_digest, create_lifetime=create_lifetime, shared=shared
+        )
+        if earlier is not None and earlier == recorded:
+            return True
+    return False
 
 
 def _check_digest_with_dependencies(

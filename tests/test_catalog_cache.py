@@ -15,6 +15,8 @@ import yaml
 from sandbox_provider_spec import check
 from sandbox_provider_spec.load import DuplicateKeyError, load
 
+strict = import_module("sandbox_provider_spec.load")
+
 loader = import_module("sandbox_provider_spec.document_cache")
 
 
@@ -135,10 +137,10 @@ def test_supplied_bytes_are_parsed_strictly(
 
 @pytest.mark.skipif(not yaml.__with_libyaml__, reason="PyYAML is built without libyaml")
 def test_the_libyaml_loader_still_refuses_duplicate_keys(tmp_path: Path) -> None:
-    assert issubclass(loader._FastLoader, yaml.CSafeLoader)
+    assert issubclass(strict._FastLoader, yaml.CSafeLoader)
     for text in ("n: 1\nn: 2\n", "a: {k: 1, k: 2}\n", "- {x: 1}\n- {y: 1, y: 2}\n"):
         with pytest.raises(DuplicateKeyError):
-            yaml.load(text, Loader=loader._FastLoader)
+            yaml.load(text, Loader=strict._FastLoader)
         with pytest.raises(DuplicateKeyError):
             loader.cached_load(tmp_path / "x.yaml", content=text.encode())
 
@@ -150,6 +152,22 @@ def _package_yaml() -> list[Path]:
         for folder in ("spec", "conformance", "providers", "examples")
         for path in (root / folder).rglob("*.y*ml")
     )
+
+
+@pytest.mark.skipif(not yaml.__with_libyaml__, reason="PyYAML is built without libyaml")
+def test_the_libyaml_and_pure_python_loaders_read_every_package_yaml_alike() -> None:
+    assert len(_package_yaml()) > 30
+    for path in _package_yaml():
+        text = path.read_text(encoding="utf-8")
+        assert yaml.load(text, Loader=strict._FastLoader) == yaml.load(
+            text, Loader=strict._UniqueKeyLoader
+        ), path
+
+
+def test_the_pure_python_loader_refuses_duplicate_keys() -> None:
+    for text in ("n: 1\nn: 2\n", "a: {k: 1, k: 2}\n", "- {x: 1}\n- {y: 1, y: 2}\n"):
+        with pytest.raises(DuplicateKeyError):
+            yaml.load(text, Loader=strict._UniqueKeyLoader)
 
 
 def test_every_package_yaml_reads_as_the_strict_loader_reads_it() -> None:

@@ -27,6 +27,15 @@ class _UniqueKeyLoader(yaml.SafeLoader):
         return super().construct_mapping(node, deep)
 
 
+_FastLoader: type[_UniqueKeyLoader] = _UniqueKeyLoader
+if yaml.__with_libyaml__:
+
+    class _CUniqueKeyLoader(yaml.CSafeLoader, _UniqueKeyLoader):
+        """libyaml's parser with the strict loader's constructors and duplicate-key refusal."""
+
+    _FastLoader = _CUniqueKeyLoader
+
+
 def _json_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     document: dict[str, Any] = {}
     for key, value in pairs:
@@ -43,11 +52,20 @@ def _plain(value: Any) -> str:
     raise TypeError(f"unsupported YAML value: {type(value).__name__}")
 
 
+def parse_yaml(text: str) -> Any:
+    """The data of one YAML text, parsed by libyaml when present. A duplicate key is an error."""
+    try:
+        return yaml.load(text, Loader=_FastLoader)
+    except yaml.YAMLError:
+        # libyaml words syntax errors differently; raise the pure-Python parser's error.
+        return yaml.load(text, Loader=_UniqueKeyLoader)
+
+
 def load(path: str | Path) -> Any:
     """Load one YAML or JSON document. Duplicate keys raise DuplicateKeyError."""
     file = Path(path)
     text = file.read_text(encoding="utf-8")
     if file.suffix == ".json":
         return json.loads(text, object_pairs_hook=_json_pairs)
-    document = yaml.load(text, Loader=_UniqueKeyLoader)
+    document = parse_yaml(text)
     return json.loads(json.dumps(document, default=_plain))
