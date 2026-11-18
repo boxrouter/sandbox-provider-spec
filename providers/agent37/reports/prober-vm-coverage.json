@@ -13,11 +13,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T02:53:30.279560+00:00",
+  "finished_at": "2026-11-18T15:33:43.870268+00:00",
   "implementation": "withheld",
   "provider": "agent37",
-  "revision": "48992f4cb6b2840898aef905a62892394c44eacd",
-  "run_id": "public-ab4884c3aab39778f164",
+  "revision": "fc884e3019b2d39f16e47ecf3478f498d4ab9b02",
+  "run_id": "public-533ae94f9310bc2502c0",
   "sdk_versions": {
     "httpx": "0.28.1",
     "withheld": "withheld"
@@ -30,8 +30,8 @@
     "coverage.network_lockdown.open"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T02:52:32.217074+00:00",
-  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
+  "started_at": "2026-11-18T15:32:44.849999+00:00",
+  "suite_digest": "sha256:a311614d8764df0daa0c0c5d78414fee01dc30ee64ecaa3d42f5891150a060cf",
   "tests": [
     {
       "cleanup": [
@@ -44,7 +44,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4658,
+      "duration_ms": 3051,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
@@ -192,7 +192,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7717,
+      "duration_ms": 6155,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -229,7 +229,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 9123,
+      "duration_ms": 13823,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -249,7 +249,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.008, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.002, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.017, \"burn_threads\": 4, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.00425, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }
@@ -266,7 +266,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23116,
+      "duration_ms": 23854,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -318,7 +318,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 13436,
+      "duration_ms": 12099,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
