@@ -1,6 +1,7 @@
 {
   "baseline": "not_run",
   "check_digests": {
+    "coverage.custom_images.defaults.dockerfile": "sha256:11eb8b7cec78de45a0e385e36b682749a17dbe951725291c3cc14a65a2bb4aca",
     "coverage.custom_images.prepare.dockerfile_context": "sha256:45d76b126f9057cc641360cd7a268c5f247076d5701a61f6bf13344125dbc7fa",
     "coverage.facts.arch.amd64": "sha256:73557fce90c28acb0b814f3cea53c52d4a7470fc9a5ac3c79ec2e23f565f0af2",
     "coverage.facts.disk_in_memory.false": "sha256:e29436b8522b1d509bf484ffa3c84c6d9f898ff59d34a020947a90b8d55b2a86",
@@ -18,11 +19,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-17T21:13:39.163282+00:00",
+  "finished_at": "2026-11-18T11:35:12.295574+00:00",
   "implementation": "withheld",
   "provider": "e2b",
-  "revision": "a8ec150378fd4e6fdbe1ffeea46e8c8a349adc9b",
-  "run_id": "public-2bc27cfd6b75628b1527",
+  "revision": "9a54a16668796ee4f44be11c484ebdde299b96a0",
+  "run_id": "public-90d43251e7faed9eea99",
   "sdk_versions": {
     "e2b": "2.59.0",
     "e2b-code-interpreter": "2.11.3",
@@ -40,11 +41,12 @@
     "coverage.previews.loopback",
     "coverage.previews.survives_pause",
     "coverage.terminal.reattach",
-    "coverage.custom_images.prepare.dockerfile_context"
+    "coverage.custom_images.prepare.dockerfile_context",
+    "coverage.custom_images.defaults.dockerfile"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-17T21:02:31.675833+00:00",
-  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
+  "started_at": "2026-11-18T11:23:54.747599+00:00",
+  "suite_digest": "sha256:a311614d8764df0daa0c0c5d78414fee01dc30ee64ecaa3d42f5891150a060cf",
   "tests": [
     {
       "cleanup": [
@@ -53,7 +55,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 34223,
+      "duration_ms": 29950,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -91,7 +93,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1811,
+      "duration_ms": 1551,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -129,7 +131,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1417,
+      "duration_ms": 1244,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -167,7 +169,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 975,
+      "duration_ms": 1736,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -203,7 +205,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5945,
+      "duration_ms": 5539,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -244,7 +246,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601569,
+      "duration_ms": 601654,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -309,7 +311,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2182,
+      "duration_ms": 2075,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -360,7 +362,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2327,
+      "duration_ms": 2719,
       "id": "coverage.previews.loopback",
       "proves": [
         {
@@ -414,7 +416,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2348,
+      "duration_ms": 2704,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -495,7 +497,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2040,
+      "duration_ms": 1907,
       "id": "coverage.terminal.reattach",
       "proves": [
         {
@@ -569,7 +571,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 12641,
+      "duration_ms": 14707,
       "id": "coverage.custom_images.prepare.dockerfile_context",
       "proves": [
         {
@@ -614,6 +616,71 @@
               "actual": {
                 "truncated": false,
                 "utf8": "c54b18b26d3b516decb1dc6fc46c86a78dd2ec82148f80893f22d5a241b79d2e  /opt/sps-copy\nf40721feb30df2bd31c6fc8fc852bc684932e80b660ad6d4c1f656736b55f3d9  /opt/sps-binary\n"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11752,
+      "id": "coverage.custom_images.defaults.dockerfile",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "dockerfile"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        },
+        {
+          "gate": "custom_images",
+          "knob": "image_defaults",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared",
+        "custom_images/image-defaults"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready\n/opt/sps-workdir\n1001\n"
               },
               "matches": true
             }
