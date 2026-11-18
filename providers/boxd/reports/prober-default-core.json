@@ -16,11 +16,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T01:42:12.756151+00:00",
+  "finished_at": "2026-11-18T02:18:10.045915+00:00",
   "implementation": "withheld",
   "provider": "boxd",
-  "revision": "ee9903fbe4f2fb555a8bcb669e54c92d2684fc7d",
-  "run_id": "public-d477c6a48b0d4702674a",
+  "revision": "21b94ba03b365b20daa4ee98ac82f3f5df5effc9",
+  "run_id": "public-caeac4a837eef293a120",
   "sdk_versions": {
     "boxd": "0.3.0",
     "withheld": "withheld"
@@ -37,7 +37,7 @@
     "pause_resume.files_and_memory"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T01:26:19.383824+00:00",
+  "started_at": "2026-11-18T02:02:27.651621+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -51,7 +51,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2775,
+      "duration_ms": 10031,
       "id": "processes.input.true",
       "proves": [
         {
@@ -106,7 +106,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2100,
+      "duration_ms": 2105,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -203,7 +203,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1735,
+      "duration_ms": 1692,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -261,14 +261,14 @@
       "cleanup": [
         {
           "kind": "terminal",
-          "result": "already_released"
+          "result": "deleted"
         },
         {
           "kind": "sandbox",
-          "result": "already_released"
+          "result": "deleted"
         }
       ],
-      "duration_ms": 1475,
+      "duration_ms": 1450,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -318,7 +318,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1088,
+      "duration_ms": 1037,
       "id": "facts.default_user",
       "proves": [
         {
@@ -352,7 +352,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1082,
+      "duration_ms": 1145,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -390,7 +390,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 623065,
+      "duration_ms": 612787,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -471,7 +471,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 317568,
+      "duration_ms": 309502,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -524,7 +524,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2479,
+      "duration_ms": 2640,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
