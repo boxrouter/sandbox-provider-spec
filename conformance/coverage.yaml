@@ -2092,6 +2092,97 @@ tests:
           utf8: |
             c54b18b26d3b516decb1dc6fc46c86a78dd2ec82148f80893f22d5a241b79d2e  /opt/sps-copy
             f40721feb30df2bd31c6fc8fc852bc684932e80b660ad6d4c1f656736b55f3d9  /opt/sps-binary
+- id: coverage.custom_images.prepare.dockerfile_defaults
+  title: An ordinary prepared Dockerfile image runs commands with its own ENV, WORKDIR and USER.
+  rules: [custom_images/prepared, custom_images/image-defaults]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: image_defaults, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM public.ecr.aws/docker/library/python:3.12-slim
+        RUN useradd -m -u 1001 sps
+        ENV SPS_IMAGE_ENV=ready
+        WORKDIR /opt/sps-workdir
+        USER 1001
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true, image_defaults: true}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printenv SPS_IMAGE_ENV; pwd; id -u
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "ready\n/opt/sps-workdir\n1001\n"}
+- id: coverage.custom_images.prepare.dockerfile_distro_defaults
+  title: An ordinary prepared Dockerfile image on a named distribution base runs commands with its own ENV, WORKDIR and USER.
+  rules: [custom_images/prepared, custom_images/image-defaults]
+  proves:
+  - {gate: custom_images, knob: source, value: dockerfile}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: image_defaults, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM ubuntu:24.04
+        RUN useradd -m -u 1001 sps
+        ENV SPS_IMAGE_ENV=ready
+        WORKDIR /opt/sps-workdir
+        USER 1001
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: dockerfile, prepared: true, image_defaults: true}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printenv SPS_IMAGE_ENV; pwd; id -u
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "ready\n/opt/sps-workdir\n1001\n"}
+- id: coverage.custom_images.prepare.registry_defaults
+  title: An ordinary prepared registry image runs commands with its own environment, working directory and user.
+  rules: [custom_images/prepared, custom_images/image-defaults]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: true}
+  - {gate: custom_images, knob: image_defaults, value: true}
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/grafana/grafana@sha256:408afb9726de5122b00a2576763a8a57a3c86d5b0eff5305bc994ceb3eb96c3f
+    as: image
+  - op: create
+    in:
+      image: $image
+      requirements:
+        custom_images: {source: oci, prepared: true, image_defaults: true}
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printenv GF_PATHS_HOME; pwd; id -u
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "/usr/share/grafana\n/usr/share/grafana\n472\n"}
 - id: coverage.custom_images.prepare.dockerfile_distro
   title: A prepared Dockerfile on a named distribution base controls the sandbox environment.
   rules: [custom_images/prepared]

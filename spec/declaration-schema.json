@@ -227,6 +227,7 @@
         "runs_entrypoint": {"$ref": "#/$defs/boolean_or_unknown"},
         "build_context": {"$ref": "#/$defs/boolean_or_unknown"},
         "image_config": {"$ref": "#/$defs/knob_value"},
+        "image_defaults": {"$ref": "#/$defs/boolean_or_unknown"},
         "networking": {"$ref": "#/$defs/knob_value"},
         "tls": {"$ref": "#/$defs/knob_value"},
         "live_view": {"$ref": "#/$defs/boolean_or_unknown"},

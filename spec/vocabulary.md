@@ -425,6 +425,7 @@ The sandbox starts from an environment the request brings in its top-level `imag
 | `source` | `oci`, `private_oci`, `dockerfile`, `provider_artifact` | An OCI image reference in a public or credentialed registry; a Dockerfile the provider builds; an image, template or snapshot the provider already holds. |
 | `prepared` | yes/no | Whether the provider prepares the source before sandbox creation and boots the resulting artifact (`true`), or creates directly from the source (`false`). A declaration that omits this knob means `false`; an explicit `unknown` remains unknown. |
 | `image_config` | `env`, `workdir`, `user` | Commands that name no directory or user run with the image's environment variables (`env`), in its working directory (`workdir`), as its user (`user`). A request lists every property it relies on and fits only a variant that offers them all. |
+| `image_defaults` | yes/no | An ordinary image behaves as its Dockerfile or configuration says without the request asking: commands and processes that name no directory or user run with the image's environment variables, in its working directory and as its user. The request needs no `image_config`; the provider promises it for every image it starts. |
 | `runs_entrypoint` | yes/no | The image's entrypoint runs when the sandbox starts, as a program whose image starts a service expects. |
 | `build_context` | yes/no | With `source: dockerfile`, `COPY` and `ADD` can read files the tool supplies while preparing the image. The context is supplied outside the matching request. |
 
@@ -444,6 +445,11 @@ each provider's evidence says.
 - With `prepared: true`, the provider **MUST** prepare the requested image source before sandbox <!-- rule: custom_images/prepared -->
   creation, and create **MUST** boot the prepared artifact.
 - With `runs_entrypoint: true`, the image's entrypoint **MUST** run when the sandbox starts. <!-- rule: custom_images/runs-entrypoint -->
+- With `image_defaults: true`, a command or process that names no directory or user **MUST** run <!-- rule: custom_images/image-defaults -->
+  with the image's environment variables, in its working directory and as its user (a Dockerfile's
+  `ENV`, `WORKDIR` and `USER`; a registry image's configuration), whatever the image's source. A
+  provider that cannot apply one of them for an image **MUST** refuse that image before creating
+  anything, never run it as if the setting were absent.
 
 - With `source: dockerfile` and `build_context: true`, the provider **MUST** build the image <!-- rule: custom_images/build-context -->
   with the supplied files available to Dockerfile `COPY` and `ADD`; the resulting sandbox

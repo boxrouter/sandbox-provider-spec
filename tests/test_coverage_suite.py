@@ -640,6 +640,11 @@ def test_shipped_base64_commands_run_verbatim_on_a_host_root(tmp_path: Path) -> 
 
 
 GUEST_USER_ROW = "coverage.guest_user.selectable"
+IMAGE_DEFAULTS_ROWS = (
+    "coverage.custom_images.prepare.dockerfile_defaults",
+    "coverage.custom_images.prepare.dockerfile_distro_defaults",
+    "coverage.custom_images.prepare.registry_defaults",
+)
 
 
 def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
@@ -658,6 +663,62 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
         DISTRO_CONTEXT_ROW,
         STANDARD_BASE_ROW,
         GUEST_USER_ROW,
+        *IMAGE_DEFAULTS_ROWS,
     }
     for identifier in set(live) & set(preserved):
         assert preserved[identifier] == live[identifier], identifier
+
+
+@pytest.mark.parametrize(
+    ("identifier", "source", "dockerfile_base", "output"),
+    [
+        (
+            "coverage.custom_images.prepare.dockerfile_defaults",
+            "dockerfile",
+            "public.ecr.aws/docker/library/python:3.12-slim",
+            "ready\n/opt/sps-workdir\n1001\n",
+        ),
+        (
+            "coverage.custom_images.prepare.dockerfile_distro_defaults",
+            "dockerfile",
+            "ubuntu:24.04",
+            "ready\n/opt/sps-workdir\n1001\n",
+        ),
+        (
+            "coverage.custom_images.prepare.registry_defaults",
+            "oci",
+            None,
+            "/usr/share/grafana\n/usr/share/grafana\n472\n",
+        ),
+    ],
+)
+def test_image_defaults_rows_ask_for_no_image_config_and_read_the_defaults_back(
+    identifier: str, source: str, dockerfile_base: str | None, output: str
+) -> None:
+    """An ordinary image is checked with no `image_config` in the request: the row names only
+    `image_defaults`, and reads the environment, the directory and the user from one script."""
+    test = _coverage_row(identifier)
+    assert test["rules"] == ["custom_images/prepared", "custom_images/image-defaults"]
+    assert test["proves"] == [
+        {"gate": "custom_images", "knob": "source", "value": source},
+        {"gate": "custom_images", "knob": "prepared", "value": True},
+        {"gate": "custom_images", "knob": "image_defaults", "value": True},
+    ]
+    prepare = next(step for step in test["steps"] if step.get("op") == "image.prepare")
+    if dockerfile_base is not None:
+        lines = prepare["in"]["dockerfile"].strip().splitlines()
+        assert lines[0] == f"FROM {dockerfile_base}"
+        assert [line.split(None, 1)[0] for line in lines] == [
+            "FROM",
+            "RUN",
+            "ENV",
+            "WORKDIR",
+            "USER",
+        ]
+        assert lines[-1] == "USER 1001"
+    create = next(step for step in test["steps"] if step.get("op") == "create")
+    assert create["in"]["requirements"] == {
+        "custom_images": {"source": source, "prepared": True, "image_defaults": True}
+    }
+    run = next(step for step in test["steps"] if step.get("op") == "run")
+    assert run["expect"]["equals"] == {"exit_code": 0, "stdout": {"utf8": output}}

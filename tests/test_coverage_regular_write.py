@@ -149,6 +149,9 @@ def test_existing_check_ids_and_bodies_are_unchanged() -> None:
         "files.stream.v1.",
         "coverage.custom_images.prepare.dockerfile_distro",
         "coverage.custom_images.prepare.dockerfile_distro_context",
+        "coverage.custom_images.prepare.dockerfile_defaults",
+        "coverage.custom_images.prepare.dockerfile_distro_defaults",
+        "coverage.custom_images.prepare.registry_defaults",
         "coverage.custom_images.prepare.dockerfile_standard_base_context",
     )
     prior = [test.id for test in suite.tests if not test.id.startswith(later)]

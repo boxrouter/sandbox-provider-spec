@@ -230,7 +230,7 @@ Some things a program might expect are not in the baseline, because providers di
 | `hidden_secrets` | Credentials the provider adds to outgoing requests, which code in the sandbox cannot read. | `rotates`, `scrubs_responses`, `injection`, `header_templates`, `transparent`, `intercepts` | `inject_into` (required), `headers` (optional) | `max_inject_into`, `inject_wildcards` |
 | `snapshots` | Save a sandbox and create new sandboxes from the save. | `keeps`, `original_after` (must be named), `deletable`, `retention_seconds` | | |
 | `volumes` | Storage that outlives the sandboxes that mount it. | `sharing`, `read_only_mounts`, `kind` (must be named) | `mounts` (required) | `max_mounts` |
-| `custom_images` | The sandbox starts from an environment the request brings. | `source`, `prepared`, `image_config`, `runs_entrypoint`, `build_context` | the request's `image` (see below) | |
+| `custom_images` | The sandbox starts from an environment the request brings. | `source`, `prepared`, `image_config`, `image_defaults`, `runs_entrypoint`, `build_context` | the request's `image` (see below) | |
 | `user_selection` | Commands, new files and background processes can run as a named user. | `commands`, `files_write`, `process_start` | | |
 | `processes` | Control of a background process beyond reading its output. | `input`, `cancel`, `reattach` | | |
 | `terminal` | An interactive terminal in the sandbox. | `reattach` | | |

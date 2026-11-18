@@ -155,6 +155,7 @@ GATES: Final[dict[str, Gate]] = {
             "prepared": Knob(FLAG),
             "runs_entrypoint": Knob(FLAG),
             "image_config": Knob(ALL_OF, ("env", "workdir", "user")),
+            "image_defaults": Knob(FLAG),
             "build_context": Knob(FLAG, only_when=("source", "dockerfile")),
         },
         settings=("image",),

@@ -501,6 +501,11 @@
           ],
           "must_be_named": false
         },
+        "image_defaults": {
+          "description": "Whether commands and processes that name no directory or user run with the image's own environment, working directory and user.",
+          "kind": "yes_no",
+          "must_be_named": false
+        },
         "build_context": {
           "description": "Whether Dockerfile COPY and ADD can read files supplied while the image is built.",
           "kind": "yes_no",
