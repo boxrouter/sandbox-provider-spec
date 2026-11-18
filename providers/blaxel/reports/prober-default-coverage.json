@@ -14,11 +14,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T08:11:29.163431+00:00",
+  "finished_at": "2026-11-18T09:05:37.606148+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "8cb173cbfc0a7b4b7dc38d74110d18f7f03fea97",
-  "run_id": "public-a1147e84dc04de9e66a0",
+  "revision": "803a6694a648bf05c9d5bc08d1ee30b615539dc4",
+  "run_id": "public-4708f622e9a2352503ac",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -33,7 +33,7 @@
     "coverage.hidden_secrets.transparent.false"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T08:10:36.439447+00:00",
+  "started_at": "2026-11-18T09:04:46.163669+00:00",
   "suite_digest": "sha256:a311614d8764df0daa0c0c5d78414fee01dc30ee64ecaa3d42f5891150a060cf",
   "tests": [
     {
@@ -47,7 +47,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2348,
+      "duration_ms": 3003,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
@@ -195,7 +195,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5383,
+      "duration_ms": 5477,
       "id": "coverage.facts.disk_in_memory.true",
       "proves": [
         {
@@ -268,7 +268,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 9983,
+      "duration_ms": 10861,
       "id": "coverage.previews.reserved_ports",
       "proves": [
         {
@@ -321,7 +321,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 5244,
+      "duration_ms": 4118,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -369,7 +369,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 4033,
+      "duration_ms": 4366,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -429,7 +429,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 8894,
+      "duration_ms": 8542,
       "id": "coverage.hidden_secrets.intercepts.all_https",
       "proves": [
         {
@@ -477,7 +477,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 16832,
+      "duration_ms": 15069,
       "id": "coverage.hidden_secrets.transparent.false",
       "proves": [
         {

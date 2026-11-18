@@ -8,11 +8,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T08:09:54.124850+00:00",
+  "finished_at": "2026-11-18T08:40:25.477945+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "8cb173cbfc0a7b4b7dc38d74110d18f7f03fea97",
-  "run_id": "public-575196fdc394e8ea5742",
+  "revision": "803a6694a648bf05c9d5bc08d1ee30b615539dc4",
+  "run_id": "public-97fa7e5f2268f2d6b7e0",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -21,7 +21,7 @@
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T08:09:43.184139+00:00",
+  "started_at": "2026-11-18T08:40:14.891541+00:00",
   "suite_digest": "sha256:a311614d8764df0daa0c0c5d78414fee01dc30ee64ecaa3d42f5891150a060cf",
   "tests": [
     {
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10938,
+      "duration_ms": 10582,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -51,7 +51,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.015, \"burn_threads\": 4, \"burn_wall_seconds\": 4.001, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.003499125218695, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.019, \"burn_threads\": 4, \"burn_wall_seconds\": 4.001, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0044988752811796, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
             "size_is_ceiling": {
               "matches": true
             }

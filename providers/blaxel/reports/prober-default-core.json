@@ -15,11 +15,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-18T08:05:34.223034+00:00",
+  "finished_at": "2026-11-18T09:04:29.731228+00:00",
   "implementation": "withheld",
   "provider": "blaxel",
-  "revision": "8cb173cbfc0a7b4b7dc38d74110d18f7f03fea97",
-  "run_id": "public-0b5ef808cb83192e0077",
+  "revision": "803a6694a648bf05c9d5bc08d1ee30b615539dc4",
+  "run_id": "public-4ad34795be8eeb850d70",
   "sdk_versions": {
     "blaxel": "0.4.8",
     "withheld": "withheld"
@@ -35,7 +35,7 @@
     "custom_images.provider_artifact"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-18T07:50:03.417135+00:00",
+  "started_at": "2026-11-18T08:48:59.099921+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -49,7 +49,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1832,
+      "duration_ms": 2571,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -146,7 +146,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1895,
+      "duration_ms": 1804,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -211,7 +211,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 984,
+      "duration_ms": 1429,
       "id": "terminal.interactive",
       "proves": [
         {
@@ -265,7 +265,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 612761,
+      "duration_ms": 612210,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -346,7 +346,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 305803,
+      "duration_ms": 306555,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {
@@ -403,7 +403,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2938,
+      "duration_ms": 2046,
       "id": "previews.access.public",
       "proves": [
         {
@@ -479,7 +479,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3728,
+      "duration_ms": 3135,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -573,7 +573,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 859,
+      "duration_ms": 875,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
