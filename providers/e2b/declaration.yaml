@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: e2b
 verified:
-  date: '2026-11-17'
+  date: '2026-11-18'
   sdks:
     e2b: 2.59.0
     e2b-code-interpreter: 2.11.3
@@ -77,10 +77,12 @@ gates:
   - live_view: true
   custom_images:
   - source: provider_artifact
+    image_defaults: true
   - source: dockerfile
     prepared: true
     build_context: true
     runs_entrypoint: unknown
+    image_defaults: true
   - source: oci
     prepared: true
   - prepared: true
@@ -274,6 +276,10 @@ evidence:
     tests:
     - custom_images.provider_artifact
     report: reports/prober-default-core.json
+  gates.custom_images.0.image_defaults:
+    tests:
+    - coverage.custom_images.defaults.dockerfile
+    report: reports/prober-default-coverage.json
   gates.custom_images.1.source:
     tests:
     - coverage.custom_images.prepare.dockerfile_context
@@ -285,6 +291,10 @@ evidence:
   gates.custom_images.1.build_context:
     tests:
     - coverage.custom_images.prepare.dockerfile_context
+    report: reports/prober-default-coverage.json
+  gates.custom_images.1.image_defaults:
+    tests:
+    - coverage.custom_images.defaults.dockerfile
     report: reports/prober-default-coverage.json
   gates.custom_images.2.source:
     tests:
