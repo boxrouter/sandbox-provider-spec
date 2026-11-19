@@ -9,11 +9,11 @@
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-19T03:27:55.871322+00:00",
+  "finished_at": "2026-11-19T06:33:37.485208+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "48062ea0659548e94162cfd30ea9a836e1a9e598",
-  "run_id": "public-e7005c3be84d5149c021",
+  "revision": "0e3aa458d09f0be8f2c2b2c1408ad8c71fc338b7",
+  "run_id": "public-37f6f8abf334dd61c18f",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -23,7 +23,7 @@
     "lifetime_timer.at_end.destroyed"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-19T03:11:26.877771+00:00",
+  "started_at": "2026-11-19T06:16:33.777516+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -37,7 +37,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 665394,
+      "duration_ms": 657607,
       "id": "facts.extendable_lifetime",
       "proves": [
         {
@@ -118,7 +118,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 323596,
+      "duration_ms": 366097,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {

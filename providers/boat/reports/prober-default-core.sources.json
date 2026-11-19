@@ -97,7 +97,6 @@
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._exec_within",
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._initialize_native",
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._parse",
-      "boxrouter_boat/sandbox.py::AsyncBoatProvider._poll",
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._run",
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._set_lifetime",
       "boxrouter_boat/sandbox.py::AsyncBoatProvider._state",
@@ -729,7 +728,7 @@
     ]
   },
   "format": 3,
-  "report_sha256": "fea6b9c58add651915974ea3398d73f8ac0518d1315c791f61c7f531e8b40a4f",
+  "report_sha256": "ec9f6fc688326ee5aa6d717d2744109e42cb92fcdd03bc859c794b1590d58c4c",
   "units": {
     "boxrouter_adapter_kit/classes.py::": "sha256:0ca9b9b365a5643ddef88b180ceb88ca900089c45219b5d629dfe360660fbfe3",
     "boxrouter_adapter_kit/classes.py::_kernels": "sha256:895275ab177617db0f38a333c1b14329271e470a9c68bc66095186ce49b0f69f",
@@ -826,7 +825,6 @@
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._exec_within": "sha256:cd090062c31cb59afcee72cc812ced83e73e8b493c9e46ccb4c595814d010f56",
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._initialize_native": "sha256:7eff057adcdfcd202583c45143888aec31e4adf91075316fbe97c72c0b713266",
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._parse": "sha256:f91748fa7cef1d66919c0365fe66c0d1ddacb361b61dbffc13919a69e85480c0",
-    "boxrouter_boat/sandbox.py::AsyncBoatProvider._poll": "sha256:f296941743ce745de0916e84edeb9becbeb1b72b1c0510ccef3a9add6f7349f3",
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._run": "sha256:7ec710436c79eb475e2f792ca98dfc297bc2903953875541d5d5fba795c4adbb",
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._set_lifetime": "sha256:d93f1f960fe987cf05d1bfcc32d008b9bacc6bad51dba0d9ca3782f4222a874d",
     "boxrouter_boat/sandbox.py::AsyncBoatProvider._state": "sha256:1aead55d172f1b164f44ba93299204049191e7579532a5f1474c650a9da81d14",
