@@ -38,6 +38,10 @@ from sandbox_provider_spec.v1 import (
     RunResult,
     Sandbox,
     SandboxPage,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     SpsError,
     TcpLink,
     from_json,
@@ -193,6 +197,35 @@ class Recorder(Provider, manifest=False):
     async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
         self._note("files_exists", sandbox_id, path)
         return example(PathInfo)
+
+    async def snapshot_create(
+        self, sandbox_id: str, request: SnapshotRequest, *, idempotency_key: str
+    ) -> Snapshot:
+        self._note("snapshot_create", sandbox_id, request, idempotency_key)
+        return example(Snapshot)
+
+    async def snapshot_get(self, snapshot_id: str) -> Snapshot:
+        self._note("snapshot_get", snapshot_id)
+        return example(Snapshot)
+
+    async def snapshot_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        sandbox_id: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SnapshotPage:
+        self._note("snapshot_list", labels, sandbox_id, cursor, limit)
+        return example(SnapshotPage)
+
+    async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
+        self._note("snapshot_delete", snapshot_id)
+        return example(SnapshotDeleteResult)
+
+    async def snapshot_cost(self, snapshot_id: str) -> Cost:
+        self._note("snapshot_cost", snapshot_id)
+        return example(Cost)
 
 
 class TwoFields(Recorder, manifest=False):
@@ -371,6 +404,17 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
         request_json("TcpLinkRequest"),
         "tcp_link",
     ),
+    (
+        "snapshot_create",
+        "POST",
+        "/v1/sandboxes/sbx-1/snapshots",
+        request_json("SnapshotRequest"),
+        "snapshot_create",
+    ),
+    ("snapshot_list", "GET", "/v1/snapshots", None, "snapshot_list"),
+    ("snapshot_get", "GET", "/v1/snapshots/snap-9", None, "snapshot_get"),
+    ("snapshot_delete", "DELETE", "/v1/snapshots/snap-9", None, "snapshot_delete"),
+    ("snapshot_cost", "GET", "/v1/snapshots/snap-9/cost", None, "snapshot_cost"),
 ]
 
 
@@ -381,7 +425,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
         path.endswith("/directories") and method == "GET"
     ):
         query = "path=/work/a.txt"
-    if path == "/v1/sandboxes" and method == "POST":
+    if method == "POST" and path in ("/v1/sandboxes", "/v1/sandboxes/sbx-1/snapshots"):
         headers["Idempotency-Key"] = IDEM
     if isinstance(body, bytes):
         return await call(
@@ -392,7 +436,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
 
 
 def test_the_route_table_covers_all_operations() -> None:
-    assert len({operation for operation, *_ in ROUTES}) == 24
+    assert len({operation for operation, *_ in ROUTES}) == 29
 
 
 @pytest.mark.parametrize(("operation", "method", "path", "body", "called"), ROUTES)
@@ -401,7 +445,9 @@ def test_each_route_reaches_its_method(
 ) -> None:
     app = create_app(Recorder)
     reply = asyncio.run(drive(app, method, path, body))
-    assert reply.status == (201 if operation == "create" else 200), bytes(reply.body)
+    assert reply.status == (201 if operation in ("create", "snapshot_create") else 200), bytes(
+        reply.body
+    )
     assert [name for name, _ in Recorder.calls] == [called]
     assert operation == called
     assert reply.headers["request-id"]
@@ -549,6 +595,69 @@ def test_a_directory_operation_that_the_provider_lacks_is_unsupported() -> None:
     app = create_app(Bare)
     reply = asyncio.run(call(app, "GET", "/v1/sandboxes/s1/files/exists", query="path=/d"))
     assert (reply.status, reply.json()["error"]["code"]) == (422, "unsupported")
+
+
+def test_snapshot_arguments_arrive_as_typed_values() -> None:
+    app = create_app(Recorder)
+    listed = asyncio.run(
+        call(
+            app,
+            "GET",
+            "/v1/snapshots",
+            query="label=team=a=b&label=env=prod&sandbox_id=sbx-1&cursor=c1&limit=7",
+        )
+    )
+    created = asyncio.run(
+        call(
+            app,
+            "POST",
+            "/v1/sandboxes/sbx-1/snapshots",
+            body=j({"keeps": "files_only", "labels": {"a": "b"}}),
+            headers={"Idempotency-Key": IDEM},
+        )
+    )
+    restored = asyncio.run(
+        call(
+            app,
+            "POST",
+            "/v1/sandboxes",
+            body=j({"snapshot": "snap-9"}),
+            headers={"Idempotency-Key": IDEM},
+        )
+    )
+    assert (listed.status, created.status, restored.status) == (200, 201, 201)
+    list_call, create_call, restore_call = Recorder.calls
+    assert list_call == ("snapshot_list", ({"team": "a=b", "env": "prod"}, "sbx-1", "c1", 7))
+    assert create_call[1][0] == "sbx-1"
+    assert create_call[1][1] == SnapshotRequest(keeps="files_only", labels={"a": "b"})
+    assert create_call[1][2] == IDEM
+    assert restore_call[1][0].snapshot == "snap-9"
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "body", "headers"),
+    [
+        ("POST", "/v1/sandboxes/s1/snapshots", {"surprise": 1}, {"Idempotency-Key": IDEM}),
+        ("POST", "/v1/sandboxes/s1/snapshots", {"keeps": "everything"}, {"Idempotency-Key": IDEM}),
+        ("POST", "/v1/sandboxes/s1/snapshots", {}, {}),
+        ("POST", "/v1/sandboxes/s1/snapshots", {}, {"Idempotency-Key": "short"}),
+    ],
+)
+def test_a_malformed_snapshot_create_is_invalid_request(
+    method: str, path: str, body: dict[str, Any], headers: dict[str, str]
+) -> None:
+    reply = asyncio.run(call(create_app(Recorder), method, path, body=j(body), headers=headers))
+    assert reply.status == 400
+    assert reply.json()["error"]["code"] == "invalid_request"
+    assert Recorder.calls == []
+
+
+def test_a_snapshot_list_refuses_unknown_and_repeated_parameters() -> None:
+    app = create_app(Recorder)
+    for query in ("surprise=1", "limit=0", "sandbox_id=a&sandbox_id=b", "cursor="):
+        reply = asyncio.run(call(app, "GET", "/v1/snapshots", query=query))
+        assert reply.status == 400, query
+    assert Recorder.calls == []
 
 
 def test_a_repeated_idempotent_create_still_returns_created() -> None:

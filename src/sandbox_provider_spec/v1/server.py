@@ -35,6 +35,7 @@ from sandbox_provider_spec.v1.types import (
     FileLinkRequest,
     ProcessStartRequest,
     RunRequest,
+    SnapshotRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, error_to_json, from_json, to_json
 
@@ -351,7 +352,7 @@ async def _create(p: Provider, r: _Request) -> Reply:
     return 201, to_json(await p.create(request, idempotency_key=key))
 
 
-async def _list(p: Provider, r: _Request) -> Reply:
+def _label_filter(r: _Request) -> dict[str, str]:
     labels: dict[str, str] = {}
     for item in r.query_all("label"):
         if not _LABEL.fullmatch(item):
@@ -359,6 +360,11 @@ async def _list(p: Provider, r: _Request) -> Reply:
         key, _, value = item.partition("=")
         if labels.setdefault(key, value) != value:
             raise SpsError("invalid_request", f"Label {key!r} is filtered twice")
+    return labels
+
+
+async def _list(p: Provider, r: _Request) -> Reply:
+    labels = _label_filter(r)
     cursor = r.query_one("cursor")
     if cursor == "":
         raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
@@ -540,10 +546,52 @@ async def _tcp(p: Provider, r: _Request) -> Reply:
     return 200, to_json(await p.tcp_link(sandbox_id, body["port"]))
 
 
+async def _snapshot_create(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    key = r.headers.get("idempotency-key", "")
+    if not _IDEMPOTENCY_KEY.fullmatch(key):
+        raise SpsError("invalid_request", "Idempotency-Key must be 8 to 63 of a-z 0-9 -")
+    request: SnapshotRequest = await r.typed_body(SnapshotRequest)
+    # As for `create`, every success is 201.
+    return 201, to_json(await p.snapshot_create(sandbox_id, request, idempotency_key=key))
+
+
+async def _snapshot_list(p: Provider, r: _Request) -> Reply:
+    labels = _label_filter(r)
+    sandbox_id = r.query_one("sandbox_id")
+    if sandbox_id is not None:
+        _entity(sandbox_id, "sandbox_id")
+    cursor = r.query_one("cursor")
+    if cursor == "":
+        raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
+    limit = r.query_int("limit", 100, 1)
+    r.check_query_used()
+    page = await p.snapshot_list(
+        labels=labels or None, sandbox_id=sandbox_id, cursor=cursor, limit=limit
+    )
+    return 200, to_json(page)
+
+
+async def _snapshot_get(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.snapshot_get(_entity(r.path_params[0], "snapshot_id")))
+
+
+async def _snapshot_delete(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.snapshot_delete(_entity(r.path_params[0], "snapshot_id")))
+
+
+async def _snapshot_cost(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.snapshot_cost(_entity(r.path_params[0], "snapshot_id")))
+
+
 _Handler = Callable[[Provider, _Request], Awaitable[Reply]]
 
 _S = rf"/v1/sandboxes/{_ID}"
 _P = rf"{_S}/processes/{_ID}"
+_N = rf"/v1/snapshots/{_ID}"
 # (method, path pattern, handler); `files.read` is the one route that does not reply with JSON.
 _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
     (m, re.compile(f"^{pattern}$"), handler)
@@ -572,6 +620,11 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("POST", f"{_P}/cancel", _cancel),
         ("POST", f"{_S}/previews", _preview),
         ("POST", f"{_S}/tcp-links", _tcp),
+        ("POST", f"{_S}/snapshots", _snapshot_create),
+        ("GET", "/v1/snapshots", _snapshot_list),
+        ("GET", _N, _snapshot_get),
+        ("DELETE", _N, _snapshot_delete),
+        ("GET", f"{_N}/cost", _snapshot_cost),
     ]
 ]
 

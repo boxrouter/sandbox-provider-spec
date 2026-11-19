@@ -47,6 +47,11 @@ OPERATION_IDS = [
     "process_write_stdin",
     "resume",
     "run",
+    "snapshot_cost",
+    "snapshot_create",
+    "snapshot_delete",
+    "snapshot_get",
+    "snapshot_list",
     "tcp_link",
 ]
 ERROR_CODES = {
@@ -234,6 +239,7 @@ def test_request_schemas_are_found() -> None:
         "PreviewRequest",
         "ProcessStartRequest",
         "RunRequest",
+        "SnapshotRequest",
         "TcpLinkRequest",
     ]
     bodies = {
@@ -264,6 +270,7 @@ def test_create_request_is_an_sps_request_plus_three_fields() -> None:
         "at_end",
         "env",
         "labels",
+        "snapshot",
     }
 
 

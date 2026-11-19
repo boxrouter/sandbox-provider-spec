@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import subprocess
 import time
 import urllib.parse
 from typing import Any
@@ -309,3 +310,159 @@ def test_bad_requests(server: Any, machine: str) -> None:
     assert status == 400
     status, _ = call(server.port, "POST", "/machines", raw=b"{not json")
     assert status == 400
+
+
+def _exec(port: int, machine_id: str, script: str) -> dict[str, Any]:
+    status, result = call_json(
+        port, "POST", f"/machines/{machine_id}/exec", body={"cmd": ["bash", "-c", script]}
+    )
+    assert status == 200, result
+    return result  # type: ignore[no-any-return]
+
+
+def _saved_images(owner: str) -> list[str]:
+    # The tests may open only loopback connections, so the Docker daemon is asked by its CLI.
+    found = subprocess.run(
+        ["docker", "images", "--filter", f"label=example.owner={owner}", "-q"],
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    return found.stdout.split()
+
+
+def test_image_keeps_files_and_not_the_machines_configuration(server: Any) -> None:
+    status, made = call_json(
+        server.port,
+        "POST",
+        "/machines",
+        body={
+            "cpu": 1,
+            "memory_mb": 256,
+            "ttl_seconds": 600,
+            "env": {"SOURCE": "yes"},
+            "tags": {"a": "1"},
+        },
+    )
+    assert status == 201, made
+    source = made["machine_id"]
+    restored = None
+    try:
+        _exec(server.port, source, "printf saved >/tmp/marker; mkdir /tmp/dir")
+        status, image = call_json(
+            server.port,
+            "POST",
+            f"/machines/{source}/images",
+            body={"tags": {"suite": "images"}, "pause": False},
+        )
+        assert status == 201, image
+        assert image["status"] == "ready" and image["machine_id"] == source
+        assert (image["cpu"], image["memory_mb"]) == (1, 256)
+        assert image["tags"] == {"suite": "images"} and image["size_bytes"] > 0
+
+        status, again = call_json(server.port, "GET", f"/images/{image['image_id']}")
+        assert (status, again) == (200, image)
+        status, page = call_json(
+            server.port, "GET", "/images?" + urllib.parse.urlencode({"tag": "suite:images"})
+        )
+        assert [item["image_id"] for item in page["images"]] == [image["image_id"]]
+        status, page = call_json(server.port, "GET", f"/images?machine={source}&tag=suite:other")
+        assert page["images"] == []
+
+        status, born = call_json(
+            server.port,
+            "POST",
+            "/machines",
+            body={
+                "image_id": image["image_id"],
+                "ttl_seconds": 600,
+                "env": {"NEW": "1"},
+                "tags": {"b": "2"},
+            },
+        )
+        assert status == 201, born
+        restored = born["machine_id"]
+        result = _exec(
+            server.port, restored, 'cat /tmp/marker; test -d /tmp/dir; echo "$SOURCE|$NEW"'
+        )
+        assert result["out"] == "saved|1\n"  # the files came along; the source's env did not
+        status, usage = call_json(server.port, "GET", f"/machines/{restored}/usage")
+        assert (usage["cpu"], usage["memory_mb"]) == (1, 256)  # the image's size
+        status, page = call_json(server.port, "GET", "/machines?tag=a:1")
+        assert restored not in {item["machine_id"] for item in page["machines"]}
+        status, page = call_json(server.port, "GET", "/machines?tag=b:2")
+        assert restored in {item["machine_id"] for item in page["machines"]}
+    finally:
+        for machine_id in (source, restored):
+            if machine_id:
+                call(server.port, "DELETE", f"/machines/{machine_id}")
+        for saved in call_json(server.port, "GET", "/images?tag=suite:images")[1]["images"]:
+            call(server.port, "DELETE", f"/images/{saved['image_id']}")
+
+
+def test_image_delete_is_repeatable_and_removes_the_docker_image(server: Any, machine: str) -> None:
+    status, image = call_json(server.port, "POST", f"/machines/{machine}/images", body={})
+    assert status == 201, image
+    image_id = image["image_id"]
+    assert _saved_images(server.owner)
+    status, deleted = call_json(server.port, "DELETE", f"/images/{image_id}")
+    assert (status, deleted) == (200, {"status": "deleted"})
+    status, deleted = call_json(server.port, "DELETE", f"/images/{image_id}")
+    assert (status, deleted) == (200, {"status": "deleted"})
+    assert _saved_images(server.owner) == []
+    assert call(server.port, "GET", f"/images/{image_id}")[0] == 404
+    status, page = call_json(server.port, "GET", "/images")
+    assert image_id not in {item["image_id"] for item in page["images"]}
+    status, _ = call(
+        server.port, "POST", "/machines", body={"image_id": image_id, "ttl_seconds": 60}
+    )
+    assert status == 404
+    assert call(server.port, "DELETE", "/images/i-0000000000000000")[0] == 404
+    assert call(server.port, "GET", "/images/i-0000000000000000/usage")[0] == 404
+
+
+def test_deleting_an_image_does_not_touch_a_machine_started_from_it(
+    server: Any, machine: str
+) -> None:
+    _exec(server.port, machine, "printf kept >/tmp/marker")
+    status, image = call_json(server.port, "POST", f"/machines/{machine}/images", body={})
+    status, born = call_json(
+        server.port,
+        "POST",
+        "/machines",
+        body={"image_id": image["image_id"], "ttl_seconds": 600},
+    )
+    assert status == 201, born
+    restored = born["machine_id"]
+    try:
+        assert call(server.port, "DELETE", f"/images/{image['image_id']}")[0] == 200
+        assert _exec(server.port, restored, "cat /tmp/marker")["out"] == "kept"
+    finally:
+        call(server.port, "DELETE", f"/machines/{restored}")
+    for _ in range(100):  # Docker frees the files once the last machine from them has ended
+        if not _saved_images(server.owner):
+            break
+        time.sleep(0.2)
+    assert _saved_images(server.owner) == []
+
+
+def test_image_usage_records_outlive_the_image(server: Any, machine: str) -> None:
+    status, image = call_json(server.port, "POST", f"/machines/{machine}/images", body={})
+    status, usage = call_json(server.port, "GET", f"/images/{image['image_id']}/usage")
+    assert status == 200
+    assert usage["machine_id"] == machine and usage["as_of"]
+    assert usage["records"] == [
+        {"size_bytes": image["size_bytes"], "from": image["created"], "until": None}
+    ]
+    call(server.port, "DELETE", f"/images/{image['image_id']}")
+    status, usage = call_json(server.port, "GET", f"/images/{image['image_id']}/usage")
+    assert status == 200 and usage["records"][0]["until"] is not None
+
+
+def test_bad_image_requests(server: Any, machine: str) -> None:
+    for body in ({"pause": "yes"}, {"tags": {"bad key": "x"}}, {"tags": ["x"]}):
+        status, _ = call(server.port, "POST", f"/machines/{machine}/images", body=body)
+        assert status == 400, body
+    assert call(server.port, "POST", "/machines/m-0000000000000000/images", body={})[0] == 404
+    assert call(server.port, "GET", "/images?tag=nocolon")[0] == 400
+    assert call(server.port, "GET", "/images", key=None)[0] == 401

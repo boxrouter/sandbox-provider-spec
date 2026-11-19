@@ -28,6 +28,7 @@ from sandbox_provider_spec.driver import (
     NativeFailure,
     NotRun,
     Observation,
+    Resource,
     Unsupported,
     number,
     resource,
@@ -43,6 +44,8 @@ from sandbox_provider_spec.v1.types import (
     ProcessStartRequest,
     RunRequest,
     Sandbox,
+    Snapshot,
+    SnapshotRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, to_json
 
@@ -75,6 +78,9 @@ CREATE_INPUTS = frozenset(
 
 # An id that no provider has issued: it fits the id syntax (contract section 3) and names nothing.
 UNKNOWN_SANDBOX_ID = "sps-test-no-such-sandbox"
+UNKNOWN_SNAPSHOT_ID = "sps-test-no-such-snapshot"
+
+_SNAPSHOT_WAIT_SECONDS = 900  # how long a snapshot may stay in `saving`
 
 _ONE_GIB = 1 << 30
 _COST_WAIT_MS = 120_000  # how long cost.final waits for a final cost when a test names no limit
@@ -110,6 +116,15 @@ class ProcessHandle:  # pylint: disable=too-many-instance-attributes
     exit_code: int | None = None
 
 
+@dataclass
+class SnapshotHandle:
+    """What a snapshot resource keeps in memory."""
+
+    id: str
+    sandbox_id: str
+    sandbox_class: str
+
+
 def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
@@ -123,6 +138,10 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
     """
 
     implementation = "sandbox_provider_spec.v1.suite_driver.ProviderDriver"
+    unobservable = {
+        "snapshot.restore_begin": "SPS 1.0 restore has no progress handle",
+        "snapshot.restore_wait": "SPS 1.0 restore has no progress handle",
+    }
 
     def __init__(
         self,
@@ -141,6 +160,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         # Operations that have a command to run when discovery does not claim them. Nothing is
         # claimed until the tester has read discovery, so it starts with all of them.
         self.command_fallback: set[str] = {"files.exists"}
+        self._snapshots: dict[str, Resource] = {}
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
         self._thread.start()
@@ -188,6 +208,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
 
     def create(self, target: object, inputs: Inputs) -> Observation:
         del target
+        return self._create(inputs)
+
+    def _create(self, inputs: Inputs, *, snapshot: SnapshotHandle | None = None) -> Observation:
         extra = sorted(set(inputs) - CREATE_INPUTS)
         if extra:
             raise Unsupported("a create input that SPS 1.0 does not define")
@@ -195,6 +218,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
         request = CreateRequest(
+            sandbox_class="default" if snapshot is None else snapshot.sandbox_class,
             resources=cast(Mapping[str, object], inputs.get("resources", {})),
             requirements=cast(Mapping[str, object], inputs.get("requirements", {})),
             image=cast("str | Mapping[str, str] | None", image),
@@ -202,6 +226,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
             env=strings(inputs, "environment"),
             labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id},
             lifetime_seconds=cast("int | None", inputs.get("lifetime_seconds", 300)),
+            snapshot=None if snapshot is None else snapshot.id,
         )
         created = self.wait(self.api.create(request, idempotency_key=self._key(inputs)))
         handle = SandboxHandle(created.id)
@@ -229,7 +254,6 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         return {"result": "deleted"}
 
     def get(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
         try:
             sandbox = self.wait(self.api.get(self._sandbox(target)))
         except NativeFailure as error:
@@ -239,10 +263,13 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         labels = dict(sandbox.labels)
         if labels.get(RUN_LABEL) == self.run_id:
             del labels[RUN_LABEL]  # the tester's own label; a test names only the labels it set
-        return {
+        observed: dict[str, object] = {
             "state": "active" if sandbox.state == "running" else sandbox.state,
             "labels": labels,
         }
+        if inputs.get("size") is True:
+            observed["size"] = _size(sandbox.size)  # what a restore is compared with
+        return observed
 
     def list(self, target: object, inputs: Inputs) -> Observation:
         del target
@@ -605,6 +632,156 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         link = self.wait(self.api.tcp_link(self._sandbox(target), number(inputs, "port", 0)))
         return {"host": link.host, "port": link.port}
 
+    # Snapshots (section `snapshots`)
+
+    @staticmethod
+    def _snapshot_handle(target: object) -> SnapshotHandle:
+        native = resource(target).native
+        if not isinstance(native, SnapshotHandle):
+            raise ValueError("operation requires a snapshot")
+        return native
+
+    def _own_snapshot(self, snapshot: Snapshot) -> Resource:
+        """The resource of a snapshot, made once: a repeated create returns the same snapshot."""
+        known = self._snapshots.get(snapshot.id)
+        if known is not None:
+            return known
+        handle = SnapshotHandle(snapshot.id, snapshot.sandbox_id, snapshot.sandbox_class)
+        owned = self.own("snapshot", handle, lambda: self._delete_snapshot(handle.id))
+        self._snapshots[snapshot.id] = owned
+        return owned
+
+    def _delete_snapshot(self, snapshot_id: str) -> Observation:
+        try:
+            self.wait(self.api.snapshot_delete(snapshot_id))
+        except NativeFailure as error:
+            if error.code != "not_found":
+                raise
+        except Unsupported:
+            # A provider whose snapshots cannot be deleted lets them expire.
+            expires = self.wait(self.api.snapshot_get(snapshot_id)).expires_at
+            if expires is None:
+                raise NativeFailure("cleanup_not_confirmed") from None
+            return {"result": "expires", "expires_at": _iso(expires)}
+        return {"result": "deleted"}
+
+    def snapshot_take(self, target: object, inputs: Inputs) -> Observation:
+        """Save a sandbox and wait until the snapshot is `ready`."""
+        keeps = inputs.get("keeps")
+        if keeps not in (None, "files_only", "files_and_memory"):
+            raise ValueError("keeps must be files_only or files_and_memory")
+        request = SnapshotRequest(
+            keeps=cast(Any, keeps), labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id}
+        )
+        created = self.wait(
+            self.api.snapshot_create(self._sandbox(target), request, idempotency_key=str(uuid4()))
+        )
+        owned = self._own_snapshot(created)  # owned before the wait, so a failed wait cleans up
+        deadline = time.monotonic() + _SNAPSHOT_WAIT_SECONDS
+        snapshot = created
+        while snapshot.state != "ready":
+            if snapshot.state == "failed":
+                raise NativeFailure("snapshot_failed")
+            if time.monotonic() >= deadline:
+                raise NotRun("snapshot_not_ready_in_window")
+            time.sleep(1)
+            snapshot = self.wait(self.api.snapshot_get(created.id))
+        return {"resource": owned, "identity": created.id}
+
+    def snapshot_restore(self, target: object, inputs: Inputs) -> Observation:
+        return self._create(inputs, snapshot=self._snapshot_handle(target))
+
+    def snapshot_delete(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        return self.release(resource(target))
+
+    def snapshot_delete_again(self, target: object, inputs: Inputs) -> Observation:
+        """Delete a snapshot that an earlier step already deleted, and report the state."""
+        del inputs
+        result = self.wait(self.api.snapshot_delete(self._snapshot_handle(target).id))
+        return {"native_delete_attempted": True, "state": result.state}
+
+    def snapshot_get(self, target: object, inputs: Inputs) -> Observation:
+        """Read one snapshot. `unknown: true` reads an id that no provider has issued."""
+        snapshot_id = (
+            UNKNOWN_SNAPSHOT_ID
+            if inputs.get("unknown") is True
+            else self._snapshot_handle(target).id
+        )
+        snapshot = self.wait(self.api.snapshot_get(snapshot_id))
+        labels = dict(snapshot.labels)
+        if labels.get(RUN_LABEL) == self.run_id:
+            del labels[RUN_LABEL]  # the tester's own label
+        return {
+            "state": snapshot.state,
+            "keeps": snapshot.keeps,
+            "sandbox_id": snapshot.sandbox_id,
+            "labels": labels,
+            "size": _size(snapshot.size),
+        }
+
+    def snapshot_list(self, target: object, inputs: Inputs) -> Observation:
+        """The run's snapshots that match the given labels and source sandbox."""
+        del target
+        wanted = {**strings(inputs, "labels"), RUN_LABEL: self.run_id}
+        sandbox_id = inputs.get("sandbox_id")
+        if sandbox_id is not None and not isinstance(sandbox_id, str):
+            raise ValueError("sandbox_id must be text")
+        ids: builtins.list[str] = []
+        cursor: str | None = None
+        while True:
+            page = self.wait(
+                self.api.snapshot_list(labels=wanted, sandbox_id=sandbox_id, cursor=cursor)
+            )
+            ids.extend(item.id for item in page.snapshots)
+            cursor = page.next_cursor
+            if cursor is None:
+                break
+        return {"count": len(ids), "ids": ids}
+
+    def snapshot_create_keyed(self, target: object, inputs: Inputs) -> Observation:
+        """Save a sandbox with an explicit idempotency key and labels, without waiting. A
+        repeat that returns the first snapshot returns the same `id`."""
+        keeps = inputs.get("keeps")
+        request = SnapshotRequest(
+            keeps=cast(Any, keeps), labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id}
+        )
+        created = self.wait(
+            self.api.snapshot_create(
+                self._sandbox(target), request, idempotency_key=self._key(inputs)
+            )
+        )
+        self._own_snapshot(created)
+        return {"id": created.id}
+
+    def snapshot_retention(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        snapshot = self.wait(self.api.snapshot_get(self._snapshot_handle(target).id))
+        if snapshot.expires_at is None:
+            raise NotRun("snapshot_has_no_expiry")
+        return {
+            "retention_seconds": int((snapshot.expires_at - snapshot.created_at).total_seconds())
+        }
+
+    def snapshot_cost(self, target: object, inputs: Inputs) -> Observation:
+        """Read a snapshot's cost and check what it promises. With `final: true`, read until the
+        cost is final, for as long as `timeout_ms` (default 120 s) allows."""
+        handle = self._snapshot_handle(target)
+        deadline = time.monotonic() + number(inputs, "timeout_ms", _COST_WAIT_MS) / 1000
+        while True:
+            cost = self.wait(self.api.snapshot_cost(handle.id))
+            if inputs.get("final") is not True or cost.status == "final":
+                break
+            if time.monotonic() >= deadline:
+                raise NotRun("cost_not_final_in_window")
+            time.sleep(2)
+        return {
+            "status": cost.status,
+            "snapshot_matches": cost.snapshot_id == handle.id,
+            "sandbox_matches": cost.sandbox_id == handle.sandbox_id,
+            "only_snapshot_lines": all(line.item == "snapshot" for line in cost.lines),
+        }
+
     # Cleanup of anything a failed create left behind
 
     def leftovers(self) -> builtins.list[str]:
@@ -626,8 +803,16 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
                 time.sleep(delay)
                 delay = min(delay * 2, 2.0)
 
+    def snapshot_leftovers(self) -> builtins.list[str]:
+        """Ids of this run's snapshots that the provider still lists; none when it has no
+        snapshots section."""
+        try:
+            return cast("builtins.list[str]", self.snapshot_list(None, {})["ids"])
+        except Unsupported:
+            return []
+
     def sweep_run(self) -> builtins.list[Observation]:
-        """Destroy every sandbox that still carries this run's label."""
+        """Destroy every sandbox and delete every snapshot that still carries this run's label."""
         results: builtins.list[Observation] = []
         for sandbox_id in self.leftovers():
             try:
@@ -636,7 +821,25 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
                 results.append(
                     {"kind": "sandbox", "result": "error", "reason": type(error).__name__}
                 )
+        try:
+            snapshot_ids = self.snapshot_leftovers()
+        except Exception as error:  # pylint: disable=broad-exception-caught
+            return [
+                *results,
+                {"kind": "snapshot", "result": "error", "reason": type(error).__name__},
+            ]
+        for snapshot_id in snapshot_ids:
+            try:
+                results.append({"kind": "snapshot", **self._delete_snapshot(snapshot_id)})
+            except Exception as error:  # pylint: disable=broad-exception-caught
+                results.append(
+                    {"kind": "snapshot", "result": "error", "reason": type(error).__name__}
+                )
         return results
+
+
+def _size(size: Any) -> dict[str, object]:
+    return {"cpu": size.cpu, "memory_mib": size.memory_mib, "disk_mib": size.disk_mib}
 
 
 async def _next(iterator: AsyncIterator[bytes]) -> bytes:

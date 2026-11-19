@@ -31,6 +31,11 @@ from requests.exceptions import RequestException
 
 IMAGE = "python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f"
 
+# Every image that Example Cloud makes carries this label, so leftovers can be found with
+# `docker images --filter label=example.snapshot=1`.
+IMAGE_LABEL = "example.snapshot"
+IMAGE_REPOSITORY = "example-cloud-image"
+
 EXEC_OUTPUT_CAP = 16 * 1024 * 1024
 JOB_OUTPUT_KEEP = 4 * 1024 * 1024
 JOB_RETENTION_SECONDS = 600
@@ -348,6 +353,23 @@ class ExampleCloud:
                 )
                 """
             )
+            con.execute(
+                """
+                CREATE TABLE IF NOT EXISTS images (
+                    image_id TEXT PRIMARY KEY,
+                    owner TEXT NOT NULL,
+                    machine_id TEXT NOT NULL,
+                    docker_id TEXT NOT NULL,
+                    cpu REAL NOT NULL,
+                    memory_mb INTEGER NOT NULL,
+                    size_bytes INTEGER NOT NULL,
+                    tags_json TEXT NOT NULL,
+                    created TEXT NOT NULL,
+                    deleted TEXT,
+                    removed INTEGER NOT NULL DEFAULT 0
+                )
+                """
+            )
         self._prune()
 
     def _prune(self) -> None:
@@ -358,6 +380,10 @@ class ExampleCloud:
         )
         with self._connect() as con:
             con.execute("DELETE FROM machines WHERE ended IS NOT NULL AND ended < ?", (cutoff,))
+            con.execute(
+                "DELETE FROM images WHERE deleted IS NOT NULL AND removed = 1 AND deleted < ?",
+                (cutoff,),
+            )
         self._last_prune = time.monotonic()
 
     def _prune_sometimes(self) -> None:
@@ -419,6 +445,14 @@ class ExampleCloud:
             ) from None
         env = spec.get("env") or {}
         tags = spec.get("tags") or {}
+        image_id = spec.get("image_id")
+        source = None
+        if image_id is not None:
+            source = self._image_row(str(image_id))
+            if "cpu" not in spec:
+                cpu = float(source["cpu"])
+            if "memory_mb" not in spec:
+                memory_mb = int(source["memory_mb"])
         if cpu <= 0:
             raise ApiError(400, "invalid_request", "cpu must be positive")
         if memory_mb < 6:
@@ -438,12 +472,22 @@ class ExampleCloud:
         for key, value in tags.items():
             labels[f"example.tag.{key}"] = value
         command = ["sleep", str(int(ttl))] if ttl is not None else ["sleep", "infinity"]
+        base_image = self.image_id
+        environment = dict(env)
+        if source is not None:
+            # A machine made from an image starts from the image's files, not from its
+            # configuration: the source machine's environment and labels came along in the
+            # image, and Docker can only overwrite them, so they are blanked here.
+            base_image = source["docker_id"]
+            inherited = self._inherited(base_image)
+            labels = {**{key: "" for key in inherited["labels"]}, **labels}
+            environment = {**{name: "" for name in inherited["env"]}, **env}
         try:
             native = self.client.containers.create(
-                self.image_id,
+                base_image,
                 command,
                 name=f"ec-{machine_id}",
-                environment=env,
+                environment=environment,
                 labels=labels,
                 nano_cpus=max(int(cpu * 1_000_000_000), 10_000_000),
                 mem_limit=f"{memory_mb}m",
@@ -468,6 +512,168 @@ class ExampleCloud:
                 ),
             )
         return self._describe(machine_id, "running", self._machine_row(machine_id))  # type: ignore[arg-type]
+
+    # -- images -------------------------------------------------------------
+
+    def _inherited(self, docker_id: str) -> dict[str, list[str]]:
+        """The Example Cloud labels and the environment names that an image took from the
+        machine it was made from."""
+        try:
+            config = self.client.images.get(docker_id).attrs["Config"]
+            base = self.client.images.get(self.image_id).attrs["Config"]
+        except (ImageNotFound, KeyError):
+            raise ApiError(404, "not_found", "the image is gone") from None
+        base_env = {item.split("=", 1)[0] for item in base.get("Env") or []}
+        env = [item.split("=", 1)[0] for item in config.get("Env") or []]
+        labels = [key for key in (config.get("Labels") or {}) if key.startswith("example.")]
+        return {"env": [name for name in env if name not in base_env], "labels": labels}
+
+    def _image_row(self, image_id: str) -> sqlite3.Row:
+        """The row of an image that exists and is not deleted, else `not_found`."""
+        with self._connect() as con:
+            row = con.execute(
+                "SELECT * FROM images WHERE image_id = ? AND owner = ? AND deleted IS NULL",
+                (image_id, self.owner),
+            ).fetchone()
+        if row is None:
+            raise ApiError(404, "not_found", f"unknown image {image_id}")
+        return row
+
+    @staticmethod
+    def _describe_image(row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "image_id": row["image_id"],
+            "machine_id": row["machine_id"],
+            "status": "ready",
+            "created": row["created"],
+            "cpu": row["cpu"],
+            "memory_mb": row["memory_mb"],
+            "size_bytes": row["size_bytes"],
+            "tags": json.loads(row["tags_json"]),
+        }
+
+    def create_image(self, machine_id: str, spec: dict[str, Any]) -> dict[str, Any]:
+        """Save a machine's filesystem as an image with `docker commit`. The image is ready when
+        this returns. `pause` (default true) freezes the machine while Docker reads its files;
+        `pause: false` lets it keep running, so a write in flight may be saved part-written."""
+        pause = spec.get("pause", True)
+        if not isinstance(pause, bool):
+            raise ApiError(400, "invalid_request", "pause must be true or false")
+        tags = spec.get("tags") or {}
+        row = self._machine_row(machine_id)
+        native = self._container(machine_id)
+        if row is None:
+            raise ApiError(404, "not_found", f"unknown machine {machine_id}")
+        image_id = "i-" + uuid.uuid4().hex[:16]
+        created = _now()
+        labels = {
+            IMAGE_LABEL: "1",
+            "example.owner": self.owner,
+            "example.image_id": image_id,
+            "example.machine_id": machine_id,
+        }
+        try:
+            native.commit(
+                repository=IMAGE_REPOSITORY, tag=image_id, pause=pause, conf={"Labels": labels}
+            )
+            image = self.client.images.get(f"{IMAGE_REPOSITORY}:{image_id}")
+            base = self.client.images.get(self.image_id)
+        except NotFound:
+            raise ApiError(404, "not_found", f"unknown machine {machine_id}") from None
+        except APIError as exc:
+            if _removing(exc):
+                raise ApiError(404, "not_found", f"unknown machine {machine_id}") from None
+            raise ApiError(502, "provider_error", f"could not save machine: {exc}") from exc
+        stored = max(int(image.attrs["Size"]) - int(base.attrs["Size"]), 0)
+        with self._connect() as con:
+            con.execute(
+                "INSERT INTO images VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 0)",
+                (
+                    image_id,
+                    self.owner,
+                    machine_id,
+                    image.id,
+                    row["cpu"],
+                    row["memory_mb"],
+                    stored,
+                    json.dumps(tags, sort_keys=True),
+                    created,
+                ),
+            )
+        return self._describe_image(self._image_row(image_id))
+
+    def describe_image(self, image_id: str) -> dict[str, Any]:
+        return self._describe_image(self._image_row(image_id))
+
+    def list_images(
+        self, tags: list[tuple[str, str]], machine: str | None, offset: int, limit: int
+    ) -> dict[str, Any]:
+        with self._connect() as con:
+            rows = con.execute(
+                "SELECT * FROM images WHERE owner = ? AND deleted IS NULL ORDER BY created, image_id",
+                (self.owner,),
+            ).fetchall()
+        found = []
+        for row in rows:
+            have = json.loads(row["tags_json"])
+            if machine is not None and row["machine_id"] != machine:
+                continue
+            if all(have.get(key) == value for key, value in tags):
+                found.append(self._describe_image(row))
+        page = found[offset : offset + limit]
+        nxt = offset + limit
+        return {"images": page, "next_page_token": str(nxt) if nxt < len(found) else None}
+
+    def delete_image(self, image_id: str) -> dict[str, Any]:
+        """Delete an image. A repeat succeeds. Docker keeps the files of an image that a running
+        machine was started from until that machine ends, so removal is retried later."""
+        with self._connect() as con:
+            row = con.execute(
+                "SELECT * FROM images WHERE image_id = ? AND owner = ?", (image_id, self.owner)
+            ).fetchone()
+            if row is None:
+                raise ApiError(404, "not_found", f"unknown image {image_id}")
+            con.execute(
+                "UPDATE images SET deleted = ? WHERE image_id = ? AND deleted IS NULL",
+                (_now(), image_id),
+            )
+        self._reap_images()
+        return {"status": "deleted"}
+
+    def _reap_images(self) -> None:
+        """Remove the Docker image of every deleted image that no machine uses any more."""
+        with self._connect() as con:
+            rows = con.execute(
+                "SELECT image_id, docker_id FROM images "
+                "WHERE owner = ? AND deleted IS NOT NULL AND removed = 0",
+                (self.owner,),
+            ).fetchall()
+        for row in rows:
+            try:
+                self.client.images.remove(row["docker_id"])
+            except NotFound:
+                pass
+            except (APIError, DockerException, RequestException):
+                continue  # still in use; the next machine to end tries again
+            with self._connect() as con:
+                con.execute("UPDATE images SET removed = 1 WHERE image_id = ?", (row["image_id"],))
+
+    def get_image_usage(self, image_id: str) -> dict[str, Any]:
+        """The stored size of an image over time. Records outlive the image."""
+        self._prune_sometimes()
+        with self._connect() as con:
+            row = con.execute(
+                "SELECT * FROM images WHERE image_id = ? AND owner = ?", (image_id, self.owner)
+            ).fetchone()
+        if row is None:
+            raise ApiError(404, "not_found", f"unknown image {image_id}")
+        return {
+            "machine_id": row["machine_id"],
+            "records": [
+                {"size_bytes": row["size_bytes"], "from": row["created"], "until": row["deleted"]}
+            ],
+            "as_of": _now(),
+        }
 
     def describe_machine(self, machine_id: str) -> dict[str, Any]:
         row = self._machine_row(machine_id)
@@ -825,11 +1031,14 @@ class ExampleCloud:
                     machine_id = attrs.get("example.machine_id")
                     if machine_id:
                         self._mark_ended(machine_id)
+                        self._reap_images()
             except (DockerException, RequestException):
                 time.sleep(1)
 
     def close(self) -> None:
         self._closed.set()
+        with contextlib.suppress(DockerException, RequestException, sqlite3.Error):
+            self._reap_images()
         for client in (self.client, self.streams):
             with contextlib.suppress(DockerException, RequestException, OSError):
                 client.close()

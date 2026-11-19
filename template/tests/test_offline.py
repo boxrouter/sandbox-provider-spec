@@ -25,6 +25,7 @@ from sandbox_provider_spec.v1 import (
     CreateRequest,
     ProcessStartRequest,
     RunRequest,
+    SnapshotRequest,
     SpsError,
     to_json,
 )
@@ -59,12 +60,16 @@ class FakeCloud:
         # Entries that are not regular files: (machine, path) -> "dir", "link" or "other".
         self.special: dict[tuple[str, str], str] = {}
         self.jobs: dict[str, dict[str, Any]] = {}
+        self.images: dict[str, dict[str, Any]] = {}
         self.posts = 0
+        self.image_posts: list[dict[str, Any]] = []
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         if not request.headers.get("x-api-key"):
             return self._error(401, "unauthenticated", "an X-Api-Key header is required")
         segments = [s for s in request.url.path.split("/") if s]
+        if segments and segments[0] == "images":
+            return self._images(request, segments)
         if not segments or segments[0] != "machines":
             return self._error(404, "not_found", "no such route")
         if len(segments) == 1:
@@ -98,15 +103,81 @@ class FakeCloud:
             return self._job_log(rest[1])
         if rest == ["usage"] and request.method == "GET":
             return self._usage(machine)
+        if rest == ["images"] and request.method == "POST":
+            return self._save(request, machine)
         return self._error(404, "not_found", "no such route")
 
     # -- routes ---------------------------------------------------------------
+
+    def _save(self, request: httpx.Request, machine: dict[str, Any]) -> httpx.Response:
+        if machine["status"] != "running":
+            return self._error(404, "not_found", f"unknown machine {machine['machine_id']}")
+        body = json.loads(request.content)
+        self.image_posts.append(body)
+        image = {
+            "image_id": "i-" + uuid.uuid4().hex[:8],
+            "machine_id": machine["machine_id"],
+            "status": "ready",
+            "created": self._now(),
+            "cpu": machine["cpu"],
+            "memory_mb": machine["memory_mb"],
+            "size_bytes": 1 << 20,
+            "tags": dict(body.get("tags") or {}),
+            "deleted": None,
+        }
+        self.images[image["image_id"]] = image
+        return self._json(201, self._image(image))
+
+    def _images(self, request: httpx.Request, segments: list[str]) -> httpx.Response:
+        if len(segments) == 1:
+            wanted = [tag.split(":", 1) for tag in request.url.params.get_list("tag")]
+            machine = request.url.params.get("machine")
+            found = [
+                self._image(i)
+                for i in self.images.values()
+                if i["deleted"] is None
+                and (machine is None or i["machine_id"] == machine)
+                and all(i["tags"].get(key) == value for key, value in wanted)
+            ]
+            return self._json(200, {"images": found, "next_page_token": None})
+        image = self.images.get(segments[1])
+        rest = segments[2:]
+        if image is None:
+            return self._error(404, "not_found", f"unknown image {segments[1]}")
+        if not rest and request.method == "DELETE":
+            image["deleted"] = image["deleted"] or self._now()
+            return self._json(200, {"status": "deleted"})
+        if image["deleted"] is not None and rest != ["usage"]:
+            return self._error(404, "not_found", f"unknown image {segments[1]}")
+        if not rest and request.method == "GET":
+            return self._json(200, self._image(image))
+        if rest == ["usage"] and request.method == "GET":
+            record = {"size_bytes": image["size_bytes"], "from": image["created"]}
+            record["until"] = image["deleted"]
+            return self._json(
+                200,
+                {"machine_id": image["machine_id"], "records": [record], "as_of": self._now()},
+            )
+        return self._error(404, "not_found", "no such route")
+
+    @staticmethod
+    def _image(image: dict[str, Any]) -> dict[str, Any]:
+        keys = ("image_id", "machine_id", "status", "created", "cpu", "memory_mb")
+        return {
+            **{k: image[k] for k in keys},
+            "size_bytes": image["size_bytes"],
+            "tags": image["tags"],
+        }
 
     def _collection(self, request: httpx.Request) -> httpx.Response:
         if request.method == "POST":
             self.posts += 1
             body = json.loads(request.content)
+            source = self.images.get(body.get("image_id", ""))
+            if "image_id" in body and (source is None or source["deleted"] is not None):
+                return self._error(404, "not_found", f"unknown image {body['image_id']}")
             mid = "m-" + uuid.uuid4().hex[:8]
+            self.created_from = getattr(self, "created_from", []) + [body.get("image_id")]
             machine = {
                 "machine_id": mid,
                 "status": "running",
@@ -409,6 +480,198 @@ def test_unsupported_requests_are_refused() -> None:
         with pytest.raises(SpsError) as error:
             call(provider, "create", request, idempotency_key="key-0005")
         assert error.value.code == "unsupported", request
+
+
+def snapshot_of(
+    provider: ExampleProvider, box_id: str, key: str = "snap-0001", **labels: str
+) -> Any:
+    return call(
+        provider,
+        "snapshot_create",
+        box_id,
+        SnapshotRequest(labels=labels),
+        idempotency_key=key,
+    )
+
+
+def test_discovery_claims_snapshots_and_prices_them() -> None:
+    doc = call(make_provider(FakeCloud()), "discovery")
+    data = to_json(doc)
+    klass = data["classes"][0]
+    assert klass["gates"]["snapshots"] == [
+        {"keeps": "files_only", "original_after": "continues", "deletable": True}
+    ]
+    assert {"item": "snapshot", "unit": "gib_month", "basis": "used"}.items() <= next(
+        price for price in klass["prices"] if price["item"] == "snapshot"
+    ).items()
+
+
+def test_snapshot_create_commits_the_machine_without_pausing_it() -> None:
+    cloud = FakeCloud()
+    provider = make_provider(cloud)
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0020")
+    snap = snapshot_of(provider, box.id, team="x", **{"k/slash": "v"})
+    assert (snap.state, snap.keeps, snap.sandbox_id, snap.sandbox_class) == (
+        "ready",
+        "files_only",
+        box.id,
+        "default",
+    )
+    assert snap.labels == {"team": "x", "k/slash": "v"}
+    assert (snap.size.cpu, snap.size.memory_mib, snap.stored_bytes) == (1, 512, 1 << 20)
+    assert snap.expires_at is None
+    assert cloud.image_posts[0]["pause"] is False  # `continues`, as discovery declares
+    assert call(provider, "snapshot_get", snap.id) == snap
+
+
+def test_snapshot_create_is_idempotent_and_refuses_another_body() -> None:
+    cloud = FakeCloud()
+    provider = make_provider(cloud)
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0021")
+    first = snapshot_of(provider, box.id, a="1")
+    again = snapshot_of(provider, box.id, a="1")
+    assert again == first and len(cloud.images) == 1
+    with pytest.raises(SpsError) as error:
+        snapshot_of(provider, box.id, a="2")
+    assert error.value.code == "conflict"
+
+
+def test_snapshot_create_refuses_keeps_it_cannot_make_and_unknown_sandboxes() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0022")
+    with pytest.raises(SpsError) as error:
+        call(
+            provider,
+            "snapshot_create",
+            box.id,
+            SnapshotRequest(keeps="files_and_memory"),
+            idempotency_key="snap-0002",
+        )
+    assert error.value.code == "unsupported"
+    with pytest.raises(SpsError) as error:
+        snapshot_of(provider, "m-none", key="snap-0003")
+    assert error.value.code == "not_found"
+
+
+def test_snapshot_list_filters_by_label_and_sandbox() -> None:
+    provider = make_provider(FakeCloud())
+    one = call(provider, "create", CreateRequest(), idempotency_key="key-0023")
+    two = call(provider, "create", CreateRequest(), idempotency_key="key-0024")
+    first = snapshot_of(provider, one.id, key="snap-0004", team="x")
+    second = snapshot_of(provider, two.id, key="snap-0005", team="y", **{"k/slash": "v"})
+    assert {s.id for s in call(provider, "snapshot_list").snapshots} == {first.id, second.id}
+    assert [s.id for s in call(provider, "snapshot_list", labels={"team": "x"}).snapshots] == [
+        first.id
+    ]
+    assert [s.id for s in call(provider, "snapshot_list", sandbox_id=two.id).snapshots] == [
+        second.id
+    ]
+    page = call(provider, "snapshot_list", labels={"k/slash": "v"})
+    assert [s.id for s in page.snapshots] == [second.id] and page.next_cursor is None
+
+
+def test_snapshot_delete_is_repeatable_and_a_restore_is_then_not_found() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0025")
+    snap = snapshot_of(provider, box.id)
+    assert call(provider, "snapshot_delete", snap.id).state == "deleted"
+    assert call(provider, "snapshot_delete", snap.id).state == "deleted"
+    with pytest.raises(SpsError) as error:
+        call(provider, "create", CreateRequest(snapshot=snap.id), idempotency_key="key-0026")
+    assert error.value.code == "not_found"
+    with pytest.raises(SpsError) as error:
+        call(provider, "snapshot_get", snap.id)
+    assert error.value.code == "not_found"
+    with pytest.raises(SpsError) as error:
+        call(provider, "snapshot_delete", "i-none")
+    assert error.value.code == "not_found"
+    assert call(provider, "snapshot_list").snapshots == []
+
+
+def test_snapshot_restore_creates_a_machine_from_the_image_with_its_own_labels() -> None:
+    cloud = FakeCloud()
+    provider = make_provider(cloud)
+    box = call(
+        provider,
+        "create",
+        CreateRequest(resources={"cpu_min": 2}, labels={"which": "source"}),
+        idempotency_key="key-0027",
+    )
+    snap = snapshot_of(provider, box.id)
+    again = call(
+        provider,
+        "create",
+        CreateRequest(snapshot=snap.id, labels={"which": "restored"}, env={"A": "b"}),
+        idempotency_key="key-0028",
+    )
+    assert cloud.created_from[-1] == snap.id
+    assert again.id != box.id and again.labels == {"which": "restored"}
+    assert (again.size.cpu, again.size.memory_mib) == (2, 2048)  # the snapshot's size
+    assert call(provider, "snapshot_get", snap.id) == snap  # a restore changes nothing
+
+
+def test_snapshot_restore_rules() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0029")
+    snap = snapshot_of(provider, box.id)
+    refused = {
+        "invalid_request": CreateRequest(snapshot=snap.id, image="base"),
+        "unsupported": CreateRequest(snapshot=snap.id, resources={"cpu_min": 2}),
+    }
+    for code, request in refused.items():
+        with pytest.raises(SpsError) as error:
+            call(provider, "create", request, idempotency_key="key-0030")
+        assert error.value.code == code
+    with pytest.raises(SpsError) as error:
+        call(provider, "create", CreateRequest(snapshot="i-none"), idempotency_key="key-0031")
+    assert error.value.code == "not_found"
+
+
+def test_snapshot_requirements_are_met_only_by_the_claimed_variant() -> None:
+    provider = make_provider(FakeCloud())
+    meets = [
+        {"snapshots": {"original_after": "any"}},
+        {"snapshots": {"original_after": ["continues", "terminated"], "keeps": "files_only"}},
+        {"snapshots": {"original_after": "continues", "deletable": True}},
+    ]
+    for index, requirements in enumerate(meets):
+        call(
+            provider,
+            "create",
+            CreateRequest(requirements=requirements),
+            idempotency_key=f"key-004{index}",
+        )
+    refused = [
+        {"snapshots": {"original_after": "terminated"}},
+        {"snapshots": {"original_after": "any", "keeps": "files_and_memory"}},
+        {"snapshots": {"original_after": "any", "deletable": False}},
+        {"snapshots": {"original_after": "any", "retention_seconds": 60}},
+    ]
+    for requirements in refused:
+        with pytest.raises(SpsError) as error:
+            call(
+                provider,
+                "create",
+                CreateRequest(requirements=requirements),
+                idempotency_key="key-0050",
+            )
+        assert error.value.code == "unsupported", requirements
+
+
+def test_snapshot_cost_lists_only_snapshot_lines_and_is_final_after_delete() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0032")
+    snap = snapshot_of(provider, box.id)
+    live = call(provider, "snapshot_cost", snap.id)
+    assert (live.status, live.snapshot_id, live.sandbox_id) == ("accruing", snap.id, box.id)
+    assert {line.item for line in live.lines} == {"snapshot"}
+    assert {line.unit for line in live.lines} == {"gib_month"}
+    call(provider, "snapshot_delete", snap.id)
+    done = call(provider, "snapshot_cost", snap.id)
+    assert done.status == "final" and done.source == "calculated"
+    assert done.total_usd == sum(line.amount_usd for line in done.lines)
+    assert to_json(done)["snapshot_id"] == snap.id
+    assert call(provider, "cost", box.id).snapshot_id is None  # never in the sandbox's cost
 
 
 def test_get_and_list_return_the_create_labels() -> None:

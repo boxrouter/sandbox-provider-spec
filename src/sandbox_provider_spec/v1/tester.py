@@ -23,7 +23,9 @@ from sandbox_provider_spec.v1.types import CreateRequest, Discovery
 SEVERITY = ("error", "differs", "not_run", "unsupported", "passed")
 
 # Tests that `--quick` leaves out because they are slow.
-QUICK_SKIPS = frozenset({"contract.files_1gib_roundtrip", "contract.cost_final"})
+QUICK_SKIPS = frozenset(
+    {"contract.files_1gib_roundtrip", "contract.cost_final", "snapshots.v1.cost"}
+)
 
 # The required operations (contract section 1) and the steps of a test that exercise each.
 OPERATIONS = (
@@ -67,6 +69,11 @@ OPERATION_CLAIMS = {
     "files.mkdir": ("operations", "files.mkdir"),
     "files.remove": ("operations", "files.remove"),
     "files.exists": ("operations", "files.exists"),
+    "snapshot.create": ("gate", "snapshots"),
+    "snapshot.get": ("gate", "snapshots"),
+    "snapshot.list": ("gate", "snapshots"),
+    "snapshot.delete": ("gate", "snapshots"),
+    "snapshot.cost": ("gate", "snapshots"),
 }
 
 # Operations that a driver can do with commands where discovery does not claim them. They are
@@ -194,7 +201,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
     for test in suite.tests:
         head = test.id.split(".", 1)[0]
         if options.tests:
-            wanted = any(test.id.startswith(prefix) for prefix in options.tests)
+            wanted = any(test.id.startswith(prefix) for prefix in options.tests) and (
+                head not in gates or _consistent(test, gates)
+            )
         elif head in {"baseline", "contract"}:
             wanted = True
         else:

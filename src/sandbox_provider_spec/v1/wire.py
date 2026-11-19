@@ -47,6 +47,10 @@ from sandbox_provider_spec.v1.types import (
     SandboxClass,
     SandboxPage,
     Size,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     TcpLink,
 )
 
@@ -135,6 +139,7 @@ def _enc_create_request(value: CreateRequest) -> Json:
         out["at_end"] = value.at_end
     out["env"] = dict(value.env)
     out["labels"] = dict(value.labels)
+    _put(out, "snapshot", value.snapshot)
     return out
 
 
@@ -175,8 +180,27 @@ def _enc_cost_line(value: CostLine) -> Json:
     }
 
 
-def _enc_cost(value: Cost) -> Json:
+def _enc_snapshot(value: Snapshot) -> Json:
     return {
+        "id": value.id,
+        "sandbox_id": value.sandbox_id,
+        "sandbox_class": value.sandbox_class,
+        "state": value.state,
+        "keeps": value.keeps,
+        "size": {
+            "cpu": _number(value.size.cpu),
+            "memory_mib": value.size.memory_mib,
+            "disk_mib": value.size.disk_mib,
+        },
+        "stored_bytes": value.stored_bytes,
+        "labels": dict(value.labels),
+        "created_at": _stamp(value.created_at),
+        "expires_at": _opt(value.expires_at, _stamp),
+    }
+
+
+def _enc_cost(value: Cost) -> Json:
+    out: Json = {
         "sandbox_id": value.sandbox_id,
         "status": value.status,
         "total_usd": _dec(value.total_usd),
@@ -184,6 +208,8 @@ def _enc_cost(value: Cost) -> Json:
         "lines": [_enc_cost_line(line) for line in value.lines],
         "as_of": _stamp(value.as_of),
     }
+    _put(out, "snapshot_id", value.snapshot_id)
+    return out
 
 
 def _enc_class(value: SandboxClass) -> Json:
@@ -294,6 +320,22 @@ def _dec_create_request(data: Json) -> CreateRequest:
         at_end=data.get("at_end", "destroyed"),
         env=dict(data.get("env", {})),
         labels=dict(data.get("labels", {})),
+        snapshot=data.get("snapshot"),
+    )
+
+
+def _dec_snapshot(data: Json) -> Snapshot:
+    return Snapshot(
+        id=data["id"],
+        sandbox_id=data["sandbox_id"],
+        sandbox_class=data["sandbox_class"],
+        state=data["state"],
+        keeps=data["keeps"],
+        size=_dec_size(data["size"]),
+        stored_bytes=data["stored_bytes"],
+        labels=dict(data["labels"]),
+        created_at=_time(data["created_at"]),
+        expires_at=_opt(data["expires_at"], _time),
     )
 
 
@@ -335,6 +377,7 @@ def _dec_cost(data: Json) -> Cost:
         source=data["source"],
         lines=tuple(_dec_cost_line(line) for line in data["lines"]),
         as_of=_time(data["as_of"]),
+        snapshot_id=data.get("snapshot_id"),
     )
 
 
@@ -408,6 +451,25 @@ _CODECS: dict[type, _Codec] = {
             "cost": _opt(v.cost, _enc_cost),
         },
         lambda d: DestroyResult(d["sandbox_id"], d["state"], _opt(d.get("cost"), _dec_cost)),
+    ),
+    SnapshotRequest: _Codec(
+        "SnapshotRequest",
+        lambda v: {"keeps": v.keeps, "labels": dict(v.labels)},
+        lambda d: SnapshotRequest(keeps=d.get("keeps"), labels=dict(d.get("labels", {}))),
+    ),
+    Snapshot: _Codec("Snapshot", _enc_snapshot, _dec_snapshot),
+    SnapshotPage: _Codec(
+        "SnapshotPage",
+        lambda v: {
+            "snapshots": [_enc_snapshot(item) for item in v.snapshots],
+            "next_cursor": v.next_cursor,
+        },
+        lambda d: SnapshotPage(tuple(_dec_snapshot(i) for i in d["snapshots"]), d["next_cursor"]),
+    ),
+    SnapshotDeleteResult: _Codec(
+        "SnapshotDeleteResult",
+        lambda v: {"snapshot_id": v.snapshot_id, "state": v.state},
+        lambda d: SnapshotDeleteResult(d["snapshot_id"], d["state"]),
     ),
     RunRequest: _Codec(
         "RunRequest",

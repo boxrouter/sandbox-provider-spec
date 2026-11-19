@@ -275,6 +275,7 @@ adapter, each optional method raises `unsupported` until you implement it.
 | `processes` with `cancel` | `process.cancel` | Ends a process and its children |
 | `previews` | `preview.link` | An HTTPS URL that reaches a port in the sandbox |
 | `tcp_ports` | `tcp.link` | A host and port that reach a TCP port in the sandbox |
+| `snapshots` | `snapshot.create`, `snapshot.get`, `snapshot.list`, `snapshot.delete`, `snapshot.cost`, and `create` with `snapshot` | Save a sandbox and start new sandboxes from the save |
 
 ### Directory operations
 

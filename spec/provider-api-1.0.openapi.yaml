@@ -744,6 +744,161 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/snapshots:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: snapshot_create
+      tags: [optional]
+      summary: Save a sandbox (idempotent)
+      description: >-
+        Section `snapshots`. Returns after the capture moment with state `saving` or `ready`; read `snapshot_get` until
+        `ready`. A repeat with the same key and body returns the first snapshot with status 201.
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SnapshotRequest"}
+      responses:
+        "201":
+          description: The snapshot made by this call or found by its idempotency key.
+          headers:
+            Request-Id: {$ref: "#/components/headers/RequestId"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Snapshot"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/snapshots:
+    get:
+      operationId: snapshot_list
+      tags: [optional]
+      summary: List snapshots, filtered by labels and source sandbox
+      description: >-
+        Section `snapshots`. Returns the snapshots that are neither deleted nor expired, in any state. The order is
+        unspecified and the cursor is opaque.
+      parameters:
+        - name: label
+          in: query
+          required: false
+          description: >-
+            `<key>=<value>`; may repeat. A snapshot matches when it has every given label with exactly that value.
+            The first `=` separates the key from the value.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items: {type: string, pattern: "^[^=]+=.*$"}
+        - name: sandbox_id
+          in: query
+          required: false
+          description: Keep only the snapshots taken from this sandbox.
+          schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        - name: cursor
+          in: query
+          required: false
+          description: The `next_cursor` of the previous page.
+          schema: {type: string, minLength: 1}
+        - name: limit
+          in: query
+          required: false
+          description: Page size, 1 to `limits.list_limit` of discovery.
+          schema: {type: integer, minimum: 1, default: 100}
+      responses:
+        "200":
+          description: One page of snapshots.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SnapshotPage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/snapshots/{snapshot_id}:
+    parameters:
+      - {$ref: "#/components/parameters/SnapshotId"}
+    get:
+      operationId: snapshot_get
+      tags: [optional]
+      summary: Read one snapshot
+      description: Section `snapshots`. It observes only.
+      responses:
+        "200":
+          description: The snapshot.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Snapshot"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    delete:
+      operationId: snapshot_delete
+      tags: [optional]
+      summary: Delete a snapshot
+      description: >-
+        Section `snapshots`. Returns once the provider has accepted it; afterwards a restore from the snapshot is
+        `not_found`. A repeated delete succeeds with state `deleted`. A sandbox already restored from it is not affected.
+      responses:
+        "200":
+          description: The delete was accepted.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SnapshotDeleteResult"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/snapshots/{snapshot_id}/cost:
+    parameters:
+      - {$ref: "#/components/parameters/SnapshotId"}
+    get:
+      operationId: snapshot_cost
+      tags: [optional]
+      summary: The snapshot's own cost
+      description: >-
+        Section `snapshots`. The lines are the snapshot's own charges, item `snapshot`; `snapshot_id` is set. The status
+        is `accruing` while the snapshot is stored and reaches `final` within 7 days after it is deleted or expires.
+      responses:
+        "200":
+          description: The cost so far, or the final cost.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Cost"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
 components:
   securitySchemes:
     bearerAuth:
@@ -802,6 +957,12 @@ components:
       in: path
       required: true
       description: The sandbox id that the provider chose.
+      schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    SnapshotId:
+      name: snapshot_id
+      in: path
+      required: true
+      description: The snapshot id that the provider chose.
       schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
     ProcessId:
       name: process_id
@@ -1236,6 +1397,12 @@ components:
         labels:
           $ref: "#/components/schemas/Labels"
           description: Labels, returned exactly by `get` and `list`.
+        snapshot:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: >-
+            Restore: start the new sandbox from this snapshot (needs the `snapshots` section). `image` must be absent or null.
+            The labels of the saved sandbox are not copied.
       allOf:
         - if:
             required: [lifetime_seconds]
@@ -1296,6 +1463,11 @@ components:
           items: {$ref: "#/components/schemas/CostLine"}
           description: One line per priced item and period.
         as_of: {$ref: "#/components/schemas/Timestamp", description: "When these figures were read."}
+        snapshot_id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: >-
+            Set by `snapshot_cost` only: the snapshot whose own charges these are. `sandbox_id` is then the saved sandbox.
       description: >-
         The sandbox's cost. Quantities come from the provider's own records of the sandbox, never from a clock in the consumer
         or in an adapter.
@@ -1324,6 +1496,65 @@ components:
           description: >-
             Null unless the provider's usage records disappear with the sandbox; then the final cost. A consumer uses it when
             present and otherwise reads `cost` until it is final.
+    SnapshotRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        keeps:
+          enum: [files_only, files_and_memory, null]
+          default: null
+          description: >-
+            What to capture. Null means the `keeps` of the variant the sandbox was created with; a value that no claimed
+            variant offers is `unsupported`.
+        labels:
+          $ref: "#/components/schemas/Labels"
+          description: The snapshot's labels.
+    Snapshot:
+      type: object
+      required: [id, sandbox_id, sandbox_class, state, keeps, size, stored_bytes, labels, created_at, expires_at]
+      properties:
+        id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: The snapshot id, chosen by the provider and never reused.
+        sandbox_id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: The sandbox it was taken from.
+        sandbox_class: {type: string, minLength: 1, description: "That sandbox's class; a restore creates a sandbox of this class."}
+        state:
+          enum: [saving, ready, failed]
+          description: "`ready`: restorable. `saving`: not yet. `failed`: never will be."
+        keeps:
+          enum: [files_only, files_and_memory]
+          description: What it captured.
+        size: {$ref: "#/components/schemas/SandboxSize"}
+        stored_bytes:
+          type: [integer, "null"]
+          minimum: 0
+          description: The bytes the provider stores for it, when the provider knows.
+        labels: {$ref: "#/components/schemas/Labels"}
+        created_at: {$ref: "#/components/schemas/Timestamp", description: "The capture moment."}
+        expires_at:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: When it stops being restorable; null means until it is deleted.
+      description: Returned by `snapshot_create`, `snapshot_get` and `snapshot_list`.
+    SnapshotPage:
+      type: object
+      required: [snapshots, next_cursor]
+      properties:
+        snapshots:
+          type: array
+          items: {$ref: "#/components/schemas/Snapshot"}
+        next_cursor:
+          type: [string, "null"]
+          description: Opaque. Null means that this page is the last one.
+    SnapshotDeleteResult:
+      type: object
+      required: [snapshot_id, state]
+      properties:
+        snapshot_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        state: {enum: [deleting, deleted]}
     RunRequest:
       type: object
       additionalProperties: false

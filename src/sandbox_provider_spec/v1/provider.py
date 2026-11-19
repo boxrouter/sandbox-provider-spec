@@ -36,6 +36,10 @@ from sandbox_provider_spec.v1.types import (
     RunResult,
     Sandbox,
     SandboxPage,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     TcpLink,
 )
 
@@ -227,6 +231,30 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
         raise self._unsupported("files.exists")
+
+    async def snapshot_create(
+        self, sandbox_id: str, request: SnapshotRequest, *, idempotency_key: str
+    ) -> Snapshot:
+        raise self._unsupported("snapshot.create")
+
+    async def snapshot_get(self, snapshot_id: str) -> Snapshot:
+        raise self._unsupported("snapshot.get")
+
+    async def snapshot_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        sandbox_id: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SnapshotPage:
+        raise self._unsupported("snapshot.list")
+
+    async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
+        raise self._unsupported("snapshot.delete")
+
+    async def snapshot_cost(self, snapshot_id: str) -> Cost:
+        raise self._unsupported("snapshot.cost")
 
     async def aclose(self) -> None:
         """Release HTTP clients; the host calls it once when it is done with the adapter."""

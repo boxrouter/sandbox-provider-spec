@@ -79,6 +79,7 @@ class CreateRequest:
     at_end: EndState = "destroyed"
     env: Mapping[str, str] = field(default_factory=dict)
     labels: Mapping[str, str] = field(default_factory=dict)
+    snapshot: str | None = None  # restore from this snapshot (needs the `snapshots` section)
 
 
 @dataclass(frozen=True)
@@ -117,6 +118,7 @@ class Cost:
     source: Literal["reported", "calculated"]
     lines: Sequence[CostLine]
     as_of: datetime
+    snapshot_id: str | None = None  # set by `snapshot_cost` only
 
 
 @dataclass(frozen=True)
@@ -124,6 +126,41 @@ class DestroyResult:
     sandbox_id: str
     state: Literal["destroying", "destroyed"]
     cost: Cost | None = None
+
+
+SnapshotKeeps = Literal["files_only", "files_and_memory"]
+
+
+@dataclass(frozen=True)
+class SnapshotRequest:
+    keeps: SnapshotKeeps | None = None  # None: what the sandbox's variant keeps
+    labels: Mapping[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class Snapshot:
+    id: str
+    sandbox_id: str
+    sandbox_class: str
+    state: Literal["saving", "ready", "failed"]
+    keeps: SnapshotKeeps
+    size: Size
+    stored_bytes: int | None
+    labels: Mapping[str, str]
+    created_at: datetime
+    expires_at: datetime | None
+
+
+@dataclass(frozen=True)
+class SnapshotPage:
+    snapshots: Sequence[Snapshot]
+    next_cursor: str | None
+
+
+@dataclass(frozen=True)
+class SnapshotDeleteResult:
+    snapshot_id: str
+    state: Literal["deleting", "deleted"]
 
 
 @dataclass(frozen=True)

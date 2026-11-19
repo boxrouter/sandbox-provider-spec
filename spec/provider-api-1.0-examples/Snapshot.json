@@ -1,0 +1,18 @@
+{
+  "id": "snap-9",
+  "sandbox_id": "sbx-17",
+  "sandbox_class": "default",
+  "state": "ready",
+  "keeps": "files_only",
+  "size": {
+    "cpu": 2,
+    "memory_mib": 2048,
+    "disk_mib": 20480
+  },
+  "stored_bytes": 52428800,
+  "labels": {
+    "job": "build-42"
+  },
+  "created_at": "2026-11-13T10:02:00Z",
+  "expires_at": null
+}

@@ -142,6 +142,9 @@ def server(tmp_path_factory: pytest.TempPathFactory, image: str) -> Any:
     for container in DOCKER.containers.list(all=True, filters={"label": f"example.owner={owner}"}):
         with contextlib.suppress(Exception):
             container.remove(force=True)
+    for saved in DOCKER.images.list(filters={"label": f"example.owner={owner}"}):
+        with contextlib.suppress(Exception):
+            DOCKER.images.remove(saved.id, force=True)
 
 
 @pytest.fixture()

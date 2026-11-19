@@ -38,6 +38,10 @@ from sandbox_provider_spec.v1.types import (
     SandboxPage,
     SandboxState,
     Size,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     TcpLink,
 )
 from sandbox_provider_spec.v1.wire import (
@@ -84,6 +88,10 @@ __all__ = [
     "SandboxPage",
     "SandboxState",
     "Size",
+    "Snapshot",
+    "SnapshotDeleteResult",
+    "SnapshotPage",
+    "SnapshotRequest",
     "SpsError",
     "TcpLink",
     "WireError",

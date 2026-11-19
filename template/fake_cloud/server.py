@@ -32,6 +32,7 @@ _BODY_LIMIT = 1 << 20
 _TAG_KEY = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\Z")
 _MACHINE_ID = re.compile(r"m-[a-z0-9]{1,32}\Z")
 _JOB_ID = re.compile(r"j-[a-z0-9]{1,32}\Z")
+_IMAGE_ID = re.compile(r"i-[a-z0-9]{1,32}\Z")
 
 
 async def _read_body(receive: Any, limit: int = _BODY_LIMIT) -> bytes:
@@ -126,6 +127,12 @@ def _fs_flag(body: dict[str, Any], name: str) -> str:
 def _machine_id(segment: str) -> str:
     if _MACHINE_ID.fullmatch(segment) is None:
         raise ApiError(404, "not_found", f"unknown machine {segment}")
+    return segment
+
+
+def _image_id(segment: str) -> str:
+    if _IMAGE_ID.fullmatch(segment) is None:
+        raise ApiError(404, "not_found", f"unknown image {segment}")
     return segment
 
 
@@ -268,6 +275,42 @@ async def _fs_get(
     await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
+async def _handle_images(
+    cloud: ExampleCloud,
+    method: str,
+    segments: list[str],
+    query: dict[str, list[str]],
+    receive: Any,
+    send: Any,
+) -> None:
+    if len(segments) == 1:
+        if method != "GET":
+            raise ApiError(405, "invalid_request", "method not allowed")
+        tags = _tags(query.get("tag", []))
+        machine = (query.get("machine") or [None])[0]
+        token = (query.get("page_token") or [""])[0]
+        if token and not token.isdigit():
+            raise ApiError(400, "invalid_request", "bad page_token")
+        limit = _int_param(query.get("limit", []), "limit", 100, 1, 1000)
+        result = await asyncio.to_thread(
+            cloud.list_images, tags, machine, int(token) if token else 0, limit
+        )
+        await _send_json(send, 200, result)
+        return
+    image_id = _image_id(segments[1])
+    rest = segments[2:]
+    if not rest and method == "GET":
+        await _send_json(send, 200, await asyncio.to_thread(cloud.describe_image, image_id))
+        return
+    if not rest and method == "DELETE":
+        await _send_json(send, 200, await asyncio.to_thread(cloud.delete_image, image_id))
+        return
+    if rest == ["usage"] and method == "GET":
+        await _send_json(send, 200, await asyncio.to_thread(cloud.get_image_usage, image_id))
+        return
+    raise ApiError(404, "not_found", "no such route")
+
+
 async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send: Any) -> None:
     method = scope["method"]
     segments = [seg for seg in scope["path"].split("/") if seg]
@@ -280,6 +323,10 @@ async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send
     headers = {key.lower(): value for key, value in scope["headers"]}
     if not headers.get(b"x-api-key"):
         raise ApiError(401, "unauthenticated", "an X-Api-Key header is required")
+
+    if segments and segments[0] == "images":
+        await _handle_images(cloud, method, segments, query, receive, send)
+        return
 
     if not segments or segments[0] != "machines":
         raise ApiError(404, "not_found", "no such route")
@@ -403,6 +450,20 @@ async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send
     if rest == ["usage"] and method == "GET":
         result = await asyncio.to_thread(cloud.get_usage, machine_id)
         await _send_json(send, 200, result)
+        return
+
+    if rest == ["images"] and method == "POST":
+        body = await _json_body(receive)
+        tags = body.get("tags") or {}
+        if not isinstance(tags, dict) or not all(
+            isinstance(key, str) and isinstance(value, str) for key, value in tags.items()
+        ):
+            raise ApiError(400, "invalid_request", "tags must be an object of strings")
+        for key in tags:
+            if _TAG_KEY.fullmatch(key) is None:
+                raise ApiError(400, "invalid_request", f"bad tag key {key!r}")
+        result = await asyncio.to_thread(cloud.create_image, machine_id, body)
+        await _send_json(send, 201, result)
         return
 
     raise ApiError(404, "not_found", "no such route")

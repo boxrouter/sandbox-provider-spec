@@ -1,0 +1,6 @@
+{
+  "keeps": "files_only",
+  "labels": {
+    "job": "build-42"
+  }
+}

@@ -18,7 +18,7 @@ import os
 import shutil
 import stat
 from collections.abc import AsyncIterable, AsyncIterator, Mapping
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, ClassVar, TypeVar
 
@@ -26,7 +26,7 @@ import jsonschema
 import pytest
 
 from sandbox_provider_spec.cli import main
-from sandbox_provider_spec.driver import NativeFailure, Unsupported, resource
+from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported, resource
 from sandbox_provider_spec.v1 import (
     Cost,
     CreateRequest,
@@ -47,6 +47,10 @@ from sandbox_provider_spec.v1 import (
     RunResult,
     Sandbox,
     SandboxPage,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     SpsError,
     from_json,
 )
@@ -216,6 +220,246 @@ class LocalProvider(Provider, manifest=False):
         return dataclasses.replace(example(Cost), sandbox_id=sandbox_id, as_of=datetime.now(UTC))
 
 
+class SnapshotProvider(LocalProvider, manifest=False):
+    """Keeps snapshots as records; a restore is a create that names one."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.snapshots: dict[str, Snapshot] = {}
+        self.deleted: set[str] = set()
+        self.keys: dict[str, str] = {}
+        self.restored_from: list[str | None] = []
+        self.states: list[str] = ["saving", "ready"]
+        self.expires_at: datetime | None = None
+
+    async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
+        if request.snapshot is not None and request.snapshot not in self.snapshots:
+            raise SpsError("not_found", "no such snapshot")
+        self.restored_from.append(request.snapshot)
+        return await super().create(request, idempotency_key=idempotency_key)
+
+    async def snapshot_create(
+        self, sandbox_id: str, request: SnapshotRequest, *, idempotency_key: str
+    ) -> Snapshot:
+        box = await self.get(sandbox_id)
+        if idempotency_key in self.keys:
+            return self.snapshots[self.keys[idempotency_key]]
+        snapshot = dataclasses.replace(
+            example(Snapshot),
+            id=f"snap-{next(self.counter)}",
+            sandbox_id=sandbox_id,
+            sandbox_class=box.sandbox_class,
+            state="saving",
+            labels=dict(request.labels),
+            expires_at=self.expires_at,
+        )
+        self.snapshots[snapshot.id] = snapshot
+        self.keys[idempotency_key] = snapshot.id
+        return snapshot
+
+    async def snapshot_get(self, snapshot_id: str) -> Snapshot:
+        if snapshot_id not in self.snapshots:
+            raise SpsError("not_found", "no such snapshot")
+        snapshot = self.snapshots[snapshot_id]
+        if self.states:
+            snapshot = dataclasses.replace(snapshot, state=self.states.pop(0))  # type: ignore[arg-type]
+        return snapshot
+
+    async def snapshot_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        sandbox_id: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SnapshotPage:
+        found = [
+            item
+            for item in self.snapshots.values()
+            if item.id not in self.deleted
+            and (sandbox_id is None or item.sandbox_id == sandbox_id)
+            and all(item.labels.get(key) == value for key, value in (labels or {}).items())
+        ]
+        return SnapshotPage(snapshots=found, next_cursor=None)
+
+    async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
+        if snapshot_id not in self.snapshots:
+            raise SpsError("not_found", "no such snapshot")
+        self.deleted.add(snapshot_id)
+        return SnapshotDeleteResult(snapshot_id, "deleted")
+
+    async def snapshot_cost(self, snapshot_id: str) -> Cost:
+        snapshot = await self.snapshot_get(snapshot_id)
+        return dataclasses.replace(
+            example(Cost),
+            sandbox_id=snapshot.sandbox_id,
+            snapshot_id=snapshot_id,
+            lines=[],
+            as_of=datetime.now(UTC),
+        )
+
+
+@pytest.fixture(name="snapshot_driver")
+def snapshot_driver_fixture() -> Any:
+    driver = ProviderDriver(SnapshotProvider(), run="run-1")
+    yield driver
+    driver.close()
+
+
+def test_snapshot_take_waits_for_ready_and_labels_the_snapshot(
+    snapshot_driver: ProviderDriver,
+) -> None:
+    box = snapshot_driver.call("create", None, {})
+    snap = snapshot_driver.call("snapshot.take", box, {"keeps": "files_only"})
+    provider: Any = snapshot_driver.api
+    assert provider.states == []  # it read the snapshot until it was ready
+    stored = provider.snapshots[str(snap["identity"])]
+    assert dict(stored.labels) == {RUN_LABEL: "run-1"}
+    info = snapshot_driver.call("snapshot.get", snap, {})
+    assert (info["labels"], info["sandbox_id"]) == ({}, box["identity"])
+
+
+def test_snapshot_take_of_a_failed_snapshot_is_a_failure_and_is_cleaned_up(
+    snapshot_driver: ProviderDriver,
+) -> None:
+    provider: Any = snapshot_driver.api
+    provider.states = ["failed"]
+    box = snapshot_driver.call("create", None, {})
+    with pytest.raises(NativeFailure) as failure:
+        snapshot_driver.call("snapshot.take", box, {})
+    assert failure.value.code == "snapshot_failed"
+    assert provider.deleted == set()
+    snapshot_driver.sweep_run()
+    assert len(provider.deleted) == 1
+
+
+def test_snapshot_restore_creates_from_the_snapshot_in_its_class(
+    snapshot_driver: ProviderDriver,
+) -> None:
+    box = snapshot_driver.call("create", None, {})
+    snap = snapshot_driver.call("snapshot.take", box, {})
+    again = snapshot_driver.call("snapshot.restore", snap, {"labels": {"k": "v"}})
+    provider: Any = snapshot_driver.api
+    assert provider.restored_from == [None, snap["identity"]]
+    assert snapshot_driver.call("get", again, {"size": True})["size"] == {
+        "cpu": 2,
+        "memory_mib": 2048,
+        "disk_mib": 20480,
+    }
+    assert snapshot_driver.call("get", again, {})["labels"] == {"k": "v"}
+    for progress in ("snapshot.restore_begin", "snapshot.restore_wait"):
+        with pytest.raises(NotRun, match="no progress handle"):
+            snapshot_driver.call(progress, snap, {})
+    snapshot_driver.release(resource(again))
+
+
+def test_snapshot_delete_twice_and_unknown_ids(snapshot_driver: ProviderDriver) -> None:
+    box = snapshot_driver.call("create", None, {})
+    snap = snapshot_driver.call("snapshot.take", box, {})
+    assert snapshot_driver.call("snapshot.delete", snap, {})["result"] == "deleted"
+    assert snapshot_driver.call("snapshot.delete_again", snap, {}) == {
+        "native_delete_attempted": True,
+        "state": "deleted",
+    }
+    with pytest.raises(NativeFailure) as failure:
+        snapshot_driver.call("snapshot.get", None, {"unknown": True})
+    assert failure.value.code == "not_found"
+
+
+def test_snapshot_create_keyed_owns_one_snapshot_however_often_a_key_returns_it(
+    snapshot_driver: ProviderDriver,
+) -> None:
+    box = snapshot_driver.call("create", None, {})
+    first = snapshot_driver.call("snapshot.create_keyed", box, {"idempotency_key": "k1"})
+    second = snapshot_driver.call("snapshot.create_keyed", box, {"idempotency_key": "k1"})
+    assert first == second
+    other = snapshot_driver.call("snapshot.create_keyed", box, {"idempotency_key": "k2"})
+    assert other != first
+    assert len([r for r in snapshot_driver.resources if r.kind == "snapshot"]) == 2
+    listed = snapshot_driver.call("snapshot.list", None, {"sandbox_id": box["identity"]})
+    assert listed["count"] == 2
+
+
+def test_snapshot_retention_is_not_run_without_an_expiry(snapshot_driver: ProviderDriver) -> None:
+    provider: Any = snapshot_driver.api
+    box = snapshot_driver.call("create", None, {})
+    snap = snapshot_driver.call("snapshot.take", box, {})
+    with pytest.raises(NotRun):
+        snapshot_driver.call("snapshot.retention", snap, {})
+    provider.snapshots[str(snap["identity"])] = dataclasses.replace(
+        provider.snapshots[str(snap["identity"])],
+        expires_at=provider.snapshots[str(snap["identity"])].created_at + timedelta(days=7),
+    )
+    assert snapshot_driver.call("snapshot.retention", snap, {}) == {"retention_seconds": 604800}
+
+
+def test_snapshot_cost_checks_identities_and_items(snapshot_driver: ProviderDriver) -> None:
+    box = snapshot_driver.call("create", None, {})
+    snap = snapshot_driver.call("snapshot.take", box, {})
+    assert snapshot_driver.call("snapshot.cost", snap, {}) == {
+        "status": "final",
+        "snapshot_matches": True,
+        "sandbox_matches": True,
+        "only_snapshot_lines": True,
+    }
+
+
+def test_the_sweep_deletes_the_runs_snapshots_and_a_provider_without_them_has_none(
+    snapshot_driver: ProviderDriver, driver: ProviderDriver
+) -> None:
+    box = snapshot_driver.call("create", None, {})
+    snapshot_driver.call("snapshot.take", box, {})
+    results = snapshot_driver.sweep_run()
+    assert {row["kind"] for row in results} == {"sandbox", "snapshot"}
+    assert snapshot_driver.snapshot_leftovers() == []
+    assert driver.snapshot_leftovers() == []  # LocalProvider has no snapshots: nothing to sweep
+
+
+def test_every_snapshot_operation_needs_the_snapshots_gate() -> None:
+    missing = unsupported_operations(example(Discovery))
+    wanted = {
+        "snapshot.create",
+        "snapshot.get",
+        "snapshot.list",
+        "snapshot.delete",
+        "snapshot.cost",
+    }
+    assert wanted <= set(missing)
+    claimed = unsupported_operations(with_gates({"snapshots": {"keeps": "files_only"}}))
+    assert not wanted & set(claimed)
+
+
+def test_an_explicit_selection_still_drops_the_tests_of_a_knob_value_not_claimed() -> None:
+    claimed = with_gates(
+        {
+            "snapshots": {
+                "keeps": "files_only",
+                "original_after": "briefly_paused",
+                "deletable": True,
+            }
+        }
+    )
+    chosen = {
+        test.id
+        for test in select_tests(
+            shared_suite(), claimed, TestOptions(tests=["snapshots."], quick=True)
+        ).tests
+    }
+    assert "snapshots.keeps.files_only" in chosen
+    assert "snapshots.original_after.briefly_paused" in chosen
+    assert "snapshots.keeps.files_and_memory" not in chosen
+    assert "snapshots.original_after.terminated" not in chosen
+    assert "snapshots.deletable.false" not in chosen
+    assert {test_id for test_id in chosen if test_id.startswith("snapshots.v1.")} == {
+        "snapshots.v1.outlives_source",
+        "snapshots.v1.completed_writes",
+        "snapshots.v1.get_and_list",
+        "snapshots.v1.idempotent_create",
+        "snapshots.v1.restore_rules",
+        "snapshots.v1.deleted_not_found",
+    }  # `snapshots.v1.cost` waits for a final cost, which --quick leaves out
+
+
 @pytest.fixture(name="driver")
 def driver_fixture() -> Any:
     driver = ProviderDriver(LocalProvider(), run="run-1")
@@ -359,7 +603,11 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
     assert {test.id for test in one.tests} >= {"baseline.run_output", "baseline.run_cwd"}
     with pytest.raises(ValueError, match="no shared tests"):
         select_tests(suite, None, TestOptions(tests=["nothing."]))
-    assert QUICK_SKIPS == {"contract.files_1gib_roundtrip", "contract.cost_final"}
+    assert QUICK_SKIPS == {
+        "contract.files_1gib_roundtrip",
+        "contract.cost_final",
+        "snapshots.v1.cost",
+    }
 
 
 def test_run_tests_passes_reports_and_cleans_up() -> None:
@@ -645,7 +893,7 @@ def test_there_are_eleven_contract_tests_and_the_tester_selects_each_by_default(
     chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
     assert ids <= chosen
     quick = {test.id for test in select_tests(suite, None, TestOptions(quick=True)).tests}
-    assert ids - quick == QUICK_SKIPS
+    assert ids - quick == {test_id for test_id in QUICK_SKIPS if test_id.startswith("contract.")}
 
 
 def test_a_provider_that_keeps_the_contract_passes_every_contract_test() -> None:

@@ -7,6 +7,10 @@ translation; a comment above it names the Example Cloud call it maps. Example Cl
 labels or sizes on a machine, so the adapter keeps them in a JSON file inside the machine
 (`META_PATH`); a provider whose API stores machine metadata would read that instead. Example
 Cloud lists only running machines, so a replayed create is found only while the first machine runs.
+
+Snapshots map to Example Cloud's images: `docker commit` of a machine, listed, described and
+deleted through `/images`, with usage records of each image's size. A restore is a machine created
+from an image. An image's labels are kept as a JSON tag, because image tags cannot hold every key.
 """
 
 from __future__ import annotations
@@ -41,12 +45,17 @@ from sandbox_provider_spec.v1 import (
     Sandbox,
     SandboxPage,
     Size,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     SpsError,
 )
 
-from sps_provider_example.create_spec import fingerprint, plan_create
+from sps_provider_example.create_spec import fingerprint, plan_create, snapshot_fingerprint
 from sps_provider_example.facts import (
     CLASS,
+    HOURS_PER_MONTH,
     IMAGE,
     LIMITS,
     LIST_LIMIT,
@@ -55,10 +64,12 @@ from sps_provider_example.facts import (
     META_PATH,
     PRICE_CPU,
     PRICE_MEM,
+    PRICE_SNAPSHOT,
     REGION,
     TAG_BODY,
     TAG_IDEM,
     TAG_LABEL,
+    TAG_LABELS,
     build_discovery,
 )
 
@@ -179,7 +190,13 @@ class ExampleProvider(Provider):
         # A provider with unique names would instead send the key as the name at
         # no extra call: `POST /machines {name: idempotency_key, ...}` and map
         # the API's name-conflict error to the replay path.
-        spec, meta = plan_create(request)
+        # A restore is the same call with `image_id`: the machine starts from the saved files.
+        snapshot_size = None
+        if request.snapshot is not None:
+            if request.image is not None:
+                raise SpsError("invalid_request", "A restore names no image")
+            snapshot_size = (await self.snapshot_get(request.snapshot)).size
+        spec, meta = plan_create(request, snapshot_size)
         spec["tags"].update({TAG_IDEM: idempotency_key, TAG_BODY: fingerprint(request)})
         page = await self._machines((TAG_IDEM, idempotency_key), limit=1)
         if page["machines"]:
@@ -418,6 +435,118 @@ class ExampleProvider(Provider):
             source="calculated",
             lines=lines,
             as_of=datetime.now(UTC),
+        )
+
+    # -- snapshots ---------------------------------------------------------------
+
+    @staticmethod
+    def _to_snapshot(image: dict[str, Any]) -> Snapshot:
+        tags = image["tags"]
+        return Snapshot(
+            id=image["image_id"],
+            sandbox_id=image["machine_id"],
+            sandbox_class=CLASS,
+            state="ready",
+            keeps="files_only",
+            size=Size(cpu=image["cpu"], memory_mib=image["memory_mb"]),
+            stored_bytes=image["size_bytes"],
+            labels=json.loads(tags.get(TAG_LABELS, "{}")),
+            created_at=_stamp(image["created"]),
+            expires_at=None,
+        )
+
+    async def snapshot_create(
+        self, sandbox_id: str, request: SnapshotRequest, *, idempotency_key: str
+    ) -> Snapshot:
+        # GET /images?tag=sps.idem:<key> finds a replay, then POST /machines/{id}/images, which
+        # is `docker commit` and returns a ready image. `pause: false` leaves the machine
+        # running, which is the `continues` that discovery declares.
+        if request.keeps not in (None, "files_only"):
+            raise SpsError("unsupported", "Example Cloud keeps files only")
+        tags = {
+            TAG_IDEM: idempotency_key,
+            TAG_BODY: snapshot_fingerprint(sandbox_id, request),
+            TAG_LABELS: json.dumps(dict(request.labels), sort_keys=True),
+            **{f"{TAG_LABEL}{k}": v for k, v in request.labels.items() if "/" not in k},
+        }
+        found = await self._json(
+            "GET", "/images", params=[("tag", f"{TAG_IDEM}:{idempotency_key}")]
+        )
+        if found["images"]:
+            image = found["images"][0]
+            if image["tags"].get(TAG_BODY) != tags[TAG_BODY]:
+                raise SpsError("conflict", "Idempotency-Key was used with a different body")
+            return self._to_snapshot(image)
+        image = await self._json(
+            "POST",
+            f"/machines/{sandbox_id}/images",
+            json={"tags": tags, "pause": False},
+            timeout=httpx.Timeout(600.0, connect=10.0),
+        )
+        return self._to_snapshot(image)
+
+    async def snapshot_get(self, snapshot_id: str) -> Snapshot:
+        # GET /images/{id}; a deleted image is unknown there.
+        return self._to_snapshot(await self._json("GET", f"/images/{snapshot_id}"))
+
+    async def snapshot_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        sandbox_id: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SnapshotPage:
+        # GET /images?tag=l.<k>:<v>&machine=&page_token=; "/" keys are checked locally.
+        query: list[tuple[str, str]] = []
+        local: dict[str, str] = {}
+        for key, value in dict(labels or {}).items():
+            if "/" in key:
+                local[key] = value
+            else:
+                query.append(("tag", f"{TAG_LABEL}{key}:{value}"))
+        if sandbox_id is not None:
+            query.append(("machine", sandbox_id))
+        query.append(("limit", str(min(limit, LIST_LIMIT))))
+        if cursor:
+            query.append(("page_token", cursor))
+        page = await self._json("GET", "/images", params=query)
+        found = [self._to_snapshot(item) for item in page["images"]]
+        if local:
+            found = [s for s in found if all(s.labels.get(k) == v for k, v in local.items())]
+        return SnapshotPage(snapshots=found, next_cursor=page["next_page_token"])
+
+    async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
+        # DELETE /images/{id}; a repeat succeeds and an unknown id is not_found there.
+        await self._req("DELETE", f"/images/{snapshot_id}")
+        return SnapshotDeleteResult(snapshot_id=snapshot_id, state="deleted")
+
+    async def snapshot_cost(self, snapshot_id: str) -> Cost:
+        # GET /images/{id}/usage: the image's stored size over time, which outlives the image.
+        usage = await self._json("GET", f"/images/{snapshot_id}/usage")
+        as_of = _stamp(usage["as_of"])  # Example Cloud's clock, not the adapter's
+        lines = []
+        for record in usage["records"]:
+            start = _stamp(record["from"])
+            end = _stamp(record["until"]) if record["until"] else as_of
+            seconds = Decimal(str(max((end - start).total_seconds(), 0.0)))
+            quantity = (
+                Decimal(record["size_bytes"])
+                / Decimal(1 << 30)
+                * seconds
+                / (3600 * HOURS_PER_MONTH)
+            )
+            lines.append(
+                CostLine("snapshot", quantity, "gib_month", quantity * PRICE_SNAPSHOT, start, end)
+            )
+        return Cost(
+            sandbox_id=usage["machine_id"],
+            status="final" if all(r["until"] for r in usage["records"]) else "accruing",
+            total_usd=sum((line.amount_usd for line in lines), start=Decimal(0)),
+            source="calculated",
+            lines=tuple(lines),
+            as_of=as_of,
+            snapshot_id=snapshot_id,
         )
 
     async def aclose(self) -> None:

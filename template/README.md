@@ -4,8 +4,8 @@
 # Template: an SPS 1.0 provider adapter
 
 This is the adapter a new provider starts from. `sps_provider_example` implements every
-required 1.0 operation by calling Example Cloud (`fake_cloud/`), a small fake provider
-API that runs each sandbox as a local Docker container. The API is deliberately not
+required 1.0 operation, and the optional `snapshots` section, by calling Example Cloud
+(`fake_cloud/`), a small fake provider API that runs each sandbox as a local Docker container. The API is deliberately not
 shaped like the standard, so `src/sps_provider_example/__init__.py` shows a real
 translation: a comment above each method names the Example Cloud call it maps.
 
@@ -41,6 +41,21 @@ smoke ok
 
 It creates a sandbox, runs `echo hi`, writes and reads a file, destroys the sandbox
 and reads its cost.
+
+## Snapshots
+
+A snapshot is an Example Cloud image: `docker commit` of the sandbox's container, which the
+adapter takes without pausing it, so discovery declares `original_after: continues`, with
+`keeps: files_only` and `deletable: true`. A restore is a `create` that names `snapshot`; Example
+Cloud starts a machine from the image's files. Each image's stored size is a usage record that the
+adapter prices as the `snapshot` item in `gib_month`. After a tester run, no image is left:
+
+```console
+$ uv run --locked --extra http sandbox-provider-spec test example \
+    --credential api_key=EXAMPLE_API_KEY --credential endpoint=EXAMPLE_ENDPOINT --test snapshots.
+$ docker images --filter label=example.snapshot=1 -q | wc -l
+0
+```
 
 ## Run the tester
 

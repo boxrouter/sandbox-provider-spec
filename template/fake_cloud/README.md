@@ -59,6 +59,12 @@ and a missing or empty one gets `401`. `GET /healthz` is unauthenticated.
 | `POST /machines/{id}/jobs` | `{cmd: [...], dir, env}` → `{job_id}`; a job keeps running after the call returns |
 | `GET /machines/{id}/jobs/{job_id}/log?offset=&wait=` | → `{out, err, offset, done, code}`; `offset` is `<stdout_pos>.<stderr_pos>`, `wait` long-polls up to 60 s |
 | `GET /machines/{id}/usage` | → `{cpu, memory_mb, started, ended}`; `ended` is null while the machine runs |
+| `POST /machines/{id}/images` | `{tags, pause}` → `{image_id, machine_id, status, created, cpu, memory_mb, size_bytes, tags}`; saves the machine's files as an image, ready when the call returns; `pause` (default true) freezes the machine meanwhile, `false` lets it run |
+| `POST /machines` with `image_id` | as above, starting from an image's files at its `cpu` and `memory_mb` (unless the call names its own); the new machine has its own `env` and `tags` |
+| `GET /images?tag=<k>:<v>&machine=&page_token=&limit=` | → `{images: [...], next_page_token}`; `tag` may repeat; lists images that are not deleted |
+| `GET /images/{id}` | → the same image object |
+| `DELETE /images/{id}` | → `{status: "deleted"}`; repeating still succeeds, an unknown id is `404`; a deleted image can no longer start a machine |
+| `GET /images/{id}/usage` | → `{machine_id, records: [{size_bytes, from, until}], as_of}`; `until` is null while the image is stored; records outlive the image |
 
 Errors look like `{"error": {"code": "not_found", "message": "..."}}` with a
 matching HTTP status.
@@ -75,6 +81,13 @@ matching HTTP status.
   `example.expires`.
 - Usage records (`usage.db` in the state directory) are kept for 30 days
   after a machine ends and are pruned lazily.
+- An image is `docker commit` of the machine's container, tagged
+  `example-cloud-image:<image_id>` and labelled `example.snapshot=1` and
+  `example.owner`, so `docker images --filter label=example.snapshot=1` lists
+  what Example Cloud holds. A machine started from an image gets its own `env`
+  and `tags`: the saved machine's are blanked, because Docker keeps them in the
+  image. Deleting an image removes its Docker image as soon as no machine
+  uses it; a machine that was started from it keeps running until it ends.
 
 ## Limits of the fake
 

@@ -6,9 +6,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from typing import Any
 
-from sandbox_provider_spec.v1 import CreateRequest, SpsError
+from sandbox_provider_spec.v1 import CreateRequest, Size, SnapshotRequest, SpsError
 
 from sps_provider_example.facts import (
     CLASS,
@@ -17,6 +18,7 @@ from sps_provider_example.facts import (
     MAX_LIFETIME_S,
     REGION,
     SIZES,
+    SNAPSHOTS,
     TAG_BODY,
     TAG_IDEM,
     TAG_LABEL,
@@ -34,19 +36,53 @@ def fingerprint(request: CreateRequest) -> str:
         "at_end": request.at_end,
         "env": dict(request.env),
         "labels": dict(request.labels),
+        "snapshot": request.snapshot,
     }
     raw = json.dumps(doc, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(raw.encode()).hexdigest()
 
 
-def plan_create(request: CreateRequest) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Translate a `CreateRequest` into a machine spec and its meta document."""
+def _offers(value: object, wanted: str) -> bool:
+    """Whether a requirement's value (one value or a list of them) accepts `wanted`."""
+    return wanted in value if isinstance(value, list) else value == wanted
+
+
+def check_requirements(requirements: Mapping[str, object]) -> None:
+    """Example Cloud claims only the `snapshots` section, with the variant of `SNAPSHOTS`."""
+    for gate, wanted in requirements.items():
+        if gate != "snapshots" or not isinstance(wanted, Mapping):
+            raise SpsError("unsupported", f"Example Cloud does not claim the section {gate!r}")
+        for knob, value in wanted.items():
+            if knob == "original_after":
+                ok = value == "any" or _offers(value, SNAPSHOTS[knob])
+            elif knob in SNAPSHOTS:
+                ok = value == SNAPSHOTS[knob] or (
+                    knob == "keeps" and _offers(value, SNAPSHOTS[knob])
+                )
+            else:
+                ok = False
+            if not ok:
+                raise SpsError("unsupported", f"Example Cloud cannot meet snapshots.{knob}")
+
+
+def snapshot_fingerprint(sandbox_id: str, request: SnapshotRequest) -> str:
+    """A stable digest of a snapshot request, stored as a tag to detect a replayed key."""
+    doc = {"sandbox_id": sandbox_id, "keeps": request.keeps, "labels": dict(request.labels)}
+    return hashlib.sha256(json.dumps(doc, sort_keys=True).encode()).hexdigest()
+
+
+def plan_create(
+    request: CreateRequest, snapshot_size: Size | None = None
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Translate a `CreateRequest` into a machine spec and its meta document. A restore passes
+    the size of its snapshot, which the new machine must have."""
+    if request.snapshot is not None and request.image is not None:
+        raise SpsError("invalid_request", "A restore names no image")
     if request.sandbox_class != CLASS:
         raise SpsError("unsupported", f"Example Cloud has no class {request.sandbox_class!r}")
     if request.at_end == "paused":
         raise SpsError("unsupported", "Example Cloud cannot pause a machine")
-    if request.requirements:
-        raise SpsError("unsupported", "Example Cloud claims no optional sections")
+    check_requirements(request.requirements)
     if request.image not in (None, IMAGE):
         raise SpsError("unsupported", "Example Cloud offers only the 'base' image")
     floors: dict[str, Any] = {}
@@ -60,7 +96,15 @@ def plan_create(request: CreateRequest) -> tuple[dict[str, Any], dict[str, Any]]
                 raise SpsError("unsupported", f"Example Cloud has no region {value!r}")
         else:
             raise SpsError("unsupported", f"Example Cloud cannot meet resources.{key}")
-    if floors:
+    if snapshot_size is not None:
+        # Example Cloud restores at the size of the image and cannot resize on restore, so a
+        # floor that the snapshot's size does not meet is a request for another size.
+        if snapshot_size.cpu < floors.get("cpu_min", 0) or snapshot_size.memory_mib < floors.get(
+            "memory_min_mib", 0
+        ):
+            raise SpsError("unsupported", "A restore has the size of its snapshot")
+        size: Size | None = snapshot_size
+    elif floors:
         size = next(
             (
                 s
@@ -89,6 +133,8 @@ def plan_create(request: CreateRequest) -> tuple[dict[str, Any], dict[str, Any]]
         "env": dict(request.env),
         "tags": tags,
     }
+    if request.snapshot is not None:
+        spec["image_id"] = request.snapshot
     meta = {
         "labels": dict(request.labels),
         "size": {"cpu": size.cpu, "memory_mib": size.memory_mib},

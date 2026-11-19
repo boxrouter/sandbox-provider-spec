@@ -53,6 +53,14 @@ OPTIONAL = {
     "files_mkdir": ("files.mkdir", ("s", "/d")),
     "files_remove": ("files.remove", ("s", "/d")),
     "files_exists": ("files.exists", ("s", "/d")),
+    "snapshot_create": (
+        "snapshot.create",
+        ("s", v1_types.SnapshotRequest(), {"idempotency_key": "idem-key-1"}),
+    ),
+    "snapshot_get": ("snapshot.get", ("n",)),
+    "snapshot_list": ("snapshot.list", ()),
+    "snapshot_delete": ("snapshot.delete", ("n",)),
+    "snapshot_cost": ("snapshot.cost", ("n",)),
 }
 
 
@@ -72,7 +80,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 24
+    assert len(ids) == 29
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -213,12 +221,14 @@ def test_required_operations_are_abstract() -> None:
 @pytest.mark.parametrize("method", sorted(OPTIONAL))
 def test_optional_operation_raises_unsupported(method: str) -> None:
     dotted, args = OPTIONAL[method]
+    keywords = args[-1] if args and isinstance(args[-1], dict) else {}
+    positional = args[:-1] if keywords else args
     call: tuple[Any, ...] = tuple(
-        v1_types.FileLinkRequest("/a", "read", 60) if a is object else a for a in args
+        v1_types.FileLinkRequest("/a", "read", 60) if a is object else a for a in positional
     )
     provider = Stub({})
     with pytest.raises(SpsError) as raised:
-        asyncio.run(getattr(provider, method)(*call))
+        asyncio.run(getattr(provider, method)(*call, **keywords))
     assert raised.value.code == "unsupported"
     assert dotted in raised.value.message
     assert raised.value.outcome == "failed"

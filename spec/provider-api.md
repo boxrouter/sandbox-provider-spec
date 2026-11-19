@@ -256,6 +256,66 @@ The server keeps at most one adapter instance per distinct token, for a bounded 
 isolates each adapter; `--port` binds to 127.0.0.1 unless `--host` says otherwise. TLS is the job
 of whatever fronts the server.
 
+## 17. Snapshots
+
+A provider that claims the `snapshots` section (`vocabulary.md`) implements `snapshot.create`,
+`snapshot.get`, `snapshot.list`, `snapshot.delete` and `snapshot.cost`, and a `create` that takes
+`snapshot`. A snapshot saves a sandbox, and a restore is a `create` that starts a new sandbox from
+it. The gate's knobs `keeps`, `original_after`, `deletable` and `retention_seconds`, and its fact
+`resizes_on_restore`, keep the meaning that the vocabulary gives them.
+
+`snapshot.create` takes `keeps` (`files_only`, `files_and_memory` or null, meaning the `keeps` of
+the variant that the sandbox was created with) and `labels` (section 5), and an `Idempotency-Key`
+as `create` does. It returns a snapshot in state `saving` or `ready`; a consumer reads
+`snapshot.get` until the state is `ready`. A snapshot holds the whole filesystem that commands can
+write, including `/tmp` and the default user's home directory, except `/proc`, `/sys`, `/dev` and
+mounted volumes. It does not hold the create request's `env`, `labels` or lifetime: a restore
+names its own.
+
+- A snapshot **MUST** hold everything that an operation reported as done before `snapshot.create` <!-- rule: provider-api/snapshot-consistency -->
+  started (a `files.write`, a `run` that returned, a `files.mkdir`), as of one moment between the
+  start and the return of the call. A write that a running process makes during the call may or
+  may not be in it, and with `files_and_memory` the captured processes and memory belong to the
+  same moment as the files.
+- Within 24 hours, a repeated `snapshot.create` with the same key and body **MUST NOT** make a <!-- rule: provider-api/snapshot-idempotent -->
+  second snapshot: it returns the first one with status 201. The same key with a different body is
+  `conflict`, and a repeat while the first call is in progress is `conflict` with
+  `retry_after_seconds`.
+- A snapshot **MUST** outlive its sandbox: pausing, destroying or ending the saved sandbox never <!-- rule: provider-api/snapshot-outlives-sandbox -->
+  deletes or changes its snapshots. A snapshot stays restorable until it is deleted or until its
+  `expires_at`, which is at least `retention_seconds` after `created_at` for a variant that states
+  `retention_seconds`.
+- A restore **MUST** start a new sandbox with the snapshot's size and class, with the `labels`, <!-- rule: provider-api/snapshot-restore -->
+  `env` and lifetime of the restoring request and not of the saved sandbox, and **MUST** refuse a
+  request that names an `image` with `invalid_request`, another class or another size (unless the
+  variant has `resizes_on_restore: true`) with `unsupported`, a snapshot in state `saving` or
+  `failed` with `conflict`, and a deleted or expired snapshot with `not_found`. One snapshot can
+  be restored many times, and each restore is a separate sandbox.
+- `snapshot.list` **MUST** return the account's snapshots that are neither deleted nor expired, <!-- rule: provider-api/snapshot-list -->
+  in any state, and only those that have every `label` filter with exactly that value and, when
+  `sandbox_id` is given, were taken from that sandbox. `snapshot.get` **MUST** return the labels
+  exactly as given to `snapshot.create`.
+- `snapshot.delete` **MUST** return once the provider has accepted it, and a restore after it <!-- rule: provider-api/snapshot-delete -->
+  **MUST** answer `not_found`. A repeated delete **MUST** succeed with state `deleted`, and an id
+  that the provider has no record of **MUST** be `not_found`. A variant with `deletable: false`
+  refuses the delete with `unsupported`. Deleting a snapshot never affects a sandbox that was
+  restored from it.
+- `snapshot.cost` **MUST** return a cost (section 10) whose `sandbox_id` is the saved sandbox and <!-- rule: provider-api/snapshot-cost -->
+  whose `snapshot_id` is the snapshot, with lines of the item `snapshot` only: its storage, and a
+  charge for each capture where the provider bills one. These charges **MUST NOT** appear in the
+  saved sandbox's `cost`. The status is `accruing` while the snapshot is stored, and **MUST**
+  become `final` within 7 days after the snapshot is deleted or expires and stay readable for 7
+  days after that. A provider whose snapshots are free lists the `snapshot` price with
+  `"price_usd": "0"` and `"included": true`, and returns `total_usd` `"0"` with no lines.
+
+After `snapshot.create` returns, the saved sandbox is in the state that the variant's
+`original_after` names. A snapshot of a paused sandbox is either taken or refused with `conflict`.
+A restore keeps the environment of restored processes and applies its `env` to what starts after
+the restore; terminals and network connections are not restored. A snapshot stays on its
+provider: a portable copy (for example a tar file through `files.read` and `files.write`) is the
+consumer's choice. `snapshot.list` returns snapshots in an unspecified order with an opaque
+cursor, with `limit` from 1 to `limits.list_limit` and 100 by default.
+
 ## 18. Directory operations
 
 Four operations make, list, test and remove paths: `files.list`, `files.mkdir`, `files.remove`

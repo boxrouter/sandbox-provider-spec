@@ -38,6 +38,10 @@ from sandbox_provider_spec.v1.types import (
     RunResult,
     Sandbox,
     SandboxPage,
+    Snapshot,
+    SnapshotDeleteResult,
+    SnapshotPage,
+    SnapshotRequest,
     TcpLink,
 )
 from sandbox_provider_spec.v1.wire import WireError, error_from_json, from_json, to_json
@@ -314,6 +318,10 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     def _sandbox_path(sandbox_id: str, tail: str = "") -> str:
         return f"/v1/sandboxes/{_id(sandbox_id, 'sandbox_id')}{tail}"
 
+    @staticmethod
+    def _snapshot_path(snapshot_id: str, tail: str = "") -> str:
+        return f"/v1/snapshots/{_id(snapshot_id, 'snapshot_id')}{tail}"
+
     def _process_path(self, sandbox_id: str, process_id: str, tail: str) -> str:
         return self._sandbox_path(sandbox_id, f"/processes/{_id(process_id, 'process_id')}{tail}")
 
@@ -507,6 +515,45 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
             self._sandbox_path(sandbox_id, "/files/exists"),
             params=[("path", path)],
         )
+
+    async def snapshot_create(
+        self, sandbox_id: str, request: SnapshotRequest, *, idempotency_key: str
+    ) -> Snapshot:
+        if not _IDEMPOTENCY_KEY.fullmatch(idempotency_key):
+            raise SpsError("invalid_request", "idempotency_key is not a valid key")
+        return await self._json(
+            Snapshot,
+            "POST",
+            self._sandbox_path(sandbox_id, "/snapshots"),
+            body=to_json(request),
+            headers={"Idempotency-Key": idempotency_key},
+            expect=(200, 201),
+        )
+
+    async def snapshot_get(self, snapshot_id: str) -> Snapshot:
+        return await self._json(Snapshot, "GET", self._snapshot_path(snapshot_id))
+
+    async def snapshot_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        sandbox_id: str | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> SnapshotPage:
+        params = [("label", f"{key}={value}") for key, value in (labels or {}).items()]
+        if sandbox_id is not None:
+            params.append(("sandbox_id", _id(sandbox_id, "sandbox_id")))
+        if cursor is not None:
+            params.append(("cursor", cursor))
+        params.append(("limit", str(limit)))
+        return await self._json(SnapshotPage, "GET", "/v1/snapshots", params=params)
+
+    async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
+        return await self._json(SnapshotDeleteResult, "DELETE", self._snapshot_path(snapshot_id))
+
+    async def snapshot_cost(self, snapshot_id: str) -> Cost:
+        return await self._json(Cost, "GET", self._snapshot_path(snapshot_id, "/cost"))
 
     async def aclose(self) -> None:
         await self._client.aclose()

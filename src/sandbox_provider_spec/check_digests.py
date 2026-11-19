@@ -156,6 +156,10 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "files.mkdir": ("v1/suite_driver.py",),
     "files.remove": ("v1/suite_driver.py",),
     "fixture.files_write_missing_parent": ("v1/suite_driver.py",),
+    "snapshot.cost": ("v1/suite_driver.py",),
+    "snapshot.create_keyed": ("v1/suite_driver.py",),
+    "snapshot.get": ("v1/suite_driver.py",),
+    "snapshot.list": ("v1/suite_driver.py",),
     "probe.tcp": ("protocol_probe.py",),
     "probe.websocket": ("protocol_probe.py",),
 }

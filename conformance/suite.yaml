@@ -1439,6 +1439,354 @@ tests:
     expect:
       equals:
         allocation: $runner.restored_size
+- id: snapshots.v1.outlives_source
+  title: A snapshot restores after its source sandbox is destroyed.
+  rules:
+  - provider-api/snapshot-outlives-sandbox
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-marker
+      data: c2F2ZWQ=
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: destroy
+    target: box
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-marker
+    expect:
+      equals:
+        data:
+          utf8: saved
+- id: snapshots.v1.completed_writes
+  title: A snapshot taken at once holds every write that was reported done, byte for byte.
+  rules:
+  - provider-api/snapshot-consistency
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-a
+      data: AAH/
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-b
+      data: dHdv
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-c
+      data: dGhyZWU=
+  - op: run
+    target: box
+    in:
+      bash_script: printf ran >/tmp/sps-run && mkdir /tmp/sps-dir
+    expect:
+      equals:
+        exit_code: 0
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    as: again
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-a
+    expect:
+      equals:
+        data:
+          b64: AAH/
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-b
+    expect:
+      equals:
+        data:
+          utf8: two
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-c
+    expect:
+      equals:
+        data:
+          utf8: three
+  - op: files.read_bytes
+    target: again
+    in:
+      path: /tmp/sps-run
+    expect:
+      equals:
+        data:
+          utf8: ran
+  - op: run
+    target: again
+    in:
+      bash_script: test -d /tmp/sps-dir
+    expect:
+      equals:
+        exit_code: 0
+- id: snapshots.v1.get_and_list
+  title: A snapshot reads back ready with its keeps and source, and is listed by label and by sandbox.
+  rules:
+  - provider-api/snapshot-list
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          keeps: files_only
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in:
+      keeps: files_only
+      labels:
+        sps.test.case: snapshot-get-and-list
+    as: snap
+  - op: snapshot.get
+    target: snap
+    as: info
+    expect:
+      equals:
+        state: ready
+        keeps: files_only
+        labels:
+          sps.test.case: snapshot-get-and-list
+  - op: bindings.compare
+    in:
+      left: $box.identity
+      right: $info.sandbox_id
+    expect:
+      equals:
+        equal: true
+  - op: snapshot.list
+    in:
+      labels:
+        sps.test.case: snapshot-get-and-list
+    expect:
+      equals:
+        count: 1
+  - op: snapshot.list
+    in:
+      sandbox_id: $box.identity
+    expect:
+      equals:
+        count: 1
+- id: snapshots.v1.idempotent_create
+  title: A repeated snapshot create with one key returns one snapshot, and other labels are a conflict.
+  rules:
+  - provider-api/snapshot-idempotent
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.create_keyed
+    target: box
+    in:
+      idempotency_key: snapshot-same
+      labels:
+        sps.test.case: snapshot-idempotent
+    as: first
+  - op: snapshot.create_keyed
+    target: box
+    in:
+      idempotency_key: snapshot-same
+      labels:
+        sps.test.case: snapshot-idempotent
+    as: second
+  - op: bindings.compare
+    in:
+      left: $first.id
+      right: $second.id
+    expect:
+      equals:
+        equal: true
+  - op: snapshot.create_keyed
+    target: box
+    in:
+      idempotency_key: snapshot-same
+      labels:
+        sps.test.case: snapshot-idempotent-other
+    expect:
+      error: conflict
+  - op: snapshot.list
+    in:
+      labels:
+        sps.test.case: snapshot-idempotent
+    expect:
+      equals:
+        count: 1
+- id: snapshots.v1.restore_rules
+  title: A restore refuses an image, has the snapshot's size, and carries only its own labels.
+  rules:
+  - provider-api/snapshot-restore
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      labels:
+        sps.test.which: source
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.restore
+    target: snap
+    in:
+      image: sps-test-image
+    expect:
+      error: invalid_request
+  - op: snapshot.restore
+    target: snap
+    in:
+      labels:
+        sps.test.which: restored
+    as: again
+  - op: snapshot.get
+    target: snap
+    as: info
+  - op: get
+    target: again
+    in:
+      size: true
+    as: restored
+    expect:
+      equals:
+        state: active
+        labels:
+          sps.test.which: restored
+  - op: bindings.compare
+    in:
+      left: $info.size
+      right: $restored.size
+    expect:
+      equals:
+        equal: true
+- id: snapshots.v1.deleted_not_found
+  title: After a snapshot is deleted a restore is not found, and a second delete succeeds.
+  rules:
+  - provider-api/snapshot-delete
+  proves:
+  - gate: snapshots
+    knob: deletable
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.delete
+    target: snap
+    expect: {}
+  - op: snapshot.restore
+    target: snap
+    in: {}
+    expect:
+      error: not_found
+  - op: snapshot.delete_again
+    target: snap
+    expect:
+      equals:
+        state: deleted
+  - op: snapshot.get
+    in:
+      unknown: true
+    expect:
+      error: not_found
+- id: snapshots.v1.cost
+  title: A snapshot has its own cost, which never names the sandbox's lines and is final after delete.
+  rules:
+  - provider-api/snapshot-cost
+  proves:
+  - gate: snapshots
+    value: true
+  steps:
+  - op: create
+    in:
+      requirements:
+        snapshots:
+          original_after: any
+    as: box
+  - op: snapshot.take
+    target: box
+    in: {}
+    as: snap
+  - op: snapshot.cost
+    target: snap
+    expect:
+      equals:
+        status: accruing
+        snapshot_matches: true
+        sandbox_matches: true
+        only_snapshot_lines: true
+  - op: snapshot.delete
+    target: snap
+  - op: snapshot.cost
+    target: snap
+    in:
+      final: true
+    expect:
+      equals:
+        status: final
+        snapshot_matches: true
+        sandbox_matches: true
+        only_snapshot_lines: true
 - id: network_lockdown.deny_all
   title: Native deny all returns no destination data from outbound connections.
   rules:

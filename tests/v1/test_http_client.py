@@ -21,6 +21,7 @@ from sandbox_provider_spec.v1 import (
     FileLinkRequest,
     Provider,
     RunRequest,
+    SnapshotRequest,
     SpsError,
 )
 from sandbox_provider_spec.v1.http_client import CHUNK_BYTES, HttpProvider
@@ -204,6 +205,39 @@ OPERATIONS: list[tuple[str, Callable[[HttpProvider], Awaitable[Any]], str, str, 
         "PathInfo",
         200,
     ),
+    (
+        "snapshot_create",
+        lambda p: p.snapshot_create("sbx-17", SnapshotRequest(), idempotency_key=IDEM),
+        "POST",
+        "/v1/sandboxes/sbx-17/snapshots",
+        "Snapshot",
+        201,
+    ),
+    (
+        "snapshot_get",
+        lambda p: p.snapshot_get("snap-9"),
+        "GET",
+        "/v1/snapshots/snap-9",
+        "Snapshot",
+        200,
+    ),
+    ("snapshot_list", lambda p: p.snapshot_list(), "GET", "/v1/snapshots", "SnapshotPage", 200),
+    (
+        "snapshot_delete",
+        lambda p: p.snapshot_delete("snap-9"),
+        "DELETE",
+        "/v1/snapshots/snap-9",
+        "SnapshotDeleteResult",
+        200,
+    ),
+    (
+        "snapshot_cost",
+        lambda p: p.snapshot_cost("snap-9"),
+        "GET",
+        "/v1/snapshots/snap-9/cost",
+        "Cost",
+        200,
+    ),
 ]
 
 
@@ -211,9 +245,9 @@ def test_is_a_provider() -> None:
     assert issubclass(HttpProvider, Provider)
 
 
-def test_files_read_is_the_twenty_fourth_operation() -> None:
-    # files_read returns a stream and has its own tests below; the other 23 are in OPERATIONS.
-    assert len(OPERATIONS) == 23
+def test_files_read_is_the_twenty_ninth_operation() -> None:
+    # files_read returns a stream and has its own tests below; the other 28 are in OPERATIONS.
+    assert len(OPERATIONS) == 28
 
 
 @pytest.mark.parametrize(("name", "run", "method", "path", "body", "status"), OPERATIONS)
@@ -237,6 +271,36 @@ def test_method_path_and_token_of_each_operation(
     assert (request.method, request.url.path) == (method, "/sps" + path), name
     assert request.headers["Authorization"] == f"Bearer {BEARER}"
     assert (result is None) == (body == "EmptyObject"), name
+
+
+def test_snapshot_list_and_create_send_their_parameters() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("SnapshotPage" if request.method == "GET" else "Snapshot", 200)
+
+    call(
+        lambda p: p.snapshot_list(labels={"a": "b=c"}, sandbox_id="sbx-17", cursor="c1", limit=5),
+        handler,
+    )
+    query = seen[0].url.params.multi_items()
+    assert query == [
+        ("label", "a=b=c"),
+        ("sandbox_id", "sbx-17"),
+        ("cursor", "c1"),
+        ("limit", "5"),
+    ]
+    call(
+        lambda p: p.snapshot_create(
+            "sbx-17", SnapshotRequest("files_only", {"k": "v"}), idempotency_key=IDEM
+        ),
+        handler,
+    )
+    assert seen[1].headers["Idempotency-Key"] == IDEM
+    assert json.loads(seen[1].content) == {"keeps": "files_only", "labels": {"k": "v"}}
+    with pytest.raises(SpsError):
+        call(lambda p: p.snapshot_get("../x"), handler)
 
 
 def test_files_read_method_and_path() -> None:
