@@ -77,7 +77,7 @@ def build_discovery(provider_id: str, provider_name: str) -> Discovery:
         ),
         # A snapshot is `docker commit` of the machine's container without pausing it, so the
         # machine keeps running (`continues`); Example Cloud can delete its images.
-        gates={"snapshots": [SNAPSHOTS]},
+        gates={"snapshots": [SNAPSHOTS], "terminal": [{"reattach": False}]},
     )
     return Discovery(
         spec_version="1.0",

@@ -58,6 +58,9 @@ and a missing or empty one gets `401`. `GET /healthz` is unauthenticated.
 | `POST /machines/{id}/fs/rm` | `{path, recursive}` → `{}`; a link is removed, never followed; `409` for a non-empty directory without `recursive`; `400` for `/` |
 | `POST /machines/{id}/jobs` | `{cmd: [...], dir, env}` → `{job_id}`; a job keeps running after the call returns |
 | `GET /machines/{id}/jobs/{job_id}/log?offset=&wait=` | → `{out, err, offset, done, code}`; `offset` is `<stdout_pos>.<stderr_pos>`, `wait` long-polls up to 60 s |
+| `POST /machines/{id}/tty` | `{cmd: [...] or null, dir, env, cols, rows, term}` → `{tty_id, ws}`; starts the program (`bash -l` when `cmd` is null) on a pseudo-terminal, and `ws` is the path of its WebSocket |
+| `WebSocket /machines/{id}/tty/{tty_id}` | binary frames carry the terminal's bytes in both directions; when the program ends, one text frame `{"exit": <code or null>}` and a close. It connects once, needs `X-Api-Key`, and closing it hangs up on the program's process group (a kill follows 5 seconds later) |
+| `POST /machines/{id}/tty/{tty_id}/resize` | `{cols, rows}` → `{}` |
 | `GET /machines/{id}/usage` | → `{cpu, memory_mb, started, ended}`; `ended` is null while the machine runs |
 | `POST /machines/{id}/images` | `{tags, pause}` → `{image_id, machine_id, status, created, cpu, memory_mb, size_bytes, tags}`; saves the machine's files as an image, ready when the call returns; `pause` (default true) freezes the machine meanwhile, `false` lets it run |
 | `POST /machines` with `image_id` | as above, starting from an image's files at its `cpu` and `memory_mb` (unless the call names its own); the new machine has its own `env` and `tags` |
@@ -79,6 +82,8 @@ matching HTTP status.
 - `tags` become container labels `example.tag.<k>`, alongside
   `example.owner`, `example.machine_id`, `example.created` and
   `example.expires`.
+- A terminal is a Docker exec with a TTY. A terminal that nobody connects to within a minute
+  is ended, and the machine's lifetime ends every terminal on it.
 - Usage records (`usage.db` in the state directory) are kept for 30 days
   after a machine ends and are pruned lazily.
 - An image is `docker commit` of the machine's container, tagged

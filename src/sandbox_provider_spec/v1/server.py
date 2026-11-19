@@ -16,10 +16,12 @@ import asyncio
 import hashlib
 import json
 import re
+import secrets
 import time
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable, MutableMapping
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from functools import cache
 from typing import Any
 from urllib.parse import parse_qsl
@@ -36,6 +38,8 @@ from sandbox_provider_spec.v1.types import (
     ProcessStartRequest,
     RunRequest,
     SnapshotRequest,
+    Terminal,
+    TerminalRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, error_to_json, from_json, to_json
 
@@ -49,6 +53,10 @@ MAX_INSTANCES = 64
 IDLE_SECONDS = 300.0
 MAX_JSON_BYTES = 1024 * 1024
 CHUNK_BYTES = 1024 * 1024
+TERMINAL_FRAME_BYTES = 65536  # the most that one terminal frame carries (provider-api.md 16)
+TERMINAL_TICKET_SECONDS = 60.0  # how long a terminal link waits to be connected
+MAX_TERMINAL_TICKETS = 1024  # links waiting to be connected, over all accounts
+TERMINAL_LINK_PATH = "/v1/terminal-links/"
 
 _ID = r"([^/]+)"
 _IDEMPOTENCY_KEY = re.compile(r"^[a-z0-9][a-z0-9-]{7,62}$")
@@ -155,6 +163,48 @@ async def _close_all(entries: list[_Entry]) -> None:
             pass  # a failing close must not fail the request that triggered it
 
 
+# --- terminal links -------------------------------------------------------------------------
+
+
+@dataclass
+class _Ticket:
+    expires: float
+    token: str
+    sandbox_id: str
+    request: TerminalRequest
+
+
+class _Tickets:
+    """The single-use tickets of terminal links: a random name for a request that waits, at most
+    `TERMINAL_TICKET_SECONDS`, for its WebSocket to connect."""
+
+    def __init__(self, clock: Callable[[], float]) -> None:
+        self._clock = clock
+        self._items: dict[str, _Ticket] = {}
+
+    def _sweep(self) -> None:
+        now = self._clock()
+        for name in [name for name, item in self._items.items() if item.expires <= now]:
+            del self._items[name]
+
+    def issue(self, token: str, sandbox_id: str, request: TerminalRequest) -> str:
+        self._sweep()
+        if len(self._items) >= MAX_TERMINAL_TICKETS:
+            raise SpsError(
+                "rate_limited", "Too many terminal links are waiting", retry_after_seconds=1
+            )
+        name = secrets.token_urlsafe(24)
+        self._items[name] = _Ticket(
+            self._clock() + TERMINAL_TICKET_SECONDS, token, sandbox_id, request
+        )
+        return name
+
+    def take(self, name: str) -> _Ticket | None:
+        """The ticket, removed: a name works once, and not after it expires."""
+        self._sweep()
+        return self._items.pop(name, None)
+
+
 # --- request validation ---------------------------------------------------------------------
 
 
@@ -179,12 +229,15 @@ def _entity(value: str, what: str) -> str:
     return value
 
 
-class _Request:
+class _Request:  # pylint: disable=too-many-instance-attributes
     """One HTTP request: its parts, and readers for its body."""
 
     def __init__(self, scope: Scope, receive: Receive) -> None:
         self.method: str = scope["method"]
+        self.scope = scope
         self.path_params: tuple[str, ...] = ()
+        self.token = ""
+        self.tickets: _Tickets | None = None
         self._receive = receive
         self.headers: dict[str, str] = {}
         for name, value in scope.get("headers", []):
@@ -587,6 +640,37 @@ async def _snapshot_cost(p: Provider, r: _Request) -> Reply:
     return 200, to_json(await p.snapshot_cost(_entity(r.path_params[0], "snapshot_id")))
 
 
+def _link_base(r: _Request) -> str:
+    """The WebSocket base URL of this server, from the request's own address."""
+    scope = r.scope
+    scheme = "wss" if scope.get("scheme", "http") == "https" else "ws"
+    host = r.headers.get("host")
+    if not host:
+        server = scope.get("server")
+        host = f"{server[0]}:{server[1]}" if server else "localhost"
+    return f"{scheme}://{host}{scope.get('root_path', '')}"
+
+
+async def _terminal_open(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    request: TerminalRequest = await r.typed_body(TerminalRequest)
+    if type(p).terminal_open is Provider.terminal_open:
+        raise SpsError("unsupported", "The provider does not support terminal.open")
+    sandbox = await p.get(sandbox_id)
+    if sandbox.state != "running":
+        raise SpsError("conflict", f"The sandbox is {sandbox.state}, not running")
+    assert r.tickets is not None
+    ticket = r.tickets.issue(r.token, sandbox_id, request)
+    expires = datetime.now(UTC).replace(microsecond=0) + timedelta(seconds=TERMINAL_TICKET_SECONDS)
+    body = {
+        "url": f"{_link_base(r)}{TERMINAL_LINK_PATH}{ticket}",
+        "headers": {},
+        "expires_at": expires.strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    _check("TerminalLink", body, "The link")
+    return 200, body
+
+
 _Handler = Callable[[Provider, _Request], Awaitable[Reply]]
 
 _S = rf"/v1/sandboxes/{_ID}"
@@ -625,6 +709,7 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("GET", _N, _snapshot_get),
         ("DELETE", _N, _snapshot_delete),
         ("GET", f"{_N}/cost", _snapshot_cost),
+        ("POST", f"{_S}/terminals", _terminal_open),
     ]
 ]
 
@@ -677,6 +762,128 @@ async def _send_file(send: Send, stream: Any, request_id: str) -> None:
     await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
+# --- terminals over a WebSocket ---------------------------------------------------------------
+
+
+async def _deny(scope: Scope, receive: Receive, send: Send, error: SpsError) -> None:
+    """Refuse a WebSocket before the upgrade: an HTTP error response when the server lets the
+    application send one, and the server's own refusal otherwise."""
+    await receive()  # websocket.connect
+    if "websocket.http.response" in scope.get("extensions", {}):
+        payload = json.dumps(error_to_json(error), separators=(",", ":")).encode("utf-8")
+        await send(
+            {
+                "type": "websocket.http.response.start",
+                "status": error.http_status,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(payload)).encode("ascii")),
+                ],
+            }
+        )
+        await send({"type": "websocket.http.response.body", "body": payload})
+    else:
+        await send({"type": "websocket.close", "code": 1008})
+
+
+async def _send_text(send: Send, document: Any) -> None:
+    await send({"type": "websocket.send", "text": json.dumps(document, separators=(",", ":"))})
+
+
+async def _ws_error(send: Send, error: SpsError) -> None:
+    await _send_text(send, {"type": "error", **error_to_json(error)})
+    await send({"type": "websocket.close", "code": 1011})
+
+
+def _control(text: str) -> tuple[str, dict[str, Any]]:
+    """A control message from the client: its type and fields, or `invalid_request`."""
+    try:
+        message = json.loads(text)
+    except ValueError:
+        raise SpsError("invalid_request", "A text frame is not valid JSON") from None
+    if not isinstance(message, dict) or message.get("type") != "resize":
+        raise SpsError("invalid_request", "A text frame has an unknown type")
+    if set(message) != {"type", "columns", "rows"}:
+        raise SpsError("invalid_request", "A resize message has the fields type, columns and rows")
+    for name in ("columns", "rows"):
+        value = message[name]
+        if not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= 1000:
+            raise SpsError("invalid_request", f"{name} must be an integer from 1 to 1000")
+    return "resize", message
+
+
+async def _client_to_terminal(terminal: Terminal, receive: Receive) -> None:
+    """Pump the client's frames into the terminal until the client disconnects (a clean return)
+    or sends something that the rules refuse (an `SpsError`)."""
+    while True:
+        message = await receive()
+        if message["type"] != "websocket.receive":
+            return
+        data = message.get("bytes")
+        if data is not None:
+            if len(data) > TERMINAL_FRAME_BYTES:
+                raise SpsError("invalid_request", "A frame is over 65536 bytes")
+            await terminal.write(data)
+            continue
+        _, fields = _control(message.get("text") or "")
+        await terminal.resize(fields["columns"], fields["rows"])
+
+
+async def _terminal_to_client(terminal: Terminal, send: Send) -> None:
+    """Pump the terminal's output to the client, then say how it ended."""
+    async for chunk in terminal.output():
+        for start in range(0, len(chunk), TERMINAL_FRAME_BYTES):
+            await send(
+                {"type": "websocket.send", "bytes": chunk[start : start + TERMINAL_FRAME_BYTES]}
+            )
+    if terminal.exit_code is None:
+        await send({"type": "websocket.close", "code": 1001})  # the sandbox ended it
+        return
+    await _send_text(send, {"type": "exit", "exit_code": terminal.exit_code})
+    await send({"type": "websocket.close", "code": 1000})
+
+
+async def _serve_terminal(
+    provider: Provider, ticket: _Ticket, receive: Receive, send: Send
+) -> None:
+    """One connected terminal link: start the program, pump both ways, end it with the link."""
+    await receive()  # websocket.connect
+    await send({"type": "websocket.accept"})
+    try:
+        terminal = await provider.terminal_open(ticket.sandbox_id, ticket.request)
+    except SpsError as error:
+        await _ws_error(send, error)
+        return
+    except Exception:  # pylint: disable=broad-exception-caught
+        await _ws_error(send, SpsError("provider_error", "internal error", outcome="unknown"))
+        return
+    inbound = asyncio.create_task(_client_to_terminal(terminal, receive))
+    outbound = asyncio.create_task(_terminal_to_client(terminal, send))
+    try:
+        await asyncio.wait({inbound, outbound}, return_when=asyncio.FIRST_COMPLETED)
+        for task in (inbound, outbound):
+            if task.done() and not task.cancelled():
+                failure = task.exception()
+                if isinstance(failure, SpsError):
+                    await _ws_error(send, failure)
+                    break
+                if failure is not None and task is outbound:
+                    await _ws_error(
+                        send, SpsError("provider_error", "internal error", outcome="unknown")
+                    )
+                    break
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass  # the connection is gone; the terminal still ends below
+    finally:
+        for task in (inbound, outbound):
+            task.cancel()
+        await asyncio.gather(inbound, outbound, return_exceptions=True)
+        try:
+            await terminal.close()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+
+
 # --- the application ------------------------------------------------------------------------
 
 
@@ -689,6 +896,7 @@ def create_app(
 ) -> App:
     """An ASGI application that serves `provider_class` over the 1.0 HTTP API."""
     pool = _Pool(provider_class, limit=max_instances, idle_seconds=idle_seconds, clock=clock)
+    tickets = _Tickets(clock)
 
     async def lifespan(receive: Receive, send: Send) -> None:
         sweeper: asyncio.Task[None] | None = None
@@ -725,7 +933,9 @@ def create_app(
                     break
             if not found:
                 raise SpsError("not_found", "No such operation")
-            key, provider = await pool.acquire(_bearer(request))
+            request.token = _bearer(request)
+            request.tickets = tickets
+            key, provider = await pool.acquire(request.token)
             if handler is None:
                 sandbox_id = _entity(request.path_params[0], "sandbox_id")
                 path = _file_path(request)
@@ -747,11 +957,37 @@ def create_app(
             if key is not None:
                 pool.release(key)
 
+    async def websocket(scope: Scope, receive: Receive, send: Send) -> None:
+        path: str = scope["path"]
+        if not path.startswith(TERMINAL_LINK_PATH):
+            await _deny(scope, receive, send, SpsError("not_found", "No such operation"))
+            return
+        ticket = tickets.take(path[len(TERMINAL_LINK_PATH) :])
+        if ticket is None:
+            await _deny(
+                scope,
+                receive,
+                send,
+                SpsError("not_found", "The terminal link is used up or expired"),
+            )
+            return
+        try:
+            key, provider = await pool.acquire(ticket.token)
+        except SpsError as error:
+            await _deny(scope, receive, send, error)
+            return
+        try:
+            await _serve_terminal(provider, ticket, receive, send)
+        finally:
+            pool.release(key)
+
     async def app(scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "lifespan":
             await lifespan(receive, send)
         elif scope["type"] == "http":
             await http(scope, receive, send)
+        elif scope["type"] == "websocket":
+            await websocket(scope, receive, send)
 
     return app
 

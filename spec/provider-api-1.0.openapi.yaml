@@ -899,6 +899,37 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/terminals:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: terminal_open
+      tags: [optional]
+      summary: A single-use WebSocket link to a terminal in the sandbox
+      description: >-
+        Section `terminal`. Checks the sandbox and the fields and starts nothing: the program starts when the returned link
+        is connected. The WebSocket messages are in `provider-api.md` section 16.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/TerminalRequest"}
+      responses:
+        "200":
+          description: The terminal link.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/TerminalLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
 components:
   securitySchemes:
     bearerAuth:
@@ -1764,3 +1795,37 @@ components:
       properties:
         host: {type: string, minLength: 1}
         port: {$ref: "#/components/schemas/Port"}
+    TerminalRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        argv:
+          anyOf:
+            - type: array
+              minItems: 1
+              maxItems: 1024
+              items: {type: string}
+            - type: "null"
+          default: null
+          description: The program to run on the terminal. Null means the default user's login shell (`bash -l` in a sandbox created without an image).
+        cwd:
+          anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
+          default: null
+          description: As for `run`. A missing directory is `not_found`, reported when the link is connected.
+        env: {$ref: "#/components/schemas/Env", description: "As for `run`."}
+        columns: {type: integer, minimum: 1, maximum: 1000, default: 80, description: "The terminal's width in characters."}
+        rows: {type: integer, minimum: 1, maximum: 1000, default: 24, description: "The terminal's height in lines."}
+        term:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[A-Za-z0-9._+-]+$"
+          default: xterm-256color
+          description: The `TERM` value that the program sees.
+    TerminalLink:
+      type: object
+      required: [url, headers, expires_at]
+      properties:
+        url: {type: string, format: uri, description: "A provider-signed, single-use `wss://` URL (`ws://` where plain HTTP is allowed). It is sensitive: never log it."}
+        headers: {type: object, additionalProperties: {type: string}, description: "Headers to send with the WebSocket handshake. They never include the consumer's credential."}
+        expires_at: {$ref: "#/components/schemas/Timestamp", description: "30 to 600 seconds after the call. A second connection, or one after this time, is refused with an HTTP status from 400 to 499 before the upgrade."}

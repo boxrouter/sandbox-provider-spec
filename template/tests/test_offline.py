@@ -21,12 +21,14 @@ from typing import Any
 
 import httpx
 import pytest
+import websockets.exceptions
 from sandbox_provider_spec.v1 import (
     CreateRequest,
     ProcessStartRequest,
     RunRequest,
     SnapshotRequest,
     SpsError,
+    TerminalRequest,
     to_json,
 )
 
@@ -61,6 +63,8 @@ class FakeCloud:
         self.special: dict[tuple[str, str], str] = {}
         self.jobs: dict[str, dict[str, Any]] = {}
         self.images: dict[str, dict[str, Any]] = {}
+        self.ttys: list[dict[str, Any]] = []
+        self.resizes: list[tuple[str, dict[str, Any]]] = []
         self.posts = 0
         self.image_posts: list[dict[str, Any]] = []
 
@@ -101,6 +105,14 @@ class FakeCloud:
             return self._start_job(request, machine)
         if len(rest) == 3 and rest[0] == "jobs" and rest[2] == "log":
             return self._job_log(rest[1])
+        if rest == ["tty"] and request.method == "POST":
+            body = json.loads(request.content)
+            tty_id = "t-" + uuid.uuid4().hex[:8]
+            self.ttys.append({"id": tty_id, "machine": machine["machine_id"], "body": body})
+            return self._json(201, {"tty_id": tty_id, "ws": f"{request.url.path}/{tty_id}"})
+        if len(rest) == 3 and rest[0] == "tty" and rest[2] == "resize":
+            self.resizes.append((rest[1], json.loads(request.content)))
+            return self._json(200, {})
         if rest == ["usage"] and request.method == "GET":
             return self._usage(machine)
         if rest == ["images"] and request.method == "POST":
@@ -914,3 +926,146 @@ def test_a_missing_key_is_unauthenticated() -> None:
     with pytest.raises(SpsError) as error:
         ExampleProvider({"endpoint": "http://example.test"})
     assert error.value.code == "unauthenticated"
+
+
+class FakeSocket:
+    """Example Cloud's terminal WebSocket, as the adapter sees it: binary frames are the
+    terminal's bytes, and a text frame says that the program is over."""
+
+    def __init__(self, url: str, headers: Any, frames: list[bytes | str]) -> None:
+        self.url, self.headers = url, dict(headers)
+        self.sent: list[bytes] = []
+        self.closed = False
+        self._frames = frames
+
+    async def send(self, data: bytes) -> None:
+        if self.closed:
+            raise websockets.exceptions.ConnectionClosedOK(None, None)
+        self.sent.append(data)
+
+    async def close(self) -> None:
+        self.closed = True
+
+    def __aiter__(self) -> Any:
+        async def frames() -> Any:
+            for frame in self._frames:
+                yield frame
+
+        return frames()
+
+
+def terminal_provider(cloud: FakeCloud, frames: list[bytes | str]) -> tuple[Any, list[FakeSocket]]:
+    sockets: list[FakeSocket] = []
+
+    async def connect(url: str, headers: Any) -> FakeSocket:
+        sockets.append(FakeSocket(url, headers, frames))
+        return sockets[-1]
+
+    provider = ExampleProvider(
+        {"api_key": "dev", "endpoint": "http://example.test"},
+        transport=httpx.MockTransport(cloud.handler),
+        connect=connect,
+    )
+    return provider, sockets
+
+
+def test_discovery_claims_a_terminal_that_cannot_be_reattached() -> None:
+    doc = call(make_provider(FakeCloud()), "discovery")
+    assert to_json(doc)["classes"][0]["gates"]["terminal"] == [{"reattach": False}]
+
+
+def test_create_accepts_the_terminal_requirement_and_refuses_a_reattachable_one() -> None:
+    provider = make_provider(FakeCloud())
+    call(
+        provider, "create", CreateRequest(requirements={"terminal": {}}), idempotency_key="key-0020"
+    )
+    with pytest.raises(SpsError) as error:
+        call(
+            provider,
+            "create",
+            CreateRequest(requirements={"terminal": {"reattach": True}}),
+            idempotency_key="key-0021",
+        )
+    assert error.value.code == "unsupported"
+
+
+def test_terminal_open_starts_the_program_and_connects_to_its_websocket() -> None:
+    cloud = FakeCloud()
+    provider, sockets = terminal_provider(cloud, [b"one", b"two", '{"exit": 7}'])
+
+    async def main() -> None:
+        box = await provider.create(CreateRequest(), idempotency_key="key-0022")
+        request = TerminalRequest(
+            argv=("bash", "-c", "exit 7"),
+            cwd="/tmp",
+            env={"A": "b"},
+            columns=100,
+            rows=40,
+            term="vt100",
+        )
+        terminal = await provider.terminal_open(box.id, request)
+        assert cloud.ttys[0]["body"] == {
+            "cmd": ["bash", "-c", "exit 7"],
+            "env": {"A": "b"},
+            "cols": 100,
+            "rows": 40,
+            "term": "vt100",
+            "dir": "/tmp",
+        }
+        assert sockets[0].url == f"ws://example.test/machines/{box.id}/tty/{cloud.ttys[0]['id']}"
+        assert sockets[0].headers == {"X-Api-Key": "dev"}
+        await terminal.write(b"input")
+        await terminal.resize(120, 50)
+        assert sockets[0].sent == [b"input"]
+        assert cloud.resizes == [(cloud.ttys[0]["id"], {"cols": 120, "rows": 50})]
+        assert [chunk async for chunk in terminal.output()] == [b"one", b"two"]
+        assert terminal.exit_code == 7
+        await terminal.close()
+        assert sockets[0].closed
+        await terminal.close()
+        await provider.aclose()
+
+    asyncio.run(main())
+
+
+def test_terminal_open_without_a_program_asks_for_the_default_shell() -> None:
+    cloud = FakeCloud()
+    provider, _ = terminal_provider(cloud, [])
+
+    async def main() -> None:
+        box = await provider.create(CreateRequest(), idempotency_key="key-0023")
+        await provider.terminal_open(box.id, TerminalRequest())
+        await provider.aclose()
+
+    asyncio.run(main())
+    assert cloud.ttys[0]["body"]["cmd"] is None and "dir" not in cloud.ttys[0]["body"]
+
+
+def test_a_program_that_the_sandbox_ended_has_no_exit_code() -> None:
+    provider, _ = terminal_provider(FakeCloud(), [b"out", '{"exit": null}'])
+
+    async def main() -> None:
+        box = await provider.create(CreateRequest(), idempotency_key="key-0024")
+        terminal = await provider.terminal_open(box.id, TerminalRequest())
+        assert [chunk async for chunk in terminal.output()] == [b"out"]
+        assert terminal.exit_code is None
+        await provider.aclose()
+
+    asyncio.run(main())
+
+
+def test_terminal_open_in_a_missing_directory_is_not_found_and_starts_nothing() -> None:
+    cloud = FakeCloud()
+    provider, sockets = terminal_provider(cloud, [])
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0025")
+    with pytest.raises(SpsError) as error:
+        call(provider, "terminal_open", box.id, TerminalRequest(cwd="/missing"))
+    assert error.value.code == "not_found"
+    assert cloud.ttys == [] and sockets == []
+
+
+def test_terminal_open_of_an_unknown_machine_is_not_found() -> None:
+    provider, _ = terminal_provider(FakeCloud(), [])
+    with pytest.raises(SpsError) as error:
+        call(provider, "terminal_open", "m-none", TerminalRequest())
+    assert error.value.code == "not_found"

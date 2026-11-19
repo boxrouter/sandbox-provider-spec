@@ -53,6 +53,7 @@ OPERATION_IDS = [
     "snapshot_get",
     "snapshot_list",
     "tcp_link",
+    "terminal_open",
 ]
 ERROR_CODES = {
     "invalid_request": (400, "caller"),
@@ -241,6 +242,7 @@ def test_request_schemas_are_found() -> None:
         "RunRequest",
         "SnapshotRequest",
         "TcpLinkRequest",
+        "TerminalRequest",
     ]
     bodies = {
         item["requestBody"]["content"]["application/json"]["schema"]["$ref"].rsplit("/", 1)[1]

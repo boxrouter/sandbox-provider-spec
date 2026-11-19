@@ -306,8 +306,22 @@ class _Job:
         return self.out_start + len(self.out) > out_pos or self.err_start + len(self.err) > err_pos
 
 
+class _Tty:
+    """A terminal: a Docker exec on a pseudo-terminal, with the hijacked connection to it."""
+
+    def __init__(self, tty_id: str, machine_id: str, exec_id: str, raw: Any, pid_path: str) -> None:
+        self.id = tty_id
+        self.machine_id = machine_id
+        self.exec_id = exec_id
+        self.raw = raw  # the exec's socket: bytes in and out, no framing on a terminal
+        self.pid_path = pid_path  # inside the machine: the program's pid, its group's id
+        self.created = time.monotonic()
+        self.attached = False
+        self.ended = False
+
+
 class ExampleCloud:
-    """The whole fake provider: machine lifecycle, exec, files, jobs, usage."""
+    """The whole fake provider: machine lifecycle, exec, files, jobs, terminals, usage."""
 
     def __init__(self, state_dir: Path, owner: str, image: str = IMAGE) -> None:
         state_dir.mkdir(parents=True, exist_ok=True)
@@ -322,6 +336,7 @@ class ExampleCloud:
         self.db_path = state_dir / "usage.db"
         self._init_db()
         self.jobs: dict[str, _Job] = {}
+        self.ttys: dict[str, _Tty] = {}
         self._jobs_lock = threading.Lock()
         self._closed = threading.Event()
         self._last_prune = 0.0
@@ -996,6 +1011,133 @@ class ExampleCloud:
                 }
 
         return collect()
+
+    # -- terminals ----------------------------------------------------------
+
+    def start_tty(
+        self,
+        machine_id: str,
+        cmd: list[str] | None,
+        cwd: str | None,
+        env: dict[str, str],
+        cols: int,
+        rows: int,
+        term: str,
+    ) -> dict[str, Any]:
+        """Start a program on a pseudo-terminal. It runs until it exits or its connection
+        (`attach_tty`) closes; a terminal that nobody connects to within a minute is ended."""
+        native = self._container(machine_id)
+        self._sweep_ttys()
+        tty_id = "t-" + uuid.uuid4().hex[:16]
+        pid_path = f"/tmp/.ec-tty-{tty_id}.pid"
+        # The program is the session leader that Docker's exec gives it; the wrapper records its
+        # pid (the process group's id) and then becomes the program.
+        argv = ["sh", "-c", 'echo $$ >"$0"; exec "$@"', pid_path, *(cmd or ["bash", "-l"])]
+        try:
+            exec_id = self.streams.api.exec_create(
+                native.id,
+                argv,
+                environment={**env, "TERM": term},
+                workdir=cwd or "/",
+                stdin=True,
+                tty=True,
+            )["Id"]
+            sock = self.streams.api.exec_start(exec_id, tty=True, socket=True)
+        except NotFound:
+            raise ApiError(404, "not_found", f"machine {machine_id} has ended") from None
+        except APIError as exc:
+            raise ApiError(502, "provider_error", f"tty failed: {exc}") from exc
+        # A program that has already exited cannot be resized, and needs no size.
+        with contextlib.suppress(APIError, NotFound):
+            self.streams.api.exec_resize(exec_id, height=rows, width=cols)
+        tty = _Tty(tty_id, machine_id, exec_id, getattr(sock, "_sock", sock), pid_path)
+        with self._jobs_lock:
+            self.ttys[tty_id] = tty
+        return {"tty_id": tty_id}
+
+    def _sweep_ttys(self) -> None:
+        with self._jobs_lock:
+            stale = [
+                tty
+                for tty in self.ttys.values()
+                if not tty.attached and time.monotonic() - tty.created > 60
+            ]
+            for tty in stale:
+                del self.ttys[tty.id]
+        for tty in stale:
+            self.end_tty(tty)
+
+    def _tty(self, machine_id: str, tty_id: str) -> _Tty:
+        with self._jobs_lock:
+            tty = self.ttys.get(tty_id)
+        if tty is None or tty.machine_id != machine_id:
+            raise ApiError(404, "not_found", f"unknown terminal {tty_id}")
+        return tty
+
+    def attach_tty(self, machine_id: str, tty_id: str) -> _Tty:
+        """Claim a terminal's stream. A terminal is attached once: it ends with its connection."""
+        tty = self._tty(machine_id, tty_id)
+        with self._jobs_lock:
+            if tty.attached:
+                raise ApiError(404, "not_found", f"terminal {tty_id} is already connected")
+            tty.attached = True
+        return tty
+
+    def resize_tty(self, machine_id: str, tty_id: str, cols: int, rows: int) -> dict[str, Any]:
+        tty = self._tty(machine_id, tty_id)
+        try:
+            self.streams.api.exec_resize(tty.exec_id, height=rows, width=cols)
+        except NotFound:
+            raise ApiError(404, "not_found", f"terminal {tty_id} has ended") from None
+        except APIError as exc:
+            raise ApiError(502, "provider_error", f"resize failed: {exc}") from exc
+        return {}
+
+    def tty_read(self, tty: _Tty) -> bytes:
+        """The next bytes the program wrote; empty when the terminal is over."""
+        try:
+            return bytes(tty.raw.recv(_STREAM_CHUNK // 16))
+        except (OSError, ValueError):
+            return b""
+
+    def tty_write(self, tty: _Tty, data: bytes) -> None:
+        with contextlib.suppress(OSError, ValueError):
+            tty.raw.sendall(data)
+
+    def tty_exit_code(self, tty: _Tty) -> int | None:
+        return self._exec_exit_code(tty.exec_id)
+
+    def tty_done(self, tty: _Tty) -> None:
+        """The program exited by itself: nothing is left to hang up on."""
+        tty.ended = True
+        with self._jobs_lock:
+            self.ttys.pop(tty.id, None)
+        with contextlib.suppress(OSError, ValueError):
+            tty.raw.close()
+
+    def end_tty(self, tty: _Tty) -> None:
+        """Hang up on the terminal's process group, and kill what is left of it 5 seconds later."""
+        if tty.ended:
+            return
+        tty.ended = True
+        with self._jobs_lock:
+            self.ttys.pop(tty.id, None)
+        with contextlib.suppress(OSError, ValueError):
+            tty.raw.close()
+        threading.Thread(target=self._hang_up, args=(tty,), daemon=True).start()
+
+    def _hang_up(self, tty: _Tty) -> None:
+        try:
+            native = self._container(tty.machine_id)
+        except ApiError:
+            return
+        for signal, wait in (("HUP", 5.0), ("KILL", 0.0)):
+            script = f'kill -s {signal} -- "-$(cat {tty.pid_path})" 2>/dev/null; true'
+            with contextlib.suppress(DockerException, RequestException):
+                native.exec_run(["sh", "-c", script])
+            time.sleep(wait)
+        with contextlib.suppress(DockerException, RequestException):
+            native.exec_run(["rm", "-f", tty.pid_path])
 
     # -- usage --------------------------------------------------------------
 

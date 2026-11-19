@@ -450,6 +450,263 @@ tests:
   proves:
   - gate: terminal
     value: true
+- id: terminal.v1.resize
+  title: A terminal reports the size it was opened with, and the size it was resized to.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    in:
+      columns: 80
+      rows: 24
+    as: tty
+  - op: terminal.write
+    target: tty
+    in:
+      data: c3R0eSBzaXplDQ==
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: 24 80
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: 24 80
+  - op: terminal.resize
+    target: tty
+    in:
+      columns: 100
+      rows: 40
+  - op: terminal.write
+    target: tty
+    in:
+      data: c3R0eSBzaXplDQ==
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: 40 100
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: 40 100
+  rules:
+  - provider-api/terminal-resize
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.exit_status
+  title: A terminal returns the program's output, then its exit status.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    in:
+      argv:
+      - bash
+      - -c
+      - printf T_EXIT; exit 7
+    as: tty
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: T_EXIT
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: T_EXIT
+  - op: terminal.wait
+    target: tty
+    in:
+      timeout_ms: 60000
+    expect:
+      equals:
+        exit_code: 7
+  rules:
+  - provider-api/terminal-exit
+  - provider-api/terminal-messages
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.start_options
+  title: A terminal starts its program in the given directory, with the given variable and TERM.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    in:
+      argv:
+      - bash
+      - -c
+      - printf '%s|%s|%s' "$PWD" "$SPS_TTY" "$TERM"
+      cwd: /tmp
+      environment:
+        SPS_TTY: 'yes'
+      term: vt100
+    as: tty
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: /tmp|yes|vt100
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: /tmp|yes|vt100
+  rules:
+  - provider-api/terminal-start
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.missing_cwd
+  title: A terminal in a directory that does not exist fails with not_found.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    in:
+      cwd: /sps-test-no-such-directory
+    as: tty
+  - op: terminal.output
+    target: tty
+    in:
+      first_chunk: true
+      timeout_ms: 60000
+    expect:
+      error: not_found
+  rules:
+  - provider-api/terminal-start
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.close_ends_program
+  title: Closing a terminal ends its program.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    as: tty
+  - op: terminal.write
+    target: tty
+    in:
+      data: ZWNobyAkJCA+L3RtcC9zcHMtdHR5LXBpZA0=
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-tty-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 20000
+  - op: terminal.close
+    target: tty
+  - op: run
+    target: box
+    in:
+      bash_script: sleep 7; test -d /proc/$(cat /tmp/sps-tty-pid) && echo alive || echo gone
+      timeout_ms: 60000
+    expect:
+      equals:
+        stdout:
+          utf8_contains: gone
+  rules:
+  - provider-api/terminal-close-ends
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.ordered_output
+  title: A terminal delivers a long output in order, with nothing dropped or repeated.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    as: tty
+  - op: fixture.terminal_ordered_output
+    target: tty
+    in:
+      timeout_ms: 60000
+    expect:
+      equals:
+        ordered: true
+  rules:
+  - provider-api/terminal-ordered-output
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.link_single_use
+  title: A terminal link serves one connection, and a second one is refused before the upgrade.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.link_reuse
+    target: box
+    expect:
+      equals:
+        second_refused: true
+  rules:
+  - provider-api/terminal-link
+  proves:
+  - gate: terminal
+    value: true
+- id: terminal.v1.idle_kept
+  title: A terminal that is idle for 40 seconds is still there afterwards.
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal: {}
+  - op: terminal.open
+    target: box
+    as: tty
+  - wait_ms: 40000
+  - op: terminal.write
+    target: tty
+    in:
+      data: cHJpbnRmICdBTCVzVkUnIEkN
+  - op: terminal.output
+    target: tty
+    in:
+      until_contains: ALIVE
+      timeout_ms: 60000
+    expect:
+      equals:
+        terminal:
+          utf8_contains: ALIVE
+  rules:
+  - provider-api/terminal-liveness
+  proves:
+  - gate: terminal
+    value: true
 - id: baseline.environment_bash
   title: The default environment contains bash.
   steps:

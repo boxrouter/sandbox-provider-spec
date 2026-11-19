@@ -33,6 +33,9 @@ _TAG_KEY = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\Z")
 _MACHINE_ID = re.compile(r"m-[a-z0-9]{1,32}\Z")
 _JOB_ID = re.compile(r"j-[a-z0-9]{1,32}\Z")
 _IMAGE_ID = re.compile(r"i-[a-z0-9]{1,32}\Z")
+_TTY_ID = re.compile(r"t-[a-z0-9]{1,32}\Z")
+_TERM = re.compile(r"[A-Za-z0-9._+-]{1,64}\Z")
+_TTY_FRAME = 65536
 
 
 async def _read_body(receive: Any, limit: int = _BODY_LIMIT) -> bytes:
@@ -122,6 +125,19 @@ def _fs_flag(body: dict[str, Any], name: str) -> str:
     if not isinstance(value, bool):
         raise ApiError(400, "invalid_request", f"{name} must be true or false")
     return "1" if value else "0"
+
+
+def _tty_id(segment: str) -> str:
+    if _TTY_ID.fullmatch(segment) is None:
+        raise ApiError(404, "not_found", f"unknown terminal {segment}")
+    return segment
+
+
+def _body_int(body: dict[str, Any], field: str, default: int) -> int:
+    value = body.get(field, default)
+    if not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= 1000:
+        raise ApiError(400, "invalid_request", f"{field} must be an integer from 1 to 1000")
+    return value
 
 
 def _machine_id(segment: str) -> str:
@@ -447,6 +463,35 @@ async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send
         await _send_json(send, 200, result)
         return
 
+    if rest == ["tty"] and method == "POST":
+        body = await _json_body(receive)
+        cmd = _require_string_list(body, "cmd") if body.get("cmd") is not None else None
+        cwd = _optional_dir(body)
+        env = _require_env(body)
+        cols = _body_int(body, "cols", 80)
+        rows = _body_int(body, "rows", 24)
+        term = body.get("term", "xterm-256color")
+        if not isinstance(term, str) or _TERM.fullmatch(term) is None:
+            raise ApiError(400, "invalid_request", "term must be a terminal type name")
+        result = await asyncio.to_thread(
+            cloud.start_tty, machine_id, cmd, cwd, env, cols, rows, term
+        )
+        result["ws"] = f"/machines/{machine_id}/tty/{result['tty_id']}"
+        await _send_json(send, 201, result)
+        return
+
+    if len(rest) == 3 and rest[0] == "tty" and rest[2] == "resize" and method == "POST":
+        body = await _json_body(receive)
+        result = await asyncio.to_thread(
+            cloud.resize_tty,
+            machine_id,
+            _tty_id(rest[1]),
+            _body_int(body, "cols", 80),
+            _body_int(body, "rows", 24),
+        )
+        await _send_json(send, 200, result)
+        return
+
     if rest == ["usage"] and method == "GET":
         result = await asyncio.to_thread(cloud.get_usage, machine_id)
         await _send_json(send, 200, result)
@@ -469,8 +514,85 @@ async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send
     raise ApiError(404, "not_found", "no such route")
 
 
+async def _refuse_upgrade(scope: dict[str, Any], send: Any, exc: ApiError) -> None:
+    """Refuse a WebSocket handshake with an error response, or with a close where the server
+    cannot send one."""
+    if "websocket.http.response" not in scope.get("extensions", {}):
+        await send({"type": "websocket.close", "code": 1008})
+        return
+    body = json.dumps({"error": {"code": exc.code, "message": exc.message}}).encode("utf-8")
+    await send(
+        {
+            "type": "websocket.http.response.start",
+            "status": exc.status,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode()),
+            ],
+        }
+    )
+    await send({"type": "websocket.http.response.body", "body": body})
+
+
+async def _tty_stream(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send: Any) -> None:
+    """The WebSocket of one terminal: binary frames carry the terminal's bytes both ways, and a
+    text frame `{"exit": <code or null>}` says that the program is over. The connection is the
+    terminal's lifetime: when it closes first, the program's process group is hung up on."""
+    segments = [seg for seg in scope["path"].split("/") if seg]
+    headers = {key.lower(): value for key, value in scope["headers"]}
+    await receive()  # websocket.connect
+    try:
+        if not headers.get(b"x-api-key"):
+            raise ApiError(401, "unauthenticated", "an X-Api-Key header is required")
+        if len(segments) != 4 or segments[0] != "machines" or segments[2] != "tty":
+            raise ApiError(404, "not_found", "no such route")
+        tty = cloud.attach_tty(_machine_id(segments[1]), _tty_id(segments[3]))
+    except ApiError as exc:
+        await _refuse_upgrade(scope, send, exc)
+        return
+    await send({"type": "websocket.accept"})
+
+    async def pump_output() -> bool:
+        """Forward the terminal's output; True when the program ended and the exit was sent."""
+        while True:
+            data = await asyncio.to_thread(cloud.tty_read, tty)
+            if not data:
+                break
+            for start in range(0, len(data), _TTY_FRAME):
+                await send({"type": "websocket.send", "bytes": data[start : start + _TTY_FRAME]})
+        code = await asyncio.to_thread(cloud.tty_exit_code, tty)
+        await send({"type": "websocket.send", "text": json.dumps({"exit": code})})
+        await send({"type": "websocket.close", "code": 1000 if code is not None else 1001})
+        return True
+
+    async def pump_input() -> None:
+        while True:
+            message = await receive()
+            if message["type"] != "websocket.receive":
+                return
+            if message.get("bytes"):
+                await asyncio.to_thread(cloud.tty_write, tty, message["bytes"])
+
+    output = asyncio.create_task(pump_output())
+    incoming = asyncio.create_task(pump_input())
+    try:
+        await asyncio.wait({output, incoming}, return_when=asyncio.FIRST_COMPLETED)
+    finally:
+        finished = output.done() and not output.cancelled() and output.exception() is None
+        incoming.cancel()
+        output.cancel()
+        await asyncio.gather(incoming, output, return_exceptions=True)
+        if finished:
+            cloud.tty_done(tty)
+        else:
+            await asyncio.to_thread(cloud.end_tty, tty)
+
+
 def make_app(cloud: ExampleCloud) -> Any:
     async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
+        if scope["type"] == "websocket":
+            await _tty_stream(cloud, scope, receive, send)
+            return
         if scope["type"] != "http":
             return
         try:

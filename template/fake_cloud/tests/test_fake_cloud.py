@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import subprocess
 import time
@@ -13,6 +14,8 @@ from typing import Any
 
 import pytest
 from conftest import call, call_json
+from websockets.exceptions import InvalidStatus
+from websockets.sync.client import ClientConnection, connect
 
 pytestmark = [pytest.mark.loopback, pytest.mark.integration]
 
@@ -466,3 +469,111 @@ def test_bad_image_requests(server: Any, machine: str) -> None:
     assert call(server.port, "POST", "/machines/m-0000000000000000/images", body={})[0] == 404
     assert call(server.port, "GET", "/images?tag=nocolon")[0] == 400
     assert call(server.port, "GET", "/images", key=None)[0] == 401
+
+
+def _open_tty(server: Any, machine: str, **body: Any) -> tuple[str, ClientConnection]:
+    status, tty = call_json(server.port, "POST", f"/machines/{machine}/tty", body=body)
+    assert status == 201, tty
+    assert tty["ws"] == f"/machines/{machine}/tty/{tty['tty_id']}"
+    return tty["ws"], connect(
+        f"ws://127.0.0.1:{server.port}{tty['ws']}",
+        additional_headers={"X-Api-Key": "dev"},
+        proxy=None,
+        open_timeout=10,
+    )
+
+
+def _read_until(socket: ClientConnection, wanted: bytes, seconds: float = 20) -> bytes:
+    data = b""
+    deadline = time.monotonic() + seconds
+    while wanted not in data:
+        assert time.monotonic() < deadline, f"never read {wanted!r}; got {data!r}"
+        frame = socket.recv(timeout=seconds)
+        assert isinstance(frame, bytes), frame
+        data += frame
+    return data
+
+
+def test_tty_runs_a_program_and_reports_its_exit(server: Any, machine: str) -> None:
+    _, socket = _open_tty(
+        server,
+        machine,
+        cmd=["bash", "-c", 'printf \'%s|%s|%s\' "$PWD" "$MARK" "$TERM"; exit 3'],
+        dir="/tmp",
+        env={"MARK": "set"},
+        term="vt100",
+    )
+    with socket:
+        assert _read_until(socket, b"/tmp|set|vt100")
+        end = socket.recv(timeout=20)
+        assert json.loads(end) == {"exit": 3}
+
+
+def test_tty_connects_once(server: Any, machine: str) -> None:
+    path, socket = _open_tty(server, machine, cmd=["sleep", "30"])
+    with socket:
+        with pytest.raises(InvalidStatus) as refused:
+            connect(
+                f"ws://127.0.0.1:{server.port}{path}",
+                additional_headers={"X-Api-Key": "dev"},
+                proxy=None,
+            )
+        assert refused.value.response.status_code == 404
+
+
+def test_tty_needs_the_api_key_and_a_known_terminal(server: Any, machine: str) -> None:
+    status, tty = call_json(server.port, "POST", f"/machines/{machine}/tty", body={"cmd": ["true"]})
+    assert status == 201
+    for path, headers, expected in [
+        (tty["ws"], {}, 401),
+        (f"/machines/{machine}/tty/t-0000000000000000", {"X-Api-Key": "dev"}, 404),
+    ]:
+        with pytest.raises(InvalidStatus) as refused:
+            connect(f"ws://127.0.0.1:{server.port}{path}", additional_headers=headers, proxy=None)
+        assert refused.value.response.status_code == expected, path
+
+
+def test_tty_bad_requests(server: Any, machine: str) -> None:
+    for body in ({"cols": 0}, {"rows": 1001}, {"term": "bad term"}, {"cmd": []}):
+        status, _ = call(server.port, "POST", f"/machines/{machine}/tty", body=body)
+        assert status == 400, body
+    status, _ = call(server.port, "POST", "/machines/m-0000000000000000/tty", body={})
+    assert status == 404
+
+
+def test_tty_resize(server: Any, machine: str) -> None:
+    path, socket = _open_tty(server, machine, cols=80, rows=24)
+    with socket:
+        socket.send(b"stty size\r")
+        _read_until(socket, b"24 80")
+        status, _ = call(server.port, "POST", f"{path}/resize", body={"cols": 100, "rows": 40})
+        assert status == 200
+        socket.send(b"stty size\r")
+        _read_until(socket, b"40 100")
+
+
+def test_tty_ends_its_program_when_the_connection_closes(server: Any, machine: str) -> None:
+    _, socket = _open_tty(server, machine)
+    with socket:
+        socket.send(b"echo $$ >/tmp/tty-pid\r")
+        for _ in range(100):
+            _, result = call_json(
+                server.port,
+                "POST",
+                f"/machines/{machine}/exec",
+                body={"cmd": ["test", "-s", "/tmp/tty-pid"]},
+            )
+            if result["code"] == 0:
+                break
+            time.sleep(0.1)
+        assert result["code"] == 0
+    time.sleep(7)  # the hang-up is immediate and the kill follows after 5 seconds
+    _, result = call_json(
+        server.port,
+        "POST",
+        f"/machines/{machine}/exec",
+        body={
+            "cmd": ["bash", "-c", "test -d /proc/$(cat /tmp/tty-pid) && echo alive || echo gone"]
+        },
+    )
+    assert result["out"] == "gone\n"

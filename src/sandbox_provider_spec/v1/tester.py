@@ -24,8 +24,17 @@ SEVERITY = ("error", "differs", "not_run", "unsupported", "passed")
 
 # Tests that `--quick` leaves out because they are slow.
 QUICK_SKIPS = frozenset(
-    {"contract.files_1gib_roundtrip", "contract.cost_final", "snapshots.v1.cost"}
+    {
+        "contract.files_1gib_roundtrip",
+        "contract.cost_final",
+        "snapshots.v1.cost",
+        "terminal.v1.idle_kept",
+    }
 )
+
+# A test that cannot apply to this form of the provider says so with one of these reasons, and
+# then counts for neither its section nor the run: the Python form has no link to reuse.
+NOT_APPLICABLE = frozenset({"the Python form has no link"})
 
 # The required operations (contract section 1) and the steps of a test that exercise each.
 OPERATIONS = (
@@ -61,6 +70,7 @@ OPERATION_CLAIMS = {
     "resume": ("gate", "pause_resume"),
     "preview.link": ("gate", "previews"),
     "tcp.link": ("gate", "tcp_ports"),
+    "terminal.open": ("gate", "terminal"),
     "lifetime.extend": ("fact", "extendable_lifetime"),
     "process.write_stdin": ("knob", ("processes", "input")),
     "process.close_stdin": ("knob", ("processes", "input")),
@@ -215,6 +225,11 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
     return Suite(suite.digest, tuple(chosen), suite.baseline_ids)
 
 
+def _applies(row: Mapping[str, Any]) -> bool:
+    """Whether a test result counts: a `not_run` with a reason from `NOT_APPLICABLE` does not."""
+    return not (row["result"] == "not_run" and row.get("reason") in NOT_APPLICABLE)
+
+
 def _worst(statuses: Sequence[str]) -> str:
     return next((status for status in SEVERITY if status in statuses), "not_run")
 
@@ -258,7 +273,7 @@ def _summary(
     by_section: dict[str, list[str]] = {name: [] for name in sorted(gates)}
     for row in results:
         head = str(row["id"]).split(".", 1)[0]
-        if head in by_section:
+        if head in by_section and _applies(row):
             by_section[head].append(str(row["result"]))
         if head != "baseline":
             continue
@@ -317,7 +332,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         document.all_passed = (
             discovery_status == "passed"
             and cost_status == "passed"
-            and all(row["result"] == "passed" for row in results)
+            and all(row["result"] == "passed" for row in results if _applies(row))
         )
         return document
     finally:

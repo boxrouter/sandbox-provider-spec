@@ -256,6 +256,74 @@ The server keeps at most one adapter instance per distinct token, for a bounded 
 isolates each adapter; `--port` binds to 127.0.0.1 unless `--host` says otherwise. TLS is the job
 of whatever fronts the server.
 
+## 16. Terminals
+
+A terminal is a program, by default a login shell, on a pseudo-terminal in the sandbox, driven
+over one WebSocket that carries input, output, resizes and the exit status. It belongs to the SPS
+gate `terminal`. Version 1.0 covers the variant with `reattach: false`; a provider that claims
+`reattach: true` gets no reattach operation in 1.0. `terminal.open` is described in the
+[OpenAPI file](provider-api-1.0.openapi.yaml); this section holds the link rules and the messages
+that travel on the WebSocket.
+
+**The link.** `terminal.open` returns a `url`, the `headers` to send with it and `expires_at`.
+
+- A provider **MUST** sign the link so that a client that sends only the URL and `headers` is <!-- rule: provider-api/terminal-link -->
+  served, with no credential of the consumer; **MUST** serve it once only; and **MUST** refuse a
+  second connection, and one after `expires_at`, with an HTTP status from 400 to 499 before the
+  upgrade. The link is a `wss://` URL (`ws://` only where plain HTTP is allowed), and `expires_at` is
+  30 to 600 seconds after the call.
+
+A link without the account's token lets a consumer hand it to a browser, which cannot set an
+`Authorization` header on a WebSocket. Treat the URL as sensitive and never log it.
+
+**Start.** `terminal.open` checks the sandbox (`not_found`; `conflict` when it is not running) and
+the fields, and starts nothing.
+
+- A provider **MUST** start the program when the link is connected: on a new pseudo-terminal of the <!-- rule: provider-api/terminal-start -->
+  given size, as the class's default user, as the leader of a new session and process group, with
+  `TERM` set to `term`, `env` added to the sandbox's environment, and `cwd` as the working
+  directory, and **MUST** report a missing `cwd` as a `not_found` error message.
+
+**Messages.** Binary frames are bytes; text frames are JSON control messages. A frame carries at
+most 65536 bytes.
+
+- A provider **MUST** carry the messages of this list, and **MUST** refuse a text frame that is not <!-- rule: provider-api/terminal-messages -->
+  valid JSON, has an unknown `type` or has an unknown field with an `error` message
+  `invalid_request`, then close the connection.
+  - A binary frame from the client is input: its bytes reach the terminal in the order sent.
+  - A binary frame from the provider is output: the bytes that the terminal produced.
+    Standard output and standard error are one stream on a terminal, and the provider converts no
+    encoding.
+  - `{"type": "resize", "columns": c, "rows": r}` from the client sets the terminal's size, and the
+    program receives `SIGWINCH`.
+  - `{"type": "exit", "exit_code": n}` from the provider says that the program exited, with
+    128 + N when signal N ended it.
+  - `{"type": "error", "error": {...}}` from the provider carries an error body (the
+    [error table](provider-api-1.0.openapi.yaml)), for example `not_found` for a missing `cwd`,
+    or `quota_exceeded` for a connection beyond the capacity limit. The provider then closes with
+    code 1011.
+- A provider **MUST** deliver output in order, and **MUST NOT** reorder, drop or repeat output while <!-- rule: provider-api/terminal-ordered-output -->
+  the connection lives.
+- A provider **MUST** apply a `resize` message to the pseudo-terminal, so that the program sees the <!-- rule: provider-api/terminal-resize -->
+  new size and receives `SIGWINCH`.
+- A provider **MUST** send the `exit` message after the last output frame and then close the <!-- rule: provider-api/terminal-exit -->
+  connection with code 1000.
+
+**End.** 1.0 has no operation to reconnect.
+
+- When the connection closes for any reason other than the program's exit, a provider **MUST** end <!-- rule: provider-api/terminal-close-ends -->
+  the terminal: it sends `SIGHUP` to the terminal's process group, then `SIGKILL` to what remains
+  of the group 5 seconds later. A process that left the group (`setsid`) is not part of the terminal.
+
+**Liveness.** A pause, stop or end of the sandbox ends its terminals: the provider closes each
+connection with code 1001.
+
+- A provider **MUST** answer WebSocket pings, **MUST** send a ping at least every 30 seconds, and <!-- rule: provider-api/terminal-liveness -->
+  **MUST NOT** end a terminal for being idle while the connection lives and the sandbox runs.
+
+**Capacity.** A provider serves at least 4 open terminals per sandbox at once. A connection beyond
+its limit gets an `error` message `quota_exceeded`.
+
 ## 17. Snapshots
 
 A provider that claims the `snapshots` section (`vocabulary.md`) implements `snapshot.create`,

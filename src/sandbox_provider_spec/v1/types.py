@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -277,6 +278,46 @@ class DirectoryPage:
 class PathInfo:
     exists: bool
     type: EntryType | None
+
+
+@dataclass(frozen=True)
+class TerminalRequest:
+    argv: Sequence[str] | None = None  # None: the default user's login shell
+    cwd: str | None = None
+    env: Mapping[str, str] = field(default_factory=dict)
+    columns: int = 80
+    rows: int = 24
+    term: str = "xterm-256color"
+
+
+@dataclass(frozen=True)
+class TerminalLink:
+    """What `terminal.open` returns over HTTP: a single-use WebSocket link."""
+
+    url: str  # sensitive: never log it
+    headers: Mapping[str, str]
+    expires_at: datetime
+
+
+class Terminal(ABC):
+    """An open terminal (contract section 10.1), returned by `terminal_open` with its program
+    started. The caller owns it and closes it; errors after the start are raised as SpsError."""
+
+    exit_code: int | None  # set once output() has ended because the program exited
+
+    @abstractmethod
+    async def write(self, data: bytes) -> None: ...
+
+    @abstractmethod
+    async def resize(self, columns: int, rows: int) -> None: ...
+
+    @abstractmethod
+    def output(self) -> AsyncIterator[bytes]:
+        """The bytes that the terminal produces, in order; ends at the exit or at close."""
+
+    @abstractmethod
+    async def close(self) -> None:
+        """End the terminal as a closed connection does. Closing twice succeeds."""
 
 
 @dataclass(frozen=True)

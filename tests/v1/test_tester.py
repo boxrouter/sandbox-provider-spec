@@ -607,6 +607,7 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
         "snapshots.v1.cost",
+        "terminal.v1.idle_kept",
     }
 
 

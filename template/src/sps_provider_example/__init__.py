@@ -16,12 +16,14 @@ from an image. An image's labels are kept as a JSON tag, because image tags cann
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterable, AsyncIterator, Mapping
+from collections.abc import AsyncIterable, AsyncIterator, Callable, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
 import httpx
+import websockets.asyncio.client
+import websockets.exceptions
 from sandbox_provider_spec.v1 import (
     ERROR_TABLE,
     Cost,
@@ -50,6 +52,8 @@ from sandbox_provider_spec.v1 import (
     SnapshotPage,
     SnapshotRequest,
     SpsError,
+    Terminal,
+    TerminalRequest,
 )
 
 from sps_provider_example.create_spec import fingerprint, plan_create, snapshot_fingerprint
@@ -85,13 +89,74 @@ def _stamp(text: str) -> datetime:
     return datetime.fromisoformat(text)
 
 
+# Opens the WebSocket of an Example Cloud terminal; a test replaces it with a stand-in.
+Connect = Callable[[str, Mapping[str, str]], Any]
+
+
+async def _connect(url: str, headers: Mapping[str, str]) -> Any:
+    try:
+        return await websockets.asyncio.client.connect(
+            url, additional_headers=dict(headers), proxy=None, compression=None, max_size=1 << 20
+        )
+    except (websockets.exceptions.WebSocketException, OSError):
+        raise SpsError("unavailable", "Example Cloud's terminal is unreachable") from None
+
+
+class ExampleTerminal(Terminal):
+    """A terminal on Example Cloud's own WebSocket: its binary frames are the terminal's bytes
+    in both directions, and a text frame `{"exit": <code or null>}` says that the program is
+    over. A resize is a separate HTTP call, so the adapter keeps the HTTP client's route."""
+
+    def __init__(self, socket: Any, resize: Callable[[int, int], Any]) -> None:
+        self._socket = socket
+        self._resize = resize
+        self.exit_code: int | None = None
+
+    async def write(self, data: bytes) -> None:
+        try:
+            await self._socket.send(data)
+        except websockets.exceptions.ConnectionClosed:
+            raise SpsError("unavailable", "The terminal connection is closed") from None
+
+    async def resize(self, columns: int, rows: int) -> None:
+        await self._resize(columns, rows)
+
+    async def output(self) -> AsyncIterator[bytes]:
+        try:
+            async for frame in self._socket:
+                if isinstance(frame, bytes):
+                    yield frame
+                    continue
+                code = json.loads(frame).get("exit")
+                self.exit_code = code if isinstance(code, int) else None
+                return
+        except websockets.exceptions.ConnectionClosedOK:
+            return
+        except websockets.exceptions.ConnectionClosedError:
+            raise SpsError(
+                "provider_error", "The terminal connection failed", outcome="unknown"
+            ) from None
+
+    async def close(self) -> None:
+        # Closing the connection ends the program: Example Cloud hangs up on its process group.
+        try:
+            await self._socket.close()
+        except (websockets.exceptions.WebSocketException, OSError):
+            pass
+
+
 class ExampleProvider(Provider):
     """A 1.0 provider over Example Cloud's machine API."""
 
     def __init__(
-        self, credentials: Mapping[str, str], *, transport: httpx.AsyncBaseTransport | None = None
+        self,
+        credentials: Mapping[str, str],
+        *,
+        transport: httpx.AsyncBaseTransport | None = None,
+        connect: Connect = _connect,
     ) -> None:
         super().__init__(credentials)
+        self._connect = connect
         endpoint = self.credentials.get("endpoint", "https://api.example.test")
         self._http = httpx.AsyncClient(
             base_url=endpoint.rstrip("/"),
@@ -548,6 +613,38 @@ class ExampleProvider(Provider):
             as_of=as_of,
             snapshot_id=snapshot_id,
         )
+
+    async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
+        # POST /machines/{id}/tty starts the program on a pseudo-terminal and returns the path
+        # of its WebSocket; the WebSocket is then the terminal. A missing working directory is
+        # a generic failure there, so a cwd is probed first, as `run` does.
+        if request.cwd is not None:
+            probe = [
+                "python3",
+                "-c",
+                "import os,sys;sys.exit(not os.path.isdir(sys.argv[1]))",
+                request.cwd,
+            ]
+            check = {"cmd": probe, "timeout_s": 30}
+            if (await self._json("POST", f"/machines/{sandbox_id}/exec", json=check))["code"]:
+                raise SpsError("not_found", f"No such directory: {request.cwd}")
+        body: dict[str, Any] = {
+            "cmd": None if request.argv is None else list(request.argv),
+            "env": dict(request.env),
+            "cols": request.columns,
+            "rows": request.rows,
+            "term": request.term,
+        }
+        if request.cwd is not None:
+            body["dir"] = request.cwd
+        tty = await self._json("POST", f"/machines/{sandbox_id}/tty", json=body)
+        url = str(self._http.base_url).rstrip("/").replace("http", "ws", 1) + tty["ws"]
+        socket = await self._connect(url, {"X-Api-Key": self.credentials["api_key"]})
+
+        async def resize(columns: int, rows: int) -> None:
+            await self._req("POST", f"{tty['ws']}/resize", json={"cols": columns, "rows": rows})
+
+        return ExampleTerminal(socket, resize)
 
     async def aclose(self) -> None:
         await self._http.aclose()

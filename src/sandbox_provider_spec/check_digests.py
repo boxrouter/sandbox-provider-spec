@@ -61,7 +61,8 @@ SHARED_OPERATIONS = frozenset(
         "snapshot.delete", "snapshot.delete_again", "snapshot.restore",
         "snapshot.restore_begin", "snapshot.restore_wait", "snapshot.retention",
         "snapshot.take", "tcp.link", "terminal.disconnect", "terminal.open",
-        "terminal.output", "terminal.reattach", "terminal.write", "volume.create",
+        "terminal.output", "terminal.reattach", "terminal.write", "terminal.resize",
+        "terminal.wait", "terminal.close", "terminal.link_reuse", "volume.create",
         "volume.create_many", "volume.observe_kind", "volume.observe_mounts",
     }
 )  # fmt: skip
@@ -70,6 +71,7 @@ SHARED_OPERATIONS = frozenset(
 # own implementation. Sibling imports and fixtures named in module source are added from source.
 OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "http.buffered": ("coverage_http_buffered.py",),
+    "fixture.terminal_ordered_output": ("terminal_ordered.py",),
     "fixture.fuse_mount": ("fuse_mount.py", "fuse_mount_identity.py", "fixtures/fuse_mount.py"),
     "fixture.fuse_mount_provider_terminal_handover": ("fuse_mount_handover.py",),
     "fixture.fuse_mount_provider_terminal_handover_read": ("fuse_mount_handover_read.py",),

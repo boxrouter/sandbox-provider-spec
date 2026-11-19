@@ -275,6 +275,7 @@ adapter, each optional method raises `unsupported` until you implement it.
 | `processes` with `cancel` | `process.cancel` | Ends a process and its children |
 | `previews` | `preview.link` | An HTTPS URL that reaches a port in the sandbox |
 | `tcp_ports` | `tcp.link` | A host and port that reach a TCP port in the sandbox |
+| `terminal` | `terminal.open` | A terminal over one WebSocket: input, output, resize and the exit status |
 | `snapshots` | `snapshot.create`, `snapshot.get`, `snapshot.list`, `snapshot.delete`, `snapshot.cost`, and `create` with `snapshot` | Save a sandbox and start new sandboxes from the save |
 
 ### Directory operations
@@ -292,8 +293,7 @@ names and never follows a symbolic link, `files.remove` removes a link and never
 
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,
-`memory_min_mib`, `region`, and `gpu_model`. Terminals, desktops, snapshots, and volumes wait for
-later 1.x releases.
+`memory_min_mib`, `region`, and `gpu_model`. Desktops and volumes wait for later 1.x releases.
 
 ## Versioning
 

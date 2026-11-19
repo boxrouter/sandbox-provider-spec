@@ -43,6 +43,9 @@ from sandbox_provider_spec.v1.types import (
     SnapshotPage,
     SnapshotRequest,
     TcpLink,
+    Terminal,
+    TerminalLink,
+    TerminalRequest,
 )
 from sandbox_provider_spec.v1.wire import (
     WireError,
@@ -94,6 +97,9 @@ __all__ = [
     "SnapshotRequest",
     "SpsError",
     "TcpLink",
+    "Terminal",
+    "TerminalLink",
+    "TerminalRequest",
     "WireError",
     "error_from_json",
     "error_to_json",

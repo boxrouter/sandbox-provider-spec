@@ -7,6 +7,7 @@ It needs the distribution's `http` extra (`httpx`).
 
 from __future__ import annotations
 
+import asyncio
 import ipaddress
 import json
 import re
@@ -16,8 +17,10 @@ from typing import Any, TypeVar
 from urllib.parse import urlsplit
 
 import httpx
+import websockets.asyncio.client
+import websockets.exceptions
 
-from sandbox_provider_spec.v1.errors import SpsError
+from sandbox_provider_spec.v1.errors import ERROR_TABLE, ErrorCode, SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
     Cost,
@@ -43,6 +46,9 @@ from sandbox_provider_spec.v1.types import (
     SnapshotPage,
     SnapshotRequest,
     TcpLink,
+    Terminal,
+    TerminalLink,
+    TerminalRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, error_from_json, from_json, to_json
 
@@ -121,6 +127,77 @@ class _BodyStream:
         await self._response.aclose()
 
 
+TERMINAL_FRAME_BYTES = 65536  # the most that one terminal frame carries (provider-api.md 16)
+_TERMINAL_CLOSE_SECONDS = 5.0
+
+
+class _WebSocketTerminal(Terminal):
+    """A `Terminal` on one WebSocket: each message of provider-api.md section 16 is one call."""
+
+    def __init__(self, socket: websockets.asyncio.client.ClientConnection) -> None:
+        self._socket = socket
+        self.exit_code: int | None = None
+
+    async def write(self, data: bytes) -> None:
+        try:
+            for start in range(0, len(data), TERMINAL_FRAME_BYTES):
+                await self._socket.send(data[start : start + TERMINAL_FRAME_BYTES])
+        except websockets.exceptions.ConnectionClosed:
+            raise SpsError("unavailable", "The terminal connection is closed") from None
+
+    async def resize(self, columns: int, rows: int) -> None:
+        message = json.dumps({"type": "resize", "columns": columns, "rows": rows})
+        try:
+            await self._socket.send(message)
+        except websockets.exceptions.ConnectionClosed:
+            raise SpsError("unavailable", "The terminal connection is closed") from None
+
+    async def output(self) -> AsyncIterator[bytes]:  # pylint: disable=invalid-overridden-method
+        try:
+            async for message in self._socket:
+                if isinstance(message, bytes):
+                    yield message
+                    continue
+                kind, error = self._control(message)
+                if kind == "exit":
+                    return
+                assert error is not None
+                raise error
+        except websockets.exceptions.ConnectionClosedOK:
+            return
+        except websockets.exceptions.ConnectionClosedError:
+            raise SpsError(
+                "provider_error", "The terminal connection failed", outcome="unknown"
+            ) from None
+
+    def _control(self, text: str) -> tuple[str, SpsError | None]:
+        """What a control message says: the program exited (`exit_code` is set), or an error."""
+        try:
+            document = json.loads(text)
+            kind = document["type"]
+            if kind == "exit":
+                code = document["exit_code"]
+                if not isinstance(code, int) or isinstance(code, bool):
+                    raise ValueError
+                self.exit_code = code
+                return "exit", None
+            if kind == "error":
+                return "error", error_from_json({"error": document["error"]})
+        except (ValueError, KeyError, TypeError):
+            pass
+        return "error", SpsError(
+            "provider_error",
+            "The terminal sent a message that is not in the 1.0 schema",
+            outcome="unknown",
+        )
+
+    async def close(self) -> None:
+        try:
+            await asyncio.wait_for(self._socket.close(), _TERMINAL_CLOSE_SECONDS)
+        except (TimeoutError, websockets.exceptions.WebSocketException, OSError):
+            pass
+
+
 def _transport_error(error: httpx.HTTPError, *, sent: bool) -> SpsError:
     """Map a failure of the connection to an error. The text names the kind of failure only: it
     never repeats the library's message, which may quote a URL or a header."""
@@ -136,6 +213,24 @@ def _transport_error(error: httpx.HTTPError, *, sent: bool) -> SpsError:
         "provider_error",
         f"The connection to the provider failed ({kind})",
         outcome="unknown" if sent else "failed",
+    )
+
+
+def _refusal(status: int, body: bytes | bytearray | None) -> SpsError:
+    """The error for a WebSocket upgrade that the provider refused with an HTTP response."""
+    try:
+        document = json.loads(bytes(body or b""))
+    except ValueError:
+        document = None
+    if isinstance(document, dict) and "error" in document:
+        return error_from_json(document)
+    code: ErrorCode | None = next(
+        (name for name, (number, _) in ERROR_TABLE.items() if number == status), None
+    )
+    return SpsError(
+        code or "provider_error",
+        f"The terminal link was refused with HTTP {status}",
+        outcome="failed" if code is not None and ERROR_TABLE[code][1] == "caller" else "unknown",
     )
 
 
@@ -173,6 +268,7 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
         if not _TOKEN.fullmatch(token):
             raise SpsError("unauthenticated", "The token is empty or not a valid bearer token")
         self._token = token
+        self._plain_http_ok = allow_plain_http
         self.base_url = base_url.rstrip("/")
         self.credentials = MappingProxyType({})
         self._client = httpx.AsyncClient(
@@ -554,6 +650,50 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
 
     async def snapshot_cost(self, snapshot_id: str) -> Cost:
         return await self._json(Cost, "GET", self._snapshot_path(snapshot_id, "/cost"))
+
+    async def terminal_link(self, sandbox_id: str, request: TerminalRequest) -> TerminalLink:
+        """Call `terminal.open` and return the link, without connecting to it."""
+        return await self._json(
+            TerminalLink,
+            "POST",
+            self._sandbox_path(sandbox_id, "/terminals"),
+            body=to_json(request),
+        )
+
+    async def terminal_connect(self, link: TerminalLink) -> Terminal:
+        """Connect to a terminal link, sending only its URL and `headers`: never this provider's
+        `Authorization` header, so that a link works for a client with no account token.
+
+        A refusal before the upgrade (a used or expired link) is an `SpsError` whose code is the
+        one in the refusal's error body, or the one that its HTTP status names."""
+        parts = urlsplit(link.url)
+        if parts.scheme not in ("ws", "wss") or not parts.hostname:
+            raise SpsError(
+                "provider_error", "The terminal link is not a WebSocket URL", outcome="unknown"
+            )
+        if parts.scheme == "ws" and not (self._plain_http_ok or _is_loopback(parts.hostname)):
+            raise SpsError(
+                "provider_error", "The terminal link is plain WebSocket", outcome="unknown"
+            )
+        try:
+            socket = await websockets.asyncio.client.connect(
+                link.url,
+                additional_headers=dict(link.headers),
+                proxy=None,
+                compression=None,
+                max_size=TERMINAL_FRAME_BYTES * 4,
+                open_timeout=_CONNECT_SECONDS,
+            )
+        except websockets.exceptions.InvalidStatus as error:
+            raise _refusal(error.response.status_code, error.response.body) from None
+        except TimeoutError:
+            raise SpsError("timeout", "The terminal link did not answer in time") from None
+        except (websockets.exceptions.WebSocketException, OSError):
+            raise SpsError("unavailable", "Could not connect to the terminal link") from None
+        return _WebSocketTerminal(socket)
+
+    async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
+        return await self.terminal_connect(await self.terminal_link(sandbox_id, request))
 
     async def aclose(self) -> None:
         await self._client.aclose()

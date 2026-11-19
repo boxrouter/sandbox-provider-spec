@@ -41,6 +41,8 @@ from sandbox_provider_spec.v1.types import (
     SnapshotPage,
     SnapshotRequest,
     TcpLink,
+    Terminal,
+    TerminalRequest,
 )
 
 MANIFEST_NAME = "sps-provider.yaml"
@@ -255,6 +257,9 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     async def snapshot_cost(self, snapshot_id: str) -> Cost:
         raise self._unsupported("snapshot.cost")
+
+    async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
+        raise self._unsupported("terminal.open")
 
     async def aclose(self) -> None:
         """Release HTTP clients; the host calls it once when it is done with the adapter."""

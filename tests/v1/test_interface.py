@@ -61,6 +61,7 @@ OPTIONAL = {
     "snapshot_list": ("snapshot.list", ()),
     "snapshot_delete": ("snapshot.delete", ("n",)),
     "snapshot_cost": ("snapshot.cost", ("n",)),
+    "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
 
 
@@ -80,7 +81,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 29
+    assert len(ids) == 30
 
 
 def test_error_table_is_the_openapi_table() -> None:

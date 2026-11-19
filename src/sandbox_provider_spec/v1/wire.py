@@ -52,6 +52,8 @@ from sandbox_provider_spec.v1.types import (
     SnapshotPage,
     SnapshotRequest,
     TcpLink,
+    TerminalLink,
+    TerminalRequest,
 )
 
 T = TypeVar("T")
@@ -586,6 +588,30 @@ _CODECS: dict[type, _Codec] = {
         "PathInfo",
         lambda v: {"exists": v.exists, "type": v.type},
         lambda d: PathInfo(d["exists"], d["type"]),
+    ),
+    TerminalLink: _Codec(
+        "TerminalLink",
+        lambda v: {"url": v.url, "headers": dict(v.headers), "expires_at": _stamp(v.expires_at)},
+        lambda d: TerminalLink(d["url"], dict(d["headers"]), _time(d["expires_at"])),
+    ),
+    TerminalRequest: _Codec(
+        "TerminalRequest",
+        lambda v: {
+            "argv": None if v.argv is None else list(v.argv),
+            "cwd": v.cwd,
+            "env": dict(v.env),
+            "columns": v.columns,
+            "rows": v.rows,
+            "term": v.term,
+        },
+        lambda d: TerminalRequest(
+            argv=None if d.get("argv") is None else tuple(d["argv"]),
+            cwd=d.get("cwd"),
+            env=dict(d.get("env", {})),
+            columns=d.get("columns", 80),
+            rows=d.get("rows", 24),
+            term=d.get("term", "xterm-256color"),
+        ),
     ),
     Limits: _Codec("Limits", _enc_limits, lambda d: Limits(**d)),
     ProviderInfo: _Codec(

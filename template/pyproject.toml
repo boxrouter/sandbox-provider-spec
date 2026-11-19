@@ -15,6 +15,7 @@ requires-python = ">=3.11"
 dependencies = [
     "sandbox-provider-spec",
     "httpx==0.28.1",
+    "websockets==16.1.1",
 ]
 
 [project.entry-points."sandbox_provider_spec.providers"]

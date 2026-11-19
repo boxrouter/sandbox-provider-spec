@@ -48,8 +48,13 @@ def _offers(value: object, wanted: str) -> bool:
 
 
 def check_requirements(requirements: Mapping[str, object]) -> None:
-    """Example Cloud claims only the `snapshots` section, with the variant of `SNAPSHOTS`."""
+    """Example Cloud claims two sections: `snapshots`, with the variant of `SNAPSHOTS`, and a
+    `terminal` that cannot be reattached."""
     for gate, wanted in requirements.items():
+        if gate == "terminal" and isinstance(wanted, Mapping):
+            if wanted.get("reattach", False) is not False or set(wanted) - {"reattach"}:
+                raise SpsError("unsupported", "Example Cloud's terminal cannot be reattached")
+            continue
         if gate != "snapshots" or not isinstance(wanted, Mapping):
             raise SpsError("unsupported", f"Example Cloud does not claim the section {gate!r}")
         for knob, value in wanted.items():

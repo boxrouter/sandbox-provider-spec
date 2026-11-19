@@ -12,9 +12,11 @@ from __future__ import annotations
 import asyncio
 import base64
 import builtins
+import contextlib
 import threading
 import time
 from collections.abc import AsyncIterator, Awaitable, Iterator, Mapping
+from concurrent.futures import Future
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
@@ -22,6 +24,7 @@ from importlib.metadata import version
 from typing import Any, TypeVar, cast
 from uuid import uuid4
 
+from sandbox_provider_spec import terminal_ordered
 from sandbox_provider_spec.driver import (
     Driver,
     Inputs,
@@ -46,6 +49,8 @@ from sandbox_provider_spec.v1.types import (
     Sandbox,
     Snapshot,
     SnapshotRequest,
+    Terminal,
+    TerminalRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, to_json
 
@@ -60,6 +65,8 @@ NOT_IN_1_0 = {
     "process.reattach": "SPS 1.0 has no operation to reattach to a process",
     "process.disconnect": "SPS 1.0 has no operation to disconnect from a process",
     "preview.revoke": "SPS 1.0 has no operation to revoke a preview link",
+    "terminal.disconnect": "SPS 1.0 has no operation to disconnect from a terminal",
+    "terminal.reattach": "SPS 1.0 has no operation to reattach to a terminal",
 }
 
 # Create inputs that SPS 1.0 maps to a field of `CreateRequest`.
@@ -86,6 +93,8 @@ _ONE_GIB = 1 << 30
 _COST_WAIT_MS = 120_000  # how long cost.final waits for a final cost when a test names no limit
 
 _OUTPUT_WAIT_MS = 1000
+_TERMINAL_OUTPUT_MS = 15_000  # how long terminal.output waits when a test names no limit
+_TERMINAL_WAIT_MS = 60_000  # how long terminal.wait waits for the exit when a test names no limit
 _WAIT_MS = 60_000  # how long process.wait waits for an exit when a test names no limit
 
 # Provider-fault codes that a retry can outlast.
@@ -125,6 +134,19 @@ class SnapshotHandle:
     sandbox_class: str
 
 
+@dataclass
+class TerminalHandle:
+    """An open terminal and the output that its pump has collected from it so far."""
+
+    sandbox_id: str
+    terminal: Terminal | None
+    output: bytearray = field(default_factory=bytearray)
+    error: SpsError | None = None
+    """What ended the terminal or refused its start, raised by the next output or wait."""
+    ended: bool = False
+    pump: Future[None] | None = None
+
+
 def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
@@ -161,6 +183,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         # claimed until the tester has read discovery, so it starts with all of them.
         self.command_fallback: set[str] = {"files.exists"}
         self._snapshots: dict[str, Resource] = {}
+        self._terminals: builtins.list[TerminalHandle] = []
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
         self._thread.start()
@@ -185,6 +208,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
     def close(self) -> None:
         """Release the provider's clients and stop the loop."""
         try:
+            for handle in self._terminals:
+                with contextlib.suppress(Exception):
+                    self._close_terminal(handle)
             self.wait(self.api.aclose())
         finally:
             self._loop.call_soon_threadsafe(self._loop.stop)
@@ -196,6 +222,13 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         if not isinstance(native, SandboxHandle):
             raise ValueError("operation requires a sandbox")
         return native.id
+
+    @staticmethod
+    def _terminal(target: object) -> TerminalHandle:
+        native = resource(target).native
+        if not isinstance(native, TerminalHandle):
+            raise ValueError("operation requires a terminal")
+        return native
 
     @staticmethod
     def _process(target: object) -> ProcessHandle:
@@ -781,6 +814,135 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
             "sandbox_matches": cost.sandbox_id == handle.sandbox_id,
             "only_snapshot_lines": all(line.item == "snapshot" for line in cost.lines),
         }
+
+    # Terminals
+
+    def terminal_open(self, target: object, inputs: Inputs) -> Observation:
+        """Open a terminal. A provider that refuses the start (a missing working directory, for
+        one) may refuse it here, in the Python form, or in the first message of the connection,
+        in the HTTP form; both are reported by the first output read or wait."""
+        sandbox_id = self._sandbox(target)
+        argv = inputs.get("argv")
+        request = TerminalRequest(
+            argv=None if argv is None else tuple(cast("list[str]", argv)),
+            cwd=cast("str | None", inputs.get("cwd")),
+            env=strings(inputs, "environment"),
+            columns=number(inputs, "columns", 80),
+            rows=number(inputs, "rows", 24),
+            term=cast(str, inputs.get("term", "xterm-256color")),
+        )
+        handle = TerminalHandle(sandbox_id, None)
+        try:
+            handle.terminal = self.wait(self.api.terminal_open(sandbox_id, request))
+        except NativeFailure as error:
+            handle.error, handle.ended = SpsError(cast(Any, error.code), "refused"), True
+        else:
+            handle.pump = asyncio.run_coroutine_threadsafe(self._pump(handle), self._loop)
+            self._terminals.append(handle)
+        owned = self.own("terminal", handle, lambda: self._close_terminal(handle))
+        return {"resource": owned}
+
+    async def _pump(self, handle: TerminalHandle) -> None:
+        """Collect a terminal's output until it ends, so that nothing waits on the reader."""
+        assert handle.terminal is not None
+        try:
+            async for chunk in handle.terminal.output():
+                handle.output.extend(chunk)
+        except SpsError as error:
+            handle.error = error
+        finally:
+            handle.ended = True
+
+    def _close_terminal(self, handle: TerminalHandle) -> Observation:
+        if handle.terminal is not None:
+            self.wait(handle.terminal.close())
+            if handle.pump is not None:
+                with contextlib.suppress(Exception):
+                    handle.pump.result(timeout=10)  # the pump ends once the terminal is closed
+        return {"result": "deleted"}
+
+    def terminal_write(self, target: object, inputs: Inputs) -> Observation:
+        handle = self._terminal(target)
+        data = base64.b64decode(text(inputs, "data"), validate=True)
+        if handle.terminal is None:
+            raise NativeFailure("terminal_not_open")
+        self.wait(handle.terminal.write(data))
+        return {}
+
+    def terminal_output(self, target: object, inputs: Inputs) -> Observation:
+        """The bytes collected so far, once the wanted text is in them, a first chunk has come,
+        the terminal has ended, or the time is up."""
+        handle = self._terminal(target)
+        deadline = time.monotonic() + number(inputs, "timeout_ms", _TERMINAL_OUTPUT_MS) / 1000
+        first_chunk = inputs.get("first_chunk") is True
+        wanted = inputs.get("until_contains")
+        needle = None if wanted is None else text(inputs, "until_contains").encode()
+        while True:
+            if needle is not None and needle in handle.output:
+                break
+            if first_chunk and handle.output:
+                break
+            if handle.error is not None:
+                raise NativeFailure(handle.error.code)
+            if handle.ended or time.monotonic() >= deadline:
+                break
+            time.sleep(0.02)
+        return {"terminal": bytes(handle.output)}
+
+    def terminal_resize(self, target: object, inputs: Inputs) -> Observation:
+        handle = self._terminal(target)
+        if handle.terminal is None:
+            raise NativeFailure("terminal_not_open")
+        self.wait(handle.terminal.resize(number(inputs, "columns", 80), number(inputs, "rows", 24)))
+        return {}
+
+    def terminal_wait(self, target: object, inputs: Inputs) -> Observation:
+        """Wait for the program to exit and return its exit code."""
+        handle = self._terminal(target)
+        deadline = time.monotonic() + number(inputs, "timeout_ms", _TERMINAL_WAIT_MS) / 1000
+        while not handle.ended:
+            if time.monotonic() >= deadline:
+                raise NotRun("native_terminal_still_running")
+            time.sleep(0.02)
+        if handle.error is not None:
+            raise NativeFailure(handle.error.code)
+        assert handle.terminal is not None
+        return {"exit_code": handle.terminal.exit_code}
+
+    def terminal_close(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        self._close_terminal(self._terminal(target))
+        return {}
+
+    def terminal_link_reuse(self, target: object, inputs: Inputs) -> Observation:
+        """Connect to one terminal link twice. The link is single-use, so the second connection
+        must be refused with an HTTP status from 400 to 499 before the upgrade."""
+        del inputs
+        link_of = getattr(self.api, "terminal_link", None)
+        connect = getattr(self.api, "terminal_connect", None)
+        if link_of is None or connect is None:
+            raise NotRun("the Python form has no link")
+        sandbox_id = self._sandbox(target)
+
+        async def reuse() -> bool:
+            link = await link_of(sandbox_id, TerminalRequest())
+            first: Terminal = await connect(link)
+            try:
+                try:
+                    second: Terminal = await connect(link)
+                except SpsError as error:
+                    return 400 <= error.http_status <= 499
+                await second.close()
+                return False
+            finally:
+                await first.close()
+
+        return {"second_refused": self.wait(reuse())}
+
+    def fixture_terminal_ordered_output(self, target: object, inputs: Inputs) -> Observation:
+        """The shared fixture of `terminal.v1.ordered_output`, run through this driver's
+        `terminal.*` operations."""
+        return terminal_ordered.observe(self, target, inputs)
 
     # Cleanup of anything a failed create left behind
 
