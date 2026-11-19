@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.12: Boat's declaration is re-dated to 2026-11-18 for the rerun of its adapter-processes and prober-coverage reports on adapter-boat 0.3.96; the size-ceiling, user-selection and prober-core reruns failed on Boat's `default` capacity and keep their earlier reports. No claim, vocabulary or conformance-suite change in the declaration.
 - 0.5.11: The shared-digest record for 0.5.10 names its pull request (#7983). No claim, vocabulary or conformance-suite change.
 - 0.5.10: `load` parses YAML with libyaml's parser when PyYAML has it (the duplicate-key refusal is unchanged), so reading the two Core suites on a process's first create drops from about 0.8 s to 0.15 s. No claim, vocabulary or conformance-suite change.
 - 0.5.9: Agent37's SPS reports (adapter defaults, network lockdown, processes and prober coverage, for the default and vm classes) rerun live on adapter-agent37 0.1.57. No claim, vocabulary or conformance-suite change.

@@ -1,20 +1,20 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "processes.cancel.true": "sha256:4b3aa1ade5e0c2955b9a0b1d23a513b8b5b6577eddfd0a75f100e23115f0c970",
-    "processes.input.false": "sha256:6d9d346ed7cb2c9b9c48cea3d244461019d4359ab634e733a45bb490eaa1bb74",
-    "processes.reattach.true": "sha256:7e0249a1b14e19f75f0dcd2dc813eecc54bf1fee8c6235902685320c153d7b2b"
+    "processes.cancel.true": "sha256:2eb484926b5f203e682cd1ff68641830665d2f2e12554b3deda7d598f112029e",
+    "processes.input.false": "sha256:d710d5c6fa6ac89a4624192a614df443ec44559c187d9e79588ca513bfaaf152",
+    "processes.reattach.true": "sha256:825f1ef4586ecf2ae01d20e03783b5060a78c58099ef2bb36acae62cad21a6ee"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-17T09:42:34.118608+00:00",
+  "finished_at": "2026-11-18T20:41:39.772442+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "0f226a613b4c9b26836e310c7efa590f9f0c4e62",
-  "run_id": "public-ad882df533d9398729c6",
+  "revision": "f5d10f843d41af18a670fd5613b73482e83cf9ce",
+  "run_id": "public-168ae5d6ff45f1b09c34",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -25,7 +25,7 @@
     "processes.reattach.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-17T09:41:49.830425+00:00",
+  "started_at": "2026-11-18T20:39:11.288314+00:00",
   "suite_digest": "sha256:4b4c821fd5c002e3d14a98e580a094fb6084308e6459aff3a94ce636ba9fb192",
   "tests": [
     {
@@ -66,7 +66,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 20908,
+      "duration_ms": 55234,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -163,7 +163,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 23378,
+      "duration_ms": 93246,
       "id": "processes.reattach.true",
       "proves": [
         {

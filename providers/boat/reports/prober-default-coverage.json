@@ -1,18 +1,18 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.facts.disk_in_memory.false": "sha256:e29436b8522b1d509bf484ffa3c84c6d9f898ff59d34a020947a90b8d55b2a86"
+    "coverage.facts.disk_in_memory.false": "sha256:5d0ba6891b824af7b11b385b5983ea9af185e97d66a307d2e4b132c10d6bd876"
   },
   "clean": true,
   "driver": {
     "name": "withheld",
     "version": "withheld"
   },
-  "finished_at": "2026-11-17T10:00:29.136952+00:00",
+  "finished_at": "2026-11-18T20:33:41.859115+00:00",
   "implementation": "withheld",
   "provider": "boat",
-  "revision": "0f226a613b4c9b26836e310c7efa590f9f0c4e62",
-  "run_id": "public-6f81b614197ae85a6129",
+  "revision": "f5d10f843d41af18a670fd5613b73482e83cf9ce",
+  "run_id": "public-2c76877499bf97d92e1a",
   "sdk_versions": {
     "boat-sdk": "1.13.0",
     "withheld": "withheld"
@@ -21,8 +21,8 @@
     "coverage.facts.disk_in_memory.false"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-17T10:00:03.496460+00:00",
-  "suite_digest": "sha256:4eca18f6a4747f1c0cc5f2ebf97db2789568eb47bf6e1e5860fad9e76c07beee",
+  "started_at": "2026-11-18T20:31:59.160137+00:00",
+  "suite_digest": "sha256:a311614d8764df0daa0c0c5d78414fee01dc30ee64ecaa3d42f5891150a060cf",
   "tests": [
     {
       "cleanup": [
@@ -31,7 +31,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 25638,
+      "duration_ms": 102695,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -54,7 +54,7 @@
             "disk_in_memory": {
               "matches": true
             },
-            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1437696, \"memory_during_bytes\": 1437696, \"memory_after_bytes\": 1437696}\n"
+            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1433600, \"memory_during_bytes\": 1433600, \"memory_after_bytes\": 1433600}\n"
           },
           "operation": "fixture.coverage_fact",
           "result": "passed"
