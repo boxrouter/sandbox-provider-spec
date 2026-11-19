@@ -16,7 +16,6 @@ import asyncio
 import hashlib
 import json
 import re
-import secrets
 import time
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable, MutableMapping
@@ -32,6 +31,11 @@ from sandbox_provider_spec.v1 import tokens
 from sandbox_provider_spec.v1._spec_files import registry, schema_ref
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
+from sandbox_provider_spec.v1.terminal_tickets import (
+    TERMINAL_TICKET_SECONDS,
+    Ticket,
+    Tickets,
+)
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
     FileLinkRequest,
@@ -54,8 +58,6 @@ IDLE_SECONDS = 300.0
 MAX_JSON_BYTES = 1024 * 1024
 CHUNK_BYTES = 1024 * 1024
 TERMINAL_FRAME_BYTES = 65536  # the most that one terminal frame carries (provider-api.md 16)
-TERMINAL_TICKET_SECONDS = 60.0  # how long a terminal link waits to be connected
-MAX_TERMINAL_TICKETS = 1024  # links waiting to be connected, over all accounts
 TERMINAL_LINK_PATH = "/v1/terminal-links/"
 
 _ID = r"([^/]+)"
@@ -163,48 +165,6 @@ async def _close_all(entries: list[_Entry]) -> None:
             pass  # a failing close must not fail the request that triggered it
 
 
-# --- terminal links -------------------------------------------------------------------------
-
-
-@dataclass
-class _Ticket:
-    expires: float
-    token: str
-    sandbox_id: str
-    request: TerminalRequest
-
-
-class _Tickets:
-    """The single-use tickets of terminal links: a random name for a request that waits, at most
-    `TERMINAL_TICKET_SECONDS`, for its WebSocket to connect."""
-
-    def __init__(self, clock: Callable[[], float]) -> None:
-        self._clock = clock
-        self._items: dict[str, _Ticket] = {}
-
-    def _sweep(self) -> None:
-        now = self._clock()
-        for name in [name for name, item in self._items.items() if item.expires <= now]:
-            del self._items[name]
-
-    def issue(self, token: str, sandbox_id: str, request: TerminalRequest) -> str:
-        self._sweep()
-        if len(self._items) >= MAX_TERMINAL_TICKETS:
-            raise SpsError(
-                "rate_limited", "Too many terminal links are waiting", retry_after_seconds=1
-            )
-        name = secrets.token_urlsafe(24)
-        self._items[name] = _Ticket(
-            self._clock() + TERMINAL_TICKET_SECONDS, token, sandbox_id, request
-        )
-        return name
-
-    def take(self, name: str) -> _Ticket | None:
-        """The ticket, removed: a name works once, and not after it expires."""
-        self._sweep()
-        return self._items.pop(name, None)
-
-
 # --- request validation ---------------------------------------------------------------------
 
 
@@ -237,7 +197,7 @@ class _Request:  # pylint: disable=too-many-instance-attributes
         self.scope = scope
         self.path_params: tuple[str, ...] = ()
         self.token = ""
-        self.tickets: _Tickets | None = None
+        self.tickets: Tickets | None = None
         self._receive = receive
         self.headers: dict[str, str] = {}
         for name, value in scope.get("headers", []):
@@ -843,9 +803,7 @@ async def _terminal_to_client(terminal: Terminal, send: Send) -> None:
     await send({"type": "websocket.close", "code": 1000})
 
 
-async def _serve_terminal(
-    provider: Provider, ticket: _Ticket, receive: Receive, send: Send
-) -> None:
+async def _serve_terminal(provider: Provider, ticket: Ticket, receive: Receive, send: Send) -> None:
     """One connected terminal link: start the program, pump both ways, end it with the link."""
     await receive()  # websocket.connect
     await send({"type": "websocket.accept"})
@@ -896,7 +854,7 @@ def create_app(
 ) -> App:
     """An ASGI application that serves `provider_class` over the 1.0 HTTP API."""
     pool = _Pool(provider_class, limit=max_instances, idle_seconds=idle_seconds, clock=clock)
-    tickets = _Tickets(clock)
+    tickets = Tickets(clock)
 
     async def lifespan(receive: Receive, send: Send) -> None:
         sweeper: asyncio.Task[None] | None = None

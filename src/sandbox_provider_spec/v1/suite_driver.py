@@ -59,8 +59,7 @@ T = TypeVar("T")
 RUN_LABEL = "sps.test.run"
 """Every sandbox that a test run creates carries this label, with the run id as its value."""
 
-# Operations that the 1.0 interface has no counterpart for. A test that needs one is
-# `unsupported`, and a provider is never told to implement it.
+# Operations that 1.0 has no counterpart for: a test needing one is `unsupported`.
 NOT_IN_1_0 = {
     "process.reattach": "SPS 1.0 has no operation to reattach to a process",
     "process.disconnect": "SPS 1.0 has no operation to disconnect from a process",
@@ -152,12 +151,9 @@ def _iso(moment: datetime | None) -> str | None:
 
 
 class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
-    """A `Driver` whose operations call a `Provider`.
-
-    `SpsError("unsupported")` becomes `Unsupported`; any other `SpsError` becomes
-    `NativeFailure(code)`. The provider is async, so the driver runs its own event loop in a
-    background thread and waits for each call.
-    """
+    """A `Driver` whose operations call a `Provider`: `SpsError("unsupported")` becomes
+    `Unsupported`, any other `SpsError` `NativeFailure(code)`. The provider is async, so the
+    driver runs its own event loop in a background thread and waits for each call."""
 
     implementation = "sandbox_provider_spec.v1.suite_driver.ProviderDriver"
     unobservable = {
@@ -267,8 +263,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         return {"resource": owned, "identity": created.id}
 
     def _key(self, inputs: Inputs) -> str:
-        """The idempotency key of a create: fresh, or derived from the run and a test's name for
-        it, so that two creates of one test share a key and no other test or run does."""
+        """A create's idempotency key: fresh, or shared by one test's creates in one run only."""
         name = inputs.get("idempotency_key")
         if name is None:
             return str(uuid4())
@@ -334,8 +329,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
     # Discovery and cost
 
     def discovery(self, target: object, inputs: Inputs) -> Observation:
-        """Read the discovery document and judge it: a valid 1.0 document, a price on every
-        class, and a file limit of at least 1 GiB (contract section 8)."""
+        """Judge the discovery document: valid 1.0, a price per class, file limit >= 1 GiB (8)."""
         del target, inputs
         found = self.wait(self.api.discovery())
         try:
@@ -350,10 +344,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         }
 
     def cost_final(self, target: object, inputs: Inputs) -> Observation:
-        """Read the cost of a destroyed sandbox until it is final, and check what a final cost
-        promises: it names the sandbox, a calculated total is the sum of its lines, and a second
-        read states the same total. A provider that returns the final cost in the destroy result
-        may no longer know the sandbox, and then the destroy result is the only read."""
+        """Read a destroyed sandbox's cost until final and check it names the sandbox, sums its
+        lines and reads the same twice. A provider that returns the final cost in the destroy
+        result may no longer know the sandbox, and then that result is the only read."""
         native = resource(target).native
         if not isinstance(native, SandboxHandle):
             raise ValueError("operation requires a sandbox")
@@ -416,8 +409,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         return {"data": self.wait(read())}
 
     def files_exists(self, target: object, inputs: Inputs) -> Observation:
-        """The native operation when the class claims it, and otherwise `test -e`. A step that
-        sets `native` checks the operation itself, so without the claim it is unsupported."""
+        """The native operation when claimed, else `test -e`; `native` steps need the claim."""
         if "files.exists" in self.command_fallback:
             if inputs.get("native") is True:
                 raise Unsupported("discovery does not claim the directory operations")
@@ -477,8 +469,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         return {}
 
     def fixture_files_write_missing_parent(self, target: object, inputs: Inputs) -> Observation:
-        """Write 4 known bytes under a missing parent. Either the provider created the parents
-        and the bytes read back, or it refused with `not_found` and created nothing."""
+        """Write 4 bytes under a missing parent: parents made and read back, or `not_found`."""
         del inputs
         sandbox_id = self._sandbox(target)
         data = b"sps\n"
@@ -773,8 +764,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         return {"count": len(ids), "ids": ids}
 
     def snapshot_create_keyed(self, target: object, inputs: Inputs) -> Observation:
-        """Save a sandbox with an explicit idempotency key and labels, without waiting. A
-        repeat that returns the first snapshot returns the same `id`."""
+        """Save a sandbox with an explicit key and labels, without waiting; a repeat returns it."""
         keeps = inputs.get("keeps")
         request = SnapshotRequest(
             keeps=cast(Any, keeps), labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id}
@@ -797,8 +787,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         }
 
     def snapshot_cost(self, target: object, inputs: Inputs) -> Observation:
-        """Read a snapshot's cost and check what it promises. With `final: true`, read until the
-        cost is final, for as long as `timeout_ms` (default 120 s) allows."""
+        """Read a snapshot's cost; `final: true` reads until final, up to `timeout_ms` (120 s)."""
         handle = self._snapshot_handle(target)
         deadline = time.monotonic() + number(inputs, "timeout_ms", _COST_WAIT_MS) / 1000
         while True:

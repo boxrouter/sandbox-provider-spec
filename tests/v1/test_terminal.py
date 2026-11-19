@@ -32,12 +32,9 @@ from sandbox_provider_spec.v1 import (
     from_json,
 )
 from sandbox_provider_spec.v1.http_client import HttpProvider
-from sandbox_provider_spec.v1.server import (
-    TERMINAL_FRAME_BYTES,
-    TERMINAL_TICKET_SECONDS,
-    create_app,
-)
+from sandbox_provider_spec.v1.server import TERMINAL_FRAME_BYTES, create_app
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
+from sandbox_provider_spec.v1.terminal_tickets import TERMINAL_TICKET_SECONDS
 
 pytestmark = [pytest.mark.loopback, pytest.mark.integration]
 EXAMPLES = Path(__file__).resolve().parents[2] / "spec" / "provider-api-1.0-examples"
