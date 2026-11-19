@@ -11,9 +11,12 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import dataclasses
+import fcntl
 import itertools
 import json
 import os
+import shutil
+import stat
 from collections.abc import AsyncIterable, AsyncIterator, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
@@ -29,11 +32,14 @@ from sandbox_provider_spec.v1 import (
     CreateRequest,
     CredentialField,
     DestroyResult,
+    DirectoryEntry,
+    DirectoryPage,
     Discovery,
     FileInfo,
     FileStream,
     OutputChunk,
     OutputPage,
+    PathInfo,
     Process,
     ProcessStartRequest,
     Provider,
@@ -225,6 +231,7 @@ def with_gates(
         discovery.classes[0],
         gates=dict(gates),
         resources={**discovery.classes[0].resources, **(resources or {})},
+        operations=(),
     )
     return dataclasses.replace(discovery, classes=[first, *discovery.classes[1:]])
 
@@ -627,10 +634,14 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_ten_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_eleven_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
-    assert ids == {*CONTRACT_TESTS, "contract.files_1gib_roundtrip"}
+    assert ids == {
+        *CONTRACT_TESTS,
+        "contract.files_1gib_roundtrip",
+        "contract.files_write_missing_parent",
+    }
     chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
     assert ids <= chosen
     quick = {test.id for test in select_tests(suite, None, TestOptions(quick=True)).tests}
@@ -726,3 +737,245 @@ def test_the_cost_test_needs_a_final_cost_that_adds_up(
     monkeypatch.setattr("sandbox_provider_spec.v1.suite_driver._COST_WAIT_MS", 1)
     found = results(Costly(), ("contract.cost_final",))
     assert found == {"contract.cost_final": "not_run" if "status" in change else "differs"}
+
+
+# --- directory operations ---------------------------------------------------------------------
+
+FOUR_OPERATIONS = ("files.list", "files.mkdir", "files.remove", "files.exists")
+
+
+def with_operations(operations: tuple[str, ...]) -> Discovery:
+    discovery = example(Discovery)
+    first = dataclasses.replace(discovery.classes[0], operations=operations)
+    return dataclasses.replace(discovery, classes=[first, *discovery.classes[1:]])
+
+
+class DirectoryProvider(ContractProvider, manifest=False):
+    """Serves the four directory operations from the local file system, as commands would."""
+
+    def __init__(self, credentials: Mapping[str, str] | None = None) -> None:
+        super().__init__(credentials)
+        self.follow_links_in_exists = False
+        self.unsorted = False
+
+    async def discovery(self) -> Discovery:
+        return with_operations(FOUR_OPERATIONS)
+
+    @staticmethod
+    def _kind(mode: int) -> Any:
+        if stat.S_ISREG(mode):
+            return "file"
+        if stat.S_ISDIR(mode):
+            return "directory"
+        return "symlink" if stat.S_ISLNK(mode) else "other"
+
+    async def files_write(
+        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+    ) -> FileInfo:
+        if not Path(path).parent.is_dir():  # one of the two behaviors that the contract allows
+            raise SpsError("not_found", "no parent directory")
+        return await super().files_write(sandbox_id, path, data, size=size)
+
+    async def files_list(
+        self, sandbox_id: str, path: str, *, cursor: str | None = None, limit: int = 100
+    ) -> Any:
+        await self.get(sandbox_id)
+        target = Path(path)
+        if not target.exists():
+            raise SpsError("not_found", "no such directory")
+        if not target.is_dir():
+            raise SpsError("invalid_request", "not a directory")
+        names = sorted(item.name for item in target.iterdir())
+        if self.unsorted:
+            names.reverse()
+        if cursor is not None:
+            names = [name for name in names if name > cursor]
+        page, more = names[:limit], len(names) > limit
+        entries = []
+        for name in page:
+            info = (target / name).lstat()
+            entries.append(DirectoryEntry(name, self._kind(info.st_mode), info.st_size))
+        return DirectoryPage(entries, page[-1] if more else None)
+
+    async def files_mkdir(self, sandbox_id: str, path: str, *, parents: bool = False) -> None:
+        await self.get(sandbox_id)
+        target = Path(path)
+        for ancestor in [target, *target.parents]:
+            if ancestor.is_symlink() or ancestor.exists():
+                if not ancestor.is_dir():
+                    raise SpsError("conflict", "an entry that is not a directory is in the way")
+                break
+            if ancestor == target and not parents and not target.parent.exists():
+                raise SpsError("not_found", "no parent")
+        if not parents and not target.parent.is_dir():
+            raise SpsError("not_found", "no parent")
+        target.mkdir(parents=parents, exist_ok=True)
+
+    async def files_remove(self, sandbox_id: str, path: str, *, recursive: bool = False) -> None:
+        await self.get(sandbox_id)
+        if path == "/":
+            raise SpsError("invalid_request", "never the root")
+        target = Path(path)
+        if not target.is_symlink() and not target.exists():
+            raise SpsError("not_found", "no such entry")
+        if target.is_dir() and not target.is_symlink():
+            if any(target.iterdir()) and not recursive:
+                raise SpsError("conflict", "the directory is not empty")
+            shutil.rmtree(target)
+        else:
+            target.unlink()
+
+    async def files_exists(self, sandbox_id: str, path: str) -> Any:
+        await self.get(sandbox_id)
+        target = Path(path)
+        if self.follow_links_in_exists and not target.exists():
+            return PathInfo(False, None)
+        if not target.is_symlink() and not target.exists():
+            return PathInfo(False, None)
+        return PathInfo(True, self._kind(target.lstat().st_mode))
+
+
+LOCAL_PATHS = tuple(
+    Path("/tmp") / name
+    for name in (
+        "sps-d", "sps-p", "sps-m", "sps-r", "sps-e", "sps-np", "sps-list-file",
+    )
+)  # fmt: skip
+
+
+@pytest.fixture(name="local_paths")
+def local_paths_fixture() -> Any:
+    """The directory tests run their commands on this machine, at fixed paths: one at a time,
+    from a clean start, leaving nothing behind."""
+
+    def clean() -> None:
+        for path in LOCAL_PATHS:
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path)
+            elif path.is_symlink() or path.exists():
+                path.unlink()
+
+    with Path("/tmp/sps-directory-tests.lock").open("w", encoding="utf-8") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        clean()
+        try:
+            yield
+        finally:
+            clean()
+
+
+DIRECTORY_TESTS = (
+    "directories.list",
+    "directories.list_paging",
+    "directories.list_errors",
+    "directories.mkdir",
+    "directories.remove",
+    "directories.exists",
+    "contract.files_write_missing_parent",
+)
+
+
+def test_the_four_operations_are_claimed_together_and_select_the_directories_section() -> None:
+    suite = shared_suite()
+    claimed = {
+        test.id
+        for test in select_tests(suite, with_operations(FOUR_OPERATIONS), TestOptions()).tests
+    }
+    assert {test.id for test in suite.tests if test.id.startswith("directories.")} <= claimed
+    assert "contract.files_write_missing_parent" in claimed
+    bare = {test.id for test in select_tests(suite, with_operations(()), TestOptions()).tests}
+    assert not any(test_id.startswith("directories.") for test_id in bare)
+    assert "contract.files_write_missing_parent" in bare  # a contract test: every provider runs it
+    assert (
+        unsupported_operations(with_operations(FOUR_OPERATIONS)).keys().isdisjoint(FOUR_OPERATIONS)
+    )
+    assert set(unsupported_operations(with_operations(()))) >= set(FOUR_OPERATIONS)
+
+
+@pytest.mark.usefixtures("local_paths")
+def test_a_provider_that_does_the_commands_work_passes_the_directories_section() -> None:
+    provider = DirectoryProvider()
+    report = run_tests(
+        provider, TestOptions(tests=("directories.", "contract.files_write_missing"))
+    )
+    assert {str(row["id"]): str(row["result"]) for row in report["tests"]} == {
+        test_id: "passed" for test_id in DIRECTORY_TESTS
+    }
+    assert "section directories passed" in report.lines
+    assert all(box.state == "destroyed" for box in provider.boxes.values())
+
+
+@pytest.mark.usefixtures("local_paths")
+def test_a_provider_that_does_not_claim_the_operations_has_them_unsupported() -> None:
+    class Unclaimed(ContractProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            return with_operations(())
+
+    report = run_tests(Unclaimed(), TestOptions(tests=("directories.",)))
+    assert {row["result"] for row in report["tests"]} == {"unsupported"}
+    assert not any(line.startswith("section directories") for line in report.lines)
+
+
+def test_exists_runs_the_command_until_the_operation_is_claimed(driver: ProviderDriver) -> None:
+    # No discovery yet: nothing is claimed, so `files.exists` is `test -e`.
+    made = driver.call("create", None, {})
+    assert driver.call("files.exists", made, {"path": "/tmp"}) == {"exists": True}
+    with pytest.raises(Unsupported):
+        driver.call("files.exists", made, {"path": "/tmp", "native": True})
+
+
+@pytest.mark.usefixtures("local_paths")
+@pytest.mark.parametrize(
+    ("flag", "failing"),
+    [
+        ("follow_links_in_exists", ["directories.exists"]),
+        ("unsorted", ["directories.list", "directories.list_paging"]),
+    ],
+)
+def test_a_provider_that_breaks_a_directory_rule_fails_its_test(
+    flag: str, failing: list[str]
+) -> None:
+    provider = DirectoryProvider()
+    setattr(provider, flag, True)
+    found = results(provider, ("directories.",))
+    assert sorted(test_id for test_id, result in found.items() if result != "passed") == sorted(
+        failing
+    )
+
+
+@pytest.mark.usefixtures("local_paths")
+def test_a_write_under_a_missing_parent_may_create_or_refuse_but_nothing_else() -> None:
+    class Refuses(DirectoryProvider, manifest=False):
+        async def files_write(
+            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        ) -> FileInfo:
+            if not Path(path).parent.exists():
+                raise SpsError("not_found", "no parent")
+            return await super().files_write(sandbox_id, path, data, size=size)
+
+    class Creates(DirectoryProvider, manifest=False):
+        async def files_write(
+            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        ) -> FileInfo:
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+            return await super().files_write(sandbox_id, path, data, size=size)
+
+    class Half(DirectoryProvider, manifest=False):
+        async def files_write(
+            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        ) -> FileInfo:
+            Path(path).parent.parent.mkdir(parents=True, exist_ok=True)
+            raise SpsError("not_found", "no parent")
+
+    test = ("contract.files_write_missing_parent",)
+    for cls, expected, text in (
+        (Refuses, "passed", "refused_not_found"),
+        (Creates, "passed", "created_parents"),
+        (Half, "differs", None),
+    ):
+        report = run_tests(cls(), TestOptions(tests=test))
+        row = report["tests"][0]
+        assert row["result"] == expected, cls.__name__
+        if text is not None:
+            assert text in json.dumps(row), cls.__name__
+        shutil.rmtree("/tmp/sps-np", ignore_errors=True)

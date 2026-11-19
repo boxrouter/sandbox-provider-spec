@@ -58,8 +58,10 @@ cannot reach instance metadata or host credentials. These rules most often catch
 - **Commands.** `run` takes `argv` and runs it without a shell. A nonzero exit code or a timeout is
   a result, not an error. At the timeout, end the command and every process that it started.
 - **Files and processes.** Move the whole file or fail: a read whose connection ends early has
-  failed and never yields a short file. A process has exited only when `state` is `exited` with an
-  `exit_code`; closed output streams do not mean that it exited.
+  failed and never yields a short file. When the parent directory of a write is missing, either
+  create every missing directory on the path, as `mkdir -p` would, and write the file, or refuse
+  with `not_found` and create nothing; a consumer relies on neither. A process has exited only
+  when `state` is `exited` with an `exit_code`; closed output streams do not mean that it exited.
 
 Discovery's `limits` object states your limits, and each has a floor that you must meet: `file_bytes`
 1 GiB, `run_timeout_ms` 60000, `output_bytes` 16 MiB, `wait_ms` 30000, `process_output_bytes` 1 MiB,
@@ -273,6 +275,19 @@ adapter, each optional method raises `unsupported` until you implement it.
 | `processes` with `cancel` | `process.cancel` | Ends a process and its children |
 | `previews` | `preview.link` | An HTTPS URL that reaches a port in the sandbox |
 | `tcp_ports` | `tcp.link` | A host and port that reach a TCP port in the sandbox |
+
+### Directory operations
+
+Four operations list, make, test and remove paths: `files.list`, `files.mkdir`, `files.remove` and
+`files.exists`. They are a fast path for what every program can already do with commands such as
+`ls -A`, `mkdir -p`, `rm -rf` and `test -e`, so they are not an SPS section and no request can ask
+for them: commands give the same result on every provider, and a consumer that finds the operations
+off runs the commands instead. You claim all four, or none, in the `operations` list of a class in
+discovery (`classes[].operations`), and they turn on when the tester passes its `directories.` tests.
+Each result must be the one that the equivalent commands, run as the class's default user at the
+same moment, would give: `files.list` returns the immediate entries sorted by the bytes of their
+names and never follows a symbolic link, `files.remove` removes a link and never its target, and
+`files.exists` reports a dangling link as existing.
 
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,

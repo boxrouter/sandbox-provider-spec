@@ -25,6 +25,8 @@ from sandbox_provider_spec.v1.types import (
     CostLine,
     CreateRequest,
     DestroyResult,
+    DirectoryEntry,
+    DirectoryPage,
     Discovery,
     FileInfo,
     FileLink,
@@ -33,6 +35,7 @@ from sandbox_provider_spec.v1.types import (
     Limits,
     OutputChunk,
     OutputPage,
+    PathInfo,
     PreviewLink,
     Price,
     Process,
@@ -193,6 +196,8 @@ def _enc_class(value: SandboxClass) -> Json:
         "lifetime_timer": dict(value.lifetime_timer),
     }
     _put(out, "gates", _opt(value.gates, dict))
+    if value.operations:
+        out["operations"] = list(value.operations)
     out["images"] = [
         {"id": image.id, "default": image.default, "description": image.description}
         for image in value.images
@@ -344,6 +349,7 @@ def _dec_class(data: Json) -> SandboxClass:
         prices=tuple(_dec_price(price) for price in data["prices"]),
         gates=_opt(data.get("gates"), dict),
         unavailable_regions=tuple(data.get("unavailable_regions", ())),
+        operations=tuple(data.get("operations", ())),
     )
 
 
@@ -497,6 +503,27 @@ _CODECS: dict[type, _Codec] = {
         "TcpLink",
         lambda v: {"host": v.host, "port": v.port},
         lambda d: TcpLink(d["host"], d["port"]),
+    ),
+    DirectoryEntry: _Codec(
+        "DirectoryEntry",
+        lambda v: {"name": v.name, "type": v.type, "size": v.size},
+        lambda d: DirectoryEntry(d["name"], d["type"], d["size"]),
+    ),
+    DirectoryPage: _Codec(
+        "DirectoryPage",
+        lambda v: {
+            "entries": [{"name": e.name, "type": e.type, "size": e.size} for e in v.entries],
+            "next_cursor": v.next_cursor,
+        },
+        lambda d: DirectoryPage(
+            tuple(DirectoryEntry(e["name"], e["type"], e["size"]) for e in d["entries"]),
+            d["next_cursor"],
+        ),
+    ),
+    PathInfo: _Codec(
+        "PathInfo",
+        lambda v: {"exists": v.exists, "type": v.type},
+        lambda d: PathInfo(d["exists"], d["type"]),
     ),
     Limits: _Codec("Limits", _enc_limits, lambda d: Limits(**d)),
     ProviderInfo: _Codec(

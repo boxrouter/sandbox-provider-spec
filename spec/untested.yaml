@@ -68,3 +68,7 @@ untested:
   facts/lifetime-timer-counts-from: >-
     The moment a timer starts is visible only at the end of a lifetime, longer than any
     conformance run waits. The value rests on a dated quote of the provider's documentation.
+  provider-api/directory-operations-claimed: >-
+    The claim is checked where it is made: discovery's schema refuses a list of some but not all
+    four operations (tests/v1/test_interface.py), and the tester runs the `directories.` tests
+    only for a class that lists them. The equivalence with commands is what those tests check.

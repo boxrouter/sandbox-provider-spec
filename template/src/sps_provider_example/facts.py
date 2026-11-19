@@ -64,6 +64,7 @@ def build_discovery(provider_id: str, provider_name: str) -> Discovery:
             "at_end": ["destroyed"],
             "counts_paused_time": False,
         },
+        operations=("files.list", "files.mkdir", "files.remove", "files.exists"),
         images=(Image(IMAGE, True, "Debian slim with bash and python3"),),
         prices=(
             Price("cpu", PRICE_CPU, "vcpu_second", "allocated"),

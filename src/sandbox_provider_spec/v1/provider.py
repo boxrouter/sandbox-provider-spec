@@ -21,12 +21,14 @@ from sandbox_provider_spec.v1.types import (
     CreateRequest,
     CredentialField,
     DestroyResult,
+    DirectoryPage,
     Discovery,
     FileInfo,
     FileLink,
     FileLinkRequest,
     FileStream,
     OutputPage,
+    PathInfo,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -211,6 +213,20 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:
         raise self._unsupported("tcp.link")
+
+    async def files_list(
+        self, sandbox_id: str, path: str, *, cursor: str | None = None, limit: int = 100
+    ) -> DirectoryPage:
+        raise self._unsupported("files.list")
+
+    async def files_mkdir(self, sandbox_id: str, path: str, *, parents: bool = False) -> None:
+        raise self._unsupported("files.mkdir")
+
+    async def files_remove(self, sandbox_id: str, path: str, *, recursive: bool = False) -> None:
+        raise self._unsupported("files.remove")
+
+    async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
+        raise self._unsupported("files.exists")
 
     async def aclose(self) -> None:
         """Release HTTP clients; the host calls it once when it is done with the adapter."""

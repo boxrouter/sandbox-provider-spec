@@ -10,7 +10,7 @@ import json
 import traceback
 from collections.abc import AsyncIterator, Awaitable, Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import pytest
@@ -172,6 +172,38 @@ OPERATIONS: list[tuple[str, Callable[[HttpProvider], Awaitable[Any]], str, str, 
         "TcpLink",
         200,
     ),
+    (
+        "files_list",
+        lambda p: p.files_list("sbx-17", "/d"),
+        "GET",
+        "/v1/sandboxes/sbx-17/directories",
+        "DirectoryPage",
+        200,
+    ),
+    (
+        "files_mkdir",
+        lambda p: p.files_mkdir("sbx-17", "/d/e", parents=True),
+        "POST",
+        "/v1/sandboxes/sbx-17/directories",
+        "EmptyObject",
+        200,
+    ),
+    (
+        "files_remove",
+        lambda p: p.files_remove("sbx-17", "/d", recursive=True),
+        "DELETE",
+        "/v1/sandboxes/sbx-17/files",
+        "EmptyObject",
+        200,
+    ),
+    (
+        "files_exists",
+        lambda p: p.files_exists("sbx-17", "/d"),
+        "GET",
+        "/v1/sandboxes/sbx-17/files/exists",
+        "PathInfo",
+        200,
+    ),
 ]
 
 
@@ -179,9 +211,9 @@ def test_is_a_provider() -> None:
     assert issubclass(HttpProvider, Provider)
 
 
-def test_files_read_is_the_twentieth_operation() -> None:
-    # files_read returns a stream and has its own tests below; the other 19 are in OPERATIONS.
-    assert len(OPERATIONS) == 19
+def test_files_read_is_the_twenty_fourth_operation() -> None:
+    # files_read returns a stream and has its own tests below; the other 23 are in OPERATIONS.
+    assert len(OPERATIONS) == 23
 
 
 @pytest.mark.parametrize(("name", "run", "method", "path", "body", "status"), OPERATIONS)
@@ -560,3 +592,51 @@ def test_unexpected_success_status_is_provider_error() -> None:
     with pytest.raises(SpsError) as raised:
         call(lambda p: p.get("sbx-17"), handler)
     assert (raised.value.code, raised.value.outcome) == ("provider_error", "unknown")
+
+
+def test_files_list_sends_path_cursor_and_limit() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("DirectoryPage")
+
+    page = call(lambda p: p.files_list("sbx-17", "/d e", cursor="c1", limit=7), handler)
+    assert [entry.name for entry in page.entries] == ["build", "latest", "notes.txt"]
+    assert page.next_cursor is None
+    assert dict(seen[0].url.params) == {"path": "/d e", "cursor": "c1", "limit": "7"}
+
+
+def test_files_remove_and_files_mkdir_send_their_flags() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json={})
+
+    call(lambda p: p.files_remove("sbx-17", "/d"), handler)
+    call(lambda p: p.files_remove("sbx-17", "/d", recursive=True), handler)
+    call(lambda p: p.files_mkdir("sbx-17", "/d"), handler)
+    assert dict(seen[0].url.params) == {"path": "/d", "recursive": "false"}
+    assert dict(seen[1].url.params) == {"path": "/d", "recursive": "true"}
+    assert json.loads(seen[2].content) == {"path": "/d", "parents": False}
+
+
+def test_files_exists_result_is_typed() -> None:
+    info = call(lambda p: p.files_exists("sbx-17", "/d"), lambda request: reply("PathInfo"))
+    assert (info.exists, info.type) == (True, "symlink")
+
+
+@pytest.mark.parametrize("code", ["not_found", "conflict", "invalid_request", "unsupported"])
+def test_a_directory_operation_error_becomes_sps_error(code: str) -> None:
+    body = {
+        "error": {"code": code, "message": "x", "outcome": "failed", "retry_after_seconds": None}
+    }
+    status = ERROR_TABLE[cast(Any, code)][0]
+
+    with pytest.raises(SpsError) as raised:
+        call(
+            lambda p: p.files_remove("sbx-17", "/d"),
+            lambda request: httpx.Response(status, json=body),
+        )
+    assert raised.value.code == code

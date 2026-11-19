@@ -63,7 +63,18 @@ OPERATION_CLAIMS = {
     "process.write_stdin": ("knob", ("processes", "input")),
     "process.close_stdin": ("knob", ("processes", "input")),
     "process.cancel": ("knob", ("processes", "cancel")),
+    "files.list": ("operations", "files.list"),
+    "files.mkdir": ("operations", "files.mkdir"),
+    "files.remove": ("operations", "files.remove"),
+    "files.exists": ("operations", "files.exists"),
 }
+
+# Operations that a driver can do with commands where discovery does not claim them. They are
+# not marked unsupported; the driver falls back to the command.
+COMMAND_FALLBACK = frozenset({"files.exists"})
+
+# The section of tests that discovery's `classes[].operations` turns on, in place of a gate.
+DIRECTORIES = "directories"
 
 
 @dataclass
@@ -104,18 +115,38 @@ def claimed_gates(discovery: Discovery) -> dict[str, list[Mapping[str, object]]]
     return found
 
 
+def claimed_operations(discovery: Discovery) -> set[str]:
+    """The operations that some class lists in `operations`."""
+    return {name for item in discovery.classes for name in item.operations}
+
+
+def claimed_sections(discovery: Discovery | None) -> list[str]:
+    """The sections whose tests a run includes: the claimed gates, and `directories` when some
+    class lists the four directory operations."""
+    if discovery is None:
+        return []
+    found = list(claimed_gates(discovery))
+    wanted = {name for name, (kind, _) in OPERATION_CLAIMS.items() if kind == "operations"}
+    if wanted <= claimed_operations(discovery):
+        found.append(DIRECTORIES)
+    return found
+
+
 def unsupported_operations(discovery: Discovery) -> dict[str, str]:
     """The optional operations that discovery does not claim, each with a fixed reason."""
     gates = claimed_gates(discovery)
     facts = {
         key for item in discovery.classes for key, value in item.resources.items() if value is True
     }
+    listed = claimed_operations(discovery)
     missing: dict[str, str] = {}
     for operation, (kind, key) in OPERATION_CLAIMS.items():
         if kind == "gate":
             claimed = key in gates
         elif kind == "fact":
             claimed = key in facts
+        elif kind == "operations":
+            claimed = key in listed
         else:
             gate, knob = cast("tuple[str, str]", key)
             claimed = any(variant.get(knob) is True for variant in gates.get(gate, []))
@@ -158,6 +189,7 @@ def shared_suite() -> Suite:
 def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions) -> Suite:
     """The baseline tests, every `contract.` test, and the tests of each claimed section."""
     gates = claimed_gates(discovery) if discovery is not None else {}
+    sections = set(claimed_sections(discovery))
     chosen: list[Test] = []
     for test in suite.tests:
         head = test.id.split(".", 1)[0]
@@ -166,7 +198,7 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         elif head in {"baseline", "contract"}:
             wanted = True
         else:
-            wanted = head in gates and _consistent(test, gates)
+            wanted = head in sections and _consistent(test, gates)
         if wanted and not (options.quick and test.id in QUICK_SKIPS):
             chosen.append(test)
     if not chosen:
@@ -249,7 +281,12 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             discovery, discovery_status = None, "error"
         if discovery is not None:
             driver.provider = discovery.provider.id
-            driver.unsupported = {**driver.unsupported, **unsupported_operations(discovery)}
+            missing = unsupported_operations(discovery)
+            driver.unsupported = {
+                **driver.unsupported,
+                **{name: why for name, why in missing.items() if name not in COMMAND_FALLBACK},
+            }
+            driver.command_fallback = set(COMMAND_FALLBACK) & set(missing)
         suite = select_tests(shared_suite(), discovery, options)
         # The 1 GiB transfer of `contract.files_1gib_roundtrip` is a requirement of the contract,
         # so a run allows it unless the caller says otherwise.
@@ -266,8 +303,8 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         document = Report(
             report(driver, suite, results, spec_revision=_source_revision(), started_at=started)
         )
-        gates = claimed_gates(discovery) if discovery is not None else {}
-        document.lines = _summary(results, discovery_status, cost_status, gates)
+        sections: dict[str, list[str]] = {name: [] for name in claimed_sections(discovery)}
+        document.lines = _summary(results, discovery_status, cost_status, sections)
         document.all_passed = (
             discovery_status == "passed"
             and cost_status == "passed"

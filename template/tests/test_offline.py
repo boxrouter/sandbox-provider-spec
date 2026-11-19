@@ -56,6 +56,8 @@ class FakeCloud:
     def __init__(self) -> None:
         self.machines: dict[str, dict[str, Any]] = {}
         self.files: dict[tuple[str, str], bytes] = {}
+        # Entries that are not regular files: (machine, path) -> "dir", "link" or "other".
+        self.special: dict[tuple[str, str], str] = {}
         self.jobs: dict[str, dict[str, Any]] = {}
         self.posts = 0
 
@@ -80,8 +82,16 @@ class FakeCloud:
                 return self._json(200, {"status": "ended"})
         if rest == ["exec"] and request.method == "POST":
             return self._exec(request)
+        if rest == ["fs"] and request.url.params.get("op") == "ls":
+            return self._ls(request, machine["machine_id"])
         if rest == ["fs"]:
             return self._fs(request, machine)
+        if rest == ["fs", "stat"]:
+            return self._stat(request, machine["machine_id"])
+        if rest == ["fs", "mkdir"]:
+            return self._mkdir(request, machine["machine_id"])
+        if rest == ["fs", "rm"]:
+            return self._rm(request, machine["machine_id"])
         if rest == ["jobs"] and request.method == "POST":
             return self._start_job(request, machine)
         if len(rest) == 3 and rest[0] == "jobs" and rest[2] == "log":
@@ -149,6 +159,81 @@ class FakeCloud:
                 return self._error(404, "not_found", f"no such file: {path}")
             return httpx.Response(200, content=self.files[key])
         return self._error(405, "invalid_request", "method not allowed")
+
+    # -- directories: an in-memory tree behind the same four calls ---------------
+
+    def _kind(self, mid: str, path: str) -> str | None:
+        if (mid, path) in self.files:
+            return "file"
+        if path == "/" or (mid, path) not in self.special and self._children(mid, path):
+            return "dir"  # a path that only has entries below it is a directory
+        return self.special.get((mid, path))
+
+    def _children(self, mid: str, path: str) -> list[str]:
+        prefix = path.rstrip("/") + "/"
+        paths = [p for (m, p) in [*self.files, *self.special] if m == mid]
+        names = {p[len(prefix) :].split("/", 1)[0] for p in paths if p.startswith(prefix)}
+        return sorted(names, key=str.encode)
+
+    def _ls(self, request: httpx.Request, mid: str) -> httpx.Response:
+        path = request.url.params["path"]
+        kind = self._kind(mid, path)
+        if kind is None:
+            return self._error(404, "not_found", "no such directory")
+        if kind != "dir":
+            return self._error(400, "invalid_request", "not a directory")
+        after = request.url.params.get("after")
+        limit = int(request.url.params["max"])
+        names = [n for n in self._children(mid, path) if after is None or n > after]
+        page, rest = names[:limit], names[limit:]
+        items = []
+        for name in page:
+            child = path.rstrip("/") + "/" + name
+            kind = self._kind(mid, child) or "dir"
+            size = len(self.files[(mid, child)]) if kind == "file" else 4096 if kind == "dir" else 7
+            items.append({"name": name, "kind": kind, "bytes": size})
+        # The token is the last name itself here; the adapter must treat it as opaque.
+        return self._json(200, {"items": items, "after": page[-1] if rest else None})
+
+    def _stat(self, request: httpx.Request, mid: str) -> httpx.Response:
+        kind = self._kind(mid, request.url.params["path"])
+        return self._json(200, {"found": kind is not None, "kind": kind})
+
+    def _mkdir(self, request: httpx.Request, mid: str) -> httpx.Response:
+        body = json.loads(request.content)
+        parts = [p for p in body["path"].split("/") if p]
+        chain = ["/" + "/".join(parts[:i]) for i in range(1, len(parts) + 1)]
+        missing = []
+        for item in chain:
+            kind = self._kind(mid, item)
+            if kind is None:
+                missing.append(item)
+            elif kind != "dir":
+                return self._error(409, "conflict", f"not a directory: {item}")
+        if len(missing) > 1 and not body["parents"]:
+            return self._error(404, "not_found", "no such parent directory")
+        for item in missing:
+            self.special[(mid, item)] = "dir"
+        return self._json(200, {})
+
+    def _rm(self, request: httpx.Request, mid: str) -> httpx.Response:
+        body = json.loads(request.content)
+        path = body["path"]
+        if path == "/":
+            return self._error(400, "invalid_request", "cannot remove /")
+        kind = self._kind(mid, path)
+        if kind is None:
+            return self._error(404, "not_found", "no such path")
+        if kind == "dir":
+            if self._children(mid, path) and not body["recursive"]:
+                return self._error(409, "conflict", "directory is not empty")
+            prefix = path.rstrip("/") + "/"
+            for table in (self.files, self.special):
+                for key in [k for k in table if k[0] == mid and k[1].startswith(prefix)]:
+                    del table[key]
+        self.files.pop((mid, path), None)
+        self.special.pop((mid, path), None)
+        return self._json(200, {})
 
     def _start_job(self, request: httpx.Request, machine: dict[str, Any]) -> httpx.Response:
         body = json.loads(request.content)
@@ -383,6 +468,137 @@ def test_files_round_trip() -> None:
     with pytest.raises(SpsError) as error:
         call(provider, "files_read", box.id, "/tmp/none")
     assert error.value.code == "not_found"
+
+
+def _write(provider: ExampleProvider, box_id: str, path: str, data: bytes) -> None:
+    async def body() -> Any:
+        yield data
+
+    call(provider, "files_write", box_id, path, body(), size=len(data))
+
+
+def test_discovery_claims_all_four_directory_operations() -> None:
+    doc = call(make_provider(FakeCloud()), "discovery")
+    assert tuple(doc.classes[0].operations) == (
+        "files.list",
+        "files.mkdir",
+        "files.remove",
+        "files.exists",
+    )
+    assert to_json(doc)["classes"][0]["operations"] == [
+        "files.list",
+        "files.mkdir",
+        "files.remove",
+        "files.exists",
+    ]
+
+
+def test_files_list_types_sizes_and_order() -> None:
+    cloud = FakeCloud()
+    provider = make_provider(cloud)
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0011")
+    call(provider, "files_mkdir", box.id, "/tmp/d/a", parents=True)
+    _write(provider, box.id, "/tmp/d/b", b"12345")
+    cloud.special[(box.id, "/tmp/d/c")] = "link"
+    cloud.special[(box.id, "/tmp/d/e")] = "other"
+    page = call(provider, "files_list", box.id, "/tmp/d")
+    assert [(e.name, e.type) for e in page.entries] == [
+        ("a", "directory"),
+        ("b", "file"),
+        ("c", "symlink"),
+        ("e", "other"),
+    ]
+    assert next(e for e in page.entries if e.name == "b").size == 5
+    assert page.next_cursor is None
+    assert to_json(page)["entries"][1] == {"name": "b", "type": "file", "size": 5}
+
+
+def test_files_list_pages_follow_name_order() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0012")
+    for index in range(7):
+        _write(provider, box.id, f"/tmp/p/f{index}", b"x")
+    seen: list[str] = []
+    cursor: str | None = None
+    pages = 0
+    while True:
+        page = call(provider, "files_list", box.id, "/tmp/p", cursor=cursor, limit=3)
+        pages += 1
+        assert len(page.entries) <= 3
+        seen += [e.name for e in page.entries]
+        cursor = page.next_cursor
+        if cursor is None:
+            break
+    assert (pages, seen) == (3, [f"f{i}" for i in range(7)])
+    with pytest.raises(SpsError) as error:
+        call(provider, "files_list", box.id, "/tmp/p", limit=0)
+    assert error.value.code == "invalid_request"
+
+
+def test_files_list_errors() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0013")
+    _write(provider, box.id, "/tmp/file", b"x")
+    for path, code in (("/tmp/missing", "not_found"), ("/tmp/file", "invalid_request")):
+        with pytest.raises(SpsError) as error:
+            call(provider, "files_list", box.id, path)
+        assert error.value.code == code
+
+
+def test_files_mkdir_rules() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0014")
+    with pytest.raises(SpsError) as error:
+        call(provider, "files_mkdir", box.id, "/tmp/m/x/y")
+    assert error.value.code == "not_found"
+    call(provider, "files_mkdir", box.id, "/tmp/m/x/y", parents=True)
+    call(provider, "files_mkdir", box.id, "/tmp/m/x/y", parents=True)  # a repeat succeeds
+    call(provider, "files_mkdir", box.id, "/tmp/m/x/y")  # an existing directory succeeds
+    assert call(provider, "files_exists", box.id, "/tmp/m/x/y").type == "directory"
+    _write(provider, box.id, "/tmp/m/file", b"x")
+    for path, parents in (("/tmp/m/file", False), ("/tmp/m/file/sub", True)):
+        with pytest.raises(SpsError) as error:
+            call(provider, "files_mkdir", box.id, path, parents=parents)
+        assert error.value.code == "conflict"
+
+
+def test_files_remove_rules() -> None:
+    provider = make_provider(FakeCloud())
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0015")
+    _write(provider, box.id, "/tmp/r/file", b"x")
+    _write(provider, box.id, "/tmp/r/dir/inner", b"x")
+    call(provider, "files_remove", box.id, "/tmp/r/file")
+    assert call(provider, "files_exists", box.id, "/tmp/r/file").exists is False
+    with pytest.raises(SpsError) as error:
+        call(provider, "files_remove", box.id, "/tmp/r/dir")
+    assert error.value.code == "conflict"
+    assert call(provider, "files_exists", box.id, "/tmp/r/dir/inner").exists is True
+    call(provider, "files_remove", box.id, "/tmp/r/dir", recursive=True)
+    assert call(provider, "files_exists", box.id, "/tmp/r/dir").exists is False
+    for path, code in (("/tmp/r/none", "not_found"), ("/", "invalid_request")):
+        with pytest.raises(SpsError) as error:
+            call(provider, "files_remove", box.id, path)
+        assert error.value.code == code
+
+
+def test_files_exists_reports_the_type_and_a_missing_parent() -> None:
+    cloud = FakeCloud()
+    provider = make_provider(cloud)
+    box = call(provider, "create", CreateRequest(), idempotency_key="key-0016")
+    _write(provider, box.id, "/tmp/e/file", b"x")
+    cloud.special[(box.id, "/tmp/e/dangling")] = "link"
+    found = [
+        call(provider, "files_exists", box.id, path)
+        for path in ("/tmp/e/file", "/tmp/e", "/tmp/e/dangling", "/tmp/e/none", "/no/parent/x")
+    ]
+    assert [(f.exists, f.type) for f in found] == [
+        (True, "file"),
+        (True, "directory"),
+        (True, "symlink"),
+        (False, None),
+        (False, None),
+    ]
+    assert to_json(found[3]) == {"exists": False, "type": None}
 
 
 def test_process_start_and_output() -> None:

@@ -128,6 +128,104 @@ def test_files_roundtrip(server: Any, machine: str) -> None:
     assert status == 404
 
 
+def _sh(server: Any, machine: str, script: str) -> None:
+    status, result = call_json(
+        server.port, "POST", f"/machines/{machine}/exec", body={"cmd": ["bash", "-c", script]}
+    )
+    assert status == 200 and result["code"] == 0, result
+
+
+def _fs_get(server: Any, machine: str, route: str, **params: Any) -> tuple[int, Any]:
+    return call_json(
+        server.port, "GET", f"/machines/{machine}/fs{route}?" + urllib.parse.urlencode(params)
+    )
+
+
+def test_fs_ls_kinds_sizes_and_order(server: Any, machine: str) -> None:
+    _sh(
+        server,
+        machine,
+        "mkdir -p /tmp/sps-d/a && printf 12345 > /tmp/sps-d/b"
+        " && ln -s /nonexistent /tmp/sps-d/c && mkfifo /tmp/sps-d/d",
+    )
+    status, page = _fs_get(server, machine, "", op="ls", path="/tmp/sps-d")
+    assert status == 200, page
+    assert [(i["name"], i["kind"]) for i in page["items"]] == [
+        ("a", "dir"),
+        ("b", "file"),
+        ("c", "link"),
+        ("d", "other"),
+    ]
+    assert page["items"][1]["bytes"] == 5
+    assert page["after"] is None
+
+    status, page = _fs_get(server, machine, "", op="ls", path="/tmp/sps-d", max=3)
+    assert [i["name"] for i in page["items"]] == ["a", "b", "c"]
+    status, rest = _fs_get(server, machine, "", op="ls", path="/tmp/sps-d", after=page["after"])
+    assert [i["name"] for i in rest["items"]] == ["d"]
+    assert rest["after"] is None
+
+    assert _fs_get(server, machine, "", op="ls", path="/tmp/sps-none")[0] == 404
+    assert _fs_get(server, machine, "", op="ls", path="/tmp/sps-d/b")[0] == 400
+
+
+def test_fs_stat_does_not_follow_the_last_link(server: Any, machine: str) -> None:
+    _sh(
+        server,
+        machine,
+        "mkdir -p /tmp/sps-s && touch /tmp/sps-s/f && ln -s /nonexistent /tmp/sps-s/l",
+    )
+    got = [
+        _fs_get(server, machine, "/stat", path=path)[1]
+        for path in (
+            "/tmp/sps-s/f",
+            "/tmp/sps-s",
+            "/tmp/sps-s/l",
+            "/tmp/sps-s/no",
+            "/tmp/sps-s/f/x",
+        )
+    ]
+    assert got == [
+        {"found": True, "kind": "file"},
+        {"found": True, "kind": "dir"},
+        {"found": True, "kind": "link"},
+        {"found": False, "kind": None},
+        {"found": False, "kind": None},
+    ]
+
+
+def test_fs_mkdir_and_rm_rules(server: Any, machine: str) -> None:
+    def post(route: str, body: dict[str, Any]) -> int:
+        return call_json(server.port, "POST", f"/machines/{machine}/fs/{route}", body=body)[0]
+
+    assert post("mkdir", {"path": "/tmp/sps-m/x/y", "parents": False}) == 404
+    assert post("mkdir", {"path": "/tmp/sps-m/x/y", "parents": True}) == 200
+    assert post("mkdir", {"path": "/tmp/sps-m/x/y", "parents": True}) == 200
+    assert post("mkdir", {"path": "/tmp/sps-m/x/y", "parents": False}) == 200
+    _sh(server, machine, "touch /tmp/sps-m/file")
+    assert post("mkdir", {"path": "/tmp/sps-m/file", "parents": False}) == 409
+    assert post("mkdir", {"path": "/tmp/sps-m/file/z", "parents": True}) == 409
+
+    _sh(server, machine, "ln -s /tmp/sps-m/x /tmp/sps-m/link")
+    assert post("rm", {"path": "/tmp/sps-m/x", "recursive": False}) == 409
+    assert post("rm", {"path": "/tmp/sps-m/link", "recursive": True}) == 200  # the link only
+    assert _fs_get(server, machine, "/stat", path="/tmp/sps-m/x/y")[1]["found"] is True
+    assert post("rm", {"path": "/tmp/sps-m/x", "recursive": True}) == 200
+    assert _fs_get(server, machine, "/stat", path="/tmp/sps-m/x")[1]["found"] is False
+    assert post("rm", {"path": "/tmp/sps-m/file", "recursive": False}) == 200
+    assert post("rm", {"path": "/tmp/sps-m/file", "recursive": False}) == 404
+    assert post("rm", {"path": "/", "recursive": True}) == 400
+    assert post("mkdir", {"path": "relative", "parents": True}) == 400
+
+
+def test_a_write_under_a_missing_parent_is_refused(server: Any, machine: str) -> None:
+    status, _ = call(
+        server.port, "PUT", f"/machines/{machine}/fs?path=/tmp/sps-np/x/y", raw=b"abcd"
+    )
+    assert status == 404
+    assert _fs_get(server, machine, "/stat", path="/tmp/sps-np")[1]["found"] is False
+
+
 def test_job_log(server: Any, machine: str) -> None:
     status, started = call_json(
         server.port,

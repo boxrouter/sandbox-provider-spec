@@ -114,7 +114,7 @@ def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
 
-class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods
+class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """A `Driver` whose operations call a `Provider`.
 
     `SpsError("unsupported")` becomes `Unsupported`; any other `SpsError` becomes
@@ -138,6 +138,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods
         self.run_id = run or uuid4().hex
         self.sdk_versions = {"sandbox-provider-spec": version("sandbox-provider-spec")}
         self.unsupported = {**NOT_IN_1_0, **(unsupported or {})}
+        # Operations that have a command to run when discovery does not claim them. Nothing is
+        # claimed until the tester has read discovery, so it starts with all of them.
+        self.command_fallback: set[str] = {"files.exists"}
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
         self._thread.start()
@@ -353,14 +356,90 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods
         return {"data": self.wait(read())}
 
     def files_exists(self, target: object, inputs: Inputs) -> Observation:
-        result = self.wait(
-            self.api.run(
-                self._sandbox(target), RunRequest(argv=["test", "-e", text(inputs, "path")])
+        """The native operation when the class claims it, and otherwise `test -e`. A step that
+        sets `native` checks the operation itself, so without the claim it is unsupported."""
+        if "files.exists" in self.command_fallback:
+            if inputs.get("native") is True:
+                raise Unsupported("discovery does not claim the directory operations")
+            result = self.wait(
+                self.api.run(
+                    self._sandbox(target), RunRequest(argv=["test", "-e", text(inputs, "path")])
+                )
+            )
+            if result.exit_code not in (0, 1):
+                raise NativeFailure("exists_check_failed")
+            return {"exists": result.exit_code == 0}
+        info = self.wait(self.api.files_exists(self._sandbox(target), text(inputs, "path")))
+        return {"exists": info.exists, "type": info.type}
+
+    # Directory operations (contract section 10.3)
+
+    def files_list(self, target: object, inputs: Inputs) -> Observation:
+        cursor = inputs.get("cursor")
+        page = self.wait(
+            self.api.files_list(
+                self._sandbox(target),
+                text(inputs, "path"),
+                cursor=None if cursor is None else str(cursor),
+                limit=number(inputs, "limit", 100),
             )
         )
-        if result.exit_code not in (0, 1):
-            raise NativeFailure("exists_check_failed")
-        return {"exists": result.exit_code == 0}
+        return {
+            "names": [entry.name for entry in page.entries],
+            "types": [entry.type for entry in page.entries],
+            "sizes": [entry.size for entry in page.entries],
+            "entries": [
+                {"name": entry.name, "type": entry.type, "size": entry.size}
+                for entry in page.entries
+            ],
+            "next_cursor": page.next_cursor,
+            "has_more": page.next_cursor is not None,
+        }
+
+    def files_mkdir(self, target: object, inputs: Inputs) -> Observation:
+        self.wait(
+            self.api.files_mkdir(
+                self._sandbox(target),
+                text(inputs, "path"),
+                parents=inputs.get("parents") is True,
+            )
+        )
+        return {}
+
+    def files_remove(self, target: object, inputs: Inputs) -> Observation:
+        self.wait(
+            self.api.files_remove(
+                self._sandbox(target),
+                text(inputs, "path"),
+                recursive=inputs.get("recursive") is True,
+            )
+        )
+        return {}
+
+    def fixture_files_write_missing_parent(self, target: object, inputs: Inputs) -> Observation:
+        """Write 4 known bytes under a missing parent. Either the provider created the parents
+        and the bytes read back, or it refused with `not_found` and created nothing."""
+        del inputs
+        sandbox_id = self._sandbox(target)
+        data = b"sps\n"
+        path = "/tmp/sps-np/x/y"
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield data
+
+        try:
+            self.wait(self.api.files_write(sandbox_id, path, chunks(), size=len(data)))
+        except NativeFailure as error:
+            if error.code != "not_found":
+                raise
+            left = self.wait(
+                self.api.run(sandbox_id, RunRequest(argv=["test", "-e", "/tmp/sps-np"]))
+            )
+            return {"passed": left.exit_code == 1, "stdout": "refused_not_found"}
+        return {
+            "passed": self.files_read_bytes(target, {"path": path})["data"] == data,
+            "stdout": "created_parents",
+        }
 
     def files_write(self, target: object, inputs: Inputs) -> Observation:
         data = base64.b64decode(text(inputs, "data"), validate=True)

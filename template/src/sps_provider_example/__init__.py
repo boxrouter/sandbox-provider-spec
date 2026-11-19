@@ -24,11 +24,15 @@ from sandbox_provider_spec.v1 import (
     CostLine,
     CreateRequest,
     DestroyResult,
+    DirectoryEntry,
+    DirectoryPage,
     Discovery,
+    EntryType,
     FileInfo,
     FileStream,
     OutputChunk,
     OutputPage,
+    PathInfo,
     Process,
     ProcessStartRequest,
     Provider,
@@ -57,6 +61,13 @@ from sps_provider_example.facts import (
     TAG_LABEL,
     build_discovery,
 )
+
+_ENTRY_TYPES: dict[str, EntryType] = {
+    "file": "file",
+    "dir": "directory",
+    "link": "symlink",
+    "other": "other",
+}
 
 
 def _stamp(text: str) -> datetime:
@@ -299,6 +310,47 @@ class ExampleProvider(Provider):
             timeout=httpx.Timeout(None, connect=10.0),
         )
         return FileInfo(path=resp.json()["path"], size=resp.json()["size"])
+
+    # The four directory operations (no gate). Example Cloud's own calls: GET fs?op=ls (a page
+    # that carries the last name as `after` when more follow), GET fs/stat, POST fs/mkdir and
+    # POST fs/rm, each run by Example Cloud inside the machine. Its kinds are file, dir, link
+    # and other.
+
+    async def files_list(
+        self, sandbox_id: str, path: str, *, cursor: str | None = None, limit: int = 100
+    ) -> DirectoryPage:
+        if not 1 <= limit <= LIST_LIMIT:
+            raise SpsError("invalid_request", f"limit must be 1 to {LIST_LIMIT}")
+        params = {"op": "ls", "path": path, "max": limit}
+        if cursor:
+            params["after"] = cursor
+        page = await self._json("GET", f"/machines/{sandbox_id}/fs", params=params)
+        entries = tuple(
+            DirectoryEntry(item["name"], _ENTRY_TYPES[item["kind"]], item["bytes"])
+            for item in page["items"]
+        )
+        return DirectoryPage(entries=entries, next_cursor=page["after"])
+
+    async def files_mkdir(self, sandbox_id: str, path: str, *, parents: bool = False) -> None:
+        await self._json(
+            "POST",
+            f"/machines/{sandbox_id}/fs/mkdir",
+            json={"path": path, "parents": parents},
+        )
+
+    async def files_remove(self, sandbox_id: str, path: str, *, recursive: bool = False) -> None:
+        # A removal that fails part way is a provider fault, which `_check` marks `unknown`.
+        await self._json(
+            "POST",
+            f"/machines/{sandbox_id}/fs/rm",
+            json={"path": path, "recursive": recursive},
+        )
+
+    async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
+        found = await self._json("GET", f"/machines/{sandbox_id}/fs/stat", params={"path": path})
+        if not found["found"]:
+            return PathInfo(exists=False, type=None)
+        return PathInfo(exists=True, type=_ENTRY_TYPES[found["kind"]])
 
     async def process_start(self, sandbox_id: str, request: ProcessStartRequest) -> Process:
         # POST /machines/{id}/jobs; a job is a detached exec with a retained log.

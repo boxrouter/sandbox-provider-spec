@@ -127,8 +127,13 @@ component over 255 bytes, and they name paths in the filesystem that commands se
 
 A missing file is `not_found`; a directory is `invalid_request`; a file over `limits.file_bytes`
 is `too_large`. `files.write` creates the file or replaces its whole content, so repeating it with
-the same bytes gives the same result. The parent directory must exist, or the write is
-`not_found`. A consumer that needs only a prefix may close a read early.
+the same bytes gives the same result. A consumer that needs only a prefix may close a read early.
+
+- When the parent directory of a `files.write` path is missing, a provider **MUST** do one of two <!-- rule: provider-api/files-write-parents -->
+  things: create every missing directory on the path, as `mkdir -p` would, and write the file; or
+  refuse with `not_found` and create nothing. A consumer relies on neither: to have parents
+  created, it makes them itself and writes again. Providers differ here natively, so the contract
+  allows both instead of making an adapter check the parent before every write.
 
 ## 9. Background processes
 
@@ -250,3 +255,45 @@ The server keeps at most one adapter instance per distinct token, for a bounded 
 `aclose()` when it drops one. `--socket` serves plain HTTP on a Unix socket for a host that
 isolates each adapter; `--port` binds to 127.0.0.1 unless `--host` says otherwise. TLS is the job
 of whatever fronts the server.
+
+## 18. Directory operations
+
+Four operations make, list, test and remove paths: `files.list`, `files.mkdir`, `files.remove`
+and `files.exists`. They are a provider-side fast path for what every program can already do with
+commands such as `mkdir -p`, `ls -A`, `test -e` and `rm -rf`, which the SPS baseline leaves to
+commands (`spec.md` section 5, "Other file operations").
+
+They are not an SPS gate. SPS admits a new word only when leaving it out would let a program be
+matched to a provider that breaks it (`spec.md` section 13), and no provider breaks these:
+commands give the same result on every provider. A request cannot ask for them, and matching
+never compares them. A provider claims them in discovery, and they turn on when the tester
+passes them. Where they are off, a consumer runs the commands instead.
+
+- A provider that offers the directory operations **MUST** list all four, and no others, in <!-- rule: provider-api/directory-operations-claimed -->
+  `classes[].operations` of each class that has them, and **MUST NOT** list some but not all of
+  them. Each operation acts with the permissions of the class's default user, and a path that the
+  user may not read or change is `forbidden`. Each result **MUST** be the result that the
+  equivalent commands, run as that user at the same moment, would give.
+- `files.list` **MUST** return the immediate entries of the directory at `path`, without `.` and <!-- rule: provider-api/files-list -->
+  `..` and without recursing, sorted by the bytes of their names. Each entry has `name`, `type`
+  (`file`, `directory`, `symlink`, or `other` for a FIFO, socket or device) and `size` (the
+  entry's own size in bytes, as `lstat` reports it). It **MUST NOT** follow a symbolic link that
+  is an entry: its type is `symlink`. A missing `path` is `not_found`; a `path` that is not a
+  directory is `invalid_request`.
+- A listing **MUST** come in pages that follow name order: `limit` is 1 to `limits.list_limit`, <!-- rule: provider-api/files-list-paging -->
+  default 100, each page starts after the last name of the page before it, and a null
+  `next_cursor` ends the listing. The cursor is opaque. An entry present during the whole listing
+  appears exactly once; one added or removed during it may appear or not.
+- `files.mkdir` **MUST** create a directory, and with `parents: true` every missing ancestor, as <!-- rule: provider-api/files-mkdir -->
+  `mkdir -p` would. An existing directory at `path` is success with or without `parents`. A
+  missing parent without `parents` is `not_found`. An entry that is not a directory, at `path` or
+  at an ancestor that `parents` would create, is `conflict`.
+- `files.remove` **MUST** remove a file, a symbolic link (the link, never its target), an entry <!-- rule: provider-api/files-remove -->
+  of type `other`, or an empty directory. A non-empty directory needs `recursive: true`; without
+  it the call is `conflict` and removes nothing. A recursive removal never follows a symbolic
+  link, and if it fails part way its outcome is `unknown`. A missing `path` is `not_found`, and
+  `path` `/` is `invalid_request`.
+- `files.exists` **MUST** return `{"exists": true, "type": <type>}` when an entry exists at <!-- rule: provider-api/files-exists -->
+  `path`, with the type as `files.list` gives it, and `{"exists": false, "type": null}` when none
+  does, including when its parent is missing. It **MUST NOT** follow a final symbolic link: a
+  dangling link exists, with type `symlink`.

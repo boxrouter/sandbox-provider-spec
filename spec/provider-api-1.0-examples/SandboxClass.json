@@ -56,6 +56,12 @@
       }
     ]
   },
+  "operations": [
+    "files.list",
+    "files.mkdir",
+    "files.remove",
+    "files.exists"
+  ],
   "images": [
     {
       "id": "base",

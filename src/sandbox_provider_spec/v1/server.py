@@ -434,6 +434,53 @@ def _file_path(r: _Request) -> str:
     return path
 
 
+def _flag(r: _Request, name: str) -> bool:
+    text = r.query_one(name)
+    if text is None or text == "false":
+        return False
+    if text == "true":
+        return True
+    raise SpsError("invalid_request", f"Query parameter {name!r} must be true or false")
+
+
+async def _files_list(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    path = _file_path(r)
+    cursor = r.query_one("cursor")
+    if cursor == "":
+        raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
+    limit = r.query_int("limit", 100, 1)
+    r.check_query_used()
+    return 200, to_json(await p.files_list(sandbox_id, path, cursor=cursor, limit=limit))
+
+
+async def _files_mkdir(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    r.check_query_used()
+    body = await r.json_body("MkdirRequest")
+    path = body["path"]
+    if any(len(part.encode("utf-8")) > 255 for part in path.split("/")):
+        raise SpsError("invalid_request", "A path component is over 255 bytes")
+    await p.files_mkdir(sandbox_id, path, parents=body.get("parents", False))
+    return 200, {}
+
+
+async def _files_remove(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    path = _file_path(r)
+    recursive = _flag(r, "recursive")
+    r.check_query_used()
+    await p.files_remove(sandbox_id, path, recursive=recursive)
+    return 200, {}
+
+
+async def _files_exists(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    path = _file_path(r)
+    r.check_query_used()
+    return 200, to_json(await p.files_exists(sandbox_id, path))
+
+
 async def _files_link(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     request: FileLinkRequest = await r.typed_body(FileLinkRequest)
@@ -509,6 +556,10 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("POST", f"{_S}/run", _run),
         ("GET", f"{_S}/files", None),
         ("PUT", f"{_S}/files", _files_write),
+        ("DELETE", f"{_S}/files", _files_remove),
+        ("GET", f"{_S}/files/exists", _files_exists),
+        ("GET", f"{_S}/directories", _files_list),
+        ("POST", f"{_S}/directories", _files_mkdir),
         ("POST", f"{_S}/processes", _process_start),
         ("GET", f"{_P}/output", _process_output),
         ("GET", f"{_S}/cost", _cost),

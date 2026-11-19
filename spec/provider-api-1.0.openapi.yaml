@@ -235,8 +235,9 @@ paths:
       tags: [required]
       summary: Write a file from a byte stream
       description: >-
-        Creates the file or replaces its whole content. The parent directory must exist. Success is reported only after
-        every byte is in the file. A body shorter or longer than `Content-Length` fails with `invalid_request` and outcome
+        Creates the file or replaces its whole content. When the parent directory is missing, the provider either creates
+        every missing directory on the path, as `mkdir -p` would, and writes the file, or refuses with `not_found` and creates
+        nothing; a consumer relies on neither. Success is reported only after every byte is in the file. A body shorter or longer than `Content-Length` fails with `invalid_request` and outcome
         `unknown`: the file may be partly written.
       parameters:
         - name: Content-Length
@@ -261,6 +262,134 @@ paths:
         "404": {$ref: "#/components/responses/NotFound"}
         "409": {$ref: "#/components/responses/Conflict"}
         "413": {$ref: "#/components/responses/TooLarge"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    delete:
+      operationId: files_remove
+      tags: [optional]
+      summary: Remove a file, a link, or a directory
+      description: >-
+        Directory operations (no gate; `classes[].operations`). Removes a file, a symbolic link (the link, never its
+        target), an entry of type `other`, or an empty directory. A non-empty directory needs `recursive` true; without it
+        the call is `conflict` and removes nothing. A recursive removal never follows a symbolic link, and its outcome is
+        `unknown` when it fails part way. A missing path is `not_found`; the path `/` is `invalid_request`.
+      parameters:
+        - name: recursive
+          in: query
+          required: false
+          description: True removes a non-empty directory with everything in it. Default false.
+          schema: {type: boolean, default: false}
+      responses:
+        "200":
+          description: The path is gone.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/files/exists:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/FilePathQuery"}
+    get:
+      operationId: files_exists
+      tags: [optional]
+      summary: Whether an entry exists at a path
+      description: >-
+        Directory operations (no gate; `classes[].operations`). Reports `exists` true with the entry's type, or `exists`
+        false with a null type, which includes a missing parent. A final symbolic link is not followed: a dangling link
+        exists, with type `symlink`.
+      responses:
+        "200":
+          description: Whether the path exists.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PathInfo"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/directories:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    get:
+      operationId: files_list
+      tags: [optional]
+      summary: List the entries of a directory
+      description: >-
+        Directory operations (no gate; `classes[].operations`). Returns the immediate entries of the directory at `path`,
+        without `.` and `..`, sorted by the bytes of their names. A symbolic link inside the directory is never followed:
+        its type is `symlink`. A missing path is `not_found`; a path that is not a directory is `invalid_request`.
+      parameters:
+        - {$ref: "#/components/parameters/FilePathQuery"}
+        - name: cursor
+          in: query
+          required: false
+          description: The `next_cursor` of the page before. Opaque.
+          schema: {type: string, minLength: 1}
+        - name: limit
+          in: query
+          required: false
+          description: 1 to `limits.list_limit`; default 100.
+          schema: {type: integer, minimum: 1, default: 100}
+      responses:
+        "200":
+          description: One page of entries, in name order.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DirectoryPage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    post:
+      operationId: files_mkdir
+      tags: [optional]
+      summary: Create a directory
+      description: >-
+        Directory operations (no gate; `classes[].operations`). Creates a directory owned by the default user; with
+        `parents` true it also creates every missing ancestor, as `mkdir -p` does. An existing directory at the path is
+        success. A missing parent without `parents` is `not_found`. An entry that is not a directory, at the path or at an
+        ancestor that `parents` would create, is `conflict`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/MkdirRequest"}
+      responses:
+        "200":
+          description: The directory exists.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
         "429": {$ref: "#/components/responses/RateLimited"}
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
@@ -1020,6 +1149,17 @@ components:
         gates:
           $ref: "declaration-schema.json#/properties/gates"
           description: The optional sections claimed, with their variants and knob values. A claim alone turns on nothing.
+        operations:
+          type: array
+          uniqueItems: true
+          items: {enum: [files.list, files.mkdir, files.remove, files.exists]}
+          oneOf:
+            - {maxItems: 0}
+            - {minItems: 4}
+          default: []
+          description: >-
+            Optional operations that no SPS gate covers: `files.list`, `files.mkdir`, `files.remove` and `files.exists`,
+            listed all four or none. They turn on when the tester passes them.
         images:
           type: array
           minItems: 1
@@ -1228,6 +1368,48 @@ components:
           description: >-
             True when `timeout_ms` passed before the command exited. The provider ended the command and every process that it
             started.
+    EntryType:
+      enum: [file, directory, symlink, other]
+      description: >-
+        What an entry is: a regular file, a directory, a symbolic link (never followed), or `other` (a FIFO, a socket or a
+        device).
+    DirectoryEntry:
+      type: object
+      required: [name, type, size]
+      properties:
+        name: {type: string, minLength: 1, description: "The entry's name, UTF-8 with invalid bytes replaced by U+FFFD."}
+        type: {$ref: "#/components/schemas/EntryType"}
+        size: {type: integer, minimum: 0, description: "The entry's own size in bytes, as `lstat` reports it."}
+    DirectoryPage:
+      type: object
+      required: [entries, next_cursor]
+      properties:
+        entries:
+          type: array
+          items: {$ref: "#/components/schemas/DirectoryEntry"}
+          description: Entries in the byte order of their names.
+        next_cursor:
+          type: [string, "null"]
+          description: Opaque. Null means that this page is the last one.
+    PathInfo:
+      type: object
+      required: [exists, type]
+      properties:
+        exists: {type: boolean}
+        type:
+          anyOf: [{$ref: "#/components/schemas/EntryType"}, {type: "null"}]
+          description: The type of the entry, null when none exists.
+      allOf:
+        - if: {properties: {exists: {const: true}}}
+          then: {properties: {type: {$ref: "#/components/schemas/EntryType"}}}
+          else: {properties: {type: {type: "null"}}}
+    MkdirRequest:
+      type: object
+      additionalProperties: false
+      required: [path]
+      properties:
+        path: {$ref: "#/components/schemas/FilePath"}
+        parents: {type: boolean, default: false, description: "True also creates every missing ancestor."}
     FileInfo:
       type: object
       required: [path, size]

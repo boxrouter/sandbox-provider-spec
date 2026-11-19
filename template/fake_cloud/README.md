@@ -51,7 +51,11 @@ and a missing or empty one gets `401`. `GET /healthz` is unauthenticated.
 | `GET /machines?tag=<k>:<v>&page_token=&limit=` | → `{machines: [...], next_page_token}`; lists only running machines, `tag` may repeat |
 | `DELETE /machines/{id}` | → `{status}`; repeating on an ended machine still succeeds |
 | `POST /machines/{id}/exec` | `{cmd: [...], dir, env, timeout_s}` → `{code, out, err, killed}`; `killed` means the timeout ended the command |
-| `GET` and `PUT /machines/{id}/fs?path=` | raw bytes in both directions, streamed; `PUT` needs `Content-Length` and the parent directory must exist |
+| `GET` and `PUT /machines/{id}/fs?path=` | raw bytes in both directions, streamed; `PUT` needs `Content-Length`; a missing parent directory is `404` and nothing is created |
+| `GET /machines/{id}/fs?op=ls&path=&after=&max=` | → `{items: [{name, kind, bytes}], after}`; `kind` is `file`, `dir`, `link` or `other`, `bytes` is the entry's own size, items are sorted by name, `max` is 1 to 1000 (default 100), `after` is an opaque token that continues the listing (null at the end) |
+| `GET /machines/{id}/fs/stat?path=` | → `{found, kind}`; a final link is not followed |
+| `POST /machines/{id}/fs/mkdir` | `{path, parents}` → `{}`; `409` when a non-directory is in the way, `404` for a missing parent without `parents` |
+| `POST /machines/{id}/fs/rm` | `{path, recursive}` → `{}`; a link is removed, never followed; `409` for a non-empty directory without `recursive`; `400` for `/` |
 | `POST /machines/{id}/jobs` | `{cmd: [...], dir, env}` → `{job_id}`; a job keeps running after the call returns |
 | `GET /machines/{id}/jobs/{job_id}/log?offset=&wait=` | → `{out, err, offset, done, code}`; `offset` is `<stdout_pos>.<stderr_pos>`, `wait` long-polls up to 60 s |
 | `GET /machines/{id}/usage` | → `{cpu, memory_mb, started, ended}`; `ended` is null while the machine runs |

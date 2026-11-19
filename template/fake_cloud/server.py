@@ -106,6 +106,23 @@ def _optional_dir(body: dict[str, Any]) -> str | None:
     return value
 
 
+_CURSOR = re.compile(r"[A-Za-z0-9_-]{1,8192}\Z")
+
+
+def _fs_path(raw: list[Any] | None) -> str:
+    value = raw[0] if raw else None
+    if not isinstance(value, str) or not value.startswith("/") or "\x00" in value:
+        raise ApiError(400, "invalid_request", "path must be an absolute path")
+    return value
+
+
+def _fs_flag(body: dict[str, Any], name: str) -> str:
+    value = body.get(name, False)
+    if not isinstance(value, bool):
+        raise ApiError(400, "invalid_request", f"{name} must be true or false")
+    return "1" if value else "0"
+
+
 def _machine_id(segment: str) -> str:
     if _MACHINE_ID.fullmatch(segment) is None:
         raise ApiError(404, "not_found", f"unknown machine {segment}")
@@ -323,10 +340,41 @@ async def _handle(cloud: ExampleCloud, scope: dict[str, Any], receive: Any, send
         if method == "PUT":
             await _fs_put(cloud, machine_id, query, scope, receive, send)
             return
+        if method == "GET" and query.get("op") == ["ls"]:
+            path = _fs_path(query.get("path"))
+            after = (query.get("after") or [""])[0]
+            if after and not _CURSOR.fullmatch(after):
+                raise ApiError(400, "invalid_request", "bad after token")
+            count = _int_param(query.get("max", []), "max", 100, 1, 1000)
+            result = await asyncio.to_thread(cloud.fs_op, machine_id, "ls", path, after, str(count))
+            await _send_json(send, 200, result)
+            return
         if method == "GET":
             await _fs_get(cloud, machine_id, query, send)
             return
         raise ApiError(405, "invalid_request", "method not allowed")
+
+    if rest == ["fs", "stat"] and method == "GET":
+        path = _fs_path(query.get("path"))
+        result = await asyncio.to_thread(cloud.fs_op, machine_id, "stat", path)
+        await _send_json(send, 200, result)
+        return
+
+    if rest == ["fs", "mkdir"] and method == "POST":
+        body = await _json_body(receive)
+        path = _fs_path([body.get("path")] if "path" in body else None)
+        flag = _fs_flag(body, "parents")
+        await asyncio.to_thread(cloud.fs_op, machine_id, "mkdir", path, flag)
+        await _send_json(send, 200, {})
+        return
+
+    if rest == ["fs", "rm"] and method == "POST":
+        body = await _json_body(receive)
+        path = _fs_path([body.get("path")] if "path" in body else None)
+        flag = _fs_flag(body, "recursive")
+        await asyncio.to_thread(cloud.fs_op, machine_id, "rm", path, flag)
+        await _send_json(send, 200, {})
+        return
 
     if rest == ["jobs"] and method == "POST":
         body = await _json_body(receive)

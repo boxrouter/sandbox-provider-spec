@@ -514,7 +514,7 @@ An elapsed observation bound is `not_run`; it does not establish a native comman
 | `destroy` | Sandbox target. | Confirmed cleanup result. |
 | `run` | Sandbox target; `bash_script`, optional `cwd`, `environment`, `timeout_ms`, `separate_streams`, `run_as` (named guest user). | `stdout`, `stderr`, `exit_code`, where the native operation exposes them. Streams can be text or byte buffers. |
 | `network.private_address` | Sandbox target; optional `ip_version` (`ipv4` or `ipv6`). | `{address, ip_version}` for the private endpoint other members use to reach the sandbox. `ip_version` is `4` or `6` for a literal endpoint and `null` when the SDK supplies a DNS name; fixtures resolve DNS names from a member sandbox when checking a requested family. |
-| `files.mkdir`, `files.remove` | Sandbox target, `path`; remove can set `recursive`. | Native operation success. |
+| `files.mkdir`, `files.remove` | Sandbox target, `path`; mkdir can set `parents`, remove can set `recursive`. | Native operation success. |
 | `files.write` | Sandbox target, `path`, base64 `data`, optional `user` (named guest user). | Native operation success. Writing a file does not guarantee it remains executable. |
 | `fixture.regular_write_usability` | Sandbox target; `case` one of `exact_bytes`, `create_parents`, `create_access`, `overwrite_access`, `authority`, `executable_effect`, `byte_bound`, `outcome`, `staging_cleanup`; optional `files_write_executable_effect`. | Isolated usability observations through the configured user's command interface. |
 | `files.read_bytes` | Sandbox target, `path`. | `data`, a native byte buffer. |
@@ -524,7 +524,9 @@ An elapsed observation bound is `not_run`; it does not establish a native comman
 | `files.read_stream` | Sandbox target, `path`. | `chunks`, an iterable of native byte chunks for one streamed read. |
 | `fixture.file_links` | Sandbox target; `case` (see [File links](#file-links-and-streamed-transfer)); `operation` for cases that take one. | Runner-side HTTPS requests through the issued links, and guest observations of the file. |
 | `fixture.file_stream` | Sandbox target; `operation` (`read` or `write`) and `size` (64 MiB, 1 GiB or 5 GiB). | One streamed transfer to or from the default user's home directory, hashed on the runner and in the guest. |
-| `files.list`, `files.exists` | Sandbox target, `path`. | `names` or boolean `exists`. |
+| `files.list` | Sandbox target, `path`; the 1.0 driver also takes `cursor` and `limit` (default 100). | `names`, `types` and `sizes` (parallel lists, in name order), `entries` (a list of `{name, type, size}`), `next_cursor` (null on the last page) and boolean `has_more`. |
+| `files.exists` | Sandbox target, `path`. | Boolean `exists`; the 1.0 driver also returns `type` (`file`, `directory`, `symlink` or `other`, null when absent) when the class claims the operation, and otherwise runs `test -e`. A step with `native: true` checks the operation itself and is unsupported without the claim. |
+| `fixture.files_write_missing_parent` | Sandbox target. | `passed` and `stdout`: the 1.0 driver writes 4 bytes under a missing parent and passes when the write succeeded and the bytes read back (`created_parents`), or failed with `not_found` and created nothing (`refused_not_found`). |
 | `process.start` | Sandbox target, `bash_script`, optional `timeout_ms`, `run_as` (named guest user). | Owned native process binding and opaque `identity` when available. |
 | `process.write_stdin` | Process target; base64 `data` for input. | Native write success. |
 | `process.output`, `process.wait` | Process target. | Native streams or `exit_code`. |

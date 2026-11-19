@@ -73,6 +73,113 @@ with open(spec["result"], "w") as handle:
 """
 
 
+# Runs inside a machine for the directory calls: one operation, one JSON line on stdout. A
+# failure that the caller should see is {"error": <code>, "message": ...}.
+_FS_SCRIPT = """
+import base64, errno, json, os, shutil, stat, sys
+
+def fail(code, message):
+    print(json.dumps({"error": code, "message": message}))
+    sys.exit(0)
+
+def kind(mode):
+    if stat.S_ISREG(mode):
+        return "file"
+    if stat.S_ISDIR(mode):
+        return "dir"
+    if stat.S_ISLNK(mode):
+        return "link"
+    return "other"
+
+def guarded(call):
+    try:
+        return call()
+    except PermissionError:
+        fail("forbidden", "permission denied")
+
+op, path = sys.argv[1], os.fsencode(sys.argv[2])
+if op == "ls":
+    after = base64.urlsafe_b64decode(sys.argv[3] + "==") if sys.argv[3] else None
+    limit = int(sys.argv[4])
+    try:
+        names = guarded(lambda: os.listdir(path))
+    except FileNotFoundError:
+        fail("not_found", "no such directory")
+    except NotADirectoryError:
+        fail("invalid_request", "not a directory")
+    names = sorted(name for name in names if after is None or name > after)
+    page, rest = names[:limit], names[limit:]
+    items = []
+    for name in page:
+        try:
+            info = os.lstat(os.path.join(path, name))
+        except FileNotFoundError:
+            continue  # removed while listing
+        items.append(
+            {"name": name.decode("utf-8", "replace"), "kind": kind(info.st_mode),
+             "bytes": info.st_size}
+        )
+    token = base64.urlsafe_b64encode(page[-1]).decode().rstrip("=") if rest else None
+    print(json.dumps({"items": items, "after": token}))
+elif op == "stat":
+    try:
+        info = guarded(lambda: os.lstat(path))
+    except (FileNotFoundError, NotADirectoryError):
+        print(json.dumps({"found": False, "kind": None}))
+    else:
+        print(json.dumps({"found": True, "kind": kind(info.st_mode)}))
+elif op == "mkdir":
+    parents = sys.argv[3] == "1"
+    def is_dir(candidate):
+        return os.path.isdir(candidate)
+    parts = [p for p in path.split(b"/") if p]
+    chain = [b"/" + b"/".join(parts[:i]) for i in range(1, len(parts) + 1)]
+    missing = []
+    for candidate in chain:
+        if os.path.lexists(candidate):
+            if not is_dir(candidate):
+                fail("conflict", "not a directory: " + candidate.decode("utf-8", "replace"))
+        else:
+            missing.append(candidate)
+    if len(missing) > 1 and not parents:
+        fail("not_found", "no such parent directory")
+    for candidate in missing:
+        try:
+            guarded(lambda: os.mkdir(candidate))
+        except FileExistsError:
+            if not is_dir(candidate):
+                fail("conflict", "not a directory")
+    print("{}")
+elif op == "rm":
+    recursive = sys.argv[3] == "1"
+    if os.path.normpath(path) == b"/":
+        fail("invalid_request", "cannot remove /")
+    try:
+        info = guarded(lambda: os.lstat(path))
+    except (FileNotFoundError, NotADirectoryError):
+        fail("not_found", "no such path")
+    if not stat.S_ISDIR(info.st_mode):
+        guarded(lambda: os.unlink(path))
+    elif recursive:
+        guarded(lambda: shutil.rmtree(path))
+    else:
+        try:
+            guarded(lambda: os.rmdir(path))
+        except OSError as exc:
+            if exc.errno in (errno.ENOTEMPTY, errno.EEXIST):
+                fail("conflict", "directory is not empty")
+            raise
+    print("{}")
+"""
+
+_FS_STATUS = {
+    "not_found": 404,
+    "invalid_request": 400,
+    "conflict": 409,
+    "forbidden": 403,
+}
+
+
 class ApiError(Exception):
     """An HTTP-visible failure: status, machine-readable code, human message."""
 
@@ -557,6 +664,19 @@ class ExampleCloud:
         if not accepted:
             raise ApiError(502, "provider_error", "write was not accepted")
         return {"path": path, "size": size}
+
+    def fs_op(self, machine_id: str, op: str, path: str, *extra: str) -> dict[str, Any]:
+        """Run one directory call (`ls`, `stat`, `mkdir`, `rm`) inside the machine."""
+        result = self.exec_command(
+            machine_id, ["python3", "-c", _FS_SCRIPT, op, path, *extra], None, {}, 60.0
+        )
+        if result["killed"] or result["code"] != 0:
+            raise ApiError(502, "provider_error", f"{op} failed: {result['err'][-200:]}")
+        reply: dict[str, Any] = json.loads(result["out"])
+        code = reply.get("error")
+        if code is not None:
+            raise ApiError(_FS_STATUS[code], code, str(reply["message"]))
+        return reply
 
     # -- jobs ---------------------------------------------------------------
 

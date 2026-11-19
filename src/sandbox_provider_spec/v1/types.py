@@ -220,6 +220,28 @@ class TcpLink:
     port: int
 
 
+EntryType = Literal["file", "directory", "symlink", "other"]
+
+
+@dataclass(frozen=True)
+class DirectoryEntry:
+    name: str
+    type: EntryType
+    size: int
+
+
+@dataclass(frozen=True)
+class DirectoryPage:
+    entries: Sequence[DirectoryEntry]
+    next_cursor: str | None
+
+
+@dataclass(frozen=True)
+class PathInfo:
+    exists: bool
+    type: EntryType | None
+
+
 @dataclass(frozen=True)
 class Limits:
     file_bytes: int
@@ -258,6 +280,9 @@ class SandboxClass:
     prices: Sequence[Price]
     gates: Mapping[str, object] | None = None
     unavailable_regions: Sequence[str] = ()
+    # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
+    # `files.remove` and `files.exists`, or none (contract section 10.3).
+    operations: Sequence[str] = ()
 
 
 @dataclass(frozen=True)

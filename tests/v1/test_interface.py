@@ -49,6 +49,10 @@ OPTIONAL = {
     "process_cancel": ("process.cancel", ("s", "p")),
     "preview_link": ("preview.link", ("s", 3000)),
     "tcp_link": ("tcp.link", ("s", 5432)),
+    "files_list": ("files.list", ("s", "/d")),
+    "files_mkdir": ("files.mkdir", ("s", "/d")),
+    "files_remove": ("files.remove", ("s", "/d")),
+    "files_exists": ("files.exists", ("s", "/d")),
 }
 
 
@@ -68,7 +72,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 20
+    assert len(ids) == 24
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -106,6 +110,7 @@ def test_every_json_object_type_is_covered() -> None:
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
         "PreviewRequest", "TcpLinkRequest",
+        "MkdirRequest", "EntryType",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}
     assert set(example_names()) == every - plain
@@ -391,3 +396,39 @@ def test_price_item_enum_equals_the_python_literal() -> None:
     enum = OPENAPI["components"]["schemas"]["PriceItem"]["enum"]
     assert set(enum) == set(typing.get_args(v1_types.PriceItem))
     assert len(enum) == 12
+
+
+FOUR = ["files.list", "files.mkdir", "files.remove", "files.exists"]
+
+
+def test_a_class_lists_all_four_directory_operations_or_none() -> None:
+    example = json.loads((EXAMPLES / "SandboxClass.json").read_text(encoding="utf-8"))
+    assert example["operations"] == FOUR
+    value = from_json(v1_types.SandboxClass, example)
+    assert tuple(value.operations) == tuple(FOUR)
+    assert to_json(value) == example
+    # None is the default and is not written.
+    bare = {key: item for key, item in example.items() if key != "operations"}
+    assert from_json(v1_types.SandboxClass, bare).operations == ()
+    assert to_json(from_json(v1_types.SandboxClass, bare)) == bare
+    for refused in (FOUR[:1], FOUR[:3], FOUR + FOUR[:1], ["files.list", "files.nope"]):
+        with pytest.raises(WireError):
+            from_json(v1_types.SandboxClass, {**example, "operations": refused})
+
+
+@pytest.mark.parametrize(
+    ("body", "refused"),
+    [
+        ({"exists": True, "type": "file"}, False),
+        ({"exists": False, "type": None}, False),
+        ({"exists": True, "type": None}, True),
+        ({"exists": False, "type": "file"}, True),
+        ({"exists": True, "type": "socket"}, True),
+    ],
+)
+def test_path_info_pairs_exists_with_type(body: dict[str, Any], refused: bool) -> None:
+    if refused:
+        with pytest.raises(WireError):
+            from_json(v1_types.PathInfo, body)
+    else:
+        assert to_json(from_json(v1_types.PathInfo, body)) == body

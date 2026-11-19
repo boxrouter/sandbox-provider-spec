@@ -4366,3 +4366,301 @@ tests:
   - provider-api/cost-final-retained
   - provider-api/cost-provider-records
   proves: []
+- id: directories.list
+  title: A directory lists its immediate entries in name order, with the type and size of each, and never follows a link.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: mkdir -p /tmp/sps-d/a && printf 12345 > /tmp/sps-d/b && ln -s /nonexistent /tmp/sps-d/c && mkfifo /tmp/sps-d/d
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.list
+    target: box
+    in:
+      path: /tmp/sps-d
+    expect:
+      equals:
+        names: [a, b, c, d]
+        types: [directory, file, symlink, other]
+        next_cursor: null
+      contains:
+        entries:
+          name: b
+          type: file
+          size: 5
+  rules:
+  - provider-api/files-list
+  proves: []
+- id: directories.list_paging
+  title: A listing of 150 entries comes in pages of 100 and 50, each page after the last name of the one before.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: |-
+        mkdir -p /tmp/sps-p && cd /tmp/sps-p
+        for i in $(seq 1 150); do : > "f$(printf %03d "$i")"; done
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.list
+    target: box
+    in:
+      path: /tmp/sps-p
+      limit: 100
+    as: first
+    expect:
+      equals:
+        names: [f001, f002, f003, f004, f005, f006, f007, f008, f009, f010, f011, f012, f013, f014, f015, f016, f017, f018, f019, f020, f021, f022, f023, f024, f025, f026, f027, f028, f029, f030, f031, f032, f033, f034, f035, f036, f037, f038, f039, f040, f041, f042, f043, f044, f045, f046, f047, f048, f049, f050, f051, f052, f053, f054, f055, f056, f057, f058, f059, f060, f061, f062, f063, f064, f065, f066, f067, f068, f069, f070, f071, f072, f073, f074, f075, f076, f077, f078, f079, f080, f081, f082, f083, f084, f085, f086, f087, f088, f089, f090, f091, f092, f093, f094, f095, f096, f097, f098, f099, f100]
+        has_more: true
+  - op: files.list
+    target: box
+    in:
+      path: /tmp/sps-p
+      limit: 100
+      cursor: $first.next_cursor
+    expect:
+      equals:
+        names: [f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150]
+        next_cursor: null
+  rules:
+  - provider-api/files-list-paging
+  proves: []
+- id: directories.list_errors
+  title: Listing a missing path is not_found, and listing a regular file is invalid_request.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf x > /tmp/sps-list-file
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.list
+    target: box
+    in:
+      path: /tmp/sps-list-no-such-directory
+    expect:
+      error: not_found
+  - op: files.list
+    target: box
+    in:
+      path: /tmp/sps-list-file
+    expect:
+      error: invalid_request
+  rules:
+  - provider-api/files-list
+  proves: []
+- id: directories.mkdir
+  title: A directory is made with or without its parents, a repeat succeeds, and a file in the way is a conflict.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: mkdir -p /tmp/sps-m && printf x > /tmp/sps-m/file
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/x/y
+    expect:
+      error: not_found
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/x/y
+      parents: true
+  - op: run
+    target: box
+    in:
+      bash_script: test -d /tmp/sps-m/x/y
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/x/y
+      parents: true
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/x/y
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/file
+    expect:
+      error: conflict
+  - op: files.mkdir
+    target: box
+    in:
+      path: /tmp/sps-m/file/z
+      parents: true
+    expect:
+      error: conflict
+  rules:
+  - provider-api/files-mkdir
+  proves: []
+- id: directories.remove
+  title: A file, a link and a directory are removed, a non-empty directory needs recursive, and a link's target stays.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: mkdir -p /tmp/sps-r/full/sub /tmp/sps-r/target && printf x > /tmp/sps-r/file && printf x > /tmp/sps-r/full/sub/f && printf keep > /tmp/sps-r/target/keep && ln -s /tmp/sps-r/target /tmp/sps-r/link
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.remove
+    target: box
+    in:
+      path: /tmp/sps-r/file
+  - op: run
+    target: box
+    in:
+      bash_script: test ! -e /tmp/sps-r/file
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.remove
+    target: box
+    in:
+      path: /tmp/sps-r/full
+    expect:
+      error: conflict
+  - op: run
+    target: box
+    in:
+      bash_script: test -f /tmp/sps-r/full/sub/f
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.remove
+    target: box
+    in:
+      path: /tmp/sps-r/full
+      recursive: true
+  - op: run
+    target: box
+    in:
+      bash_script: test ! -e /tmp/sps-r/full
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.remove
+    target: box
+    in:
+      path: /tmp/sps-r/link
+  - op: run
+    target: box
+    in:
+      bash_script: test ! -e /tmp/sps-r/link && test ! -L /tmp/sps-r/link && test -f /tmp/sps-r/target/keep
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.remove
+    target: box
+    in:
+      path: /tmp/sps-r/no-such-entry
+    expect:
+      error: not_found
+  - op: files.remove
+    target: box
+    in:
+      path: /
+      recursive: true
+    expect:
+      error: invalid_request
+  rules:
+  - provider-api/files-remove
+  proves: []
+- id: directories.exists
+  title: An entry exists with its type, a dangling link exists as a link, and a missing path or parent does not exist.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: mkdir -p /tmp/sps-e/d && printf x > /tmp/sps-e/f && ln -s /nonexistent /tmp/sps-e/l
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-e/f
+      native: true
+    expect:
+      equals:
+        exists: true
+        type: file
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-e/d
+      native: true
+    expect:
+      equals:
+        exists: true
+        type: directory
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-e/l
+      native: true
+    expect:
+      equals:
+        exists: true
+        type: symlink
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-e/missing
+      native: true
+    expect:
+      equals:
+        exists: false
+        type: null
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-e/no-such-parent/missing
+      native: true
+    expect:
+      equals:
+        exists: false
+        type: null
+  rules:
+  - provider-api/files-exists
+  proves: []
+- id: contract.files_write_missing_parent
+  title: A write under a missing parent either creates the parents and the bytes read back, or is not_found and creates nothing.
+  steps:
+  - op: create
+    as: box
+  - op: fixture.files_write_missing_parent
+    target: box
+    expect:
+      equals:
+        passed: true
+      record:
+      - stdout
+  rules:
+  - provider-api/files-write-parents
+  proves: []

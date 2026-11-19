@@ -21,12 +21,15 @@ from sandbox_provider_spec.v1 import (
     CreateRequest,
     CredentialField,
     DestroyResult,
+    DirectoryEntry,
+    DirectoryPage,
     Discovery,
     FileInfo,
     FileLink,
     FileLinkRequest,
     FileStream,
     OutputPage,
+    PathInfo,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -175,6 +178,22 @@ class Recorder(Provider, manifest=False):
         self._note("tcp_link", sandbox_id, port)
         return example(TcpLink)
 
+    async def files_list(
+        self, sandbox_id: str, path: str, *, cursor: str | None = None, limit: int = 100
+    ) -> DirectoryPage:
+        self._note("files_list", sandbox_id, path, cursor, limit)
+        return DirectoryPage((DirectoryEntry("a", "file", 1),), None)
+
+    async def files_mkdir(self, sandbox_id: str, path: str, *, parents: bool = False) -> None:
+        self._note("files_mkdir", sandbox_id, path, parents)
+
+    async def files_remove(self, sandbox_id: str, path: str, *, recursive: bool = False) -> None:
+        self._note("files_remove", sandbox_id, path, recursive)
+
+    async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
+        self._note("files_exists", sandbox_id, path)
+        return example(PathInfo)
+
 
 class TwoFields(Recorder, manifest=False):
     provider_id = "two"
@@ -304,6 +323,16 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
         request_json("FileLinkRequest"),
         "files_link",
     ),
+    ("files_list", "GET", "/v1/sandboxes/sbx-1/directories", None, "files_list"),
+    (
+        "files_mkdir",
+        "POST",
+        "/v1/sandboxes/sbx-1/directories",
+        request_json("MkdirRequest"),
+        "files_mkdir",
+    ),
+    ("files_remove", "DELETE", "/v1/sandboxes/sbx-1/files", None, "files_remove"),
+    ("files_exists", "GET", "/v1/sandboxes/sbx-1/files/exists", None, "files_exists"),
     ("pause", "POST", "/v1/sandboxes/sbx-1/pause", {}, "pause"),
     ("resume", "POST", "/v1/sandboxes/sbx-1/resume", {}, "resume"),
     (
@@ -348,7 +377,9 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
 async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
     headers: dict[str, str] = {}
     query = ""
-    if path.endswith("/files"):
+    if path.endswith(("/files", "/files/exists")) or (
+        path.endswith("/directories") and method == "GET"
+    ):
         query = "path=/work/a.txt"
     if path == "/v1/sandboxes" and method == "POST":
         headers["Idempotency-Key"] = IDEM
@@ -360,8 +391,8 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
     return await call(app, method, path, body=payload, headers=headers, query=query)
 
 
-def test_the_route_table_covers_all_twenty_operations() -> None:
-    assert len({operation for operation, *_ in ROUTES}) == 20
+def test_the_route_table_covers_all_operations() -> None:
+    assert len({operation for operation, *_ in ROUTES}) == 24
 
 
 @pytest.mark.parametrize(("operation", "method", "path", "body", "called"), ROUTES)
@@ -415,6 +446,109 @@ def test_arguments_arrive_as_typed_values() -> None:
     request = create[1][0]
     assert isinstance(request, CreateRequest)
     assert (request.labels, request.lifetime_seconds, create[1][1]) == ({"a": "b"}, 60, IDEM)
+
+
+def test_files_list_arguments_and_defaults() -> None:
+    app = create_app(Recorder)
+    asyncio.run(call(app, "GET", "/v1/sandboxes/s1/directories", query="path=/d"))
+    asyncio.run(call(app, "GET", "/v1/sandboxes/s1/directories", query="path=/d&cursor=c9&limit=7"))
+    assert Recorder.calls == [
+        ("files_list", ("s1", "/d", None, 100)),
+        ("files_list", ("s1", "/d", "c9", 7)),
+    ]
+
+
+def test_files_mkdir_and_files_remove_arguments() -> None:
+    app = create_app(Recorder)
+    made = asyncio.run(call(app, "POST", "/v1/sandboxes/s1/directories", body=j({"path": "/d/e"})))
+    assert (made.status, made.json()) == (200, {})
+    asyncio.run(
+        call(
+            app,
+            "POST",
+            "/v1/sandboxes/s1/directories",
+            body=j({"path": "/d/e", "parents": True}),
+        )
+    )
+    removed = asyncio.run(call(app, "DELETE", "/v1/sandboxes/s1/files", query="path=/d"))
+    assert (removed.status, removed.json()) == (200, {})
+    asyncio.run(call(app, "DELETE", "/v1/sandboxes/s1/files", query="path=/d&recursive=true"))
+    assert Recorder.calls == [
+        ("files_mkdir", ("s1", "/d/e", False)),
+        ("files_mkdir", ("s1", "/d/e", True)),
+        ("files_remove", ("s1", "/d", False)),
+        ("files_remove", ("s1", "/d", True)),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "body", "query"),
+    [
+        ("GET", "/v1/sandboxes/s1/directories", b"", ""),  # no path
+        ("GET", "/v1/sandboxes/s1/directories", b"", "path=/d&limit=0"),
+        ("GET", "/v1/sandboxes/s1/directories", b"", "path=/d&cursor="),
+        ("GET", "/v1/sandboxes/s1/directories", b"", "path=/d&extra=1"),
+        ("POST", "/v1/sandboxes/s1/directories", j({"parents": True}), ""),  # no path
+        ("POST", "/v1/sandboxes/s1/directories", j({"path": "/d", "parents": "yes"}), ""),
+        ("POST", "/v1/sandboxes/s1/directories", j({"path": "/d", "surprise": 1}), ""),
+        ("POST", "/v1/sandboxes/s1/directories", j({"path": "d"}), ""),
+        ("DELETE", "/v1/sandboxes/s1/files", b"", "path=/d&recursive=maybe"),
+        ("DELETE", "/v1/sandboxes/s1/files", b"", "recursive=true"),
+        ("GET", "/v1/sandboxes/s1/files/exists", b"", ""),
+        ("GET", "/v1/sandboxes/s1/files/exists", b"", "path=relative"),
+    ],
+)
+def test_a_malformed_directory_request_is_invalid_request(
+    method: str, path: str, body: bytes, query: str
+) -> None:
+    app = create_app(Recorder)
+    reply = asyncio.run(call(app, method, path, body=body, query=query))
+    assert reply.status == 400, bytes(reply.body)
+    assert reply.json()["error"]["code"] == "invalid_request"
+    assert Recorder.calls == []
+
+
+def test_a_path_component_over_255_bytes_is_refused_by_every_directory_operation() -> None:
+    app = create_app(Recorder)
+    long = "/d/" + "x" * 256
+    replies = [
+        asyncio.run(call(app, "GET", "/v1/sandboxes/s1/directories", query=f"path={long}")),
+        asyncio.run(call(app, "POST", "/v1/sandboxes/s1/directories", body=j({"path": long}))),
+        asyncio.run(call(app, "DELETE", "/v1/sandboxes/s1/files", query=f"path={long}")),
+        asyncio.run(call(app, "GET", "/v1/sandboxes/s1/files/exists", query=f"path={long}")),
+    ]
+    assert [reply.status for reply in replies] == [400] * 4
+    assert Recorder.calls == []
+
+
+def test_a_directory_operation_that_the_provider_lacks_is_unsupported() -> None:
+    class Bare(Provider, manifest=False):
+        provider_id = "bare"
+        name = "Bare"
+        spec_version = "1.0"
+        credential_fields: ClassVar[tuple[CredentialField, ...]] = (CredentialField("api_key"),)
+
+        async def discovery(self) -> Any: ...
+        async def create(self, request: Any, *, idempotency_key: str) -> Any: ...
+        async def get(self, sandbox_id: str) -> Any: ...
+        async def list(
+            self, *, labels: Any = None, cursor: Any = None, limit: int = 100
+        ) -> Any: ...
+        async def destroy(self, sandbox_id: str) -> Any: ...
+        async def run(self, sandbox_id: str, request: Any) -> Any: ...
+        async def files_read(self, sandbox_id: str, path: str) -> Any: ...
+        async def files_write(
+            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        ) -> Any: ...
+        async def process_start(self, sandbox_id: str, request: Any) -> Any: ...
+        async def process_output(
+            self, sandbox_id: str, process_id: str, *, cursor: Any = None, wait_ms: int = 0
+        ) -> Any: ...
+        async def cost(self, sandbox_id: str) -> Any: ...
+
+    app = create_app(Bare)
+    reply = asyncio.run(call(app, "GET", "/v1/sandboxes/s1/files/exists", query="path=/d"))
+    assert (reply.status, reply.json()["error"]["code"]) == (422, "unsupported")
 
 
 def test_a_repeated_idempotent_create_still_returns_created() -> None:

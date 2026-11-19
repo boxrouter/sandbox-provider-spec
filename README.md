@@ -103,7 +103,7 @@ does or an input is invalid. `baseline_failed` means that the cited reports do n
 baseline that every provider must pass. The [tutorial](docs/getting-started.md) walks through more.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 48 knobs; the conformance suite has 253 tests.
+The vocabulary has 16 gates and 48 knobs; the conformance suite has 260 tests.
 
 ## Principles
 

@@ -23,12 +23,14 @@ from sandbox_provider_spec.v1.types import (
     Cost,
     CreateRequest,
     DestroyResult,
+    DirectoryPage,
     Discovery,
     FileInfo,
     FileLink,
     FileLinkRequest,
     FileStream,
     OutputPage,
+    PathInfo,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -471,6 +473,39 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:
         return await self._json(
             TcpLink, "POST", self._sandbox_path(sandbox_id, "/tcp-links"), body={"port": port}
+        )
+
+    async def files_list(
+        self, sandbox_id: str, path: str, *, cursor: str | None = None, limit: int = 100
+    ) -> DirectoryPage:
+        params = [("path", path)]
+        if cursor is not None:
+            params.append(("cursor", cursor))
+        params.append(("limit", str(limit)))
+        return await self._json(
+            DirectoryPage, "GET", self._sandbox_path(sandbox_id, "/directories"), params=params
+        )
+
+    async def files_mkdir(self, sandbox_id: str, path: str, *, parents: bool = False) -> None:
+        await self._ack(
+            "POST",
+            self._sandbox_path(sandbox_id, "/directories"),
+            body={"path": path, "parents": parents},
+        )
+
+    async def files_remove(self, sandbox_id: str, path: str, *, recursive: bool = False) -> None:
+        await self._ack(
+            "DELETE",
+            self._sandbox_path(sandbox_id, "/files"),
+            params=[("path", path), ("recursive", "true" if recursive else "false")],
+        )
+
+    async def files_exists(self, sandbox_id: str, path: str) -> PathInfo:
+        return await self._json(
+            PathInfo,
+            "GET",
+            self._sandbox_path(sandbox_id, "/files/exists"),
+            params=[("path", path)],
         )
 
     async def aclose(self) -> None:
