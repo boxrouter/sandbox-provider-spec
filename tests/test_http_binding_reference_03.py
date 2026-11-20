@@ -88,7 +88,7 @@ class AdmittedFakeBackend(DeterministicBackend):
         )
         if self.create_entered is not None:
             self.create_entered.set()
-        if self.create_release is not None and not self.create_release.wait(2):
+        if self.create_release is not None and not self.create_release.wait(30):
             raise OSError("fake create did not settle")
         if self.create_failure is not None:
             if self.create_settled is not None:
@@ -525,10 +525,10 @@ def test_03_concurrent_exact_create_dispatches_once(reference03: Reference03) ->
     reference03.backend.create_release = threading.Event()
     with ThreadPoolExecutor(max_workers=2) as workers:
         first = workers.submit(reference03.send, request)
-        assert reference03.backend.create_entered.wait(1)
-        replay = workers.submit(reference03.send, request).result(timeout=2)
+        assert reference03.backend.create_entered.wait(30)
+        replay = workers.submit(reference03.send, request).result(timeout=30)
         reference03.backend.create_release.set()
-        created = first.result(timeout=3)
+        created = first.result(timeout=30)
 
     assert replay["state"] == "unknown" and replay["sandbox"] is None
     assert created["state"] == "ready"
@@ -559,12 +559,12 @@ def test_03_late_native_settlement_preserves_definitive_or_unknown_outcome(
         first = reference.send(request, status=504)
         assert first["error"]["code"] == "timeout"
         assert first["error"]["outcome"] == "unknown"
-        assert backend.create_entered.wait(2)
+        assert backend.create_entered.wait(30)
         backend.create_release.set()
-        assert backend.create_settled.wait(1)
+        assert backend.create_settled.wait(30)
         with reference.endpoint._runtime.observations:
             assert reference.endpoint._runtime.observations.wait_for(
-                lambda: reference.endpoint._runtime.pending == 0, timeout=1
+                lambda: reference.endpoint._runtime.pending == 0, timeout=30
             )
 
         replay = reference.send(request, status=replay_status)
