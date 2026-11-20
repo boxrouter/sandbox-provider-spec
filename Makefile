@@ -12,9 +12,15 @@ check: lint
 	$(MAKE) check-docs
 	build=$$(mktemp -d); trap 'rm -rf "$$build"' EXIT HUP INT TERM; \
 		$(UV) build --quiet --out-dir "$$build" && \
+		mkdir "$$build/dist" && \
+		mv "$$build"/sandbox_provider_spec-*.whl "$$build/dist/" && \
+		version=$$(sed -n 's/^version = "\([^"]*\)"$$/\1/p' pyproject.toml) && \
+		$(RUN) python scripts/verify_distribution.py \
+			--manifest distribution-manifest.json \
+			--artifact-directory "$$build/dist" --tag "v$$version" && \
 		$(UV) venv --quiet "$$build/venv" && \
 		$(UV) pip install --quiet --python "$$build/venv/bin/python" \
-			"$$build"/sandbox_provider_spec-*.whl && \
+			"$$build/dist"/sandbox_provider_spec-*.whl && \
 		$(RUN) python tools/check_docs.py --readme-examples \
 			--cli "$$build/venv/bin/sandbox-provider-spec"
 
