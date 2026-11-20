@@ -688,7 +688,6 @@ class ExampleCloud:
                 {"size_bytes": row["size_bytes"], "from": row["created"], "until": row["deleted"]}
             ],
             "as_of": _now(),
-            "revision": 1,
         }
 
     def describe_machine(self, machine_id: str) -> dict[str, Any]:
@@ -1155,8 +1154,7 @@ class ExampleCloud:
             "memory_mb": row["memory_mb"],  # type: ignore[index]
             "started": row["started"],  # type: ignore[index]
             "ended": row["ended"],  # type: ignore[index]
-            "as_of": _now(),  # the record runs through this time; a running machine counts up to it
-            "revision": 1,  # Example Cloud never corrects a record it has reported
+            "as_of": _now(),  # when this record was read; a running machine counts up to it
         }
 
     # -- background ---------------------------------------------------------

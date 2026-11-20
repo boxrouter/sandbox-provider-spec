@@ -183,15 +183,16 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         self, sandbox_id: str, process_id: str, *, cursor: str | None = None, wait_ms: int = 0
     ) -> OutputPage: ...
 
-    @abstractmethod
-    async def cost(self, sandbox_id: str) -> Cost: ...
-
     # Optional operations. Each default refuses with `unsupported`; a provider overrides the
-    # ones whose section it claims and the tester passes.
+    # ones whose section it claims and the tester passes. `cost` is one of them: a provider
+    # offers it by stating `limits.cost_final_within_seconds`.
 
     def _unsupported(self, operation: str) -> SpsError:
         provider = getattr(type(self), "provider_id", type(self).__name__)
         return SpsError("unsupported", f"{provider} does not support {operation}")
+
+    async def cost(self, sandbox_id: str) -> Cost:
+        raise self._unsupported("cost")
 
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         raise self._unsupported("files.link")

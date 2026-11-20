@@ -172,7 +172,6 @@ class FakeCloud:
                     "machine_id": image["machine_id"],
                     "records": [record],
                     "as_of": self._now(),
-                    "revision": 1,
                 },
             )
         return self._error(404, "not_found", "no such route")
@@ -362,7 +361,6 @@ class FakeCloud:
                 "started": machine["created"],
                 "ended": machine["ended"],
                 "as_of": self._now(),
-                "revision": 1,
             },
         )
 
@@ -690,7 +688,7 @@ def test_snapshot_cost_lists_only_snapshot_lines_and_is_final_after_delete() -> 
     assert done.status == "final" and done.source == "calculated"
     assert done.total_usd == sum(line.amount_usd for line in done.lines)
     assert to_json(done)["snapshot_id"] == snap.id
-    assert call(provider, "cost", box.id).snapshot_id is None  # never in the sandbox's cost
+    assert call(provider, "cost", box.id).snapshot_id is None
 
 
 def test_get_and_list_return_the_create_labels() -> None:
@@ -902,13 +900,15 @@ def test_destroy_is_repeatable_and_cost_reaches_final() -> None:
     provider = make_provider(FakeCloud())
     box = call(provider, "create", CreateRequest(), idempotency_key="key-0011")
     result = call(provider, "destroy", box.id)
-    assert result.state == "destroyed" and result.cost is None
+    assert result.state == "destroyed"
     again = call(provider, "destroy", box.id)
     assert again.state == "destroyed"
     cost = call(provider, "cost", box.id)
     assert cost.status == "final" and cost.source == "calculated"
     assert {line.item for line in cost.lines} == {"cpu", "memory"}
     assert cost.total_usd == sum(line.amount_usd for line in cost.lines)
+    assert all(line.quantity is not None and line.unit is not None for line in cost.lines)
+    assert all(line.start is not None and line.end is not None for line in cost.lines)
 
 
 def test_error_mapping() -> None:

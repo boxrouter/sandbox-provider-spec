@@ -61,13 +61,13 @@ and a missing or empty one gets `401`. `GET /healthz` is unauthenticated.
 | `POST /machines/{id}/tty` | `{cmd: [...] or null, dir, env, cols, rows, term}` → `{tty_id, ws}`; starts the program (`bash -l` when `cmd` is null) on a pseudo-terminal, and `ws` is the path of its WebSocket |
 | `WebSocket /machines/{id}/tty/{tty_id}` | binary frames carry the terminal's bytes in both directions; when the program ends, one text frame `{"exit": <code or null>}` and a close. It connects once, needs `X-Api-Key`, and closing it hangs up on the program's process group (a kill follows 5 seconds later) |
 | `POST /machines/{id}/tty/{tty_id}/resize` | `{cols, rows}` → `{}` |
-| `GET /machines/{id}/usage` | → `{cpu, memory_mb, started, ended, as_of, revision}`; `ended` is null while the machine runs and then counts up to `as_of`, the time of the read; `revision` is 1 (nothing is ever corrected) |
+| `GET /machines/{id}/usage` | → `{cpu, memory_mb, started, ended, as_of}`; `ended` is null while the machine runs and then counts up to `as_of`, the time of the read |
 | `POST /machines/{id}/images` | `{tags, pause}` → `{image_id, machine_id, status, created, cpu, memory_mb, size_bytes, tags}`; saves the machine's files as an image, ready when the call returns; `pause` (default true) freezes the machine meanwhile, `false` lets it run |
 | `POST /machines` with `image_id` | as above, starting from an image's files at its `cpu` and `memory_mb` (unless the call names its own); the new machine has its own `env` and `tags` |
 | `GET /images?tag=<k>:<v>&machine=&page_token=&limit=` | → `{images: [...], next_page_token}`; `tag` may repeat; lists images that are not deleted |
 | `GET /images/{id}` | → the same image object |
 | `DELETE /images/{id}` | → `{status: "deleted"}`; repeating still succeeds, an unknown id is `404`; a deleted image can no longer start a machine |
-| `GET /images/{id}/usage` | → `{machine_id, records: [{size_bytes, from, until}], as_of, revision}`; `until` is null while the image is stored; records outlive the image |
+| `GET /images/{id}/usage` | → `{machine_id, records: [{size_bytes, from, until}], as_of}`; `until` is null while the image is stored; records outlive the image |
 
 Errors look like `{"error": {"code": "not_found", "message": "..."}}` with a
 matching HTTP status.

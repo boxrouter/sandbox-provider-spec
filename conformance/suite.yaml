@@ -2007,7 +2007,7 @@ tests:
     expect:
       error: not_found
 - id: snapshots.v1.cost
-  title: A snapshot has its own cost, which never names the sandbox's lines and is final after delete.
+  title: A snapshot has its own cost, with lines of the item snapshot only, and it is final after delete.
   rules:
   - provider-api/snapshot-cost
   proves:
@@ -4945,7 +4945,7 @@ tests:
   - provider-api/ids-not-reused
   proves: []
 - id: contract.cost_final
-  title: A destroyed sandbox has a final cost that names it, adds up and stays the same when read again.
+  title: A destroyed sandbox has a final cost that names it, adds up, has no open line and stays the same when read again.
   steps:
   - op: create
     as: box
@@ -4966,83 +4966,14 @@ tests:
         status: final
         sandbox_matches: true
         total_matches_lines: true
+        quantities_present: true
+        no_open_line: true
         stable: true
   rules:
   - provider-api/cost-final-within
+  - provider-api/cost-retained
+  - provider-api/cost-lines
   - provider-api/cost-provider-records
-  proves: []
-- id: contract.cost_revision
-  title: A cost has a revision of at least 1 that does not go down between two reads.
-  steps:
-  - op: create
-    as: box
-  - op: run
-    target: box
-    in:
-      bash_script: printf ok
-    expect:
-      equals:
-        stdout:
-          utf8: ok
-  - op: cost.revision
-    target: box
-    expect:
-      equals:
-        revision_valid: true
-        not_decreasing: true
-  - op: destroy
-    target: box
-  rules:
-  - provider-api/cost-revision
-  proves: []
-- id: contract.cost_as_of
-  title: While a sandbox runs its cost is accruing and runs through a time at most 60 seconds old.
-  steps:
-  - op: create
-    as: box
-  - op: run
-    target: box
-    in:
-      bash_script: printf ok
-    expect:
-      equals:
-        stdout:
-          utf8: ok
-  - op: cost.as_of
-    target: box
-    expect:
-      equals:
-        status: accruing
-        as_of_recent: true
-  - op: destroy
-    target: box
-  rules:
-  - provider-api/cost-through-time
-  proves: []
-- id: contract.cost_closed_lines
-  title: After a sandbox ends no line of its cost ends after the time it runs through, and a second read gives the same lines.
-  steps:
-  - op: create
-    as: box
-  - op: run
-    target: box
-    in:
-      bash_script: printf ok
-    expect:
-      equals:
-        stdout:
-          utf8: ok
-  - op: destroy
-    target: box
-  - op: cost.closed_lines
-    target: box
-    expect:
-      equals:
-        status: final
-        ends_by_as_of: true
-        same_lines: true
-  rules:
-  - provider-api/cost-closed-lines
   proves: []
 - id: directories.list
   title: A directory lists its immediate entries in name order, with the type and size of each, and never follows a link.

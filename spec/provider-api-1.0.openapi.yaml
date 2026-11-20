@@ -6,7 +6,7 @@ info:
   version: 1.0.0
   summary: The operations that a sandbox provider implements.
   description: |
-    A provider implements eleven required operations and any of the optional ones. This file is the
+    A provider implements ten required operations and any of the optional ones. This file is the
     authority for the shapes of every request and result. The rules that span operations
     (idempotency, lifetime, ids, destroy, files, processes, cost, errors, versioning) are in
     provider-api.md next to this file.
@@ -27,9 +27,11 @@ security:
   - bearerAuth: []
 tags:
   - name: required
-    description: The eleven operations that every provider implements.
+    description: The ten operations that every provider implements.
   - name: optional
-    description: Operations of the optional sections. Claimed in discovery, turned on by the tester.
+    description: >-
+      Operations that a provider offers or claims in discovery, and that the tester turns on: those of the optional
+      sections, and `cost`, which a provider offers by stating `limits.cost_final_within_seconds`.
 paths:
   /v1/discovery:
     get:
@@ -468,13 +470,13 @@ paths:
       - {$ref: "#/components/parameters/SandboxId"}
     get:
       operationId: cost
-      tags: [required]
+      tags: [optional]
       summary: The sandbox's cost
       description: >-
-        Works in every state, including after the sandbox ends. While the sandbox exists the status is `accruing` and
-        `as_of` is at most 60 seconds before the response. The cost reaches `final` within `limits.cost_final_within_seconds`
-        after the sandbox ends and stays readable for at least 90 days after that. A provider allows one read per running
-        sandbox every 60 seconds without `rate_limited`.
+        Offered when discovery states `limits.cost_final_within_seconds`; without it the answer is `unsupported`. Works in
+        every state, including after the sandbox ends. While the sandbox exists the status is `accruing`. The cost reaches
+        `final` within `limits.cost_final_within_seconds` after the sandbox ends and stays readable at least until it is
+        `final`.
       responses:
         "200":
           description: The cost so far, or the final cost.
@@ -484,6 +486,7 @@ paths:
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "404": {$ref: "#/components/responses/NotFound"}
+        "422": {$ref: "#/components/responses/Unsupported"}
         "429": {$ref: "#/components/responses/RateLimited"}
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
@@ -884,9 +887,9 @@ paths:
       tags: [optional]
       summary: The snapshot's own cost
       description: >-
-        Section `snapshots`. The lines are the snapshot's own charges, item `snapshot`; `snapshot_id` is set. The status
-        is `accruing` while the snapshot is stored and reaches `final` within `limits.cost_final_within_seconds` after it is
-        deleted or expires.
+        Section `snapshots`, and `unsupported` when the provider does not offer `cost`. The lines are the snapshot's own
+        charges, item `snapshot`; `snapshot_id` is set. The status is `accruing` while the snapshot is stored and reaches
+        `final` within `limits.cost_final_within_seconds` after it is deleted or expires.
       responses:
         "200":
           description: The cost so far, or the final cost.
@@ -1288,7 +1291,7 @@ components:
       type: object
       description: >-
         The provider's limits. Each value except `cost_final_within_seconds` is at least its floor, which every conforming
-        provider meets; `cost_final_within_seconds` is at most its ceiling.
+        provider meets. `cost_final_within_seconds` is the provider's own statement, and stating it offers `cost`.
       required:
         - file_bytes
         - run_timeout_ms
@@ -1297,7 +1300,6 @@ components:
         - process_output_bytes
         - process_retention_seconds
         - list_limit
-        - cost_final_within_seconds
       properties:
         file_bytes: {type: integer, minimum: 1073741824, description: "Largest file that `files.read` and `files.write` accept."}
         run_timeout_ms: {type: integer, minimum: 60000, description: "Largest `timeout_ms` that `run` accepts."}
@@ -1312,9 +1314,9 @@ components:
         cost_final_within_seconds:
           type: integer
           minimum: 0
-          maximum: 604800
           description: >-
-            The provider promises `status: final` on a sandbox's `cost` this many seconds after the sandbox ends. At most 7 days.
+            Offers `cost`. The provider makes a sandbox's `cost` `final` within this many seconds after the sandbox ends. The
+            spec sets no ceiling.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -1488,43 +1490,35 @@ components:
           description: Opaque. Null means that this page is the last one.
     Cost:
       type: object
-      required: [sandbox_id, status, total_usd, source, lines, as_of, revision]
+      required: [sandbox_id, status, total_usd, source, lines, as_of]
       properties:
         sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
         status:
           enum: [accruing, final]
           description: >-
-            `final` means that no new usage will be added. A correction can still follow, raises `revision` and leaves the
-            status `final`.
+            `final` means that the figures will not change: a `final` cost has a `total_usd` and no open line.
         total_usd:
-          $ref: "#/components/schemas/Decimal"
+          anyOf: [{$ref: "#/components/schemas/Decimal"}, {type: "null"}]
           description: >-
             The sum of the line amounts, in US dollars at the provider's published list price when the usage happened, before
-            any plan, free tier, trial, gifted credit or discount. A running total, never a zero for usage that is not metered
-            yet.
+            any plan, free tier, trial, credit or discount. Null only while the status is `accruing` and nothing is metered
+            yet; `"0"` is a true zero.
         source:
           enum: [reported, calculated]
           description: >-
-            `reported`: the provider's billing system states the amounts. `calculated`: each quantity comes from the provider's
-            own usage records and is multiplied by the price in discovery.
+            `reported`: the provider's own records state the amounts, at list price. `calculated`: each quantity comes from the
+            provider's own usage records and is multiplied by the provider's published price. A source that states net
+            amounts is turned into list amounts from its quantities and is then `calculated`.
         lines:
           type: array
           items: {$ref: "#/components/schemas/CostLine"}
           description: >-
-            One line per priced item and period. A charge that is not metered yet is left out while the status is `accruing`;
-            an amount of `"0"` means a true zero. A line whose `end` is not after `as_of` changes only through a correction.
+            Empty while the status is `accruing` and nothing is metered yet, or when the provider bills nothing for the
+            sandbox and `total_usd` is `"0"`.
         as_of:
           $ref: "#/components/schemas/Timestamp"
           description: >-
-            The time these figures run through: everything that happened before it is included, and a line that is still open
-            counts up to it. While the status is `accruing` it is at most 60 seconds before the response. All figures are
-            running totals.
-        revision:
-          type: integer
-          minimum: 1
-          description: >-
-            Starts at 1 and goes up by at least 1 whenever the provider corrects a figure it already reported, also after
-            `final`. It never goes down. Cost growing on an accruing sandbox is not a correction.
+            When the provider stated these figures: the read time of its record.
         snapshot_id:
           type: string
           pattern: "^[A-Za-z0-9._:-]{1,128}$"
@@ -1532,32 +1526,33 @@ components:
             Set by `snapshot_cost` only: the snapshot whose own charges these are. `sandbox_id` is then the saved sandbox.
       description: >-
         The sandbox's cost. Quantities come from the provider's own records of the sandbox, never from a clock in the consumer
-        or in an adapter.
+        or in an adapter. "The sandbox ends" is when `get` reports it `destroyed` or it is gone.
     CostLine:
       type: object
-      required: [item, quantity, unit, amount_usd]
+      required: [item, amount_usd]
       properties:
         item: {$ref: "#/components/schemas/PriceItem"}
-        quantity: {$ref: "#/components/schemas/Decimal", description: "The measured quantity, in `unit`."}
-        unit: {$ref: "#/components/schemas/PriceUnit"}
+        quantity:
+          $ref: "#/components/schemas/Decimal"
+          description: "The quantity that the amount was priced from, in `unit`. Required when the cost's `source` is `calculated`."
+        unit:
+          $ref: "#/components/schemas/PriceUnit"
+          description: "The unit of `quantity`. Required when the cost's `source` is `calculated`."
         amount_usd: {$ref: "#/components/schemas/Decimal", description: "The amount in US dollars."}
         start:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
-          description: The start of the period, when the line covers one.
+          description: The start of the period that the line covers. With `end` null it is an open period, which runs up to `as_of`.
         end:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
-          description: The end of the period, when the line covers one.
+          description: >-
+            The end of the period. Both `start` and `end` null: the line covers no period, as a fee does. `start` set and `end`
+            null: an open period, allowed only while the status is `accruing`.
     DestroyResult:
       type: object
       required: [sandbox_id, state]
       properties:
         sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
         state: {enum: [destroying, destroyed]}
-        cost:
-          anyOf: [{$ref: "#/components/schemas/Cost"}, {type: "null"}]
-          description: >-
-            Null unless the provider's usage records disappear with the sandbox; then the final cost. A consumer uses it when
-            present and otherwise reads `cost` until it is final.
     SnapshotRequest:
       type: object
       additionalProperties: false

@@ -104,22 +104,21 @@ class Price:
 @dataclass(frozen=True)
 class CostLine:
     item: str
-    quantity: Decimal
-    unit: str
     amount_usd: Decimal
-    start: datetime | None
-    end: datetime | None
+    quantity: Decimal | None = None  # required when the cost is `calculated`
+    unit: str | None = None  # required when the cost is `calculated`
+    start: datetime | None = None  # both null: no period (a fee); `end` null alone: open
+    end: datetime | None = None
 
 
 @dataclass(frozen=True)
 class Cost:
     sandbox_id: str
     status: Literal["accruing", "final"]
-    total_usd: Decimal
+    total_usd: Decimal | None  # null only while `accruing` and nothing is metered yet
     source: Literal["reported", "calculated"]
     lines: Sequence[CostLine]
-    as_of: datetime  # the time the figures run through; at most 60 s old while `accruing`
-    revision: int  # starts at 1; goes up whenever a reported figure is corrected
+    as_of: datetime  # when the provider stated the figures
     snapshot_id: str | None = None  # set by `snapshot_cost` only
 
 
@@ -127,7 +126,6 @@ class Cost:
 class DestroyResult:
     sandbox_id: str
     state: Literal["destroying", "destroyed"]
-    cost: Cost | None = None
 
 
 SnapshotKeeps = Literal["files_only", "files_and_memory"]
@@ -330,7 +328,7 @@ class Limits:
     process_output_bytes: int
     process_retention_seconds: int
     list_limit: int
-    cost_final_within_seconds: int  # at most 604800 (7 days)
+    cost_final_within_seconds: int | None = None  # stating it offers `cost`
 
 
 @dataclass(frozen=True)

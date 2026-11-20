@@ -40,7 +40,6 @@ from sandbox_provider_spec.driver import (
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
-    Cost,
     CreateRequest,
     FileLinkRequest,
     ProcessStartRequest,
@@ -103,8 +102,6 @@ class SandboxHandle:
     """What a sandbox resource keeps in memory."""
 
     id: str
-    cost: Cost | None = None
-    """The cost that the first destroy returned, when it returned one."""
 
 
 @dataclass
@@ -257,7 +254,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         )
         created = self.wait(self.api.create(request, idempotency_key=self._key(inputs)))
         handle = SandboxHandle(created.id)
-        owned = self.own("sandbox", handle, lambda: self._destroy(handle.id, handle))
+        owned = self.own("sandbox", handle, lambda: self._destroy(handle.id))
         return {"resource": owned, "identity": created.id}
 
     def _key(self, inputs: Inputs) -> str:
@@ -269,11 +266,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
             raise ValueError("idempotency_key must name the key")
         return f"sps-{self.run_id[:20]}-{name}"
 
-    def _destroy(self, sandbox_id: str, handle: SandboxHandle | None = None) -> Observation:
+    def _destroy(self, sandbox_id: str) -> Observation:
         try:
-            result = self.wait(self.api.destroy(sandbox_id))
-            if handle is not None and result.cost is not None and handle.cost is None:
-                handle.cost = result.cost
+            self.wait(self.api.destroy(sandbox_id))
         except NativeFailure as error:
             if error.code != "not_found":
                 raise
@@ -343,27 +338,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
 
     def cost_final(self, target: object, inputs: Inputs) -> Observation:
         """Read a destroyed sandbox's cost until it is final, within `cost_final_within_seconds`."""
-        native = self._sandbox_handle(target)
-        return cost_checks.final(self, native.id, native.cost, inputs)
-
-    def cost_revision(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
-        return cost_checks.revision(self, self._sandbox(target))
-
-    def cost_as_of(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
-        return cost_checks.as_of(self, self._sandbox(target))
-
-    def cost_closed_lines(self, target: object, inputs: Inputs) -> Observation:
-        native = self._sandbox_handle(target)
-        return cost_checks.closed_lines(self, native.id, native.cost, inputs)
-
-    @staticmethod
-    def _sandbox_handle(target: object) -> SandboxHandle:
-        native = resource(target).native
-        if not isinstance(native, SandboxHandle):
-            raise ValueError("operation requires a sandbox")
-        return native
+        return cost_checks.final(self, self._sandbox(target), inputs)
 
     # Commands and files
 
@@ -793,7 +768,9 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
             "status": cost.status,
             "snapshot_matches": cost.snapshot_id == handle.id,
             "sandbox_matches": cost.sandbox_id == handle.sandbox_id,
-            "only_snapshot_lines": all(line.item == "snapshot" for line in cost.lines),
+            # No lines is fine only while nothing is metered yet.
+            "only_snapshot_lines": all(line.item == "snapshot" for line in cost.lines)
+            and (bool(cost.lines) or cost.status == "accruing"),
         }
 
     # Terminals

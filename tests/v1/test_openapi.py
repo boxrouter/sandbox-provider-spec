@@ -234,19 +234,42 @@ def _errors(name: str, document: Any) -> list[str]:
     return [error.message for error in validator(name).iter_errors(document)]
 
 
-def test_cost_needs_a_revision_of_at_least_one() -> None:
+def test_a_cost_has_no_revision_and_may_have_no_total_while_accruing() -> None:
     example = _example("Cost")
     assert _errors("Cost", example) == []
-    assert _errors("Cost", {k: v for k, v in example.items() if k != "revision"})
-    assert _errors("Cost", {**example, "revision": 0})
-    assert _errors("Cost", {**example, "revision": "1"})
+    assert _errors("Cost", {**example, "status": "accruing", "total_usd": None, "lines": []}) == []
+    assert _errors("Cost", {**example, "total_usd": 1})  # a decimal string, not a number
+    assert "revision" not in SCHEMAS["Cost"]["properties"]
 
 
-def test_limits_state_how_soon_a_cost_is_final_and_at_most_seven_days() -> None:
+def test_a_cost_line_needs_only_an_item_and_an_amount() -> None:
+    line = {"item": "cpu", "amount_usd": "1"}
+    assert _errors("CostLine", line) == []
+    assert _errors("CostLine", {"item": "cpu"})
+    assert _errors("CostLine", {"amount_usd": "1"})
+    assert _errors("CostLine", {**line, "quantity": "2", "unit": "vcpu_second"}) == []
+
+
+def test_limits_state_how_soon_a_cost_is_final_with_no_ceiling_and_it_is_optional() -> None:
     example = _example("Limits")
-    assert _errors("Limits", {**example, "cost_final_within_seconds": 604800}) == []
-    assert _errors("Limits", {**example, "cost_final_within_seconds": 604801})
-    assert _errors("Limits", {k: v for k, v in example.items() if k != "cost_final_within_seconds"})
+    assert _errors("Limits", {**example, "cost_final_within_seconds": 10**9}) == []
+    assert _errors("Limits", {**example, "cost_final_within_seconds": -1})
+    assert (
+        _errors("Limits", {k: v for k, v in example.items() if k != "cost_final_within_seconds"})
+        == []
+    )
+
+
+def test_cost_is_an_optional_operation_that_may_answer_unsupported() -> None:
+    operation = DOCUMENT["paths"]["/v1/sandboxes/{sandbox_id}/cost"]["get"]
+    assert operation["tags"] == ["optional"] and "422" in operation["responses"]
+    required = [
+        step["operationId"]
+        for path in DOCUMENT["paths"].values()
+        for step in path.values()
+        if isinstance(step, dict) and step.get("tags") == ["required"]
+    ]
+    assert len(required) == 10 and "cost" not in required
 
 
 def test_the_cost_example_on_the_implementer_page_is_a_valid_cost() -> None:

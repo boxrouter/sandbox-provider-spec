@@ -61,6 +61,7 @@ OPTIONAL = {
     "snapshot_list": ("snapshot.list", ()),
     "snapshot_delete": ("snapshot.delete", ("n",)),
     "snapshot_cost": ("snapshot.cost", ("n",)),
+    "cost": ("cost", ("s",)),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
 
@@ -162,13 +163,36 @@ def test_decimals_keep_their_digits_and_times_end_in_z() -> None:
             "source": "reported",
             "lines": [],
             "as_of": "2026-11-13T10:05:00.250Z",
-            "revision": 3,
         },
     )
     data = to_json(cost)
     assert data["total_usd"] == "0.0000004500"
     assert data["as_of"] == "2026-11-13T10:05:00.250000Z"
-    assert data["revision"] == 3
+    assert "revision" not in data
+
+
+def test_a_cost_may_have_no_total_yet_and_a_reported_line_no_quantity() -> None:
+    document = {
+        "sandbox_id": "s",
+        "status": "accruing",
+        "total_usd": None,
+        "source": "reported",
+        "lines": [{"item": "cpu", "amount_usd": "1", "start": None, "end": None}],
+        "as_of": "2026-11-13T10:05:00Z",
+    }
+    cost = from_json(v1_types.Cost, document)
+    assert cost.total_usd is None
+    assert (cost.lines[0].quantity, cost.lines[0].unit) == (None, None)
+    assert to_json(cost) == document
+
+
+def test_discovery_offers_cost_only_when_it_states_a_final_window() -> None:
+    stated = json.loads((EXAMPLES / "Limits.json").read_text(encoding="utf-8"))
+    assert from_json(v1_types.Limits, stated).cost_final_within_seconds == 3600
+    del stated["cost_final_within_seconds"]
+    silent = from_json(v1_types.Limits, stated)
+    assert silent.cost_final_within_seconds is None
+    assert to_json(silent) == stated
 
 
 def test_wire_refuses_what_the_schema_refuses() -> None:
@@ -208,12 +232,11 @@ class Stub(Provider, manifest=False):
     async def process_output(
         self, sandbox_id: str, process_id: str, *, cursor: Any = None, wait_ms: int = 0
     ) -> Any: ...
-    async def cost(self, sandbox_id: str) -> Any: ...
 
 
 def test_required_operations_are_abstract() -> None:
     assert sorted(Provider.__abstractmethods__) == [
-        "cost", "create", "destroy", "discovery", "files_read", "files_write", "get", "list",
+        "create", "destroy", "discovery", "files_read", "files_write", "get", "list",
         "process_output", "process_start", "run",
     ]  # fmt: skip
     with pytest.raises(TypeError):

@@ -316,10 +316,9 @@ class ExampleProvider(Provider):
         return SandboxPage(sandboxes=boxes, next_cursor=page["next_page_token"])
 
     async def destroy(self, sandbox_id: str) -> DestroyResult:
-        # DELETE /machines/{id}; usage records outlive the machine, so cost stays
-        # readable and the result carries no final cost.
+        # DELETE /machines/{id}; usage records outlive the machine, so cost stays readable.
         await self._req("DELETE", f"/machines/{sandbox_id}")
-        return DestroyResult(sandbox_id=sandbox_id, state="destroyed", cost=None)
+        return DestroyResult(sandbox_id=sandbox_id, state="destroyed")
 
     async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
         # POST /machines/{id}/exec. A missing workdir is a generic failure there,
@@ -484,8 +483,8 @@ class ExampleProvider(Provider):
     async def cost(self, sandbox_id: str) -> Cost:
         # GET /machines/{id}/usage; the price list in discovery prices the record.
         usage = await self._json("GET", f"/machines/{sandbox_id}/usage")
-        # The record runs through `as_of`, Example Cloud's clock, and a running machine counts up
-        # to it; the line stays open (`end` null) until the machine ends.
+        # `as_of` is when Example Cloud read its record, by its own clock; a running machine
+        # counts up to it, and the line stays open (`end` null) until the machine ends.
         as_of = _stamp(usage["as_of"])
         start = _stamp(usage["started"])
         end = _stamp(usage["ended"]) if usage["ended"] else None
@@ -493,8 +492,8 @@ class ExampleProvider(Provider):
         cpu_q = Decimal(str(usage["cpu"])) * seconds
         mem_q = Decimal(str(usage["memory_mb"])) / 1024 * seconds
         lines = (
-            CostLine("cpu", cpu_q, "vcpu_second", cpu_q * PRICE_CPU, start, end),
-            CostLine("memory", mem_q, "gib_second", mem_q * PRICE_MEM, start, end),
+            CostLine("cpu", cpu_q * PRICE_CPU, cpu_q, "vcpu_second", start, end),
+            CostLine("memory", mem_q * PRICE_MEM, mem_q, "gib_second", start, end),
         )
         return Cost(
             sandbox_id=sandbox_id,
@@ -503,7 +502,6 @@ class ExampleProvider(Provider):
             source="calculated",
             lines=lines,
             as_of=as_of,
-            revision=usage["revision"],
         )
 
     # -- snapshots ---------------------------------------------------------------
@@ -606,7 +604,7 @@ class ExampleProvider(Provider):
                 / (3600 * HOURS_PER_MONTH)
             )
             lines.append(
-                CostLine("snapshot", quantity, "gib_month", quantity * PRICE_SNAPSHOT, start, end)
+                CostLine("snapshot", quantity * PRICE_SNAPSHOT, quantity, "gib_month", start, end)
             )
         return Cost(
             sandbox_id=usage["machine_id"],
@@ -615,7 +613,6 @@ class ExampleProvider(Provider):
             source="calculated",
             lines=tuple(lines),
             as_of=as_of,
-            revision=usage["revision"],
             snapshot_id=snapshot_id,
         )
 

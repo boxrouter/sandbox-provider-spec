@@ -17,8 +17,9 @@ import json
 import os
 import shutil
 import stat
-from collections.abc import AsyncIterable, AsyncIterator, Mapping
+from collections.abc import AsyncIterable, AsyncIterator, Callable, Mapping
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, ClassVar, TypeVar
 
@@ -30,6 +31,7 @@ from sandbox_provider_spec.cli import main
 from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported, resource
 from sandbox_provider_spec.v1 import (
     Cost,
+    CostLine,
     CreateRequest,
     CredentialField,
     DestroyResult,
@@ -300,7 +302,7 @@ class SnapshotProvider(LocalProvider, manifest=False):
             example(Cost),
             sandbox_id=snapshot.sandbox_id,
             snapshot_id=snapshot_id,
-            lines=[],
+            lines=[CostLine("snapshot", Decimal("0.00390"), Decimal("1"), "gib_month")],
             as_of=datetime.now(UTC),
         )
 
@@ -612,7 +614,6 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
     assert QUICK_SKIPS == {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
-        "contract.cost_closed_lines",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }
@@ -882,9 +883,6 @@ CONTRACT_TESTS = (
     "contract.run_timeout_ends_command",
     "contract.destroy_repeat",
     "contract.cost_final",
-    "contract.cost_revision",
-    "contract.cost_as_of",
-    "contract.cost_closed_lines",
 )  # every contract test but the 1 GiB transfer, which a live run covers
 
 
@@ -893,7 +891,7 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_fourteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_eleven_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
@@ -988,7 +986,7 @@ def test_the_cost_test_needs_a_final_cost_that_adds_up(
             return dataclasses.replace(
                 base,
                 **{
-                    key: (value if key == "status" else type(base.total_usd)(value))
+                    key: (value if key == "status" else Decimal(value))
                     for key, value in change.items()
                 },  # type: ignore[arg-type]
             )
@@ -1001,87 +999,133 @@ def test_the_cost_test_needs_a_final_cost_that_adds_up(
 def test_the_cost_final_wait_is_what_discovery_promises_plus_a_grace() -> None:
     driver = ProviderDriver(ContractProvider(), run="run-1")
     promised = example(Discovery).limits.cost_final_within_seconds
-    assert cost_checks.final_wait_seconds(driver, {}) == promised + 30
+    assert promised is not None and cost_checks.final_wait_seconds(driver, {}) == promised + 30
     assert cost_checks.final_wait_seconds(driver, {"timeout_ms": 5000}) == 5
     assert cost_checks.poll_seconds(10) == 2 and cost_checks.poll_seconds(604800) == 30
     driver.close()
 
 
-def test_revision_that_goes_down_or_is_not_a_positive_integer_differs() -> None:
-    class Falling(ContractProvider, manifest=False):
-        reads = 0
+class _Final(ContractProvider, manifest=False):
+    """A provider whose final cost a test changes through `change`."""
 
-        async def cost(self, sandbox_id: str) -> Cost:
-            base = await super().cost(sandbox_id)
-            type(self).reads += 1
-            return dataclasses.replace(base, revision=10 - type(self).reads)
+    change: ClassVar[Callable[[Cost, int], Cost | None]] = staticmethod(lambda cost, _: cost)
+    reads = 0
 
-    class Zero(ContractProvider, manifest=False):
-        async def cost(self, sandbox_id: str) -> Cost:
-            return dataclasses.replace(await super().cost(sandbox_id), revision=0)
-
-    assert results(Falling(), ("contract.cost_revision",)) == {"contract.cost_revision": "differs"}
-    assert results(Zero(), ("contract.cost_revision",)) == {"contract.cost_revision": "differs"}
-
-
-def test_as_of_older_than_sixty_seconds_on_a_running_sandbox_differs() -> None:
-    class Stale(ContractProvider, manifest=False):
-        async def cost(self, sandbox_id: str) -> Cost:
-            base = await super().cost(sandbox_id)
-            if base.status == "final":
-                return base
-            return dataclasses.replace(base, as_of=datetime.now(UTC) - timedelta(seconds=61))
-
-    assert results(Stale(), ("contract.cost_as_of",)) == {"contract.cost_as_of": "differs"}
+    async def cost(self, sandbox_id: str) -> Cost:
+        base = await super().cost(sandbox_id)
+        if base.status != "final":
+            return base
+        type(self).reads += 1
+        changed = type(self).change(base, type(self).reads)
+        if changed is None:
+            raise SpsError("not_found", "the record is gone")
+        return changed
 
 
-def test_a_running_sandbox_whose_cost_is_final_differs_on_the_cost_as_of_test() -> None:
-    class Early(ContractProvider, manifest=False):
-        async def cost(self, sandbox_id: str) -> Cost:
-            return dataclasses.replace(await super().cost(sandbox_id), status="final")
+def final_results(change: Callable[[Cost, int], Cost | None]) -> dict[str, str]:
+    class Changed(_Final, manifest=False):
+        pass
 
-    assert results(Early(), ("contract.cost_as_of",)) == {"contract.cost_as_of": "differs"}
+    Changed.change = staticmethod(change)
+    Changed.reads = 0
+    return results(Changed(), ("contract.cost_final",))
 
 
-@pytest.mark.parametrize("change", ["end_after_as_of", "lines_change"])
-def test_a_line_that_ends_after_as_of_or_changes_between_reads_differs(change: str) -> None:
-    class Open(ContractProvider, manifest=False):
-        reads = 0
+def test_a_final_cost_with_an_open_line_differs() -> None:
+    def open_line(cost: Cost, _: int) -> Cost:
+        return dataclasses.replace(cost, lines=[dataclasses.replace(cost.lines[0], end=None)])
 
-        async def cost(self, sandbox_id: str) -> Cost:
-            base = await super().cost(sandbox_id)
-            if base.status != "final":
-                return base
-            type(self).reads += 1
-            line = base.lines[0]
-            if change == "end_after_as_of":
-                line = dataclasses.replace(line, end=base.as_of + timedelta(seconds=5))
-            elif type(self).reads > 1:
-                line = dataclasses.replace(line, quantity=line.quantity + 1)
-            return dataclasses.replace(base, lines=[line])
+    assert final_results(open_line) == {"contract.cost_final": "differs"}
 
-    assert results(Open(), ("contract.cost_closed_lines",)) == {
-        "contract.cost_closed_lines": "differs"
+
+def test_a_calculated_line_without_a_quantity_or_unit_differs() -> None:
+    def bare(cost: Cost, _: int) -> Cost:
+        return dataclasses.replace(
+            cost, lines=[dataclasses.replace(cost.lines[0], quantity=None, unit=None)]
+        )
+
+    assert final_results(bare) == {"contract.cost_final": "differs"}
+
+
+def test_a_reported_line_may_leave_out_its_quantity_and_unit() -> None:
+    def reported(cost: Cost, _: int) -> Cost:
+        line = dataclasses.replace(cost.lines[0], quantity=None, unit=None)
+        sums = line.amount_usd
+        return dataclasses.replace(cost, source="reported", lines=[line], total_usd=sums)
+
+    assert final_results(reported) == {"contract.cost_final": "passed"}
+
+
+def test_a_final_cost_whose_lines_come_in_another_order_is_stable() -> None:
+    def shuffled(cost: Cost, read: int) -> Cost:
+        lines = list(cost.lines)
+        return dataclasses.replace(cost, lines=lines if read % 2 else lines[::-1])
+
+    assert final_results(shuffled) == {"contract.cost_final": "passed"}
+
+
+@pytest.mark.parametrize("change", ["line", "status"])
+def test_a_final_cost_that_changes_between_reads_differs(change: str) -> None:
+    def moving(cost: Cost, read: int) -> Cost:
+        if read == 1:
+            return cost
+        if change == "line":
+            line = dataclasses.replace(cost.lines[0], unit="vcpu_hour")
+            return dataclasses.replace(cost, lines=[line, *cost.lines[1:]])
+        return dataclasses.replace(cost, status="accruing")
+
+    assert final_results(moving) == {"contract.cost_final": "differs"}
+
+
+def test_a_provider_may_stop_answering_once_the_cost_is_final() -> None:
+    assert final_results(lambda cost, read: cost if read == 1 else None) == {
+        "contract.cost_final": "passed"
     }
 
 
-def test_lines_that_change_with_a_correction_are_the_same_lines_when_revision_rose() -> None:
-    class Corrected(ContractProvider, manifest=False):
-        reads = 0
-
-        async def cost(self, sandbox_id: str) -> Cost:
-            base = await super().cost(sandbox_id)
-            if base.status != "final":
-                return base
-            type(self).reads += 1
-            line = dataclasses.replace(
-                base.lines[0], quantity=base.lines[0].quantity + type(self).reads
+def test_a_provider_that_states_no_final_window_does_not_offer_cost() -> None:
+    class NoCost(ContractProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            found = await super().discovery()
+            return dataclasses.replace(
+                found, limits=dataclasses.replace(found.limits, cost_final_within_seconds=None)
             )
-            return dataclasses.replace(base, lines=[line], revision=type(self).reads)
 
-    assert results(Corrected(), ("contract.cost_closed_lines",)) == {
-        "contract.cost_closed_lines": "passed"
+        async def cost(self, sandbox_id: str) -> Cost:
+            raise SpsError("unsupported", "no cost")
+
+    report = run_tests(NoCost(), TestOptions(tests=("contract.discovery_valid",)))
+    assert "operation cost unsupported" in report.lines
+    assert report.all_passed
+    default = {
+        test.id for test in select_tests(shared_suite(), example(Discovery), TestOptions()).tests
     }
+    assert "contract.cost_final" in default
+    silent = dataclasses.replace(
+        example(Discovery),
+        limits=dataclasses.replace(example(Discovery).limits, cost_final_within_seconds=None),
+    )
+    left_out = {test.id for test in select_tests(shared_suite(), silent, TestOptions()).tests}
+    assert not {
+        test_id
+        for test_id in left_out
+        if test_id.startswith(("contract.cost", "snapshots.v1.cost"))
+    }
+    assert "contract.discovery_valid" in left_out
+    explicit = run_tests(NoCost(), TestOptions(tests=("contract.cost_final",)))
+    assert [line for line in explicit.lines if line.startswith("contract.cost")] == [
+        "contract.cost_final unsupported"
+    ]
+
+
+def test_a_stated_window_beyond_the_testers_limit_is_not_run() -> None:
+    class Slow(ContractProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            found = await super().discovery()
+            limits = dataclasses.replace(found.limits, cost_final_within_seconds=604800)
+            return dataclasses.replace(found, limits=limits)
+
+    assert results(Slow(), ("contract.cost_final",)) == {"contract.cost_final": "not_run"}
 
 
 # --- directory operations ---------------------------------------------------------------------

@@ -13,7 +13,7 @@ The request, declaration, and matching formats (format 0.1) are a working draft 
 ## For Sandbox Providers
 
 Start with **[Implement SPS 1.0](docs/implement.md)**. It is one page that covers the two ways to
-conform, the eleven required operations, discovery and prices, cost, errors, the template adapter,
+conform, the ten required operations, discovery and prices, the optional cost, errors, the template adapter,
 and the tester.
 
 ```console
@@ -103,7 +103,7 @@ does or an input is invalid. `baseline_failed` means that the cited reports do n
 baseline that every provider must pass. The [tutorial](docs/getting-started.md) walks through more.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 48 knobs; the conformance suite has 278 tests.
+The vocabulary has 16 gates and 48 knobs; the conformance suite has 275 tests.
 
 ## Principles
 

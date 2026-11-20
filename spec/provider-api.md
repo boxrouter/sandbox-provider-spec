@@ -152,42 +152,44 @@ keep running, or exit while a child holds a stream open. This is the rule of the
 
 ## 10. Cost
 
-`cost` returns a sandbox's cost with a status of `accruing` or `final`, and a source of `reported`
-or `calculated`. `reported` means that the provider's billing system states the amounts.
-`calculated` means that each quantity comes from the provider's own usage records and is
-multiplied by the price in discovery. An item that discovery does not price has an unknown price,
-never a zero price. It works in every state of the sandbox, including after the sandbox ends. All
-figures are running totals: every line, and `total_usd`, covers everything from the start up to
-`as_of`.
+`cost` is offered, not required. A provider offers it by stating `limits.cost_final_within_seconds` <!-- rule: provider-api/cost-offered -->
+in discovery. Without that value `cost` answers `unsupported`, and a consumer treats the provider
+as one that does not state a cost.
+
+`cost` returns what a sandbox cost: a `status` of `accruing` or `final`, a `source` of `reported`
+or `calculated`, the `lines` and their `total_usd`, and `as_of`. `reported` means that the
+provider's own records state the amounts. `calculated` means that each quantity comes from the
+provider's own usage records and is multiplied by the provider's published price. It works in
+every state of the sandbox. The sandbox ends when `get` reports it `destroyed` or it is gone;
+every timing rule here counts from then.
+
+A line has an `item` and an `amount_usd`. `quantity` and `unit` are required when `source` is
+`calculated`, as what the amount was priced from, and optional when `source` is `reported`. `start`
+and `end` give the period that the line covers. Both null means that the line covers no period, as
+a fee does. `start` set with `end` null is an open period, which runs up to `as_of` and is allowed
+only while the status is `accruing`. `total_usd` is the sum of the line amounts. While the status is
+`accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. An amount of `"0"`
+always means a true zero, never "not counted yet".
 
 - A provider **MUST** take the quantities of a cost from its own records of the sandbox, never <!-- rule: provider-api/cost-provider-records -->
-  from a clock in the consumer or in an adapter, and **MUST** be able to state a cost for every
-  sandbox that it creates.
+  from a clock in the consumer or in an adapter.
 - Amounts **MUST** be the provider's published list price when the usage happened, in US dollars <!-- rule: provider-api/cost-list-price -->
-  as decimal strings, before any plan, free tier, trial, gifted credit or discount. While the
-  status is `accruing`, a charge that is not metered yet **MUST** be left out of `lines` and
-  `total_usd`, never returned as zero; an amount of `"0"` means a true zero.
-- `as_of` **MUST** be the time that the figures run through: everything that happened before it <!-- rule: provider-api/cost-through-time -->
-  is included, and a line that is still open (its `end` is null) counts up to `as_of`. While the
-  status is `accruing`, `as_of` **MUST** be at most 60 seconds before the response.
-- A line whose `end` is not after `as_of` **MUST NOT** change except through a correction, so a <!-- rule: provider-api/cost-closed-lines -->
-  consumer can bill it without waiting for `final`.
-- `revision` **MUST** start at 1 and **MUST** go up by at least 1 whenever the provider corrects a <!-- rule: provider-api/cost-revision -->
-  figure that it already reported, also after the status is `final`, and **MUST NOT** go down.
-  Cost growing on an accruing sandbox is not a correction. The status stays `final` after a
-  correction.
-- A provider **MUST** state `limits.cost_final_within_seconds` in discovery, at most 604800 (7 <!-- rule: provider-api/cost-final-within -->
-  days), and **MUST** make the cost `final` that many seconds after the sandbox ends. `final`
-  means that no new usage will be added.
-- A provider **MUST** keep the cost readable for at least 90 days after the sandbox ends. <!-- rule: provider-api/cost-retained -->
-- A provider **MUST** allow one `cost` read per running sandbox every 60 seconds, for thousands of <!-- rule: provider-api/cost-read-rate -->
-  running sandboxes at once, without answering `rate_limited`.
+  as decimal strings, before any plan, free tier, trial, credit or discount. A `reported` cost
+  states those list amounts in the provider's records. A source that states amounts net of a
+  discount is turned into list amounts from its quantities, and the cost is then `calculated`.
+- `as_of` **MUST** be the time at which the provider stated the figures: the read time of its <!-- rule: provider-api/cost-stated-at -->
+  record.
+- Every line **MUST** have an `item` and an `amount_usd`, and a `calculated` line **MUST** also <!-- rule: provider-api/cost-lines -->
+  have a `quantity` and a `unit`. `total_usd` **MUST** be the sum of the line amounts, or null
+  where the paragraph above allows it.
+- A provider **MUST** make the cost `final` within `limits.cost_final_within_seconds` after the <!-- rule: provider-api/cost-final-within -->
+  sandbox ends, or, when the cost includes storage that outlives the sandbox, after that storage
+  ends. `final` means that the figures **MUST NOT** change afterwards. A `final` cost has a
+  `total_usd` and no open line. The provider chooses the number and states it as it is.
+- A provider **MUST** keep the cost readable after the sandbox ends at least until it is `final`. <!-- rule: provider-api/cost-retained -->
 
-While the sandbox exists, `cost` returns the cost so far with status `accruing`. A provider whose
-usage records disappear with the sandbox cannot meet the retention rule on its own. Such a
-provider reads the usage as part of `destroy` and returns the final cost in the destroy result. A
-consumer uses the destroy result's cost when it is present, and otherwise reads `cost` until it is
-`final`.
+While the sandbox exists, `cost` returns the cost so far with status `accruing`. SPS defines no
+correction after `final`: a consumer that finds a later difference reconciles it itself.
 
 ## 11. Errors
 
@@ -346,8 +348,8 @@ its limit gets an `error` message `quota_exceeded`.
 ## 17. Snapshots
 
 A provider that claims the `snapshots` section (`vocabulary.md`) implements `snapshot.create`,
-`snapshot.get`, `snapshot.list`, `snapshot.delete` and `snapshot.cost`, and a `create` that takes
-`snapshot`. A snapshot saves a sandbox, and a restore is a `create` that starts a new sandbox from
+`snapshot.get`, `snapshot.list`, `snapshot.delete` and `snapshot.cost` (when it offers `cost`), and a
+`create` that takes `snapshot`. A snapshot saves a sandbox, and a restore is a `create` that starts a new sandbox from
 it. The gate's knobs `keeps`, `original_after`, `deletable` and `retention_seconds`, and its fact
 `resizes_on_restore`, keep the meaning that the vocabulary gives them.
 
@@ -389,11 +391,12 @@ names its own.
   restored from it.
 - `snapshot.cost` **MUST** return a cost (section 10) whose `sandbox_id` is the saved sandbox and <!-- rule: provider-api/snapshot-cost -->
   whose `snapshot_id` is the snapshot, with lines of the item `snapshot` only: its storage, and a
-  charge for each capture where the provider bills one. These charges **MUST NOT** appear in the
-  saved sandbox's `cost`. The status is `accruing` while the snapshot is stored, and **MUST**
-  become `final` within `limits.cost_final_within_seconds` after the snapshot is deleted or
-  expires and stay readable for 90 days after that. A provider whose snapshots are free lists the `snapshot` price with
-  `"price_usd": "0"` and `"included": true`, and returns `total_usd` `"0"` with no lines.
+  charge for each capture where the provider bills one. The status is `accruing` while the
+  snapshot is stored, and **MUST** become `final` within `limits.cost_final_within_seconds` after
+  the snapshot is deleted or expires. It stays readable at least until it is `final`. A provider
+  whose snapshots are free lists the `snapshot` price with `"price_usd": "0"` and
+  `"included": true`, and returns one `snapshot` line with the amount `"0"`. A provider that does
+  not offer `cost` (section 10) answers `unsupported` to `snapshot.cost`.
 
 After `snapshot.create` returns, the saved sandbox is in the state that the variant's
 `original_after` names. A snapshot of a paused sandbox is either taken or refused with `conflict`.

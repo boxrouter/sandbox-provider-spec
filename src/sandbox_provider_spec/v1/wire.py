@@ -172,14 +172,13 @@ def _enc_price(value: Price) -> Json:
 
 
 def _enc_cost_line(value: CostLine) -> Json:
-    return {
-        "item": value.item,
-        "quantity": _dec(value.quantity),
-        "unit": value.unit,
-        "amount_usd": _dec(value.amount_usd),
-        "start": _opt(value.start, _stamp),
-        "end": _opt(value.end, _stamp),
-    }
+    out: Json = {"item": value.item}
+    _put(out, "quantity", _opt(value.quantity, _dec))
+    _put(out, "unit", value.unit)
+    out["amount_usd"] = _dec(value.amount_usd)
+    out["start"] = _opt(value.start, _stamp)
+    out["end"] = _opt(value.end, _stamp)
+    return out
 
 
 def _enc_snapshot(value: Snapshot) -> Json:
@@ -205,11 +204,10 @@ def _enc_cost(value: Cost) -> Json:
     out: Json = {
         "sandbox_id": value.sandbox_id,
         "status": value.status,
-        "total_usd": _dec(value.total_usd),
+        "total_usd": _opt(value.total_usd, _dec),
         "source": value.source,
         "lines": [_enc_cost_line(line) for line in value.lines],
         "as_of": _stamp(value.as_of),
-        "revision": value.revision,
     }
     _put(out, "snapshot_id", value.snapshot_id)
     return out
@@ -247,7 +245,7 @@ def _enc_discovery(value: Discovery) -> Json:
 
 
 def _enc_limits(value: Limits) -> Json:
-    return {
+    out: Json = {
         "file_bytes": value.file_bytes,
         "run_timeout_ms": value.run_timeout_ms,
         "output_bytes": value.output_bytes,
@@ -255,8 +253,9 @@ def _enc_limits(value: Limits) -> Json:
         "process_output_bytes": value.process_output_bytes,
         "process_retention_seconds": value.process_retention_seconds,
         "list_limit": value.list_limit,
-        "cost_final_within_seconds": value.cost_final_within_seconds,
     }
+    _put(out, "cost_final_within_seconds", value.cost_final_within_seconds)
+    return out
 
 
 def _enc_file_link(value: FileLink) -> Json:
@@ -365,9 +364,9 @@ def _dec_price(data: Json) -> Price:
 def _dec_cost_line(data: Json) -> CostLine:
     return CostLine(
         item=data["item"],
-        quantity=_decimal(data["quantity"]),
-        unit=data["unit"],
         amount_usd=_decimal(data["amount_usd"]),
+        quantity=_opt(data.get("quantity"), _decimal),
+        unit=data.get("unit"),
         start=_opt(data.get("start"), _time),
         end=_opt(data.get("end"), _time),
     )
@@ -377,11 +376,10 @@ def _dec_cost(data: Json) -> Cost:
     return Cost(
         sandbox_id=data["sandbox_id"],
         status=data["status"],
-        total_usd=_decimal(data["total_usd"]),
+        total_usd=_opt(data["total_usd"], _decimal),
         source=data["source"],
         lines=tuple(_dec_cost_line(line) for line in data["lines"]),
         as_of=_time(data["as_of"]),
-        revision=data["revision"],
         snapshot_id=data.get("snapshot_id"),
     )
 
@@ -450,12 +448,8 @@ _CODECS: dict[type, _Codec] = {
     Cost: _Codec("Cost", _enc_cost, _dec_cost),
     DestroyResult: _Codec(
         "DestroyResult",
-        lambda v: {
-            "sandbox_id": v.sandbox_id,
-            "state": v.state,
-            "cost": _opt(v.cost, _enc_cost),
-        },
-        lambda d: DestroyResult(d["sandbox_id"], d["state"], _opt(d.get("cost"), _dec_cost)),
+        lambda v: {"sandbox_id": v.sandbox_id, "state": v.state},
+        lambda d: DestroyResult(d["sandbox_id"], d["state"]),
     ),
     SnapshotRequest: _Codec(
         "SnapshotRequest",

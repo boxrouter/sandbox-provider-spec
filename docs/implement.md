@@ -23,7 +23,7 @@ adapter and move to a native API later.
 
 ## Required Operations
 
-Every provider implements these eleven operations. Paths are relative to your base URL.
+Every provider implements these ten operations, and may offer an eleventh, `cost` (see [Cost](#cost)). Paths are relative to your base URL.
 
 | Operation | HTTP | What it does |
 | --- | --- | --- |
@@ -37,7 +37,6 @@ Every provider implements these eleven operations. Paths are relative to your ba
 | `files.write` | `PUT /v1/sandboxes/{sandbox_id}/files?path=` | Writes a file from a byte stream of at least 1 GiB |
 | `process.start` | `POST /v1/sandboxes/{sandbox_id}/processes` | Starts a background process |
 | `process.output` | `GET /v1/sandboxes/{sandbox_id}/processes/{process_id}/output` | Reads a process's output and exit status |
-| `cost` | `GET /v1/sandboxes/{sandbox_id}/cost` | Returns the sandbox's cost |
 
 Inside a sandbox, commands and the file operations see the same filesystem. A sandbox created
 without an image has `bash` and `python3` on its path, outbound HTTPS works, and sandbox code
@@ -65,8 +64,8 @@ cannot reach instance metadata or host credentials. These rules most often catch
 
 Discovery's `limits` object states your limits, and each has a floor that you must meet: `file_bytes`
 1 GiB, `run_timeout_ms` 60000, `output_bytes` 16 MiB, `wait_ms` 30000, `process_output_bytes` 1 MiB,
-`process_retention_seconds` 600, and `list_limit` 100. `cost_final_within_seconds` is your promise
-instead, at most 604800 (7 days); see [Cost](#cost).
+`process_retention_seconds` 600, and `list_limit` 100. `cost_final_within_seconds` is your own statement
+and has no floor; stating it offers `cost` (see [Cost](#cost)).
 
 ## Discovery And Prices
 
@@ -120,30 +119,14 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 
 ## Cost
 
-Customers of a router pay for sandboxes with prepaid credits. The router reads each running
-sandbox's cost every 1 to 5 minutes, stops the sandbox when the credit runs out, and bills the
-final figure. For that, `GET /v1/sandboxes/{sandbox_id}/cost` needs to do seven things:
+`cost` is optional: state `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`, or leave it out and `cost` answers `unsupported`. If you offer it:
 
-1. Answer in every state: running, paused, stopped, or deleted.
-2. Return every billed period as a line with its item, quantity, amount, start, and end, so that
-   the lines add up to `total_usd`. A pause, resume, resize, or price change starts a new line.
-3. Set `as_of` to the time that the figures run through. Everything before it is included, and a
-   line that is still open (`end` is null) counts up to it. While the sandbox runs, `as_of` is at
-   most 60 seconds old. All figures are running totals. A line that ended before `as_of` changes
-   only through a correction, so a consumer bills it without waiting.
-4. Set `status` to `final` once no new usage will be added, no later than
-   `limits.cost_final_within_seconds` after the sandbox ends. You state that number in
-   discovery, and it is at most 604800 (7 days). A 15 second sandbox is exact by then, even if
-   nobody read its cost while it ran.
-5. Keep a `revision` that starts at 1 and goes up by at least 1 whenever you correct a figure that
-   you already reported, also after `final`, which then stays true. Cost growing on a running
-   sandbox is not a correction.
-6. Give amounts in US dollars, as decimal strings, at your published list price when the usage
-   happened, before any plan, free tier, trial, or credit. Leave a charge that is not metered
-   yet out of `lines` and `total_usd`. Never return `"0"` for it: `"0"` means a true zero.
-7. Keep the cost readable for 90 days after the sandbox ends, and allow one read per running
-   sandbox every 60 seconds, for thousands of sandboxes at once, without `rate_limited`. If you
-   cannot, say so to the consumer when you apply.
+1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. Take quantities from your own records, never from a clock in the consumer or an adapter.
+2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated`. `total_usd` is the sum of the lines. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`.
+3. `as_of` is when you stated the figures: the read time of your record.
+4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number). A `final` cost has a `total_usd` and no open line.
+5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, and `calculated` when you multiply quantities from your usage records by your prices.
+6. While `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. `"0"` is a true zero, never "not counted yet".
 
 ```json
 {"sandbox_id": "sbx-17", "status": "accruing", "total_usd": "0.01344", "source": "calculated",
@@ -151,17 +134,10 @@ final figure. For that, `GET /v1/sandboxes/{sandbox_id}/cost` needs to do seven 
             "start": "2026-11-13T10:00:00Z", "end": "2026-11-13T10:02:00Z"},
            {"item": "cpu", "quantity": "720", "unit": "vcpu_second", "amount_usd": "0.01008",
             "start": "2026-11-13T10:02:00Z", "end": null}],
- "as_of": "2026-11-13T10:05:00Z", "revision": 1}
+ "as_of": "2026-11-13T10:05:00Z"}
 ```
 
-`source` is `reported` when your billing system states the amounts, and `calculated` when you
-multiply quantities from your own usage records by the prices in discovery. Take quantities from
-your records, never from a clock in the consumer or in an adapter. If your usage records disappear
-with the sandbox, read the usage during `destroy` and return the final cost in its result.
-A snapshot's own cost is optional: it is `snapshot.cost` in the optional `snapshots` section, and
-nothing in a sandbox's `cost` needs it.
-
-Run the tester: `cost` must pass.
+A router that bills from your figures publishes what it asks of a provider on [its own page](https://boxrouter.ai/docs/providers/cost). A snapshot's own cost is `snapshot.cost` in the optional `snapshots` section.
 
 ## Errors
 
@@ -231,7 +207,7 @@ class ExampleProvider(Provider):  # __init__ makes self._http from self.credenti
         return RunResult(exit_code=body["code"], stdout=body["out"], stderr=body["err"])
 ```
 
-**Native API.** Serve the eleven operations under your base URL, as the OpenAPI file defines them.
+**Native API.** Serve the ten operations under your base URL, as the OpenAPI file defines them.
 To see a working server, serve the template adapter over the HTTP API. The `serve` command serves
 any installed adapter, and it needs the `http` extra:
 
@@ -281,9 +257,10 @@ uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandb
 
 The tester runs the baseline and contract tests, then the tests of every optional section that
 your discovery claims, and deletes every sandbox that it created. It prints one line per test, then
-one per required operation and per claimed section, such as `operation create passed`; a status is
+one per required operation, one for `cost` (`operation cost unsupported` when discovery states no
+`cost_final_within_seconds`) and one per claimed section, such as `operation create passed`; a status is
 `passed`, `differs`, `unsupported`, `not_run`, or `error`. It writes a JSON report
-(`sps-report.json`) and exits 0 only when every test that it ran and the required `cost` operation passed.
+(`sps-report.json`) and exits 0 only when every test that it ran passed, `cost` included when you offer it.
 `--quick` skips the 1 GiB round trip and the waits for a final cost while you iterate; a quick pass
 exits 3, never 0. A consumer runs the same tester. To state that you conform, name the spec version,
 the class, and the passing report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).

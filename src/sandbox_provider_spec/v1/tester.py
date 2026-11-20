@@ -27,7 +27,6 @@ QUICK_SKIPS = frozenset(
     {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
-        "contract.cost_closed_lines",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }
@@ -36,6 +35,10 @@ QUICK_SKIPS = frozenset(
 # A test that cannot apply to this form of the provider says so with one of these reasons, and
 # then counts for neither its section nor the run: the Python form has no link to reuse.
 NOT_APPLICABLE = frozenset({"the Python form has no link"})
+
+# The tests that need an offered `cost` (contract section 10): a run leaves them out, and the
+# `cost` operation reports `unsupported`, when discovery states no `cost_final_within_seconds`.
+COST_TESTS = ("contract.cost", "snapshots.v1.cost")
 
 # The required operations (contract section 1) and the steps of a test that exercise each.
 OPERATIONS = (
@@ -50,7 +53,7 @@ OPERATIONS = (
     "process.start",
     "process.output",
     "cost",
-)
+)  # `cost` is required only of a provider that offers it
 STEP_OPERATION = {
     "create": "create",
     "get": "get",
@@ -173,6 +176,11 @@ def unsupported_operations(discovery: Discovery) -> dict[str, str]:
     return missing
 
 
+def cost_offered(discovery: Discovery | None) -> bool:
+    """Whether discovery states `cost_final_within_seconds`, which is how a provider offers cost."""
+    return discovery is not None and discovery.limits.cost_final_within_seconds is not None
+
+
 def _consistent(test: Test, gates: Mapping[str, list[Mapping[str, object]]]) -> bool:
     """A test of a section variant runs only when a claimed variant has that knob value."""
     for proof in test.proves:
@@ -219,6 +227,8 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             wanted = True
         else:
             wanted = head in sections and _consistent(test, gates)
+        if wanted and not options.tests and discovery is not None and not cost_offered(discovery):
+            wanted = not test.id.startswith(COST_TESTS)
         if wanted and not (options.quick and test.id in QUICK_SKIPS):
             chosen.append(test)
     if not chosen:
@@ -243,8 +253,11 @@ def _source_revision() -> str:
         return DEVELOPMENT_REVISION
 
 
-def _probe_cost(driver: ProviderDriver) -> str:
-    """Create a sandbox, read its cost, destroy it: the one operation no baseline test uses."""
+def _probe_cost(driver: ProviderDriver, discovery: Discovery | None) -> str:
+    """Create a sandbox, read its cost, destroy it: the one operation no baseline test uses. A
+    provider that does not offer cost has `unsupported`."""
+    if discovery is not None and not cost_offered(discovery):
+        return "unsupported"
     created = None
     try:
         created = driver.wait(
@@ -284,6 +297,9 @@ def _summary(
                 by_operation[operation].append(str(row["result"]))
     by_operation["discovery"].append(discovery_status)
     by_operation["cost"].append(cost_status)
+    by_operation["cost"] += [
+        str(row["result"]) for row in results if str(row["id"]).startswith("contract.cost")
+    ]
     lines += [f"operation {name} {_worst(by_operation[name])}" for name in OPERATIONS]
     lines += [f"section {name} {_worst(by_section[name])}" for name in by_section]
     return lines
@@ -321,7 +337,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             "reachable_url": options.reachable_url,
         }
         results = run_suite(driver, suite, fixtures)
-        cost_status = _probe_cost(driver)
+        cost_status = _probe_cost(driver, discovery)
         leftovers = driver.sweep_run()
         if leftovers and results:
             cast("list[Any]", results[-1].setdefault("cleanup", [])).extend(leftovers)
@@ -332,7 +348,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         document.lines = _summary(results, discovery_status, cost_status, sections)
         document.all_passed = (
             discovery_status == "passed"
-            and cost_status == "passed"
+            and cost_status in ("passed", "unsupported")
             and all(row["result"] == "passed" for row in results if _applies(row))
         )
         return document
