@@ -226,7 +226,8 @@ def test_discovery_example_is_the_one_in_the_design() -> None:
 
 
 def _example(name: str) -> dict[str, Any]:
-    return json.loads((EXAMPLES / f"{name}.json").read_text(encoding="utf-8"))
+    document: dict[str, Any] = json.loads((EXAMPLES / f"{name}.json").read_text(encoding="utf-8"))
+    return document
 
 
 def _errors(name: str, document: Any) -> list[str]:
