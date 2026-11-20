@@ -78,6 +78,8 @@ untested:
     (tests/v1/test_tester.py).
   provider-api/cost-list-price: >-
     Which price a provider applied, and whether it has metered a charge yet, cannot be observed
-    from outside. The tests check what can be: that a cost's lines add up and stay the same.
+    from outside. The tests check what can be: that a cost's lines add up and stay the same, and
+    that a calculated line's amount is its quantity times the price in discovery
+    (provider-api/cost-priced-from-discovery).
   provider-api/cost-stated-at: >-
-    The time at which a provider read its own record cannot be observed from outside.
+    The time up to which a provider's figures count usage cannot be observed from outside.

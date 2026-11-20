@@ -4944,6 +4944,23 @@ tests:
   - provider-api/destroy-on-acceptance
   - provider-api/ids-not-reused
   proves: []
+- id: contract.lifetime_ends
+  title: A sandbox created with a lifetime of 60 seconds is destroyed within 30 seconds after the lifetime ends.
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 60
+    as: box
+  - wait_ms: 60000
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: destroyed
+      eventually_ms: 30000
+  rules:
+  - provider-api/lifetime-enforced
+  proves: []
 - id: contract.cost_final
   title: A destroyed sandbox has a final cost that names it, adds up, has no open line and stays the same when read again.
   steps:
@@ -4967,12 +4984,14 @@ tests:
         sandbox_matches: true
         total_matches_lines: true
         quantities_present: true
+        amounts_match_prices: true
         no_open_line: true
         stable: true
   rules:
   - provider-api/cost-final-within
   - provider-api/cost-retained
   - provider-api/cost-lines
+  - provider-api/cost-priced-from-discovery
   - provider-api/cost-provider-records
   proves: []
 - id: directories.list

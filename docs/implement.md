@@ -70,7 +70,8 @@ and has no floor (see [Cost](#cost)).
 ## Discovery And Prices
 
 `GET /v1/discovery` needs the same token as every other request, because two accounts on different
-plans may see different classes, regions, sizes, and prices. A class is a wholesale different kind
+plans may see different classes, regions, and sizes. Prices are list prices: a plan or discount on
+an account never changes them. A class is a wholesale different kind
 of sandbox, such as a container or a microVM; the main class has the id `default`.
 
 ```json
@@ -122,10 +123,10 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 `cost` is optional: state `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`, or leave it out and `cost` answers `unsupported`. If you offer it:
 
 1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. Take quantities from your own records, never from a clock in the consumer or an adapter.
-2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated`. `total_usd` is the sum of the lines. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`.
-3. `as_of` is when you stated the figures: the read time of your record.
+2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee). `total_usd` is the sum of the lines. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
+3. `as_of` is the time up to which your figures count usage. It may be earlier than the time of the read, if your records lag.
 4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number; the tester waits at most 7 days). A `final` cost has a `total_usd` and no open line.
-5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, and `calculated` when you multiply quantities from your usage records by your prices.
+5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, and `calculated` when you multiply quantities from your usage records by your prices. The tester checks that a `calculated` line's amount is its quantity times the price in your discovery for that item and unit, to the decimal places that the amount states.
 6. While `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. `"0"` is a true zero, never "not counted yet". A free sandbox returns one line with the amount `"0"`.
 
 ```json
@@ -177,6 +178,7 @@ The tester and a reference server ship in the `sandbox-provider-spec` package. T
 template are in the [GitHub repository](https://github.com/boxrouter/sandbox-provider-spec); the
 commands below run the package straight from it, so there is nothing else to install. Add `@` and
 a release tag after the URL (`git+https://github.com/boxrouter/sandbox-provider-spec@<tag>`) to pin a release.
+The contract that you implement is SPS 1.0; the package's own version numbers the tools, not the contract.
 
 **Adapter.** The template is a complete adapter for Example Cloud, a small fake provider API that
 runs each sandbox as a local Docker container. Example Cloud is deliberately not shaped like SPS,
@@ -187,6 +189,12 @@ yours. [`template/README.md`](../template/README.md) shows how to run it on your
 ```console
 git clone https://github.com/boxrouter/sandbox-provider-spec
 cp -r sandbox-provider-spec/template my_adapter
+```
+
+To try the template as it is, start Example Cloud in another terminal (it needs Docker):
+
+```console
+uv run --project sandbox-provider-spec --extra docker --extra http python sandbox-provider-spec/template/fake_cloud/server.py --port 18080 --state-dir /tmp/example-cloud
 ```
 
 Each method translates one operation to your API and raises `SpsError` for an error:
@@ -215,7 +223,9 @@ any installed adapter, and it needs the `http` extra:
 uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandbox-provider-spec' --with ./my_adapter sandbox-provider-spec serve example --port 18431
 ```
 
-Use your own provider id in place of `example` after you rename the template.
+Use your own provider id in place of `example` after you rename the template. A served adapter takes
+its credentials from the bearer token. With one credential field, the token is the value itself; with
+several, it is `sps1.` and the unpadded base64url encoding of a JSON object that maps each field to its value.
 
 ### 2. Write The Manifest (Adapter Only)
 
@@ -247,12 +257,21 @@ Run the tester against your own test account. It reads each credential from the 
 variable that you name, never from the command line.
 
 ```console
-# Adapter: the provider id from your manifest
-uvx --from git+https://github.com/boxrouter/sandbox-provider-spec --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
+# Adapter: the provider id from your manifest, and one --credential for each field of your manifest
+export EXAMPLE_API_KEY=dev EXAMPLE_ENDPOINT=http://127.0.0.1:18080
+uvx --from git+https://github.com/boxrouter/sandbox-provider-spec --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY --credential endpoint=EXAMPLE_ENDPOINT
 
 # Native API: your base URL (the URL form needs the http extra)
 uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandbox-provider-spec' sandbox-provider-spec test \
   https://api.example.com/sps --credential token=EXAMPLE_TOKEN
+```
+
+The first command tests the template against Example Cloud from step 1. To test the template served
+as a native API, serve it as in step 1, make its token, and test its URL:
+
+```console
+export SPS_TOKEN=$(python3 -c 'import base64, json; print("sps1." + base64.urlsafe_b64encode(json.dumps({"api_key": "dev", "endpoint": "http://127.0.0.1:18080"}).encode()).decode().rstrip("="))')
+uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandbox-provider-spec' sandbox-provider-spec test http://127.0.0.1:18431 --credential token=SPS_TOKEN
 ```
 
 The tester runs the baseline and contract tests, then the tests of every optional section that
@@ -261,8 +280,11 @@ one per required operation, one for `cost` (`operation cost unsupported` when di
 `cost_final_within_seconds`) and one per claimed section, such as `operation create passed`; a status is
 `passed`, `differs`, `unsupported`, `not_run`, or `error`. It writes a JSON report
 (`sps-report.json`) and exits 0 only when every test that it ran passed, `cost` included when you offer it.
-`--quick` skips the 1 GiB round trip and the waits for a final cost while you iterate; a quick pass
-exits 3, never 0. A consumer runs the same tester. To state that you conform, name the spec version,
+A full run also waits for a final cost, up to your `cost_final_within_seconds` after it destroys a
+sandbox, and for a sandbox to end at the lifetime that it asked for (60 seconds, plus up to 30). `--quick`
+skips the 1 GiB round trip and those waits while you iterate, and prints `not_run` for what it did
+not test; a quick pass exits 3, never 0. If the tester cannot reach `https://example.com` from a
+sandbox, pass `--reachable-url` with an HTTPS URL that your sandboxes can reach. A consumer runs the same tester. To state that you conform, name the spec version,
 the class, and the passing report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).
 
 ## Optional Sections

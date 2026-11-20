@@ -285,6 +285,17 @@ def _test(args: argparse.Namespace) -> int:
     for row in result["tests"]:
         if row["result"] not in {"passed", "unsupported"}:
             print(f"{row['id']}: {row.get('reason', row['result'])}", file=sys.stderr)
+            for step in row["steps"]:
+                if "command" in step:
+                    print(f"  command: {step['command']}", file=sys.stderr)
+                if step.get("stderr"):
+                    print(f"  stderr: {step['stderr']}", file=sys.stderr)
+    if any(row.get("reason") == "probe_connection_failed" for row in result["tests"]):
+        print(
+            f"hint: a sandbox could not reach {args.reachable_url}; "
+            "pass --reachable-url with an HTTPS URL that your sandboxes can reach",
+            file=sys.stderr,
+        )
     write_report(Path(args.output), result)
     print(f"report: {args.output}", file=sys.stderr)
     if not result.all_passed:

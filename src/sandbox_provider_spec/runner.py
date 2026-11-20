@@ -159,6 +159,24 @@ def bounded(value: object) -> object:
     return {"unrecorded": True}
 
 
+_FAILED_COMMAND_CHARS = 4096
+_FAILED_STDERR_BYTES = 1024
+
+
+def _failed_command(
+    operation: str, inputs: Mapping[str, object], result: Mapping[str, object]
+) -> dict[str, str]:
+    """What a failed `run` step ran, and the first 1 KiB of its stderr, for the report."""
+    script = inputs.get("bash_script")
+    if operation != "run" or not isinstance(script, str):
+        return {}
+    shown = {"command": script[:_FAILED_COMMAND_CHARS]}
+    stderr = result.get("stderr")
+    if isinstance(stderr, bytes) and stderr:
+        shown["stderr"] = stderr[:_FAILED_STDERR_BYTES].decode("utf-8", "replace")
+    return shown
+
+
 def asserted(result: Mapping[str, object], expected: Mapping[str, Any]) -> dict[str, object]:
     """Return only fields explicitly asserted; no handles, URLs, tokens or native errors."""
     observations: dict[str, object] = {}
@@ -637,6 +655,7 @@ class Runner:
         target = bindings.get(step.get("target", ""))
         expected = resolve(step.get("expect", {}), bindings, self.fixtures)
         deadline = time.monotonic() + expected.get("eventually_ms", 0) / 1000
+        result: Mapping[str, object] = {}
         while True:
             try:
                 result = (
@@ -670,6 +689,7 @@ class Runner:
                     "operation": operation,
                     "result": "differs",
                     "observations": error.observation or {str(error): {"matches": False}},
+                    **_failed_command(operation, inputs, result),
                 }
                 if time.monotonic() >= deadline:
                     raise

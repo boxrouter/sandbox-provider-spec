@@ -56,9 +56,10 @@ A provider conforms to Provider API 1.0 in one of two ways:
 ```console
 git clone https://github.com/boxrouter/sandbox-provider-spec
 cp -r sandbox-provider-spec/template my_adapter
-# Replace the template's Example Cloud calls with calls to your API, then run the tester:
-uvx --from git+https://github.com/boxrouter/sandbox-provider-spec --with ./my_adapter sandbox-provider-spec test example --credential api_key=EXAMPLE_API_KEY
+# Replace the template's Example Cloud calls with calls to your API, then run the tester.
 ```
+
+The guide's [Get Started](docs/implement.md#get-started) section has every command, from starting the template's stand-in cloud to running the tester.
 
 The tester runs the same conformance checks that any consumer runs. It prints one result line for each required operation and for each optional section that your discovery response claims, writes a JSON report, and exits 0 only when every test that it ran passes. A provider that serves the HTTP API directly runs the same command against its HTTPS base URL.
 
@@ -97,28 +98,25 @@ $ sandbox-provider-spec check coding-agent.yaml
 coding-agent.yaml: ok
 ```
 
-The `match` command compares the request against provider declarations that ship in the package. When a declaration does not qualify, each refusal line names the requirement that failed and why. In this example, one provider supports only IPv4 address allowlists rather than host names, and the other provider pauses sandboxes without keeping running processes in memory:
+The `match` command compares the request against provider declarations that ship in the package. When a declaration does not qualify, each refusal line names the requirement that failed and why. In this example, the declaration for a local container engine offers no previews or network lockdown, and it does not state how long a sandbox may live, what an ended sandbox does, or its sizes:
 
 <!-- sps:example exit=1 stream=stdout -->
 
 ```console
-$ sandbox-provider-spec match coding-agent.yaml --met-need pro_plan \
-    "$(sandbox-provider-spec installed-declaration e2b)" \
-    "$(sandbox-provider-spec installed-declaration vercel)"
-e2b: not eligible
+$ sandbox-provider-spec match coding-agent.yaml --met-need pro_plan "$(sandbox-provider-spec installed-declaration docker-engine)"
+docker-engine: not eligible
   - baseline_failed: no newest clean baseline-passing report for this provider, class and SDK set
-  - limit_exceeded: variant 1: entry_kinds ['addresses'] does not cover ['names']; variant 2: policy: asked allowlist, offers deny_all
-vercel: not eligible
-  - baseline_failed: no newest clean baseline-passing report for this provider, class and SDK set
-  - knob_mismatch: variant 1: keeps: asked files_and_memory, offers files_only
-  - knob_mismatch: variant 1: policy: asked allowlist, offers deny_all
-  - resource_mismatch: at_end: asked paused, declared ['destroyed', 'stopped']
+  - gate_not_listed: previews: this route does not list it, so it is not offered
+  - gate_not_listed: network_lockdown: this route does not list it, so it is not offered
+  - resource_unknown: lifetime_seconds 86,400: the most a route allows is unknown
+  - resource_unknown: at_end: asked paused, declared ['unknown']
+  - resource_unknown: sizes: declared unknown, asked {'memory_min_mib': 4096}
 ```
 
 Matching runs offline without provider credentials and without creating a sandbox. Exit code 0 means that at least one declaration qualifies; exit code 1 means that no declaration qualifies or that an input file is invalid. A `baseline_failed` refusal means that the declaration's cited reports do not establish a clean pass across every baseline test that all providers must pass. The [tutorial](docs/getting-started.md) walks through checking requests and reading refusal reasons in detail.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 48 knobs; the conformance suite has 275 tests.
+The vocabulary has 16 gates and 48 knobs; the conformance suite has 276 tests.
 
 ## What Is In This Repository
 

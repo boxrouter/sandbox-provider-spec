@@ -574,28 +574,32 @@ def test_refusals_match_the_strict_loader(monkeypatch: pytest.MonkeyPatch, tmp_p
 
 
 SHARED_BEFORE_0_5_10 = "sha256:857eed51f2b715399c2b8e69a6b61303ff7e8e17f1e39a5fcf858434d12fae6e"
+SHARED_BEFORE_0_5_32 = "sha256:3c9d42eeab273f1fe8e0681634feec609eedbdd1bef541c579173a46952c7116"
 
 
-def test_only_the_one_recorded_previous_shared_digest_counts() -> None:
-    """SPS 0.5.10 changed load.py with no change to any check result (libyaml).
+def test_only_the_recorded_previous_shared_digests_count() -> None:
+    """SPS 0.5.10 changed load.py (libyaml) and SPS 0.5.32 changed runner.py (the report of a
+    failed step), each with no change to any check result.
 
-    A digest recorded under the shared digest of 0.5.9 stands; one recorded under any other
-    shared digest stays stale.
+    A digest recorded under a shared digest from before either stands; one recorded under any
+    other shared digest stays stale.
     """
     history = json.loads((suite_path().parent / "historical-shared-digests.json").read_text())
-    assert list(history) == [SHARED_BEFORE_0_5_10]
+    assert list(history) == [SHARED_BEFORE_0_5_10, SHARED_BEFORE_0_5_32]
     assert all(isinstance(reason, str) and "\n" not in reason for reason in history.values())
-    assert digests.shared_digest() != SHARED_BEFORE_0_5_10
+    assert digests.shared_digest() not in {SHARED_BEFORE_0_5_10, SHARED_BEFORE_0_5_32}
 
     catalog = load(spec_dir() / "catalog.yaml")
     suite = read_suite()
     for test in suite.tests[:5]:
         current = digests.check_digest(test, catalog, digests.shared_digest())
         old = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_10)
+        older = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_32)
         unknown = digests.check_digest(test, catalog, "sha256:" + "0" * 64)
         assert old != current
         assert digests.check_digest_stands(test, current, suite.digest)
         assert digests.check_digest_stands(test, old, suite.digest)
+        assert digests.check_digest_stands(test, older, suite.digest)
         assert not digests.check_digest_stands(test, unknown, suite.digest)
         assert not digests.check_digest_stands(test, None, suite.digest)
 

@@ -165,7 +165,8 @@ every timing rule here counts from then.
 
 A line has an `item` and an `amount_usd`. `quantity` and `unit` are required when `source` is
 `calculated`, as what the amount was priced from, and optional when `source` is `reported`. `start`
-and `end` give the period that the line covers. Both null means that the line covers no period, as
+and `end` give the period that the line covers, which may be a billing period (such as an hour)
+that contains the usage. Both null means that the line covers no period, as
 a fee does. `start` set with `end` null is an open period, which runs up to `as_of` and is allowed
 only while the status is `accruing`. `total_usd` is the sum of the line amounts. While the status is
 `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. A sandbox for which
@@ -175,11 +176,17 @@ true zero, never "not counted yet".
 - A provider **MUST** take the quantities of a cost from its own records of the sandbox, never <!-- rule: provider-api/cost-provider-records -->
   from a clock in the consumer or in an adapter.
 - Amounts **MUST** be the provider's published list price when the usage happened, in US dollars <!-- rule: provider-api/cost-list-price -->
-  as decimal strings, before any plan, free tier, trial, credit or discount. A `reported` cost
+  as decimal strings, before any plan, free tier, trial, credit or discount. The prices in discovery
+  are list prices too: a plan or discount on an account never changes them. A `reported` cost
   states those list amounts in the provider's records. A source that states amounts net of a
   discount is turned into list amounts from its quantities, and the cost is then `calculated`.
-- `as_of` **MUST** be the time at which the provider stated the figures: the read time of its <!-- rule: provider-api/cost-stated-at -->
-  record.
+- `as_of` **MUST** be the time up to which the figures count usage. It may be earlier than the <!-- rule: provider-api/cost-stated-at -->
+  time of the read, for records that lag.
+- A `calculated` line's `amount_usd` **MUST** equal its `quantity` times the price that discovery <!-- rule: provider-api/cost-priced-from-discovery -->
+  states for its `item` and `unit`, rounded to the decimal places that the amount states (a
+  difference of at most half a unit in the last of them is rounding). Where discovery states several
+  prices for them (by size, region or variant), one of them applies. The tester does not check a line
+  whose `item` and `unit` discovery does not price.
 - Every line **MUST** have an `item` and an `amount_usd`, and a `calculated` line **MUST** also <!-- rule: provider-api/cost-lines -->
   have a `quantity` and a `unit`. `total_usd` **MUST** be the sum of the line amounts, or null
   where the paragraph above allows it.

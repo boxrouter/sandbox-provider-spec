@@ -11,6 +11,7 @@ from typing import Any, cast
 from uuid import uuid4
 
 from sandbox_provider_spec.conformance import run_suite
+from sandbox_provider_spec.driver import NativeFailure
 from sandbox_provider_spec.report import DEVELOPMENT_REVISION, report, revision
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
@@ -26,6 +27,7 @@ QUICK_SKIPS = frozenset(
     {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.lifetime_ends",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }
@@ -95,6 +97,22 @@ COMMAND_FALLBACK = frozenset({"files.exists"})
 
 # The section of tests that discovery's `classes[].operations` turns on, in place of a gate.
 DIRECTORIES = "directories"
+
+
+# What a run says when discovery cannot be read for one of these reasons: nothing else could run.
+CANNOT_RUN = {
+    "unavailable": "the provider could not be reached (unavailable): check its base URL or "
+    "endpoint, and that the service is running",
+    "timeout": "the provider did not answer in time (timeout): check its base URL or endpoint",
+    "unauthenticated": "the provider refused the credential (unauthenticated): check the value "
+    "that each --credential names",
+    "forbidden": "the provider refused the credential (forbidden): check the value that each "
+    "--credential names, and what its account may do",
+}
+
+
+class CannotRun(ValueError):
+    """The run cannot start; the message is one plain line for a person."""
 
 
 @dataclass
@@ -313,6 +331,10 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         try:
             discovery = driver.wait(provider.discovery())
             discovery_status = "passed"
+        except NativeFailure as error:
+            if error.code in CANNOT_RUN:
+                raise CannotRun(CANNOT_RUN[error.code]) from None
+            discovery, discovery_status = None, "error"
         except Exception:  # pylint: disable=broad-exception-caught
             discovery, discovery_status = None, "error"
         if discovery is not None:
@@ -333,6 +355,10 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         }
         results = run_suite(driver, suite, fixtures)
         cost_status = _probe_cost(driver, discovery)
+        if cost_status == "passed" and not any(
+            str(row["id"]).startswith("contract.cost") for row in results
+        ):
+            cost_status = "not_run"  # the read worked, but no test checked the cost
         leftovers = driver.sweep_run()
         if leftovers and results:
             cast("list[Any]", results[-1].setdefault("cleanup", [])).extend(leftovers)
@@ -343,7 +369,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         document.lines = _summary(results, discovery_status, cost_status, sections)
         document.all_passed = (
             discovery_status == "passed"
-            and cost_status in ("passed", "unsupported")
+            and cost_status in ("passed", "unsupported", "not_run")
             and all(row["result"] == "passed" for row in results if _applies(row))
         )
         return document

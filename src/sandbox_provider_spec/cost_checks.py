@@ -75,6 +75,28 @@ def same_figures(first: Cost, second: Cost) -> bool:
     )
 
 
+def amounts_match_prices(driver: ProviderDriver, cost: Cost) -> bool:
+    """Each `calculated` line that discovery prices has the amount quantity x price, within the
+    rounding of the amount: half a unit in the last decimal place that it states. A line whose item
+    and unit discovery does not price is not checked, and where discovery states several prices for
+    them (by size, region or variant) one of them must fit."""
+    if cost.source != "calculated":
+        return True
+    prices: dict[tuple[str, str], set[Decimal]] = {}
+    for item in driver.wait(driver.api.discovery()).classes:
+        for price in item.prices:
+            prices.setdefault((price.item, price.unit), set()).add(price.price_usd)
+    for line in cost.lines:
+        stated = prices.get((line.item, line.unit or ""))
+        if not stated or line.quantity is None:
+            continue
+        exponent = line.amount_usd.as_tuple().exponent
+        half_unit = Decimal(1).scaleb(exponent if isinstance(exponent, int) else 0) / 2
+        if all(abs(line.amount_usd - line.quantity * price) > half_unit for price in stated):
+            return False
+    return True
+
+
 def final(driver: ProviderDriver, sandbox_id: str, inputs: Inputs) -> Observation:
     """A destroyed sandbox's final cost names it, adds up, has no open line and reads the same
     twice."""
@@ -86,6 +108,7 @@ def final(driver: ProviderDriver, sandbox_id: str, inputs: Inputs) -> Observatio
         "total_matches_lines": cost.total_usd == lines,
         "quantities_present": cost.source != "calculated"
         or all(line.quantity is not None and line.unit is not None for line in cost.lines),
+        "amounts_match_prices": amounts_match_prices(driver, cost),
         "no_open_line": all(
             not (line.start is not None and line.end is None) for line in cost.lines
         ),

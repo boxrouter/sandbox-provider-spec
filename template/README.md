@@ -23,20 +23,20 @@ ownership of its adapter and may use it anywhere.
 
 ## Run it
 
-Example Cloud needs a local Docker daemon.
+Every command below runs from the root of the cloned repository
+(`git clone https://github.com/boxrouter/sandbox-provider-spec`). Example Cloud needs a local Docker
+daemon:
 
 ```console
-$ uv run --locked python template/fake_cloud/server.py --port 18080 --state-dir /tmp/example-cloud &
+$ uv run --extra docker --extra http python template/fake_cloud/server.py --port 18080 --state-dir /tmp/example-cloud &
 ```
 
 Every request needs a non-empty `X-Api-Key`; any value works, for example `dev`.
 
 ## Smoke check
 
-From `packages/sandbox-provider-spec`:
-
 ```console
-$ uv run --locked --package sps-provider-example python template/scripts/smoke.py \
+$ uv run --no-project --with '.[http]' --with ./template python template/scripts/smoke.py \
     --endpoint http://127.0.0.1:18080 --api-key dev
 smoke ok
 ```
@@ -53,7 +53,8 @@ Cloud starts a machine from the image's files. Each image's stored size is a usa
 adapter prices as the `snapshot` item in `gib_month`. After a tester run, no image is left:
 
 ```console
-$ uv run --locked --extra http sandbox-provider-spec test example \
+$ export EXAMPLE_API_KEY=dev EXAMPLE_ENDPOINT=http://127.0.0.1:18080
+$ uv run --no-project --with '.[http]' --with ./template sandbox-provider-spec test example \
     --credential api_key=EXAMPLE_API_KEY --credential endpoint=EXAMPLE_ENDPOINT --test snapshots.
 $ docker images --filter label=example.snapshot=1 -q | wc -l
 0
@@ -63,26 +64,27 @@ $ docker images --filter label=example.snapshot=1 -q | wc -l
 
 ```console
 $ export EXAMPLE_API_KEY=dev EXAMPLE_ENDPOINT=http://127.0.0.1:18080
-$ uv run --locked --extra http sandbox-provider-spec test example \
+$ uv run --no-project --with '.[http]' --with ./template sandbox-provider-spec test example \
     --credential api_key=EXAMPLE_API_KEY --credential endpoint=EXAMPLE_ENDPOINT
 ```
 
-Or serve the adapter over the standard HTTP API and test it as a native provider:
+A full run takes a few minutes: it moves a 1 GiB file, waits for a final cost and waits for a
+60-second lifetime to end. Add `--quick` to skip those while you iterate.
+
+Or serve the adapter over the standard HTTP API and test it as a native provider. A served adapter
+with several credential fields takes one token: `sps1.` and the unpadded base64url encoding of a
+JSON object that maps each field to its value.
 
 ```console
-$ uv run --locked --extra http sandbox-provider-spec serve example --port 18431 &
-$ export SPS_TOKEN=$(uv run --locked python -c \
-    "from sandbox_provider_spec.v1.tokens import encode; print(encode({'api_key': 'dev', 'endpoint': 'http://127.0.0.1:18080'}))")
-$ uv run --locked --extra http sandbox-provider-spec test http://127.0.0.1:18431 --credential token=SPS_TOKEN
+$ uv run --no-project --with '.[http]' --with ./template sandbox-provider-spec serve example --port 18431 &
+$ export SPS_TOKEN=$(python3 -c 'import base64, json; print("sps1." + base64.urlsafe_b64encode(json.dumps({"api_key": "dev", "endpoint": "http://127.0.0.1:18080"}).encode()).decode().rstrip("="))')
+$ uv run --no-project --with '.[http]' sandbox-provider-spec test http://127.0.0.1:18431 --credential token=SPS_TOKEN
 ```
 
 ## Offline tests
 
 ```console
-$ uv run --locked --package sps-provider-example pytest template/tests -q
+$ uv run --no-project --with '.[http]' --with ./template --with pytest==9.1.1 pytest template/tests -q -o addopts=""
 ```
-
-(Run it from `packages/sandbox-provider-spec`. uv does not treat `template/` as a workspace member
-when it is the current directory, so name the package instead of changing into it.)
 
 They replay recorded Example Cloud responses and need no Docker daemon.

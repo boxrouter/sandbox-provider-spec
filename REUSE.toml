@@ -48,7 +48,6 @@ path = [
   "examples/requests/fork-from-snapshot.yaml",
   "examples/requests/gpu-inference.yaml",
   "providers/**",
-  "publication-approvals.json",
   "pyproject.toml",
   "spec/README.md",
   "spec/catalog-schema.json",

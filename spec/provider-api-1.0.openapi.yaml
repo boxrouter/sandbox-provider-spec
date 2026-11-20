@@ -38,7 +38,9 @@ paths:
       operationId: discovery
       tags: [required]
       summary: What this account can create, and the prices
-      description: Account-scoped. Two accounts on different plans may see different classes, regions, sizes and prices.
+      description: >-
+        Account-scoped. Two accounts on different plans may see different classes, regions and sizes. Prices are list prices:
+        a plan or discount on an account never changes them.
       responses:
         "200":
           description: The discovery document.
@@ -1396,7 +1398,9 @@ components:
           minItems: 1
           items: {$ref: "#/components/schemas/SandboxClass"}
           description: The sandbox classes that this account can use.
-      description: What this account can create, and the prices. Two accounts may see different documents.
+      description: >-
+        What this account can create, and the list prices. Two accounts may see different classes, regions and sizes; a plan
+        or discount on an account never changes a price.
     SandboxSize:
       type: object
       required: [cpu, memory_mib, disk_mib]
@@ -1517,7 +1521,7 @@ components:
         as_of:
           $ref: "#/components/schemas/Timestamp"
           description: >-
-            When the provider stated these figures: the read time of its record.
+            The time up to which these figures count usage. It may be earlier than the time of the read, for records that lag.
         snapshot_id:
           type: string
           pattern: "^[A-Za-z0-9._:-]{1,128}$"
@@ -1540,7 +1544,9 @@ components:
         amount_usd: {$ref: "#/components/schemas/Decimal", description: "The amount in US dollars."}
         start:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
-          description: The start of the period that the line covers. With `end` null it is an open period, which runs up to `as_of`.
+          description: >-
+            The start of the period that the line covers. It may be a billing period (such as an hour) that contains the usage.
+            With `end` null it is an open period, which runs up to `as_of`.
         end:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
           description: >-

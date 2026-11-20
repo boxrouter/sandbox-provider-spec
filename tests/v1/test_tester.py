@@ -614,6 +614,7 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
     assert QUICK_SKIPS == {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.lifetime_ends",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }
@@ -636,7 +637,7 @@ def test_run_tests_passes_reports_and_cleans_up() -> None:
     lines = report.lines
     assert lines[0] == "baseline.create_env passed"
     assert "operation create passed" in lines
-    assert "operation cost passed" in lines
+    assert "operation cost not_run" in lines  # the cost read worked, but no selected test checks it
     assert "operation files.read not_run" in lines  # no selected test reads a file
     sections = [line for line in lines if line.startswith("section ")]
     assert sections  # the example discovery claims some
@@ -680,7 +681,7 @@ def fake_report(passed: bool) -> Report:
 
 @pytest.mark.parametrize(
     ("cost_fails", "cost_status", "code"),
-    [(False, "passed", 0), (True, "error", 1)],
+    [(False, "not_run", 0), (True, "error", 1)],
 )
 def test_the_command_exit_code_includes_the_cost_probe(
     monkeypatch: pytest.MonkeyPatch,
@@ -717,6 +718,109 @@ def test_the_command_exit_code_includes_the_cost_probe(
 
     assert result == code
     assert f"operation cost {cost_status}" in capsys.readouterr().out
+
+
+def test_an_operation_that_no_selected_test_exercised_is_not_run_not_passed() -> None:
+    report = run_tests(
+        ContractProvider(), TestOptions(tests=("contract.not_found_codes",), quick=True)
+    )
+    assert "operation cost not_run" in report.lines
+    assert "operation create not_run" in report.lines
+    assert report.all_passed
+
+
+def test_a_run_whose_cost_test_ran_reports_the_cost_operation_by_that_test() -> None:
+    report = run_tests(ContractProvider(), TestOptions(tests=("contract.cost_final",)))
+    assert "operation cost passed" in report.lines
+
+
+@pytest.mark.parametrize(
+    ("code", "words"),
+    [
+        ("unavailable", "could not be reached"),
+        ("timeout", "did not answer in time"),
+        ("unauthenticated", "refused the credential"),
+        ("forbidden", "refused the credential"),
+    ],
+)
+def test_a_provider_that_cannot_be_asked_gives_one_plain_line(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    code: str,
+    words: str,
+) -> None:
+    class Down(LocalProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            raise SpsError(code, "no")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(
+        "sandbox_provider_spec.cli._load_provider_class", lambda _provider_id, _command: Down
+    )
+    monkeypatch.setenv("SPS_TEST_TOKEN", "test-token")
+    result = main(
+        ["test", "local", "--credential", "api_key=SPS_TEST_TOKEN", "--output", str(tmp_path / "r")]
+    )
+    streams = capsys.readouterr()
+    assert result == 1 and streams.out == ""
+    assert streams.err.count("\n") == 1 and words in streams.err
+    assert "Traceback" not in streams.err and "test-token" not in streams.err
+
+
+def test_a_failed_command_step_reports_its_command_and_the_first_kib_of_stderr(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    class Failing(LocalProvider, manifest=False):
+        async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
+            return RunResult(exit_code=6, stdout="", stderr="e" * 3000)
+
+    report = run_tests(Failing(), TestOptions(tests=("baseline.run_exit_code",)))
+    row = report["tests"][0]
+    step = next(item for item in row["steps"] if item["result"] == "differs")
+    assert "exit" in step["command"]
+    assert step["stderr"] == "e" * 1024
+
+    monkeypatch.setattr(tester_module, "run_tests", lambda provider, options: report)
+    monkeypatch.setattr(
+        "sandbox_provider_spec.cli._load_provider_class", lambda _provider_id, _command: Failing
+    )
+    monkeypatch.setenv("SPS_TEST_TOKEN", "x")
+    main(
+        ["test", "local", "--credential", "api_key=SPS_TEST_TOKEN", "--output", str(tmp_path / "r")]
+    )
+    err = capsys.readouterr().err
+    assert "  command: " in err and "  stderr: " + "e" * 1024 in err
+
+
+def test_a_failed_reachability_probe_suggests_the_reachable_url(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def fake_run(provider: Provider, options: TestOptions) -> Report:
+        report = fake_report(False)
+        report["tests"] = [
+            {
+                "id": "baseline.outbound_network",
+                "result": "error",
+                "reason": "probe_connection_failed",
+                "steps": [],
+            }
+        ]
+        return report
+
+    monkeypatch.setattr(tester_module, "run_tests", fake_run)
+    monkeypatch.setenv("SPS_TEST_TOKEN", "x")
+    main(
+        [
+            "test",
+            "http://127.0.0.1:9",
+            "--credential",
+            "token=SPS_TEST_TOKEN",
+            "--output",
+            str(tmp_path / "r"),
+        ]
+    )
+    err = capsys.readouterr().err
+    assert "--reachable-url" in err and "https://example.com" in err
 
 
 @pytest.mark.parametrize(
@@ -891,13 +995,14 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_eleven_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_twelve_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
         *CONTRACT_TESTS,
         "contract.files_1gib_roundtrip",
         "contract.files_write_missing_parent",
+        "contract.lifetime_ends",
     }
     chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
     assert ids <= chosen
@@ -1054,6 +1159,30 @@ def test_a_reported_line_may_leave_out_its_quantity_and_unit() -> None:
         return dataclasses.replace(cost, source="reported", lines=[line], total_usd=sums)
 
     assert final_results(reported) == {"contract.cost_final": "passed"}
+
+
+def test_a_calculated_amount_must_be_its_quantity_times_the_discovery_price() -> None:
+    def tenfold(cost: Cost, _: int) -> Cost:
+        line = dataclasses.replace(cost.lines[0], amount_usd=cost.lines[0].amount_usd * 10)
+        return dataclasses.replace(cost, lines=[line], total_usd=line.amount_usd)
+
+    assert final_results(tenfold) == {"contract.cost_final": "differs"}
+
+
+def test_a_calculated_amount_may_be_rounded_to_the_places_that_it_states() -> None:
+    def rounded(cost: Cost, _: int) -> Cost:
+        line = dataclasses.replace(cost.lines[0], amount_usd=Decimal("0.0034"))  # 0.00336
+        return dataclasses.replace(cost, lines=[line], total_usd=line.amount_usd)
+
+    assert final_results(rounded) == {"contract.cost_final": "passed"}
+
+
+def test_a_line_that_discovery_does_not_price_is_not_checked() -> None:
+    def unpriced(cost: Cost, _: int) -> Cost:
+        line = dataclasses.replace(cost.lines[0], item="request", unit="each", quantity=Decimal(3))
+        return dataclasses.replace(cost, lines=[line], total_usd=line.amount_usd)
+
+    assert final_results(unpriced) == {"contract.cost_final": "passed"}
 
 
 def test_a_final_cost_whose_lines_come_in_another_order_is_stable() -> None:
