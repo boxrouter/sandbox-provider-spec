@@ -1513,8 +1513,7 @@ components:
           type: array
           items: {$ref: "#/components/schemas/CostLine"}
           description: >-
-            Empty while the status is `accruing` and nothing is metered yet, or when the provider bills nothing for the
-            sandbox and `total_usd` is `"0"`.
+            Empty while the status is `accruing` and nothing is metered yet.
         as_of:
           $ref: "#/components/schemas/Timestamp"
           description: >-

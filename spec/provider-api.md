@@ -168,8 +168,9 @@ A line has an `item` and an `amount_usd`. `quantity` and `unit` are required whe
 and `end` give the period that the line covers. Both null means that the line covers no period, as
 a fee does. `start` set with `end` null is an open period, which runs up to `as_of` and is allowed
 only while the status is `accruing`. `total_usd` is the sum of the line amounts. While the status is
-`accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. An amount of `"0"`
-always means a true zero, never "not counted yet".
+`accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. A sandbox for which
+the provider bills nothing returns one line with the amount `"0"`. An amount of `"0"` always means a
+true zero, never "not counted yet".
 
 - A provider **MUST** take the quantities of a cost from its own records of the sandbox, never <!-- rule: provider-api/cost-provider-records -->
   from a clock in the consumer or in an adapter.

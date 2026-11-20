@@ -1,7 +1,7 @@
 {
   "sandbox_id": "sbx-17",
   "status": "final",
-  "total_usd": "0.00390",
+  "total_usd": "0.00444",
   "source": "calculated",
   "lines": [
     {
@@ -14,9 +14,9 @@
     },
     {
       "item": "memory",
-      "quantity": "120",
+      "quantity": "240",
       "unit": "gib_second",
-      "amount_usd": "0.00054",
+      "amount_usd": "0.00108",
       "start": "2026-11-13T10:00:00Z",
       "end": "2026-11-13T10:02:00Z"
     }

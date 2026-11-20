@@ -65,7 +65,7 @@ cannot reach instance metadata or host credentials. These rules most often catch
 Discovery's `limits` object states your limits, and each has a floor that you must meet: `file_bytes`
 1 GiB, `run_timeout_ms` 60000, `output_bytes` 16 MiB, `wait_ms` 30000, `process_output_bytes` 1 MiB,
 `process_retention_seconds` 600, and `list_limit` 100. `cost_final_within_seconds` is your own statement
-and has no floor; stating it offers `cost` (see [Cost](#cost)).
+and has no floor (see [Cost](#cost)).
 
 ## Discovery And Prices
 
@@ -124,16 +124,16 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. Take quantities from your own records, never from a clock in the consumer or an adapter.
 2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated`. `total_usd` is the sum of the lines. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`.
 3. `as_of` is when you stated the figures: the read time of your record.
-4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number). A `final` cost has a `total_usd` and no open line.
+4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number; the tester waits at most 7 days). A `final` cost has a `total_usd` and no open line.
 5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, and `calculated` when you multiply quantities from your usage records by your prices.
-6. While `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. `"0"` is a true zero, never "not counted yet".
+6. While `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. `"0"` is a true zero, never "not counted yet". A free sandbox returns one line with the amount `"0"`.
 
 ```json
-{"sandbox_id": "sbx-17", "status": "accruing", "total_usd": "0.01344", "source": "calculated",
+{"sandbox_id": "sbx-17", "status": "final", "total_usd": "0.00444", "source": "calculated",
  "lines": [{"item": "cpu", "quantity": "240", "unit": "vcpu_second", "amount_usd": "0.00336",
             "start": "2026-11-13T10:00:00Z", "end": "2026-11-13T10:02:00Z"},
-           {"item": "cpu", "quantity": "720", "unit": "vcpu_second", "amount_usd": "0.01008",
-            "start": "2026-11-13T10:02:00Z", "end": null}],
+           {"item": "memory", "quantity": "240", "unit": "gib_second", "amount_usd": "0.00108",
+            "start": "2026-11-13T10:00:00Z", "end": "2026-11-13T10:02:00Z"}],
  "as_of": "2026-11-13T10:05:00Z"}
 ```
 

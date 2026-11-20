@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import re
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -281,7 +282,15 @@ def test_the_cost_example_on_the_implementer_page_is_a_valid_cost() -> None:
     ]
     assert len(blocks) == 1
     assert _errors("Cost", blocks[0]) == []
-    assert blocks[0]["status"] == "accruing" and blocks[0]["lines"][-1]["end"] is None
+    cost = blocks[0]
+    assert cost["status"] == "final" and all(line["end"] is not None for line in cost["lines"])
+    assert Decimal(cost["total_usd"]) == sum(Decimal(line["amount_usd"]) for line in cost["lines"])
+    assert all(
+        Decimal(line["quantity"]) * price == Decimal(line["amount_usd"])
+        for line, price in zip(
+            cost["lines"], (Decimal("0.000014"), Decimal("0.0000045")), strict=True
+        )
+    )
 
 
 REQUEST_SCHEMAS = sorted(
