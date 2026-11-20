@@ -80,6 +80,16 @@
       "granted_by": "founder",
       "granted_on": "2026-11-16",
       "quote": "publish BOTH Boxd and Agent37 after the first full Cloud run, once their cells pass the same gates as the other five (cost-complete, render, expected-history); page shows seven providers"
+    },
+    {
+      "id": "founder-2026-11-20-modal-vm-publish",
+      "provider": "modal",
+      "class": "vm",
+      "from": "hidden",
+      "to": "published",
+      "granted_by": "founder",
+      "granted_on": "2026-11-20",
+      "quote": "Modal VM now, gVisor later (Recommended)"
     }
   ]
 }
