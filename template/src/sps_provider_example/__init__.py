@@ -484,9 +484,12 @@ class ExampleProvider(Provider):
     async def cost(self, sandbox_id: str) -> Cost:
         # GET /machines/{id}/usage; the price list in discovery prices the record.
         usage = await self._json("GET", f"/machines/{sandbox_id}/usage")
+        # The record runs through `as_of`, Example Cloud's clock, and a running machine counts up
+        # to it; the line stays open (`end` null) until the machine ends.
+        as_of = _stamp(usage["as_of"])
         start = _stamp(usage["started"])
-        end = _stamp(usage["ended"]) if usage["ended"] else datetime.now(UTC)
-        seconds = Decimal(str(max((end - start).total_seconds(), 0.0)))
+        end = _stamp(usage["ended"]) if usage["ended"] else None
+        seconds = Decimal(str(max(((end or as_of) - start).total_seconds(), 0.0)))
         cpu_q = Decimal(str(usage["cpu"])) * seconds
         mem_q = Decimal(str(usage["memory_mb"])) / 1024 * seconds
         lines = (
@@ -499,7 +502,8 @@ class ExampleProvider(Provider):
             total_usd=sum(line.amount_usd for line in lines),
             source="calculated",
             lines=lines,
-            as_of=datetime.now(UTC),
+            as_of=as_of,
+            revision=usage["revision"],
         )
 
     # -- snapshots ---------------------------------------------------------------
@@ -611,6 +615,7 @@ class ExampleProvider(Provider):
             source="calculated",
             lines=tuple(lines),
             as_of=as_of,
+            revision=usage["revision"],
             snapshot_id=snapshot_id,
         )
 

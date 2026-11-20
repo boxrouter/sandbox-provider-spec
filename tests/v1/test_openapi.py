@@ -225,6 +225,41 @@ def test_discovery_example_is_the_one_in_the_design() -> None:
     assert example["limits"]["file_bytes"] == 5368709120
 
 
+def _example(name: str) -> dict[str, Any]:
+    return json.loads((EXAMPLES / f"{name}.json").read_text(encoding="utf-8"))
+
+
+def _errors(name: str, document: Any) -> list[str]:
+    return [error.message for error in validator(name).iter_errors(document)]
+
+
+def test_cost_needs_a_revision_of_at_least_one() -> None:
+    example = _example("Cost")
+    assert _errors("Cost", example) == []
+    assert _errors("Cost", {k: v for k, v in example.items() if k != "revision"})
+    assert _errors("Cost", {**example, "revision": 0})
+    assert _errors("Cost", {**example, "revision": "1"})
+
+
+def test_limits_state_how_soon_a_cost_is_final_and_at_most_seven_days() -> None:
+    example = _example("Limits")
+    assert _errors("Limits", {**example, "cost_final_within_seconds": 604800}) == []
+    assert _errors("Limits", {**example, "cost_final_within_seconds": 604801})
+    assert _errors("Limits", {k: v for k, v in example.items() if k != "cost_final_within_seconds"})
+
+
+def test_the_cost_example_on_the_implementer_page_is_a_valid_cost() -> None:
+    page = (SPEC.parent / "docs" / "implement.md").read_text(encoding="utf-8")
+    blocks = [
+        json.loads(block)
+        for block in re.findall(r"```json\n(.*?)\n```", page, re.DOTALL)
+        if '"lines"' in block
+    ]
+    assert len(blocks) == 1
+    assert _errors("Cost", blocks[0]) == []
+    assert blocks[0]["status"] == "accruing" and blocks[0]["lines"][-1]["end"] is None
+
+
 REQUEST_SCHEMAS = sorted(
     name for name in SCHEMAS if name.endswith("Request") or name == "EmptyObject"
 )

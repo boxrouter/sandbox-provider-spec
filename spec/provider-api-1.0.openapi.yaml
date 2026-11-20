@@ -471,8 +471,10 @@ paths:
       tags: [required]
       summary: The sandbox's cost
       description: >-
-        While the sandbox exists the status is `accruing`. The cost reaches `final` within 7 days after the sandbox ends
-        and stays readable for at least 7 days after that.
+        Works in every state, including after the sandbox ends. While the sandbox exists the status is `accruing` and
+        `as_of` is at most 60 seconds before the response. The cost reaches `final` within `limits.cost_final_within_seconds`
+        after the sandbox ends and stays readable for at least 90 days after that. A provider allows one read per running
+        sandbox every 60 seconds without `rate_limited`.
       responses:
         "200":
           description: The cost so far, or the final cost.
@@ -883,7 +885,8 @@ paths:
       summary: The snapshot's own cost
       description: >-
         Section `snapshots`. The lines are the snapshot's own charges, item `snapshot`; `snapshot_id` is set. The status
-        is `accruing` while the snapshot is stored and reaches `final` within 7 days after it is deleted or expires.
+        is `accruing` while the snapshot is stored and reaches `final` within `limits.cost_final_within_seconds` after it is
+        deleted or expires.
       responses:
         "200":
           description: The cost so far, or the final cost.
@@ -1284,7 +1287,8 @@ components:
     Limits:
       type: object
       description: >-
-        The provider's limits. Each value is at least its floor, which every conforming provider meets.
+        The provider's limits. Each value except `cost_final_within_seconds` is at least its floor, which every conforming
+        provider meets; `cost_final_within_seconds` is at most its ceiling.
       required:
         - file_bytes
         - run_timeout_ms
@@ -1293,6 +1297,7 @@ components:
         - process_output_bytes
         - process_retention_seconds
         - list_limit
+        - cost_final_within_seconds
       properties:
         file_bytes: {type: integer, minimum: 1073741824, description: "Largest file that `files.read` and `files.write` accept."}
         run_timeout_ms: {type: integer, minimum: 60000, description: "Largest `timeout_ms` that `run` accepts."}
@@ -1304,6 +1309,12 @@ components:
           minimum: 600
           description: How long a process's record and output stay readable after it exits.
         list_limit: {type: integer, minimum: 100, description: "Largest page that `list` returns."}
+        cost_final_within_seconds:
+          type: integer
+          minimum: 0
+          maximum: 604800
+          description: >-
+            The provider promises `status: final` on a sandbox's `cost` this many seconds after the sandbox ends. At most 7 days.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -1477,13 +1488,20 @@ components:
           description: Opaque. Null means that this page is the last one.
     Cost:
       type: object
-      required: [sandbox_id, status, total_usd, source, lines, as_of]
+      required: [sandbox_id, status, total_usd, source, lines, as_of, revision]
       properties:
         sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
         status:
           enum: [accruing, final]
-          description: "`final` means that the amount will not change."
-        total_usd: {$ref: "#/components/schemas/Decimal", description: "The sum of the line amounts, in US dollars."}
+          description: >-
+            `final` means that no new usage will be added. A correction can still follow, raises `revision` and leaves the
+            status `final`.
+        total_usd:
+          $ref: "#/components/schemas/Decimal"
+          description: >-
+            The sum of the line amounts, in US dollars at the provider's published list price when the usage happened, before
+            any plan, free tier, trial, gifted credit or discount. A running total, never a zero for usage that is not metered
+            yet.
         source:
           enum: [reported, calculated]
           description: >-
@@ -1492,8 +1510,21 @@ components:
         lines:
           type: array
           items: {$ref: "#/components/schemas/CostLine"}
-          description: One line per priced item and period.
-        as_of: {$ref: "#/components/schemas/Timestamp", description: "When these figures were read."}
+          description: >-
+            One line per priced item and period. A charge that is not metered yet is left out while the status is `accruing`;
+            an amount of `"0"` means a true zero. A line whose `end` is not after `as_of` changes only through a correction.
+        as_of:
+          $ref: "#/components/schemas/Timestamp"
+          description: >-
+            The time these figures run through: everything that happened before it is included, and a line that is still open
+            counts up to it. While the status is `accruing` it is at most 60 seconds before the response. All figures are
+            running totals.
+        revision:
+          type: integer
+          minimum: 1
+          description: >-
+            Starts at 1 and goes up by at least 1 whenever the provider corrects a figure it already reported, also after
+            `final`. It never goes down. Cost growing on an accruing sandbox is not a correction.
         snapshot_id:
           type: string
           pattern: "^[A-Za-z0-9._:-]{1,128}$"

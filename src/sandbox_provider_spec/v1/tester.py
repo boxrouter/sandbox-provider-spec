@@ -27,6 +27,7 @@ QUICK_SKIPS = frozenset(
     {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.cost_closed_lines",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }

@@ -30,6 +30,7 @@ MAX_LIFETIME_S = 86400
 MAX_RUN_S = 3600  # Example Cloud's exec timeout ceiling
 MAX_WAIT_S = 60  # its job-log long-poll ceiling
 LIST_LIMIT = 1000
+COST_FINAL_WITHIN_S = 60  # Example Cloud's usage record closes when the machine ends
 # Tags are readable only as list filters: enough to find a replayed key or filter by label.
 TAG_IDEM, TAG_BODY, TAG_LABEL = "sps.idem", "sps.body", "l."  # label "k" is tag "l.k"
 TAG_LABELS = "sps.labels"  # an image's labels as JSON: image tags cannot hold every label key
@@ -42,6 +43,7 @@ LIMITS = Limits(
     process_output_bytes=4194304,
     process_retention_seconds=600,
     list_limit=LIST_LIMIT,
+    cost_final_within_seconds=COST_FINAL_WITHIN_S,
 )
 
 

@@ -19,12 +19,11 @@ from collections.abc import AsyncIterator, Awaitable, Iterator, Mapping
 from concurrent.futures import Future
 from dataclasses import dataclass, field
 from datetime import datetime
-from decimal import Decimal
 from importlib.metadata import version
 from typing import Any, TypeVar, cast
 from uuid import uuid4
 
-from sandbox_provider_spec import terminal_ordered
+from sandbox_provider_spec import cost_checks, terminal_ordered
 from sandbox_provider_spec.driver import (
     Driver,
     Inputs,
@@ -89,7 +88,6 @@ UNKNOWN_SNAPSHOT_ID = "sps-test-no-such-snapshot"
 _SNAPSHOT_WAIT_SECONDS = 900  # how long a snapshot may stay in `saving`
 
 _ONE_GIB = 1 << 30
-_COST_WAIT_MS = 120_000  # how long cost.final waits for a final cost when a test names no limit
 
 _OUTPUT_WAIT_MS = 1000
 _TERMINAL_OUTPUT_MS = 15_000  # how long terminal.output waits when a test names no limit
@@ -344,36 +342,28 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         }
 
     def cost_final(self, target: object, inputs: Inputs) -> Observation:
-        """Read a destroyed sandbox's cost until final and check it names the sandbox, sums its
-        lines and reads the same twice. A provider that returns the final cost in the destroy
-        result may no longer know the sandbox, and then that result is the only read."""
+        """Read a destroyed sandbox's cost until it is final, within `cost_final_within_seconds`."""
+        native = self._sandbox_handle(target)
+        return cost_checks.final(self, native.id, native.cost, inputs)
+
+    def cost_revision(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        return cost_checks.revision(self, self._sandbox(target))
+
+    def cost_as_of(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        return cost_checks.as_of(self, self._sandbox(target))
+
+    def cost_closed_lines(self, target: object, inputs: Inputs) -> Observation:
+        native = self._sandbox_handle(target)
+        return cost_checks.closed_lines(self, native.id, native.cost, inputs)
+
+    @staticmethod
+    def _sandbox_handle(target: object) -> SandboxHandle:
         native = resource(target).native
         if not isinstance(native, SandboxHandle):
             raise ValueError("operation requires a sandbox")
-        deadline = time.monotonic() + number(inputs, "timeout_ms", _COST_WAIT_MS) / 1000
-        cost = native.cost if native.cost is not None and native.cost.status == "final" else None
-        while cost is None:
-            read = self.wait(self.api.cost(native.id))
-            if read.status == "final":
-                cost = read
-            elif time.monotonic() >= deadline:
-                raise NotRun("cost_not_final_in_window")
-            else:
-                time.sleep(2)
-        try:
-            again: Cost | None = self.wait(self.api.cost(native.id))
-        except NativeFailure as error:
-            if error.code != "not_found" or native.cost is None:
-                raise
-            again = None  # the destroy result carried the cost; the provider forgot the sandbox
-        lines = sum((line.amount_usd for line in cost.lines), start=Decimal(0))
-        return {
-            "status": cost.status,
-            "sandbox_matches": cost.sandbox_id == native.id,
-            "total_matches_lines": cost.source == "reported" or lines == cost.total_usd,
-            "stable": again is None
-            or (again.status == "final" and again.total_usd == cost.total_usd),
-        }
+        return native
 
     # Commands and files
 
@@ -787,16 +777,18 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         }
 
     def snapshot_cost(self, target: object, inputs: Inputs) -> Observation:
-        """Read a snapshot's cost; `final: true` reads until final, up to `timeout_ms` (120 s)."""
+        """Read a snapshot's cost; `final: true` reads until final, up to `timeout_ms` (else
+        `cost_final_within_seconds`)."""
         handle = self._snapshot_handle(target)
-        deadline = time.monotonic() + number(inputs, "timeout_ms", _COST_WAIT_MS) / 1000
+        window = cost_checks.final_wait_seconds(self, inputs) if inputs.get("final") is True else 0
+        deadline = time.monotonic() + window
         while True:
             cost = self.wait(self.api.snapshot_cost(handle.id))
             if inputs.get("final") is not True or cost.status == "final":
                 break
             if time.monotonic() >= deadline:
                 raise NotRun("cost_not_final_in_window")
-            time.sleep(2)
+            time.sleep(cost_checks.poll_seconds(window))
         return {
             "status": cost.status,
             "snapshot_matches": cost.snapshot_id == handle.id,

@@ -12,7 +12,8 @@
     "wait_ms": 60000,
     "process_output_bytes": 4194304,
     "process_retention_seconds": 3600,
-    "list_limit": 1000
+    "list_limit": 1000,
+    "cost_final_within_seconds": 3600
   },
   "classes": [
     {

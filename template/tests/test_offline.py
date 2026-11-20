@@ -168,7 +168,12 @@ class FakeCloud:
             record["until"] = image["deleted"]
             return self._json(
                 200,
-                {"machine_id": image["machine_id"], "records": [record], "as_of": self._now()},
+                {
+                    "machine_id": image["machine_id"],
+                    "records": [record],
+                    "as_of": self._now(),
+                    "revision": 1,
+                },
             )
         return self._error(404, "not_found", "no such route")
 
@@ -356,6 +361,8 @@ class FakeCloud:
                 "memory_mb": machine["memory_mb"],
                 "started": machine["created"],
                 "ended": machine["ended"],
+                "as_of": self._now(),
+                "revision": 1,
             },
         )
 

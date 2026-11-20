@@ -162,11 +162,13 @@ def test_decimals_keep_their_digits_and_times_end_in_z() -> None:
             "source": "reported",
             "lines": [],
             "as_of": "2026-11-13T10:05:00.250Z",
+            "revision": 3,
         },
     )
     data = to_json(cost)
     assert data["total_usd"] == "0.0000004500"
     assert data["as_of"] == "2026-11-13T10:05:00.250000Z"
+    assert data["revision"] == 3
 
 
 def test_wire_refuses_what_the_schema_refuses() -> None:

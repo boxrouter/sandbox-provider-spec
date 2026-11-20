@@ -118,7 +118,8 @@ class Cost:
     total_usd: Decimal
     source: Literal["reported", "calculated"]
     lines: Sequence[CostLine]
-    as_of: datetime
+    as_of: datetime  # the time the figures run through; at most 60 s old while `accruing`
+    revision: int  # starts at 1; goes up whenever a reported figure is corrected
     snapshot_id: str | None = None  # set by `snapshot_cost` only
 
 
@@ -329,6 +330,7 @@ class Limits:
     process_output_bytes: int
     process_retention_seconds: int
     list_limit: int
+    cost_final_within_seconds: int  # at most 604800 (7 days)
 
 
 @dataclass(frozen=True)

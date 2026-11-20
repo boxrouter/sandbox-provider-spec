@@ -209,6 +209,7 @@ def _enc_cost(value: Cost) -> Json:
         "source": value.source,
         "lines": [_enc_cost_line(line) for line in value.lines],
         "as_of": _stamp(value.as_of),
+        "revision": value.revision,
     }
     _put(out, "snapshot_id", value.snapshot_id)
     return out
@@ -254,6 +255,7 @@ def _enc_limits(value: Limits) -> Json:
         "process_output_bytes": value.process_output_bytes,
         "process_retention_seconds": value.process_retention_seconds,
         "list_limit": value.list_limit,
+        "cost_final_within_seconds": value.cost_final_within_seconds,
     }
 
 
@@ -379,6 +381,7 @@ def _dec_cost(data: Json) -> Cost:
         source=data["source"],
         lines=tuple(_dec_cost_line(line) for line in data["lines"]),
         as_of=_time(data["as_of"]),
+        revision=data["revision"],
         snapshot_id=data.get("snapshot_id"),
     )
 

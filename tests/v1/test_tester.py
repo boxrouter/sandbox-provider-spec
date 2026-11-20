@@ -25,6 +25,7 @@ from typing import Any, ClassVar, TypeVar
 import jsonschema
 import pytest
 
+from sandbox_provider_spec import cost_checks
 from sandbox_provider_spec.cli import main
 from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported, resource
 from sandbox_provider_spec.v1 import (
@@ -216,8 +217,13 @@ class LocalProvider(Provider, manifest=False):
         )
 
     async def cost(self, sandbox_id: str) -> Cost:
-        await self.get(sandbox_id)
-        return dataclasses.replace(example(Cost), sandbox_id=sandbox_id, as_of=datetime.now(UTC))
+        box = await self.get(sandbox_id)
+        return dataclasses.replace(
+            example(Cost),
+            sandbox_id=sandbox_id,
+            status="final" if box.state == "destroyed" else "accruing",
+            as_of=datetime.now(UTC),
+        )
 
 
 class SnapshotProvider(LocalProvider, manifest=False):
@@ -606,6 +612,7 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
     assert QUICK_SKIPS == {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.cost_closed_lines",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
     }
@@ -875,6 +882,9 @@ CONTRACT_TESTS = (
     "contract.run_timeout_ends_command",
     "contract.destroy_repeat",
     "contract.cost_final",
+    "contract.cost_revision",
+    "contract.cost_as_of",
+    "contract.cost_closed_lines",
 )  # every contract test but the 1 GiB transfer, which a live run covers
 
 
@@ -883,7 +893,7 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_eleven_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_fourteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
@@ -983,9 +993,95 @@ def test_the_cost_test_needs_a_final_cost_that_adds_up(
                 },  # type: ignore[arg-type]
             )
 
-    monkeypatch.setattr("sandbox_provider_spec.v1.suite_driver._COST_WAIT_MS", 1)
+    monkeypatch.setattr("sandbox_provider_spec.cost_checks.final_wait_seconds", lambda *_: 0.001)
     found = results(Costly(), ("contract.cost_final",))
     assert found == {"contract.cost_final": "not_run" if "status" in change else "differs"}
+
+
+def test_the_cost_final_wait_is_what_discovery_promises_plus_a_grace() -> None:
+    driver = ProviderDriver(ContractProvider(), run="run-1")
+    promised = example(Discovery).limits.cost_final_within_seconds
+    assert cost_checks.final_wait_seconds(driver, {}) == promised + 30
+    assert cost_checks.final_wait_seconds(driver, {"timeout_ms": 5000}) == 5
+    assert cost_checks.poll_seconds(10) == 2 and cost_checks.poll_seconds(604800) == 30
+    driver.close()
+
+
+def test_revision_that_goes_down_or_is_not_a_positive_integer_differs() -> None:
+    class Falling(ContractProvider, manifest=False):
+        reads = 0
+
+        async def cost(self, sandbox_id: str) -> Cost:
+            base = await super().cost(sandbox_id)
+            type(self).reads += 1
+            return dataclasses.replace(base, revision=10 - type(self).reads)
+
+    class Zero(ContractProvider, manifest=False):
+        async def cost(self, sandbox_id: str) -> Cost:
+            return dataclasses.replace(await super().cost(sandbox_id), revision=0)
+
+    assert results(Falling(), ("contract.cost_revision",)) == {"contract.cost_revision": "differs"}
+    assert results(Zero(), ("contract.cost_revision",)) == {"contract.cost_revision": "differs"}
+
+
+def test_as_of_older_than_sixty_seconds_on_a_running_sandbox_differs() -> None:
+    class Stale(ContractProvider, manifest=False):
+        async def cost(self, sandbox_id: str) -> Cost:
+            base = await super().cost(sandbox_id)
+            if base.status == "final":
+                return base
+            return dataclasses.replace(base, as_of=datetime.now(UTC) - timedelta(seconds=61))
+
+    assert results(Stale(), ("contract.cost_as_of",)) == {"contract.cost_as_of": "differs"}
+
+
+def test_a_running_sandbox_whose_cost_is_final_differs_on_the_cost_as_of_test() -> None:
+    class Early(ContractProvider, manifest=False):
+        async def cost(self, sandbox_id: str) -> Cost:
+            return dataclasses.replace(await super().cost(sandbox_id), status="final")
+
+    assert results(Early(), ("contract.cost_as_of",)) == {"contract.cost_as_of": "differs"}
+
+
+@pytest.mark.parametrize("change", ["end_after_as_of", "lines_change"])
+def test_a_line_that_ends_after_as_of_or_changes_between_reads_differs(change: str) -> None:
+    class Open(ContractProvider, manifest=False):
+        reads = 0
+
+        async def cost(self, sandbox_id: str) -> Cost:
+            base = await super().cost(sandbox_id)
+            if base.status != "final":
+                return base
+            type(self).reads += 1
+            line = base.lines[0]
+            if change == "end_after_as_of":
+                line = dataclasses.replace(line, end=base.as_of + timedelta(seconds=5))
+            elif type(self).reads > 1:
+                line = dataclasses.replace(line, quantity=line.quantity + 1)
+            return dataclasses.replace(base, lines=[line])
+
+    assert results(Open(), ("contract.cost_closed_lines",)) == {
+        "contract.cost_closed_lines": "differs"
+    }
+
+
+def test_lines_that_change_with_a_correction_are_the_same_lines_when_revision_rose() -> None:
+    class Corrected(ContractProvider, manifest=False):
+        reads = 0
+
+        async def cost(self, sandbox_id: str) -> Cost:
+            base = await super().cost(sandbox_id)
+            if base.status != "final":
+                return base
+            type(self).reads += 1
+            line = dataclasses.replace(
+                base.lines[0], quantity=base.lines[0].quantity + type(self).reads
+            )
+            return dataclasses.replace(base, lines=[line], revision=type(self).reads)
+
+    assert results(Corrected(), ("contract.cost_closed_lines",)) == {
+        "contract.cost_closed_lines": "passed"
+    }
 
 
 # --- directory operations ---------------------------------------------------------------------

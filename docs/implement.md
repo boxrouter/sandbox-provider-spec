@@ -65,7 +65,8 @@ cannot reach instance metadata or host credentials. These rules most often catch
 
 Discovery's `limits` object states your limits, and each has a floor that you must meet: `file_bytes`
 1 GiB, `run_timeout_ms` 60000, `output_bytes` 16 MiB, `wait_ms` 30000, `process_output_bytes` 1 MiB,
-`process_retention_seconds` 600, and `list_limit` 100.
+`process_retention_seconds` 600, and `list_limit` 100. `cost_final_within_seconds` is your promise
+instead, at most 604800 (7 days); see [Cost](#cost).
 
 ## Discovery And Prices
 
@@ -78,7 +79,8 @@ of sandbox, such as a container or a microVM; the main class has the id `default
   "spec_version": "1.0",
   "provider": {"id": "example", "name": "Example Cloud"},
   "limits": {"file_bytes": 5368709120, "run_timeout_ms": 600000, "output_bytes": 16777216, "wait_ms": 60000,
-             "process_output_bytes": 4194304, "process_retention_seconds": 3600, "list_limit": 1000},
+             "process_output_bytes": 4194304, "process_retention_seconds": 3600, "list_limit": 1000,
+             "cost_final_within_seconds": 3600},
   "classes": [{
     "id": "default", "name": "Linux container", "ready": true,
     "resources": {"regions": ["example:us-east"], "located_in": ["US"],
@@ -118,21 +120,48 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 
 ## Cost
 
-`GET /v1/sandboxes/{sandbox_id}/cost` returns what a sandbox cost:
+Customers of a router pay for sandboxes with prepaid credits. The router reads each running
+sandbox's cost every 1 to 5 minutes, stops the sandbox when the credit runs out, and bills the
+final figure. For that, `GET /v1/sandboxes/{sandbox_id}/cost` needs to do seven things:
+
+1. Answer in every state: running, paused, stopped, or deleted.
+2. Return every billed period as a line with its item, quantity, amount, start, and end, so that
+   the lines add up to `total_usd`. A pause, resume, resize, or price change starts a new line.
+3. Set `as_of` to the time that the figures run through. Everything before it is included, and a
+   line that is still open (`end` is null) counts up to it. While the sandbox runs, `as_of` is at
+   most 60 seconds old. All figures are running totals. A line that ended before `as_of` changes
+   only through a correction, so a consumer bills it without waiting.
+4. Set `status` to `final` once no new usage will be added, no later than
+   `limits.cost_final_within_seconds` after the sandbox ends. You state that number in
+   discovery, and it is at most 604800 (7 days). A 15 second sandbox is exact by then, even if
+   nobody read its cost while it ran.
+5. Keep a `revision` that starts at 1 and goes up by at least 1 whenever you correct a figure that
+   you already reported, also after `final`, which then stays true. Cost growing on a running
+   sandbox is not a correction.
+6. Give amounts in US dollars, as decimal strings, at your published list price when the usage
+   happened, before any plan, free tier, trial, or credit. Leave a charge that is not metered
+   yet out of `lines` and `total_usd`. Never return `"0"` for it: `"0"` means a true zero.
+7. Keep the cost readable for 90 days after the sandbox ends, and allow one read per running
+   sandbox every 60 seconds, for thousands of sandboxes at once, without `rate_limited`. If you
+   cannot, say so to the consumer when you apply.
 
 ```json
-{"sandbox_id": "sbx-17", "status": "final", "total_usd": "0.00336", "source": "calculated",
+{"sandbox_id": "sbx-17", "status": "accruing", "total_usd": "0.01344", "source": "calculated",
  "lines": [{"item": "cpu", "quantity": "240", "unit": "vcpu_second", "amount_usd": "0.00336",
-            "start": "2026-11-13T10:00:00Z", "end": "2026-11-13T10:02:00Z"}],
- "as_of": "2026-11-13T10:05:00Z"}
+            "start": "2026-11-13T10:00:00Z", "end": "2026-11-13T10:02:00Z"},
+           {"item": "cpu", "quantity": "720", "unit": "vcpu_second", "amount_usd": "0.01008",
+            "start": "2026-11-13T10:02:00Z", "end": null}],
+ "as_of": "2026-11-13T10:05:00Z", "revision": 1}
 ```
 
-`source` is `reported` when your billing system states the amounts, or `calculated` when you
-multiply quantities from your own usage records by the prices in discovery. Quantities come from
-your records, never from a clock in the consumer or in an adapter, and every sandbox has a cost.
-The status is `accruing` while the sandbox exists. The cost becomes `final` within 7 days after the
-sandbox ends and stays readable for at least 7 days after that. If your usage records disappear
+`source` is `reported` when your billing system states the amounts, and `calculated` when you
+multiply quantities from your own usage records by the prices in discovery. Take quantities from
+your records, never from a clock in the consumer or in an adapter. If your usage records disappear
 with the sandbox, read the usage during `destroy` and return the final cost in its result.
+A snapshot's own cost is optional: it is `snapshot.cost` in the optional `snapshots` section, and
+nothing in a sandbox's `cost` needs it.
+
+Run the tester: `cost` must pass.
 
 ## Errors
 
@@ -255,7 +284,7 @@ your discovery claims, and deletes every sandbox that it created. It prints one 
 one per required operation and per claimed section, such as `operation create passed`; a status is
 `passed`, `differs`, `unsupported`, `not_run`, or `error`. It writes a JSON report
 (`sps-report.json`) and exits 0 only when every test that it ran and the required `cost` operation passed.
-`--quick` skips the 1 GiB round trip and the wait for a final cost while you iterate; a quick pass
+`--quick` skips the 1 GiB round trip and the waits for a final cost while you iterate; a quick pass
 exits 3, never 0. A consumer runs the same tester. To state that you conform, name the spec version,
 the class, and the passing report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).
 

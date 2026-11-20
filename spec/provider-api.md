@@ -156,13 +156,32 @@ keep running, or exit while a child holds a stream open. This is the rule of the
 or `calculated`. `reported` means that the provider's billing system states the amounts.
 `calculated` means that each quantity comes from the provider's own usage records and is
 multiplied by the price in discovery. An item that discovery does not price has an unknown price,
-never a zero price.
+never a zero price. It works in every state of the sandbox, including after the sandbox ends. All
+figures are running totals: every line, and `total_usd`, covers everything from the start up to
+`as_of`.
 
 - A provider **MUST** take the quantities of a cost from its own records of the sandbox, never <!-- rule: provider-api/cost-provider-records -->
   from a clock in the consumer or in an adapter, and **MUST** be able to state a cost for every
   sandbox that it creates.
-- A provider **MUST** make the cost `final` within 7 days after the sandbox ends and keep it <!-- rule: provider-api/cost-final-retained -->
-  readable for at least 7 days after that.
+- Amounts **MUST** be the provider's published list price when the usage happened, in US dollars <!-- rule: provider-api/cost-list-price -->
+  as decimal strings, before any plan, free tier, trial, gifted credit or discount. While the
+  status is `accruing`, a charge that is not metered yet **MUST** be left out of `lines` and
+  `total_usd`, never returned as zero; an amount of `"0"` means a true zero.
+- `as_of` **MUST** be the time that the figures run through: everything that happened before it <!-- rule: provider-api/cost-through-time -->
+  is included, and a line that is still open (its `end` is null) counts up to `as_of`. While the
+  status is `accruing`, `as_of` **MUST** be at most 60 seconds before the response.
+- A line whose `end` is not after `as_of` **MUST NOT** change except through a correction, so a <!-- rule: provider-api/cost-closed-lines -->
+  consumer can bill it without waiting for `final`.
+- `revision` **MUST** start at 1 and **MUST** go up by at least 1 whenever the provider corrects a <!-- rule: provider-api/cost-revision -->
+  figure that it already reported, also after the status is `final`, and **MUST NOT** go down.
+  Cost growing on an accruing sandbox is not a correction. The status stays `final` after a
+  correction.
+- A provider **MUST** state `limits.cost_final_within_seconds` in discovery, at most 604800 (7 <!-- rule: provider-api/cost-final-within -->
+  days), and **MUST** make the cost `final` that many seconds after the sandbox ends. `final`
+  means that no new usage will be added.
+- A provider **MUST** keep the cost readable for at least 90 days after the sandbox ends. <!-- rule: provider-api/cost-retained -->
+- A provider **MUST** allow one `cost` read per running sandbox every 60 seconds, for thousands of <!-- rule: provider-api/cost-read-rate -->
+  running sandboxes at once, without answering `rate_limited`.
 
 While the sandbox exists, `cost` returns the cost so far with status `accruing`. A provider whose
 usage records disappear with the sandbox cannot meet the retention rule on its own. Such a
@@ -372,8 +391,8 @@ names its own.
   whose `snapshot_id` is the snapshot, with lines of the item `snapshot` only: its storage, and a
   charge for each capture where the provider bills one. These charges **MUST NOT** appear in the
   saved sandbox's `cost`. The status is `accruing` while the snapshot is stored, and **MUST**
-  become `final` within 7 days after the snapshot is deleted or expires and stay readable for 7
-  days after that. A provider whose snapshots are free lists the `snapshot` price with
+  become `final` within `limits.cost_final_within_seconds` after the snapshot is deleted or
+  expires and stay readable for 90 days after that. A provider whose snapshots are free lists the `snapshot` price with
   `"price_usd": "0"` and `"included": true`, and returns `total_usd` `"0"` with no lines.
 
 After `snapshot.create` returns, the saved sandbox is in the state that the variant's
