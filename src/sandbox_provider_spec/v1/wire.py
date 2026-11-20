@@ -13,12 +13,9 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from functools import cache
 from typing import Any, TypeVar, cast
 
-from jsonschema import Draft202012Validator, FormatChecker
-
-from sandbox_provider_spec.v1._spec_files import registry, schema_ref
+from sandbox_provider_spec.v1._spec_files import validator
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, Outcome, SpsError
 from sandbox_provider_spec.v1.types import (
     Cost,
@@ -225,23 +222,28 @@ def _enc_class(value: SandboxClass) -> Json:
     _put(out, "gates", _opt(value.gates, dict))
     if value.operations:
         out["operations"] = list(value.operations)
-    out["images"] = [
-        {"id": image.id, "default": image.default, "description": image.description}
-        for image in value.images
-    ]
+    out["images"] = [_enc_image(image) for image in value.images]
     out["prices"] = [_enc_price(price) for price in value.prices]
     return out
 
 
+def _enc_image(value: Image) -> Json:
+    return {"id": value.id, "default": value.default, "description": value.description}
+
+
 def _enc_discovery(value: Discovery) -> Json:
-    provider: Json = {"id": value.provider.id, "name": value.provider.name}
-    _put(provider, "docs_url", value.provider.docs_url)
     return {
         "spec_version": value.spec_version,
-        "provider": provider,
+        "provider": _enc_provider_info(value.provider),
         "limits": _enc_limits(value.limits),
         "classes": [_enc_class(item) for item in value.classes],
     }
+
+
+def _enc_provider_info(value: ProviderInfo) -> Json:
+    out: Json = {"id": value.id, "name": value.name}
+    _put(out, "docs_url", value.docs_url)
+    return out
 
 
 def _enc_limits(value: Limits) -> Json:
@@ -613,32 +615,17 @@ _CODECS: dict[type, _Codec] = {
     Limits: _Codec("Limits", _enc_limits, lambda d: Limits(**d)),
     ProviderInfo: _Codec(
         "ProviderInfo",
-        lambda v: {
-            "id": v.id,
-            "name": v.name,
-            **({} if v.docs_url is None else {"docs_url": v.docs_url}),
-        },
+        _enc_provider_info,
         lambda d: ProviderInfo(d["id"], d["name"], d.get("docs_url")),
     ),
-    Image: _Codec(
-        "Image",
-        lambda v: {"id": v.id, "default": v.default, "description": v.description},
-        lambda d: Image(d["id"], d["default"], d["description"]),
-    ),
+    Image: _Codec("Image", _enc_image, lambda d: Image(d["id"], d["default"], d["description"])),
     SandboxClass: _Codec("SandboxClass", _enc_class, _dec_class),
     Discovery: _Codec("Discovery", _enc_discovery, _dec_discovery),
 }
 
 
-@cache
-def _validator(schema: str) -> Draft202012Validator:
-    return Draft202012Validator(
-        schema_ref(schema), registry=registry(), format_checker=FormatChecker()
-    )
-
-
 def _check(schema: str, data: Any) -> None:
-    errors = sorted(_validator(schema).iter_errors(data), key=lambda error: list(error.path))
+    errors = sorted(validator(schema).iter_errors(data), key=lambda error: list(error.path))
     if errors:
         details = "; ".join(
             f"{'/'.join(map(str, error.path)) or '(root)'}: {error.message[:200]}"

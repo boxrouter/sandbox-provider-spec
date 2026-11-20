@@ -21,14 +21,11 @@ import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable, MutableMapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from functools import cache
 from typing import Any
 from urllib.parse import parse_qsl
 
-from jsonschema import Draft202012Validator, FormatChecker
-
 from sandbox_provider_spec.v1 import tokens
-from sandbox_provider_spec.v1._spec_files import registry, schema_ref
+from sandbox_provider_spec.v1._spec_files import validator
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.terminal_tickets import (
@@ -167,15 +164,8 @@ async def _close_all(entries: list[_Entry]) -> None:
 # --- request validation ---------------------------------------------------------------------
 
 
-@cache
-def _validator(schema: str) -> Draft202012Validator:
-    return Draft202012Validator(
-        schema_ref(schema), registry=registry(), format_checker=FormatChecker()
-    )
-
-
 def _check(schema: str, data: Any, what: str) -> None:
-    errors = sorted(_validator(schema).iter_errors(data), key=lambda e: list(e.path))
+    errors = sorted(validator(schema).iter_errors(data), key=lambda e: list(e.path))
     if errors:
         first = errors[0]
         where = "/".join(map(str, first.path)) or "(root)"

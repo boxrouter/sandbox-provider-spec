@@ -14,7 +14,6 @@ from sandbox_provider_spec.conformance import run_suite
 from sandbox_provider_spec.report import DEVELOPMENT_REVISION, report, revision
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
-from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery
@@ -267,8 +266,6 @@ def _probe_cost(driver: ProviderDriver, discovery: Discovery | None) -> str:
         )
         driver.wait(driver.api.cost(created.id))
         return "passed"
-    except SpsError:
-        return "error"
     except Exception:  # pylint: disable=broad-exception-caught
         return "error"
     finally:
@@ -316,8 +313,6 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         try:
             discovery = driver.wait(provider.discovery())
             discovery_status = "passed"
-        except SpsError:
-            discovery, discovery_status = None, "error"
         except Exception:  # pylint: disable=broad-exception-caught
             discovery, discovery_status = None, "error"
         if discovery is not None:

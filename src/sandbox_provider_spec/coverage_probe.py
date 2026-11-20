@@ -130,15 +130,9 @@ def _on_memory_exhausted(
     return {"on_memory_exhausted": "process_killed"}
 
 
-def _require_ceiling_size(inputs: Mapping[str, object]) -> None:
+def _positive_cpu_memory(cpu: object, memory: object) -> bool:
     # pylint: disable=too-many-boolean-expressions
-    size = inputs.get("size")
-    point = size[0] if isinstance(size, list) and len(size) == 1 else None
-    if not isinstance(point, Mapping):
-        raise ValueError("size ceiling probe requires the tested size")
-    cpu = point.get("cpu")
-    memory = point.get("memory_mib")
-    if (
+    return not (
         isinstance(cpu, bool)
         or not isinstance(cpu, (int, float))
         or not math.isfinite(cpu)
@@ -146,7 +140,17 @@ def _require_ceiling_size(inputs: Mapping[str, object]) -> None:
         or isinstance(memory, bool)
         or not isinstance(memory, int)
         or memory <= 0
-    ):
+    )
+
+
+def _require_ceiling_size(inputs: Mapping[str, object]) -> None:
+    size = inputs.get("size")
+    point = size[0] if isinstance(size, list) and len(size) == 1 else None
+    if not isinstance(point, Mapping):
+        raise ValueError("size ceiling probe requires the tested size")
+    cpu = point.get("cpu")
+    memory = point.get("memory_mib")
+    if not _positive_cpu_memory(cpu, memory):
         raise ValueError("size ceiling probe requires the tested size")
 
 
@@ -248,6 +252,22 @@ def _size_ceiling(
         return _size_ceiling_use(driver, target, inputs)
 
 
+def _guest_json(result: Mapping[str, object]) -> object:
+    if (
+        isinstance(result.get("exit_code"), bool)
+        or not isinstance(result.get("exit_code"), int)
+        or result["exit_code"] != 0
+    ):
+        raise NativeFailure("guest_fact_probe_failed")
+    payload = result.get("stdout")
+    if not isinstance(payload, (str, bytes)) or len(payload) > 8192:
+        raise NativeFailure("guest_fact_probe_invalid")
+    try:
+        return json.loads(payload)
+    except (ValueError, KeyError, TypeError):
+        raise NativeFailure("guest_fact_probe_invalid") from None
+
+
 def _size_ceiling_bounds(
     driver: Driver, target: object, inputs: Mapping[str, object]
 ) -> Mapping[str, object]:
@@ -265,17 +285,8 @@ def _size_ceiling_bounds(
             "timeout_ms": 45000,
         },
     )
-    if (
-        isinstance(result.get("exit_code"), bool)
-        or not isinstance(result.get("exit_code"), int)
-        or result["exit_code"] != 0
-    ):
-        raise NativeFailure("guest_fact_probe_failed")
-    payload = result.get("stdout")
-    if not isinstance(payload, (str, bytes)) or len(payload) > 8192:
-        raise NativeFailure("guest_fact_probe_invalid")
     try:
-        value = json.loads(payload)
+        value = _guest_json(result)
         cpu, memory = _ceiling_limits(value)
     except (ValueError, KeyError, TypeError):
         raise NativeFailure("guest_fact_probe_invalid") from None
@@ -376,17 +387,8 @@ def _size_ceiling_use(
             "timeout_ms": 120000,
         },
     )
-    if (
-        isinstance(result.get("exit_code"), bool)
-        or not isinstance(result.get("exit_code"), int)
-        or result["exit_code"] != 0
-    ):
-        raise NativeFailure("guest_fact_probe_failed")
-    payload = result.get("stdout")
-    if not isinstance(payload, (str, bytes)) or len(payload) > 8192:
-        raise NativeFailure("guest_fact_probe_invalid")
     try:
-        observation = _ceiling_use_observation(json.loads(payload))
+        observation = _ceiling_use_observation(_guest_json(result))
     except (ValueError, KeyError, TypeError):
         raise NativeFailure("guest_fact_probe_invalid") from None
     measured = cast(float, observation["burn_cpu_seconds"]) / cast(
@@ -450,18 +452,9 @@ def _requested_size(inputs: Mapping[str, object]) -> tuple[float, int]:
         raise ValueError("allocation probe requires the requested size")
     cpu = size.get("cpu_min")
     memory = size.get("memory_min_mib")
-    # pylint: disable=too-many-boolean-expressions
-    if (
-        isinstance(cpu, bool)
-        or not isinstance(cpu, (int, float))
-        or not math.isfinite(cpu)
-        or cpu <= 0
-        or isinstance(memory, bool)
-        or not isinstance(memory, int)
-        or memory <= 0
-    ):
+    if not _positive_cpu_memory(cpu, memory):
         raise ValueError("allocation probe requires the requested size")
-    return float(cpu), memory
+    return float(cast(int | float, cpu)), cast(int, memory)
 
 
 def _delivered(value: Mapping[str, object], cpu: float, memory: int) -> Mapping[str, object]:

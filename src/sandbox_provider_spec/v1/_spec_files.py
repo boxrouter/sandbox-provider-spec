@@ -8,6 +8,7 @@ from functools import cache
 from importlib.resources import as_file, files
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
@@ -43,3 +44,11 @@ def registry() -> Registry[Any]:
 def schema_ref(name: str) -> dict[str, str]:
     """A schema that points at one component of the OpenAPI file."""
     return {"$ref": f"{BASE}{OPENAPI_NAME}#/components/schemas/{name}"}
+
+
+@cache
+def validator(schema: str) -> Draft202012Validator:
+    """The cached validator of one component schema of the OpenAPI file."""
+    return Draft202012Validator(
+        schema_ref(schema), registry=registry(), format_checker=FormatChecker()
+    )
