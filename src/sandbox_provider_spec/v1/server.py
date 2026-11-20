@@ -143,7 +143,6 @@ class _Pool:
             entry = _Entry(self._class(credentials), self._clock())
             self._entries[key] = entry
         entry.in_flight += 1
-        entry.last_used = self._clock()
         return key, entry.provider
 
     def release(self, key: str) -> None:
@@ -187,6 +186,13 @@ def _entity(value: str, what: str) -> str:
     if not _ENTITY_ID.fullmatch(value):
         raise SpsError("invalid_request", f"{what} is not a valid id")
     return value
+
+
+def _parse_json(raw: bytes) -> Any:
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        raise SpsError("invalid_request", "The body is not valid JSON") from None
 
 
 class _Request:  # pylint: disable=too-many-instance-attributes
@@ -271,20 +277,13 @@ class _Request:  # pylint: disable=too-many-instance-attributes
                 raise SpsError("invalid_request", "The request needs a JSON body")
             data: Any = {}
         else:
-            try:
-                data = json.loads(raw.decode("utf-8"))
-            except (UnicodeDecodeError, ValueError):
-                raise SpsError("invalid_request", "The body is not valid JSON") from None
+            data = _parse_json(raw)
         _check(schema, data, "The body")
         return data
 
     async def typed_body(self, cls: type[Any]) -> Any:
         """A JSON body as a 1.0 value; an unknown field or a bad value is `invalid_request`."""
-        raw = await self.read_all(MAX_JSON_BYTES)
-        try:
-            data = json.loads(raw.decode("utf-8"))
-        except (UnicodeDecodeError, ValueError):
-            raise SpsError("invalid_request", "The body is not valid JSON") from None
+        data = _parse_json(await self.read_all(MAX_JSON_BYTES))
         try:
             return from_json(cls, data)
         except WireError as error:
@@ -703,10 +702,6 @@ async def _send_file(send: Send, stream: Any, request_id: str) -> None:
                 await send({"type": "http.response.body", "body": part, "more_body": True})
         if size is not None and sent != size:
             raise _StreamAborted
-    except SpsError:
-        if not started:
-            raise
-        raise _StreamAborted from None
     except _StreamAborted:
         raise
     except Exception:
