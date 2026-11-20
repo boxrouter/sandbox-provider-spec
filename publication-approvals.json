@@ -90,6 +90,26 @@
       "granted_by": "founder",
       "granted_on": "2026-11-20",
       "quote": "Modal VM now, gVisor later (Recommended)"
+    },
+    {
+      "id": "founder-2026-11-20-boxd-publish",
+      "provider": "boxd",
+      "class": null,
+      "from": "hidden",
+      "to": "published",
+      "granted_by": "founder",
+      "granted_on": "2026-11-20",
+      "quote": "Make Boxd public"
+    },
+    {
+      "id": "founder-2026-11-20-boxd-default-publish",
+      "provider": "boxd",
+      "class": "default",
+      "from": "hidden",
+      "to": "published",
+      "granted_by": "founder",
+      "granted_on": "2026-11-20",
+      "quote": "Make Boxd public"
     }
   ]
 }
