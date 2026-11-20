@@ -76,3 +76,22 @@ The `terminal` gate declares one knobless variant. The
 [sandbox overview](https://docs.blaxel.ai/Sandboxes/Overview) says “You can explore the contents
 of a sandbox with an interactive terminal.” The conformance report `reports/adapter-default-core.json`
 (blaxel 0.4.8) passes `terminal.interactive`; reattaching a lost terminal is not established.
+
+## Idle standby: `idle_shutdown` with `on_idle: paused` — 2026-11-20
+
+Blaxel's [sandbox overview](https://docs.blaxel.ai/Sandboxes/Overview) says a sandbox without an
+active connection "automatically transitions to a warm standby mode", "in approximately 15
+seconds", keeping its memory, processes and filesystem, and that reconnecting wakes it. There is no
+call to enter or leave standby ([standby control](https://docs.blaxel.ai/Sandboxes/Standby-control)).
+That is the spec's `idle_shutdown` with `on_idle: paused`, with no caller-chosen idle time.
+
+The claim was declared until 2026-10-21 and withdrawn then for lack of current evidence, not because
+it failed. It is declared again on a fresh native run,
+[`reports/native-idle-standby-20261120.json`](reports/native-idle-standby-20261120.json) (run
+`blx-idle-standby-20261120`, Blaxel SDK 0.4.8, workspace `boxrouter-internal`): the sandbox read
+`active` 3 s after create and `paused` (native state `STANDBY`) 75 s later; `clean=true`, the
+sandbox was deleted. Separately, benchmark trials of 2026-11-18 showed the guest uptime stop about
+15 s after the last request in every 60 s and 15 min wait (6 of 6).
+
+`auto_wake` and `custom_idle_time` stay unclaimed. The adapter reports a sleeping sandbox as
+`active` (it wakes on the next request), so the claim rests on the native report.

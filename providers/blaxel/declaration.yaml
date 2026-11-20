@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: blaxel
 verified:
-  date: '2026-11-18'
+  date: '2026-11-20'
   sdks:
     blaxel: 0.4.8
 resources:
@@ -60,6 +60,8 @@ gates:
   - source: provider_artifact
   terminal:
   - {}
+  idle_shutdown:
+  - on_idle: paused
 evidence:
   resources.size_is_ceiling:
     tests:
@@ -207,6 +209,10 @@ evidence:
     tests:
     - terminal.interactive
     report: reports/prober-default-core.json
+  gates.idle_shutdown.0.on_idle:
+    tests:
+    - idle_shutdown.on_idle.paused
+    report: reports/native-idle-standby-20261120.json
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: true

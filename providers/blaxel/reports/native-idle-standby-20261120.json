@@ -1,0 +1,88 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "idle_shutdown.on_idle.paused": "sha256:3dc4219605a0bbc8573b4e58f3360fac7ba36fbc6e45576b5e90df09ba86096c"
+  },
+  "clean": true,
+  "driver": {
+    "name": "BlaxelDriver",
+    "version": "0.5.21"
+  },
+  "finished_at": "2026-11-20T09:07:49.866787+00:00",
+  "provider": "blaxel",
+  "revision": "ac3373d263aae38c2e2acaa7f8d864d254b0c311",
+  "run_id": "public-4b97cdca12fdd19c106c",
+  "sdk_versions": {
+    "blaxel": "0.4.8"
+  },
+  "selected_tests": [
+    "idle_shutdown.on_idle.paused"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-20T09:06:26.931493+00:00",
+  "suite_digest": "sha256:b8fb1ab4e0c0aa2a9b160312ab11166b4f6b0698741f3d2322128dad2aeb2b17",
+  "tests": [
+    {
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 82932,
+      "id": "idle_shutdown.on_idle.paused",
+      "proves": [
+        {
+          "gate": "idle_shutdown",
+          "knob": "on_idle",
+          "value": "paused"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "idle_shutdown/paused"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "paused"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
