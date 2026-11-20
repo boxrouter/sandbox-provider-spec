@@ -233,11 +233,6 @@ def test_long_running_is_unsupported_because_standby_is_fixed() -> None:
         _config({"resources": {"long_running": True}})
 
 
-def test_a_dockerfile_image_build_is_not_run() -> None:
-    with pytest.raises(NotRun, match="^image_build_mapping_pending$"):
-        native.BlaxelDriver().image_create(None, {"source": "dockerfile", "dockerfile": "FROM x"})
-
-
 def test_idle_deletion_without_a_duration_is_not_run() -> None:
     with pytest.raises(NotRun, match="^native_idle_duration_required$"):
         _config({"requirements": {"idle_shutdown": {"on_idle": "destroyed"}}})

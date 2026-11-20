@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.27: removes four definitions that nothing calls: `http_binding_validation.key_disposition`, `GateAsk.names_a_value`, `drivers/vercel._cidrs` (its bare-IPv4 test now goes through `_policy`) and `BlaxelDriver.image_create` with Vercel's unused `image.create` unsupported entry; no suite step issues `image.create`. No declaration, vocabulary, catalog or conformance-suite change, and no check digest moves.
 - 0.5.25: `spec/README.md` no longer says that no public release has been cut; it links the releases page. No declaration, vocabulary, catalog or suite change.
 - 0.5.23: Blaxel declares `idle_shutdown` with `on_idle: paused` again: its sandbox stands by on its own after about 15 s without a connection, keeping memory, and the next request wakes it. The claim was withdrawn on 2026-10-21 for lack of current evidence; it now cites a fresh native report (`providers/blaxel/reports/native-idle-standby-20261120.json`), and the declaration is re-dated to 2026-11-20. No vocabulary, catalog or conformance-suite change.
 - 0.5.22: rewrites the README so that it says plainly what SPS is and what it gives providers and tools, defines baseline, gate, knob, declaration, request and matching where they first appear, and adds a banner that invites issues, capability proposals and new providers. The checked examples and transcripts are unchanged. No declaration, vocabulary, catalog or suite change.

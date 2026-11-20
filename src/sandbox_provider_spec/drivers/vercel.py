@@ -90,11 +90,6 @@ def _kill_after(inputs: Inputs) -> float | None:
     return None if milliseconds == 0 else milliseconds / 1000
 
 
-def _cidrs(entries: list[str]) -> list[str]:
-    """Vercel's subnet lists take CIDR ranges; a bare IPv4 address is its own /32."""
-    return [str(ipaddress.IPv4Network(entry, strict=False)) for entry in entries]
-
-
 def _policy(settings: Mapping[str, Any]) -> NetworkPolicy:
     policy = settings["policy"]
     if policy == "deny_all":
@@ -271,7 +266,6 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
         "desktop.key": "Vercel Sandbox SDK has no desktop operation",
         "desktop.start": "Vercel Sandbox SDK has no desktop operation",
         "desktop.live_link": "Vercel Sandbox SDK has no desktop operation",
-        "image.create": "Vercel Sandbox SDK has no image build",
     }
 
     def create(self, target: object, inputs: Inputs) -> Observation:

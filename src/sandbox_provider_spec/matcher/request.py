@@ -107,10 +107,6 @@ class GateAsk:
         wanted = self.knobs.get(knob)
         return None if wanted is None or wanted == ANY else list(wanted)
 
-    @property
-    def names_a_value(self) -> bool:
-        return any(wanted != ANY for wanted in self.knobs.values())
-
 
 @dataclass(frozen=True)
 class Request:

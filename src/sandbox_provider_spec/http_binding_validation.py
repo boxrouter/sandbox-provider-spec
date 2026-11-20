@@ -558,29 +558,6 @@ def _normalized_requirements(request: Request) -> dict[str, Any]:
     return requirements
 
 
-def key_disposition(
-    *, key: str, digest: str, now: int, expiry_floor: int, stored_digest: str | None
-) -> str:
-    """Fixture oracle, NOT an atomic/durable key store. Inputs are account-scoped.
-
-    Before emitting expired_key, durably latch expiry even for a never-seen key:
-    persist a floor at least its expiry or permanent per-key rejection state.
-    Consult that state on every later call; this pure function cannot persist it.
-    No implementation proof follows from this function.
-    """
-    validate_message("AllocationKey", key)
-    validate_message("Digest", digest)
-    issued = int(key.split(":", 1)[0])
-    effective_now = max(now, expiry_floor)
-    if effective_now >= issued + 86400:
-        return "expired_key"
-    if issued > effective_now + 60:
-        return "invalid_request"
-    if stored_digest is None:
-        return "reserve"
-    return "replay" if digest == stored_digest else "conflict"
-
-
 def _validate_03_metadata(
     response: dict[str, Any],
     *,

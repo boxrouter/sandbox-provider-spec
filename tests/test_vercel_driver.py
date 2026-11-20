@@ -301,9 +301,8 @@ def test_a_zero_timeout_sets_no_command_deadline() -> None:
 
 
 def test_bare_ipv4_entries_are_single_address_ranges() -> None:
-    cidrs = native._cidrs  # pylint: disable=protected-access
-    assert cidrs(["1.1.1.1", "1.0.0.0/24", "192.0.2.7/32"]) == [
-        "1.1.1.1/32",
-        "1.0.0.0/24",
-        "192.0.2.7/32",
-    ]
+    policy = native._policy(  # pylint: disable=protected-access
+        {"policy": "allowlist_ips", "allow": ["1.1.1.1", "1.0.0.0/24", "192.0.2.7/32"]}
+    )
+    assert policy.subnets is not None and policy.subnets.allow is not None
+    assert list(policy.subnets.allow) == ["1.1.1.1/32", "1.0.0.0/24", "192.0.2.7/32"]

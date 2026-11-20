@@ -857,12 +857,6 @@ class BlaxelDriver(Driver):  # pylint: disable=too-many-public-methods
         # An existing image is borrowed, never built or deleted by the test.
         return {"resource": Resource("image_reference", text(inputs, "image"), lambda: {}, True)}
 
-    def image_create(self, target: object, inputs: Inputs) -> Observation:
-        del target, inputs
-        # The SDK builds a Dockerfile only by deploying it as a sandbox, and an image's own
-        # ENTRYPOINT replaces the sandbox API that every other operation goes through.
-        raise NotRun("image_build_mapping_pending")
-
     def volume_create(self, target: object, inputs: Inputs) -> Observation:
         del target
         if inputs.get("kind", "filesystem") != "filesystem":
