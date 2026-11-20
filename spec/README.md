@@ -15,6 +15,6 @@ example requests, and driver notes help apply it; they do not define additional 
 | Look up the machine-readable vocabulary | [Catalog source](catalog.yaml), [generated catalog](catalog.json), [catalog schema](catalog-schema.json), and [registries](registries/) |
 | Understand versions and claims | [Versioning](spec.md#12-versioning), [governance](../GOVERNANCE.md#versioning), [conformance claims](../GOVERNANCE.md#conformance-claims), and [changelog](../CHANGELOG.md) |
 
-Published tags are fixed snapshots; `main` is the changing draft. No public release has
-been cut yet. A file-format version and the Python package version serve different
+Published tags are fixed snapshots, and `main` is the changing draft. Every release is listed
+on the [releases page](https://github.com/boxrouter/sandbox-provider-spec/releases). A file-format version and the Python package version serve different
 purposes; requests are interpreted by the matcher version that reads them.
