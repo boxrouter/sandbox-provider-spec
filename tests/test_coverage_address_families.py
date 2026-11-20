@@ -13,9 +13,10 @@ from typing import Any, cast
 import pytest
 from jsonschema import validate
 
-from sandbox_provider_spec import coverage_address_families
-from sandbox_provider_spec.driver import NotRun
-from sandbox_provider_spec.suite import suite_path
+from sandbox_provider_spec import conformance, coverage_address_families
+from sandbox_provider_spec.driver import Driver, NotRun
+from sandbox_provider_spec.suite import Suite, suite_path
+from sandbox_provider_spec.suite import Test as Scenario
 
 _SCRIPT = suite_path().parent / "fixtures" / "address_families.py"
 _GUEST = runpy.run_path(str(_SCRIPT))
@@ -278,6 +279,50 @@ def test_address_families_runner_dispatches_its_own_operation(
     monkeypatch.setattr(coverage_address_families, "guest", guest)
     runner = coverage_address_families.AddressFamiliesRunner(cast(Any, None))
     assert runner._test_operation("fixture.address_families", None, {}) == expected
+
+
+def test_run_suite_dispatches_address_families_to_its_runner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    expected = {"ipv4_native": True, "stdout": "synthetic-address-families"}
+
+    def guest(_driver: object, _target: object, _inputs: object) -> dict[str, object]:
+        return expected
+
+    monkeypatch.setattr(coverage_address_families, "guest", guest)
+
+    class CreateOnly(Driver):
+        def create(self, _target: object, _inputs: object) -> dict[str, object]:
+            return {"id": "synthetic-box"}
+
+    test = Scenario(
+        id="coverage.facts.outbound_ip_families.ipv4",
+        title="run_suite reaches the address-families runner.",
+        steps=(
+            {"op": "create", "as": "box"},
+            {
+                "op": "fixture.address_families",
+                "target": "box",
+                "in": {"fixture": "$runner.address_families"},
+                "expect": {"record": ["stdout"], "equals": {"ipv4_native": True}},
+            },
+        ),
+        proves=(),
+        rules=(),
+    )
+    results = conformance.run_suite(
+        CreateOnly(), Suite("", (test,)), {"address_families": dict(_FIXTURE)}
+    )
+    assert results[0]["result"] == "passed"
+    steps = cast(list[dict[str, object]], results[0]["steps"])
+    assert steps[1] == {
+        "operation": "fixture.address_families",
+        "result": "passed",
+        "observations": {
+            "stdout": "synthetic-address-families",
+            "ipv4_native": {"matches": True},
+        },
+    }
 
 
 class FakeSocket:

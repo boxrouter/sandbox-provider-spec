@@ -10,13 +10,14 @@ import json
 import runpy
 import socket
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
-from sandbox_provider_spec import check_digests
+from sandbox_provider_spec import check_digests, conformance, coverage_guest_reserved_tcp_ports
+from sandbox_provider_spec.driver import Driver
+from sandbox_provider_spec.suite import Suite, suite_path
 from sandbox_provider_spec.suite import Test as Scenario
-from sandbox_provider_spec.suite import suite_path
 
 _SCRIPT = suite_path().parent / "fixtures" / "guest_reserved_tcp_ports.py"
 _PROBE = runpy.run_path(str(_SCRIPT))
@@ -356,3 +357,55 @@ def test_candidate_count_is_bounded_and_there_is_no_port_range_scan() -> None:
     assert len(binds) == len(candidates)
     assert {candidate["port"] for candidate in binds} == {8080, 8081}
     assert result["guest_reserved_tcp_ports"] == "unknown"
+
+
+def test_run_suite_dispatches_guest_reserved_tcp_ports_to_its_runner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    expected: dict[str, object] = {
+        "guest_reserved_tcp_ports": [8080],
+        "stdout": "synthetic-guest-reserved-tcp-ports",
+    }
+
+    def guest(_driver: object, _target: object, _inputs: object) -> dict[str, object]:
+        return expected
+
+    monkeypatch.setattr(coverage_guest_reserved_tcp_ports, "guest", guest)
+
+    class CreateOnly(Driver):
+        def create(self, _target: object, _inputs: object) -> dict[str, object]:
+            return {"id": "synthetic-box"}
+
+    test = Scenario(
+        id="coverage.facts.guest_reserved_tcp_ports.8080",
+        title="run_suite reaches the guest-reserved-TCP-ports runner.",
+        steps=(
+            {"op": "create", "as": "box"},
+            {
+                "op": "fixture.guest_reserved_tcp_ports",
+                "target": "box",
+                "in": {"fixture": "$runner.guest_reserved_tcp_ports"},
+                "expect": {
+                    "record": ["stdout"],
+                    "equals": {"guest_reserved_tcp_ports": [8080]},
+                },
+            },
+        ),
+        proves=(),
+        rules=(),
+    )
+    results = conformance.run_suite(
+        CreateOnly(),
+        Suite("", (test,)),
+        {"guest_reserved_tcp_ports": _fixture(_candidate())},
+    )
+    assert results[0]["result"] == "passed"
+    steps = cast(list[dict[str, object]], results[0]["steps"])
+    assert steps[1] == {
+        "operation": "fixture.guest_reserved_tcp_ports",
+        "result": "passed",
+        "observations": {
+            "stdout": "synthetic-guest-reserved-tcp-ports",
+            "guest_reserved_tcp_ports": {"matches": True},
+        },
+    }

@@ -16,7 +16,11 @@ from pathlib import Path
 from typing import cast
 
 from sandbox_provider_spec import drivers as drivers_package
+from sandbox_provider_spec.coverage_address_families import AddressFamiliesRunner
 from sandbox_provider_spec.coverage_file_transfer import FileTransferRunner
+from sandbox_provider_spec.coverage_guest_reserved_tcp_ports import (
+    GuestReservedTcpPortsRunner,
+)
 from sandbox_provider_spec.driver import Driver, Observation
 from sandbox_provider_spec.opt_in import OPT_IN_CHECKS, select_tests
 from sandbox_provider_spec.report import report, revision, write_report
@@ -24,12 +28,16 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, read_suite, suite_path
 
 
+class _FixtureRunner(AddressFamiliesRunner, GuestReservedTcpPortsRunner, FileTransferRunner):
+    """Adds the fixture checks kept in their own modules to the shared chain."""
+
+
 def run_suite(
     driver: Driver, suite: Suite, fixtures: dict[str, object] | None = None
 ) -> list[dict[str, object]]:
     """Run shared checks, then record any driver-owned cleanup after the suite."""
     try:
-        results = FileTransferRunner(driver, fixtures).run(suite)
+        results = _FixtureRunner(driver, fixtures).run(suite)
     except BaseException:
         reclaim(driver)  # an interrupt must not strand what the run created
         raise

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.30: wires the two advertised coverage rows that had no dispatch — `fixture.address_families` and `fixture.guest_reserved_tcp_ports` — into the shared conformance runner, so a coverage run executes them instead of reporting `not_run`. No declaration, vocabulary, catalog or conformance-suite change, and no check digest moves.
 - 0.5.29: publishes Modal's `vm` class (`providers/modal/publication.yaml`, `classes.vm.state: published`) under the founder record `founder-2026-11-20-modal-vm-publish`, with a content-bound receipt: benchmarks run and publish Modal on its VM class, labelled Modal VM. The provider state, its `default` class and their receipts are unchanged. No declaration, vocabulary, catalog or conformance-suite change.
 - 0.5.28: shares the v1 request validator and exact image/provider encoders, folds duplicate coverage-probe checks, and removes redundant tester exception branches. No declaration, vocabulary, catalog, or conformance-suite change; request and response behavior and operation digests are unchanged.
 - 0.5.27: removes four definitions that nothing calls: `http_binding_validation.key_disposition`, `GateAsk.names_a_value`, `drivers/vercel._cidrs` (its bare-IPv4 test now goes through `_policy`) and `BlaxelDriver.image_create` with Vercel's unused `image.create` unsupported entry; no suite step issues `image.create`. No declaration, vocabulary, catalog or conformance-suite change, and no check digest moves.
