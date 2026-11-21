@@ -22,9 +22,6 @@ REGION = "local"
 IMAGE = "base"
 SIZES = (Size(cpu=1, memory_mib=512), Size(cpu=2, memory_mib=2048))
 DEFAULT_SIZE = SIZES[0]
-PRICE_CPU = Decimal("0.000014")  # USD per vCPU-second
-PRICE_MEM = Decimal("0.0000045")  # USD per GiB-second
-PRICE_SNAPSHOT = Decimal("0.05")  # USD per GiB-month of stored snapshot
 HOURS_PER_MONTH = 730  # the standard's month
 MAX_LIFETIME_S = 86400
 MAX_RUN_S = 3600  # Example Cloud's exec timeout ceiling
@@ -73,9 +70,11 @@ def build_discovery(provider_id: str, provider_name: str) -> Discovery:
         operations=("files.list", "files.mkdir", "files.remove", "files.exists"),
         images=(Image(IMAGE, True, "Debian slim with bash and python3"),),
         prices=(
-            Price("cpu", PRICE_CPU, "vcpu_second", "allocated"),
-            Price("memory", PRICE_MEM, "gib_second", "allocated"),
-            Price("snapshot", PRICE_SNAPSHOT, "gib_month", "used"),
+            # Published list prices, as data. The adapter never multiplies them: `cost` reports
+            # usage and the router prices it.
+            Price("cpu", Decimal("0.000014"), "vcpu_second", "allocated"),
+            Price("memory", Decimal("0.0000045"), "gib_second", "allocated"),
+            Price("snapshot", Decimal("0.05"), "gib_month", "used"),
         ),
         # A snapshot is `docker commit` of the machine's container without pausing it, so the
         # machine keeps running (`continues`); Example Cloud can delete its images.

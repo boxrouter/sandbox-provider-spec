@@ -996,7 +996,8 @@ paths:
         Section `images` (`classes[].operations`; the class also claims `custom_images` knob `prepared`). The body is
         `multipart/form-data`: the part `request` (JSON, first) and, for a Dockerfile that copies files, the part `context`
         (a tar archive of the build context). The context never travels inside JSON and a server reads it as a stream. The
-        provider reaches no registry: `config` and `digest` are the caller's. Returns once the provider has accepted the
+        provider reaches no registry: `config` and `digest` are the caller's. The provider makes any OCI image or Dockerfile
+        runnable and never treats one image differently by its name or reference. Returns once the provider has accepted the
         work, with state `preparing`, `ready` or `failed`; read `image_get` until `ready`. A repeat with the same key and
         the same request returns the first image with status 201.
       parameters:
@@ -1881,19 +1882,22 @@ components:
         status:
           enum: [accruing, final]
           description: >-
-            `final` means that the figures will not change: a `final` cost has a `total_usd` and no open line.
+            `final` means that the figures will not change: a `final` cost has no open line, and has a `total_usd` unless
+            its `source` is `usage`.
         total_usd:
           anyOf: [{$ref: "#/components/schemas/Decimal"}, {type: "null"}]
           description: >-
             The sum of the line amounts, in US dollars at the provider's published list price when the usage happened, before
             any plan, free tier, trial, credit or discount. Null only while the status is `accruing` and nothing is metered
-            yet; `"0"` is a true zero.
+            yet; `"0"` is a true zero. Always null when `source` is `usage`: the provider states no amount.
         source:
-          enum: [reported, calculated]
+          enum: [reported, calculated, usage]
           description: >-
             `reported`: the provider's own records state the amounts, at list price. `calculated`: each quantity comes from the
             provider's own usage records and is multiplied by the provider's published price. A source that states net
-            amounts is turned into list amounts from its quantities and is then `calculated`.
+            amounts is turned into list amounts from its quantities and is then `calculated`. `usage`: each line states a
+            quantity and a unit from the provider's own usage records and no amount (`amount_usd` null, `total_usd` null); the
+            consumer prices the quantities. `calculated` stays valid.
         lines:
           type: array
           items: {$ref: "#/components/schemas/CostLine"}
@@ -1918,11 +1922,13 @@ components:
         item: {$ref: "#/components/schemas/PriceItem"}
         quantity:
           $ref: "#/components/schemas/Decimal"
-          description: "The quantity that the amount was priced from, in `unit`. Required when the cost's `source` is `calculated`."
+          description: "The quantity that the amount was priced from, or that the line reports, in `unit`. Required when the cost's `source` is `calculated` or `usage`."
         unit:
           $ref: "#/components/schemas/PriceUnit"
-          description: "The unit of `quantity`. Required when the cost's `source` is `calculated`."
-        amount_usd: {$ref: "#/components/schemas/Decimal", description: "The amount in US dollars."}
+          description: "The unit of `quantity`. Required when the cost's `source` is `calculated` or `usage`."
+        amount_usd:
+          anyOf: [{$ref: "#/components/schemas/Decimal"}, {type: "null"}]
+          description: "The amount in US dollars. Null exactly when the cost's `source` is `usage`."
         start:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
           description: >-

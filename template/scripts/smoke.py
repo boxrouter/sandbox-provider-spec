@@ -42,7 +42,7 @@ async def main() -> None:
 
     await provider.destroy(box.id)
     cost = await provider.cost(box.id)
-    assert cost.status == "final" and cost.source == "calculated", cost
+    assert cost.status == "final" and cost.source == "usage", cost
 
     await provider.aclose()
     print("smoke ok")

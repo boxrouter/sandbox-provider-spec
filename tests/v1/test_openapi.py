@@ -250,6 +250,14 @@ def test_a_cost_has_no_revision_and_may_have_no_total_while_accruing() -> None:
     assert "revision" not in SCHEMAS["Cost"]["properties"]
 
 
+def test_a_usage_cost_states_quantities_and_no_amount() -> None:
+    line = {"item": "cpu", "quantity": "240", "unit": "vcpu_second", "amount_usd": None}
+    usage = {**_example("Cost"), "source": "usage", "total_usd": None, "lines": [line]}
+    assert _errors("Cost", usage) == []
+    assert _errors("Cost", {**usage, "source": "calculated"}) == []  # still valid on the wire
+    assert _errors("Cost", {**usage, "source": "guessed"})
+
+
 def test_a_cost_line_needs_only_an_item_and_an_amount() -> None:
     line = {"item": "cpu", "amount_usd": "1"}
     assert _errors("CostLine", line) == []

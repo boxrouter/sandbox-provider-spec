@@ -1153,6 +1153,37 @@ def test_a_calculated_line_without_a_quantity_or_unit_differs() -> None:
     assert final_results(bare) == {"contract.cost_final": "differs"}
 
 
+def _usage(cost: Cost, **changes: object) -> Cost:
+    lines = [dataclasses.replace(line, amount_usd=None) for line in cost.lines]
+    return dataclasses.replace(cost, source="usage", total_usd=None, lines=lines, **changes)
+
+
+def test_a_usage_cost_with_quantities_and_no_amounts_passes() -> None:
+    assert final_results(lambda cost, _: _usage(cost)) == {"contract.cost_final": "passed"}
+
+
+def test_a_usage_cost_with_an_amount_or_a_total_differs() -> None:
+    def with_total(cost: Cost, _: int) -> Cost:
+        return dataclasses.replace(_usage(cost), total_usd=Decimal("1"))
+
+    def with_amount(cost: Cost, _: int) -> Cost:
+        used = _usage(cost)
+        line = dataclasses.replace(used.lines[0], amount_usd=Decimal("1"))
+        return dataclasses.replace(used, lines=[line])
+
+    assert final_results(with_total) == {"contract.cost_final": "differs"}
+    assert final_results(with_amount) == {"contract.cost_final": "differs"}
+
+
+def test_a_usage_line_without_a_quantity_or_unit_differs() -> None:
+    def bare(cost: Cost, _: int) -> Cost:
+        used = _usage(cost)
+        line = dataclasses.replace(used.lines[0], quantity=None, unit=None)
+        return dataclasses.replace(used, lines=[line])
+
+    assert final_results(bare) == {"contract.cost_final": "differs"}
+
+
 def test_a_reported_line_may_leave_out_its_quantity_and_unit() -> None:
     def reported(cost: Cost, _: int) -> Cost:
         line = dataclasses.replace(cost.lines[0], quantity=None, unit=None)

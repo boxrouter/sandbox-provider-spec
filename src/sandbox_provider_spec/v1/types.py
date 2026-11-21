@@ -155,9 +155,9 @@ class Price:
 @dataclass(frozen=True)
 class CostLine:
     item: str
-    amount_usd: Decimal
-    quantity: Decimal | None = None  # required when the cost is `calculated`
-    unit: str | None = None  # required when the cost is `calculated`
+    amount_usd: Decimal | None  # null exactly when the cost's source is `usage`
+    quantity: Decimal | None = None  # required unless the cost is `reported`
+    unit: str | None = None  # required unless the cost is `reported`
     start: datetime | None = None  # both null: no period (a fee); `end` null alone: open
     end: datetime | None = None
 
@@ -166,8 +166,9 @@ class CostLine:
 class Cost:
     sandbox_id: str
     status: Literal["accruing", "final"]
-    total_usd: Decimal | None  # null only while `accruing` and nothing is metered yet
-    source: Literal["reported", "calculated"]
+    # null while `accruing` with nothing metered yet, and always when `source` is `usage`
+    total_usd: Decimal | None
+    source: Literal["reported", "calculated", "usage"]
     lines: Sequence[CostLine]
     as_of: datetime  # when the provider stated the figures
     snapshot_id: str | None = None  # set by `snapshot_cost` only

@@ -186,19 +186,25 @@ keep running, or exit while a child holds a stream open. This is the rule of the
 in discovery. Without that value `cost` answers `unsupported`, and a consumer treats the provider
 as one that does not state a cost.
 
-`cost` returns what a sandbox cost: a `status` of `accruing` or `final`, a `source` of `reported`
-or `calculated`, the `lines` and their `total_usd`, and `as_of`. `reported` means that the
-provider's own records state the amounts. `calculated` means that each quantity comes from the
-provider's own usage records and is multiplied by the provider's published price. It works in
+`cost` returns what a sandbox cost: a `status` of `accruing` or `final`, a `source` of `reported`,
+`calculated` or `usage`, the `lines` and their `total_usd`, and `as_of`. `reported` means that the
+provider's own records state the amounts. `usage` means that each line states a quantity and a unit
+from the provider's own usage records and no amount: the consumer prices the quantities, so the
+provider keeps no copy of its prices in its adapter. `calculated` means that each quantity comes
+from the provider's own usage records and is multiplied by the provider's published price; it stays
+valid. It works in
 every state of the sandbox. The sandbox ends when `get` reports it `destroyed` or it is gone;
 every timing rule here counts from then.
 
 A line has an `item` and an `amount_usd`. `quantity` and `unit` are required when `source` is
-`calculated`, as what the amount was priced from, and optional when `source` is `reported`. `start`
+`calculated`, as what the amount was priced from, and when it is `usage`, as what the line reports;
+they are optional when `source` is `reported`. When `source` is `usage`, `amount_usd` is null on
+every line and `total_usd` is null. `start`
 and `end` give the period that the line covers, which may be a billing period (such as an hour)
 that contains the usage. Both null means that the line covers no period, as
 a fee does. `start` set with `end` null is an open period, which runs up to `as_of` and is allowed
-only while the status is `accruing`. `total_usd` is the sum of the line amounts. While the status is
+only while the status is `accruing`. `total_usd` is the sum of the line amounts, except for `usage`.
+While the status is
 `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. A sandbox for which
 the provider bills nothing returns one line with the amount `"0"`. An amount of `"0"` always means a
 true zero, never "not counted yet".
@@ -219,11 +225,12 @@ true zero, never "not counted yet".
   whose `item` and `unit` discovery does not price.
 - Every line **MUST** have an `item` and an `amount_usd`, and a `calculated` line **MUST** also <!-- rule: provider-api/cost-lines -->
   have a `quantity` and a `unit`. `total_usd` **MUST** be the sum of the line amounts, or null
-  where the paragraph above allows it.
+  where the paragraph above allows it. A `usage` line **MUST** have an `item`, a `quantity` and a
+  `unit`, and **MUST** have a null `amount_usd`; the `total_usd` of a `usage` cost **MUST** be null.
 - A provider **MUST** make the cost `final` within `limits.cost_final_within_seconds` after the <!-- rule: provider-api/cost-final-within -->
   sandbox ends, or, when the cost includes storage that outlives the sandbox, after that storage
-  ends. `final` means that the figures **MUST NOT** change afterwards. A `final` cost has a
-  `total_usd` and no open line. The provider chooses the number and states it as it is.
+  ends. `final` means that the figures **MUST NOT** change afterwards. A `final` cost has no open
+  line, and a `total_usd` unless its source is `usage`. The provider chooses the number and states it as it is.
 - A provider **MUST** keep the cost readable after the sandbox ends at least until it is `final`. <!-- rule: provider-api/cost-retained -->
 
 While the sandbox exists, `cost` returns the cost so far with status `accruing`. SPS defines no
@@ -523,7 +530,9 @@ provider's own domains.
   as an error response has. The provider **MUST** apply the `config` of an OCI source as the
   defaults of every sandbox made from the image, and **MUST NOT** read a registry to find them.
   A `private_oci` source's `credentials` **MUST NOT** be returned, logged or stored beyond the
-  preparation.
+  preparation. The provider **MUST** make any OCI image or Dockerfile runnable and **MUST NOT**
+  treat one image differently by its name or reference; what the provider needs to run an
+  arbitrary image (an entrypoint, an init wrapper) is part of its own build.
 - A build context **MUST** travel only in the part `context` and **MUST NOT** be held whole in <!-- rule: provider-api/image-context -->
   memory: a server reads it as a stream. A context over `limits.image_context_bytes` is
   `too_large`, a context with a source that is not a Dockerfile is `invalid_request`, and a part

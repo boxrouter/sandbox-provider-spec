@@ -123,10 +123,10 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 `cost` is optional: state `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`, or leave it out and `cost` answers `unsupported`. If you offer it:
 
 1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. Take quantities from your own records, never from a clock in the consumer or an adapter.
-2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee). `total_usd` is the sum of the lines. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
+2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee) or `usage` (what the line reports, with `amount_usd` null). `total_usd` is the sum of the lines, and null for `usage`. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
 3. `as_of` is the time up to which your figures count usage. It may be earlier than the time of the read, if your records lag.
-4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number; the tester waits at most 7 days). A `final` cost has a `total_usd` and no open line.
-5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, and `calculated` when you multiply quantities from your usage records by your prices. The tester checks that a `calculated` line's amount is its quantity times the price in your discovery for that item and unit, to the decimal places that the amount states.
+4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number; the tester waits at most 7 days). A `final` cost has no open line, and a `total_usd` unless its `source` is `usage`.
+5. Amounts are US dollars, as decimal strings, at your published list price when the usage happened, before any plan, free tier, trial, credit or discount. `source` is `reported` when your records state those amounts, `usage` when you state only the quantities from your usage records (no amount, `total_usd` null) and leave the pricing to the consumer, and `calculated` when you multiply quantities from your usage records by your prices. `usage` is the simplest: your adapter holds no copy of your prices beyond the list prices in discovery. The tester checks that a `calculated` line's amount is its quantity times the price in your discovery for that item and unit, to the decimal places that the amount states.
 6. While `accruing` and nothing is metered yet, `total_usd` may be null and `lines` empty. `"0"` is a true zero, never "not counted yet". A free sandbox returns one line with the amount `"0"`.
 
 ```json
@@ -339,6 +339,9 @@ passes its `images.` tests.
 - **No registry.** `digest` and `config` (environment, working directory, user, entrypoint, command)
   come from the caller, who resolved them. Apply `config` as the defaults of every sandbox made from
   the image, and reach no registry. Registry credentials are write-only: never return or log them.
+- **Every image alike.** Make any OCI image or Dockerfile runnable, and never treat one image
+  differently by its name or reference. What you need to run an arbitrary image (an entrypoint, an
+  init wrapper) is part of your own build.
 - **The result.** A `PreparedImage` in state `preparing`, `ready` or `failed` (with an `error` body).
   A consumer reads `image.get` until `ready`, then creates with
   `image: {"provider_artifact": "<id>"}`. `image.delete` returns on acceptance, and afterwards the

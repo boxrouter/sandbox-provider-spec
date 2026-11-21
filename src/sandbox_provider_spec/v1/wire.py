@@ -223,7 +223,7 @@ def _enc_cost_line(value: CostLine) -> Json:
     out: Json = {"item": value.item}
     _put(out, "quantity", _opt(value.quantity, _dec))
     _put(out, "unit", value.unit)
-    out["amount_usd"] = _dec(value.amount_usd)
+    out["amount_usd"] = _opt(value.amount_usd, _dec)
     out["start"] = _opt(value.start, _stamp)
     out["end"] = _opt(value.end, _stamp)
     return out
@@ -507,7 +507,7 @@ def _dec_price(data: Json) -> Price:
 def _dec_cost_line(data: Json) -> CostLine:
     return CostLine(
         item=data["item"],
-        amount_usd=_decimal(data["amount_usd"]),
+        amount_usd=_opt(data["amount_usd"], _decimal),
         quantity=_opt(data.get("quantity"), _decimal),
         unit=data.get("unit"),
         start=_opt(data.get("start"), _time),

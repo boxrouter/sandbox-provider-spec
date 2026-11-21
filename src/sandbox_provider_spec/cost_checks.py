@@ -75,6 +75,16 @@ def same_figures(first: Cost, second: Cost) -> bool:
     )
 
 
+def total_matches_lines(cost: Cost) -> bool:
+    """The total is the sum of the line amounts. A `usage` cost states no amount: its total and
+    every line amount are null."""
+    if cost.source == "usage":
+        return cost.total_usd is None and all(line.amount_usd is None for line in cost.lines)
+    if any(line.amount_usd is None for line in cost.lines):
+        return False
+    return cost.total_usd == sum((line.amount_usd or Decimal(0) for line in cost.lines), Decimal(0))
+
+
 def amounts_match_prices(driver: ProviderDriver, cost: Cost) -> bool:
     """Each `calculated` line that discovery prices has the amount quantity x price, within the
     rounding of the amount: half a unit in the last decimal place that it states. A line whose item
@@ -88,7 +98,7 @@ def amounts_match_prices(driver: ProviderDriver, cost: Cost) -> bool:
             prices.setdefault((price.item, price.unit), set()).add(price.price_usd)
     for line in cost.lines:
         stated = prices.get((line.item, line.unit or ""))
-        if not stated or line.quantity is None:
+        if not stated or line.quantity is None or line.amount_usd is None:
             continue
         exponent = line.amount_usd.as_tuple().exponent
         half_unit = Decimal(1).scaleb(exponent if isinstance(exponent, int) else 0) / 2
@@ -101,12 +111,11 @@ def final(driver: ProviderDriver, sandbox_id: str, inputs: Inputs) -> Observatio
     """A destroyed sandbox's final cost names it, adds up, has no open line and reads the same
     twice."""
     cost, again = _read_final(driver, sandbox_id, inputs)
-    lines = sum((line.amount_usd for line in cost.lines), start=Decimal(0))
     return {
         "status": cost.status,
         "sandbox_matches": cost.sandbox_id == sandbox_id,
-        "total_matches_lines": cost.total_usd == lines,
-        "quantities_present": cost.source != "calculated"
+        "total_matches_lines": total_matches_lines(cost),
+        "quantities_present": cost.source == "reported"
         or all(line.quantity is not None and line.unit is not None for line in cost.lines),
         "amounts_match_prices": amounts_match_prices(driver, cost),
         "no_open_line": all(

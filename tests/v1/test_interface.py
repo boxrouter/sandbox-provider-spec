@@ -203,6 +203,29 @@ def test_a_cost_may_have_no_total_yet_and_a_reported_line_no_quantity() -> None:
     assert to_json(cost) == document
 
 
+def test_a_usage_cost_has_quantities_and_null_amounts() -> None:
+    document = {
+        "sandbox_id": "s",
+        "status": "final",
+        "total_usd": None,
+        "source": "usage",
+        "lines": [
+            {
+                "item": "cpu",
+                "quantity": "240",
+                "unit": "vcpu_second",
+                "amount_usd": None,
+                "start": "2026-11-13T10:00:00Z",
+                "end": "2026-11-13T10:02:00Z",
+            }
+        ],
+        "as_of": "2026-11-13T10:05:00Z",
+    }
+    cost = from_json(v1_types.Cost, document)
+    assert cost.source == "usage" and cost.total_usd is None and cost.lines[0].amount_usd is None
+    assert to_json(cost) == document
+
+
 def test_discovery_offers_cost_only_when_it_states_a_final_window() -> None:
     stated = json.loads((EXAMPLES / "Limits.json").read_text(encoding="utf-8"))
     assert from_json(v1_types.Limits, stated).cost_final_within_seconds == 3600
