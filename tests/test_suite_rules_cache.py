@@ -66,12 +66,14 @@ def test_coverage_rules_and_changed_bytes_are_current(
             ).hexdigest()
         )
 
-    expected = {"baseline.example": ["original"], "covered": ["first"]}
+    # The shared suite under this digest is `suite.yaml` and `coverage.yaml` together
+    # (`tester.shared_suite`), so every core test counts, not only the baseline ones.
+    expected = {"baseline.example": ["original"], "other": [], "covered": ["first"]}
     assert evidence._source_suite_rules(digest(coverage)) == (expected, [])
     changed = coverage.replace(b"first", b"other")
     path.write_bytes(changed)  # Same byte count; content, not stat metadata, invalidates it.
     assert evidence._source_suite_rules(digest(changed)) == (
-        {"baseline.example": ["original"], "covered": ["other"]},
+        {"baseline.example": ["original"], "other": [], "covered": ["other"]},
         [],
     )
     (conformance / "historical-suite-rules.json").write_text("{}")

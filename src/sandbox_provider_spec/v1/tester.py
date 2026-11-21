@@ -407,7 +407,7 @@ def _consistent(
     """A test of a section variant runs only when one claimed variant has every knob value that the
     test proves for that section (and, for previews, the access its sandbox asks for)."""
     known = fixtures or {}
-    knobs: dict[str, list[tuple[str, object]]] = {}
+    knobs: dict[str, list[tuple[str, object, bool]]] = {}
     for proof in test.proves:
         if "gate" not in proof:
             continue
@@ -415,20 +415,24 @@ def _consistent(
         if gate not in gates:
             return False
         if "knob" in proof:
+            # A count that the test names itself (`{at_least: 2}`) is a floor that a larger claim
+            # meets; one that its fixtures set (`{at_least: $runner.max_allow_count}`) is what the
+            # fixtures prove, so the claim must equal it.
+            fixed = "$runner" not in repr(proof["value"])
             knobs.setdefault(gate, []).append(
-                (str(proof["knob"]), _resolved(test, proof["value"], known))
+                (str(proof["knob"]), _resolved(test, proof["value"], known), fixed)
             )
     access = _implied(test, "access", ("public", "private"))
     credential = _implied(test, "credential", ("link", "header"))
 
-    def holds(variant: Mapping[str, object], knob: str, value: object) -> bool:
+    def holds(variant: Mapping[str, object], knob: str, value: object, fixed: bool) -> bool:
         claimed = variant.get(knob)
         if value is _UNRESOLVED:
             return False
         return (
             claimed == value
             or (isinstance(claimed, list) and value in claimed)
-            or _reaches(claimed, value)
+            or (fixed and _reaches(claimed, value))
         )
 
     def listed_or_open(variant: Mapping[str, object], knob: str, wanted: str | None) -> bool:
@@ -450,7 +454,7 @@ def _consistent(
         knobs["previews"] = []
     return all(
         any(
-            all(holds(variant, knob, value) for knob, value in wanted)
+            all(holds(variant, knob, value, fixed) for knob, value, fixed in wanted)
             and (gate != "previews" or offers(variant))
             for variant in gates[gate]
         )
