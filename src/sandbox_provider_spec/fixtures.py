@@ -42,7 +42,8 @@ FIXTURES: Mapping[str, str] = {
         "`allowed_ip_url`."
     ),
     "allowed_ip_url": (
-        "A literal-IP HTTP URL that a sandbox can reach, for the address allowlist tests."
+        "A plain-HTTP literal-IPv4 URL that answers 2xx without a redirect and that a sandbox "
+        "can reach, for the address allowlist, block-all and root-resistance tests."
     ),
     "allowed_ips": "A list of IP addresses or CIDRs that an allowlist for `allowed_ip_url` holds.",
     "allowed_mixed": (
@@ -187,6 +188,11 @@ FIXTURES: Mapping[str, str] = {
         "A list of at most 64 distinct ports that the provider reserves (may be empty)."
     ),
     "restored_size": "The resource request that a sandbox restored from a snapshot asks for.",
+    "snapshot_keeps": (
+        "What `snapshots.v1.get_and_list` takes and expects back: `files_only` or "
+        "`files_and_memory`. The tester sets it from the class's `snapshots` variants "
+        "(`files_only` unless the class lists only another value); a value given here pins it."
+    ),
     "standard_base_dockerfile": (
         "A Dockerfile on the provider's standard image, with the four `COPY` and `ADD` lines the "
         "test names."

@@ -282,3 +282,26 @@ def test_the_labels_test_runs_only_for_a_class_that_lists_the_operation() -> Non
     }
     assert "labels.update" not in off
     assert "labels.update" in on
+
+
+def test_a_private_link_gets_the_unauthenticated_url_the_suite_probes(
+    driver: ProviderDriver,
+) -> None:
+    box = driver.call("create", None, {})
+    public = driver.call("preview.link", box, {"port": 3000})
+    header = driver.call("preview.link", box, {"port": 3001, "access": "private"})
+    assert "unauthorized_url" not in public
+    assert header["unauthorized_url"] == header["url"]  # the credential is in the headers
+
+    async def with_link_credential(sandbox_id: str, port: int, **options: Any) -> PreviewLink:
+        return dataclasses.replace(
+            example(PreviewLink),
+            url="https://p-3000.example.test/app?token=SECRET&x=1#frag",
+            access="private",
+            credential="link",
+        )
+
+    driver.api.preview_link = with_link_credential  # type: ignore[method-assign]
+    link = driver.call("preview.link", box, {"port": 3002, "access": "private"})
+    assert link["unauthorized_url"] == "https://p-3000.example.test/app"
+    assert "SECRET" not in str(link["unauthorized_url"])

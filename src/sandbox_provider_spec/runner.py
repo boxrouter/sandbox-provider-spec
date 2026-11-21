@@ -298,8 +298,35 @@ def asserted(result: Mapping[str, object], expected: Mapping[str, Any]) -> dict[
     return observations
 
 
+BOOTSTRAP_HOPS = 3
+
+
+def _origin(url: str) -> tuple[str, str, int | None]:
+    parts = urllib.parse.urlsplit(url)
+    return parts.scheme, (parts.hostname or "").lower(), parts.port
+
+
+def _bootstrap(error: urllib.error.HTTPError, url: str) -> tuple[str, str] | None:
+    """Where a credential link's cookie bootstrap goes next, and the cookies it set: a redirect
+    that sets a cookie and stays on the link's own origin. A sign-in redirect sets no cookie or
+    leaves the origin, so it is not followed."""
+    location = error.headers.get("Location")
+    cookies = [
+        value.split(";", 1)[0].strip()
+        for value in error.headers.get_all("Set-Cookie") or []
+        if "=" in value.split(";", 1)[0]
+    ]
+    if error.code not in (301, 302, 303, 307, 308) or not location or not cookies:
+        return None
+    target = urllib.parse.urljoin(url, location)
+    return (target, "; ".join(cookies)) if _origin(target) == _origin(url) else None
+
+
 def http(inputs: Mapping[str, object]) -> Mapping[str, object]:
-    """No redirect: a sign-in page is not a successful authorized preview."""
+    """No redirect: a sign-in page is not a successful authorized preview. The one redirect it
+    follows is a credential's cookie bootstrap (a request that carries headers or a query, and an
+    answer that sets a cookie and redirects within the same origin), with the cookie it set, at
+    most `BOOTSTRAP_HOPS` times. A request without a credential never follows."""
 
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, *args: Any, **kwargs: Any) -> None:
@@ -313,24 +340,31 @@ def http(inputs: Mapping[str, object]) -> Mapping[str, object]:
         url = urllib.parse.urlunsplit(
             parts._replace(query=parts.query + "&" + encoded if parts.query else encoded)
         )
-    request = urllib.request.Request(url, headers=strings(inputs, "headers"))
-    try:
-        with opener.open(request, timeout=10) as response:
-            return {
-                "status": response.status,
-                "reachable": True,
-                "served": 200 <= response.status < 300,
-                "body": response.read(65536),
-            }
-    except urllib.error.HTTPError as error:
-        return {
-            "status": error.code,
-            "served": False,
-            "reachable": True,
-            "body": error.read(65536),
-        }
-    except urllib.error.URLError:
-        raise NativeFailure("probe_connection_failed") from None
+    headers = dict(strings(inputs, "headers"))
+    credentialed = bool(headers) or bool(urllib.parse.urlsplit(url).query)
+    for hop in range(BOOTSTRAP_HOPS + 1):
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with opener.open(request, timeout=10) as response:
+                return {
+                    "status": response.status,
+                    "reachable": True,
+                    "served": 200 <= response.status < 300,
+                    "body": response.read(65536),
+                }
+        except urllib.error.HTTPError as error:
+            step = _bootstrap(error, url) if credentialed and hop < BOOTSTRAP_HOPS else None
+            if step is None:
+                return {
+                    "status": error.code,
+                    "served": False,
+                    "reachable": True,
+                    "body": error.read(65536),
+                }
+            url, headers = step[0], {**headers, "Cookie": step[1]}
+        except urllib.error.URLError:
+            raise NativeFailure("probe_connection_failed") from None
+    raise AssertionError("unreachable")  # pragma: no cover
 
 
 class Runner:

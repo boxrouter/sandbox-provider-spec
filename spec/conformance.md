@@ -228,7 +228,7 @@ Common fixture names are below. Supplementary denylist tests also need the
 | `egress_harness_domains` | Nonempty list of host names that resolve to the controlled host in `egress_harness`; these names are the allowlist entries for domain-traffic coverage. |
 | `connection_harness` | HTTPS `stream_url`, a private token, and optional `ca_pem`; its stream sends data often enough to observe whether an established connection remains open. |
 | `connection_harness_domains` | The streaming host name used in the initial network policy. |
-| `allowed_ip_url` | A literal-IP HTTP endpoint reachable from an unrestricted guest. IP allowlist, block-all and root-resistance tests exercise it without DNS or proxy settings. |
+| `allowed_ip_url` | A plain-HTTP endpoint on a literal IPv4 address (`http://<address>/<path>`, no host name, no TLS) that answers `GET` with a 2xx status and no redirect, reachable from an unrestricted guest. IP allowlist, block-all and root-resistance tests exercise it without DNS or proxy settings. The block-all and root-resistance tests (`network_lockdown.deny_all`, `network_lockdown.root_cannot_lift`) probe it with no receiver record, so an HTTPS URL, a host name or an IPv6 address is refused (`proof_fixture_invalid`): a provider that intercepts TLS cannot tell a blocked HTTPS address from an answer of its own. A third-party address that redirects to HTTPS does not qualify. |
 | `allowed_ip_range_url` | A second literal-IPv4 HTTP endpoint on a different address from `allowed_ip_url`, inside `allowed_ip_range`, reachable from an unrestricted guest. The range allowlist test probes both addresses. |
 | `allowed_ip_range` | One IPv4 range with a prefix length of 24 or shorter (`/0` to `/24`) that covers the addresses of `allowed_ip_url` and `allowed_ip_range_url`. When `denied_url` uses a literal IPv4 address, that address must fall outside this range. A host name is not an address in the range. |
 | `max_allow_entries`, `wildcard_domains` | Allowlist domain lists for limit and wildcard tests; the allowed endpoint must match and the denied endpoint must remain outside them. `max_allow_entries` must be a list of 1 through 32 distinct strings, compared case-sensitively, with one matching URL per entry in `max_allow_urls`. |
@@ -395,7 +395,7 @@ and its digest) cannot be given on the command line.
 | `allowed_domains` | A list of domains or CIDRs that an allowlist for `allowed_url` holds. |
 | `allowed_ip_range` | One IPv4 range (`/0` to `/24`) that covers `allowed_ip_url` and `allowed_ip_range_url`. |
 | `allowed_ip_range_url` | A second literal-IPv4 HTTP URL, inside `allowed_ip_range`, on another address than `allowed_ip_url`. |
-| `allowed_ip_url` | A literal-IP HTTP URL that a sandbox can reach, for the address allowlist tests. |
+| `allowed_ip_url` | A plain-HTTP literal-IPv4 URL that answers 2xx without a redirect and that a sandbox can reach, for the address allowlist, block-all and root-resistance tests. |
 | `allowed_ips` | A list of IP addresses or CIDRs that an allowlist for `allowed_ip_url` holds. |
 | `allowed_mixed` | A list holding a host name that covers `allowed_url` and an address that covers `allowed_ip_url`. |
 | `allowed_url` | A controlled HTTP(S) receiver URL that the allowlist tests expect to reach. |
@@ -458,6 +458,7 @@ and its digest) cannot be given on the command line.
 | `reachable_url` | Set by `--reachable-url`: an HTTPS URL that a sandbox can reach with a 2xx response. |
 | `reserved_ports` | A list of at most 64 distinct ports that the provider reserves (may be empty). |
 | `restored_size` | The resource request that a sandbox restored from a snapshot asks for. |
+| `snapshot_keeps` | What `snapshots.v1.get_and_list` takes and expects back: `files_only` or `files_and_memory`. The tester sets it from the class's `snapshots` variants (`files_only` unless the class lists only another value); a value given here pins it. |
 | `standard_base_dockerfile` | A Dockerfile on the provider's standard image, with the four `COPY` and `ADD` lines the test names. |
 | `test_gpu` | A resource request `{gpu_model: [<registry model>]}` for the GPU sandbox. |
 | `test_size` | A resource request using `cpu_min`, `memory_min_mib` and optional `disk_min_mib`, for the size tests. |
@@ -682,7 +683,7 @@ An elapsed observation bound is `not_run`; it does not establish a native comman
 | `terminal.close` | Terminal target. | Native success after closing the terminal's connection, which ends its program; closing twice succeeds. |
 | `terminal.link_reuse` | Sandbox target. | `second_refused`: whether a second connection to one terminal link was refused with an HTTP status from 400 to 499 before the upgrade. Only a provider reached over HTTP has a link; any other form is `not_run` with the reason `the Python form has no link`, which counts for neither its section nor the run. |
 | `fixture.terminal_ordered_output` | Open terminal target; optional `timeout_ms`. | `ordered`: whether `seq 1 20000`, typed on the terminal, came back as one contiguous run of numbers (carriage returns removed), none dropped, repeated or reordered. |
-| `preview.link` | Sandbox target; `port`, `access` (`public` or `private`), optional `credential` (`link` or `header`) and `lifetime_seconds`. | `url` and request `headers`; a private link may also return `unauthorized_url` for the unauthenticated control. Newly allocated native previews or credentials return an owned resource binding. The 1.0 driver sends `access` and `lifetime_seconds` as the request fields of those names, does not send `credential` (the provider chooses it from the class's claim and reports it as `credential`), and also returns `access`. |
+| `preview.link` | Sandbox target; `port`, `access` (`public` or `private`), optional `credential` (`link` or `header`) and `lifetime_seconds`. | `url` and request `headers`; a private link also returns `unauthorized_url`, the unauthenticated control: the link's URL for a `header` credential, and the URL without its query and fragment for a `link` credential (so the credential of a `link` form must travel in the query or the fragment). Newly allocated native previews or credentials return an owned resource binding. The 1.0 driver sends `access` and `lifetime_seconds` as the request fields of those names, does not send `credential` (the provider chooses it from the class's claim and reports it as `credential`), and also returns `access`. |
 | `preview.revoke` | Preview-link target returned by `preview.link`; no additional inputs. | Native revocation success; subsequent `probe.http` steps check that the issued authority no longer opens the preview. The 1.0 driver revokes by the link's `id`; it is unsupported unless the class claims `previews` with `revocable: true` and the link has an `id`. |
 | `labels.update` | Sandbox target; `labels` (an empty value removes the key). | `labels` the sandbox now carries, without the tester's own label. Runs for a class that lists `labels.update` in `operations`. |
 | `pause`, `resume` | Sandbox target; optional `keeps` selects a native persistence mode. | Native operation success; subsequent steps inspect the result. |
@@ -723,7 +724,7 @@ An elapsed observation bound is `not_run`; it does not establish a native comman
 | `allocation.observe` | Sandbox target. | Native `allocation` for comparison with the requested resource fixture. |
 | `clock.start`, `clock.observe` | Runner monotonic start binding and `limit_ms`. | Whether observation occurred before the self-ending streaming workload could complete. These are test timing, never provider speed guarantees. |
 | `bindings.compare` | Two opaque bound fields, `left` and `right`. | Runner-only boolean `equal`; no SDK call or handle enters the report. |
-| `probe.http` | Runner-side `url`, optional `headers` and URL-encoded `query`. | `status`, `reachable`, `served`, `body`; HTTP error responses remain reachable; no redirects or ambient proxy credentials. |
+| `probe.http` | Runner-side `url`, optional `headers` and URL-encoded `query`. | `status`, `reachable`, `served`, `body`; HTTP error responses remain reachable; no ambient proxy credentials. A request that carries a credential (headers or a query) follows one kind of redirect, a cookie bootstrap: an answer that sets a cookie and redirects within the same origin is followed, with the cookie, up to three times. Every other redirect, and every redirect of a request without a credential, is the answer. |
 
 The shared tests do not call `process.close_stdin` or `snapshot.original_after`.
 The `continues` and `briefly_paused` snapshot transition tests use ticker fixtures around

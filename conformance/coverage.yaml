@@ -23,10 +23,15 @@ tests:
     target: box
     in:
       bash_script: |
-        if [ "$(id -u)" = 0 ]; then
-          useradd --create-home --uid 10001 --shell /bin/bash runner
+        if command -v useradd >/dev/null 2>&1; then
+          add="useradd --create-home --uid 10001 --shell /bin/bash runner"
         else
-          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+          add="adduser -D -u 10001 -s /bin/sh runner"
+        fi
+        if [ "$(id -u)" = 0 ]; then
+          $add
+        else
+          sudo -n $add
         fi
     expect:
       equals:

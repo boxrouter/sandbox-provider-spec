@@ -40,6 +40,12 @@ opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect
 request = urllib.request.Request(
     item["url"], method=item["method"], headers={"X-SPS-Probe": item["token"]}
 )
+def ambiguous(error):
+    # A handshake that the peer ended before any certificate came (EOF) is a refused connection,
+    # a block. A certificate that fails to verify may be an interceptor's answer: ambiguous.
+    if isinstance(error, ssl.SSLEOFError) or "UNEXPECTED_EOF" in str(error):
+        return False
+    return isinstance(error, ssl.SSLError)
 try:
     with opener.open(request, timeout=8) as response:
         response.read(1)
@@ -47,9 +53,9 @@ try:
 except urllib.error.HTTPError:
     result = {"succeeded": False, "ambiguous": False}
 except urllib.error.URLError as error:
-    result = {"succeeded": False, "ambiguous": isinstance(error.reason, ssl.SSLError)}
-except ssl.SSLError:
-    result = {"succeeded": False, "ambiguous": True}
+    result = {"succeeded": False, "ambiguous": ambiguous(error.reason)}
+except ssl.SSLError as error:
+    result = {"succeeded": False, "ambiguous": ambiguous(error)}
 except (TimeoutError, OSError):
     result = {"succeeded": False, "ambiguous": False}
 print(json.dumps(result, separators=(",", ":")))

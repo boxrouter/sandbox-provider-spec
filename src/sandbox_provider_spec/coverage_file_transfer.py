@@ -485,7 +485,8 @@ def _user_selection(check: Check, inputs: Mapping[str, object]) -> Mapping[str, 
     secret, mine = root + "/secret", root + "/mine"
     try:
         check.run(
-            f"(id -u {user} >/dev/null 2>&1 || useradd -M -s /bin/sh {user}) && "
+            f"(id -u {user} >/dev/null 2>&1 || useradd -M -s /bin/sh {user} || "
+            f"adduser -D -H -s /bin/sh {user}) && "
             f"mkdir -p {root} && chmod 1777 {check.root} {root} && "
             f"printf secret > {secret} && chown 0:0 {secret} && chmod 600 {secret} && "
             f"printf mine > {mine} && chown {user} {mine} && chmod 600 {mine}",

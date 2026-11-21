@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from importlib.metadata import version
 from typing import Any, TypeVar, cast
+from urllib.parse import urlsplit, urlunsplit
 from uuid import uuid4
 
 from sandbox_provider_spec import cost_checks, terminal_ordered
@@ -603,6 +604,11 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
         link = self.wait(self.api.preview_link(sandbox_id, number(inputs, "port", 0), **options))
         handle = PreviewHandle(sandbox_id, link.id)
         owned = self.own("preview", handle, lambda: self._revoke_preview(handle))
+        unauthorized = (
+            {"unauthorized_url": _without_credential(link.url, link.credential)}
+            if link.access == "private"
+            else {}
+        )
         return {
             "resource": owned,
             "url": link.url,
@@ -610,6 +616,7 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
             "expires_at": _iso(link.expires_at),
             "access": link.access,
             "credential": link.credential,
+            **unauthorized,
         }
 
     def _revoke_preview(self, handle: PreviewHandle) -> Observation:
@@ -977,6 +984,14 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
                     {"kind": "snapshot", "result": "error", "reason": type(error).__name__}
                 )
         return results + self.sweep_images()
+
+
+def _without_credential(url: str, credential: str | None) -> str:
+    """A private link's URL as a request without its credential sends it: a `header` credential
+    is not in the URL; a `link` credential (or none reported) is in the query or fragment."""
+    if credential == "header":
+        return url
+    return urlunsplit(urlsplit(url)._replace(query="", fragment=""))
 
 
 def _size(size: Any) -> dict[str, object]:

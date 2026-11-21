@@ -201,6 +201,21 @@ def _http_ipv4(url: str) -> ipaddress.IPv4Address | None:
     return _ipv4_host(url)
 
 
+def _allowed_ip_probe(fixtures: Mapping[str, object]) -> None:
+    """The unrestricted control and the blocked probe both use `allowed_ip_url` with no recorder,
+    so it must be plain HTTP on a literal IPv4 address: a provider that intercepts TLS cannot tell
+    a blocked HTTPS address from an interception it answered itself."""
+    allowed = fixtures.get("allowed_ip_url")
+    if allowed is None:
+        raise NotRun("fixture_missing")
+    if not isinstance(allowed, str):
+        raise NotRun("proof_fixture_invalid")
+    if _http_ipv4(allowed) is None:
+        raise NotRun(
+            "proof_fixture_invalid", detail="allowed_ip_url must be http on a literal IPv4 address"
+        )
+
+
 def _allowlist_range(fixtures: Mapping[str, object]) -> None:
     """Two distinct in-range HTTP addresses, and no denied literal address inside the CIDR."""
     raw = fixtures.get("allowed_ip_range")
@@ -251,6 +266,14 @@ def proof_fixtures(test: Test, fixtures: Mapping[str, object]) -> dict[str, obje
         } != {"names", "addresses"}:
             raise NotRun("proof_fixture_invalid")
         return {"max_deny_count": len(cast(list[str], entries))} if limit else {}
+    if test.id == "snapshots.v1.get_and_list":
+        keeps = fixtures.get("snapshot_keeps", "files_only")
+        if keeps not in ("files_only", "files_and_memory"):
+            raise NotRun("proof_fixture_invalid")
+        return {"snapshot_keeps": keeps}
+    if test.id in {"network_lockdown.deny_all", "network_lockdown.root_cannot_lift"}:
+        _allowed_ip_probe(fixtures)
+        return {}
     if test.id == "coverage.network_lockdown.allowlist.range":
         _allowlist_range(fixtures)
         return {}

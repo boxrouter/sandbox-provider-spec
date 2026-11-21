@@ -12,7 +12,8 @@ from typing import Any, cast
 from uuid import uuid4
 
 from sandbox_provider_spec.conformance import run_suite
-from sandbox_provider_spec.driver import NativeFailure
+from sandbox_provider_spec.driver import NativeFailure, NotRun
+from sandbox_provider_spec.proofs import proof_fixtures
 from sandbox_provider_spec.report import DEVELOPMENT_REVISION, report, revision
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
@@ -118,6 +119,13 @@ OPERATION_CLAIMS = {
 # Operations that a driver can do with commands where discovery does not claim them. They are
 # not marked unsupported; the driver falls back to the command.
 COMMAND_FALLBACK = frozenset({"files.exists"})
+
+# The tests of a section whose ids do not start with the section's name: `user_selection` is
+# proved by the three operation tests that select a user, so its summary line counts them.
+SECTION_TESTS = {
+    "user_selection": ("run.user", "files.write.user", "process.start.user"),
+}
+TEST_SECTION = {test: section for section, tests in SECTION_TESTS.items() for test in tests}
 
 # The sections of tests that discovery's `classes[].operations` turns on, in place of a gate: a
 # section runs when some class lists every operation of its group.
@@ -236,13 +244,15 @@ def unsupported_operations(discovery: Discovery) -> dict[str, str]:
     return missing
 
 
-def not_claimed_tests(discovery: Discovery | None) -> dict[str, str]:
-    """The tests that a claim leaves out, each with its reason. The tests create in the `default`
-    class, so `contract.lifetime_ends` is left out when that class states `router`."""
+def not_claimed_tests(discovery: Discovery | None, class_name: str | None = None) -> dict[str, str]:
+    """The tests that a claim leaves out, each with its reason. A test runs in the class that
+    `class_for_test` names (the baseline's class, `default` else the first, for a test that claims
+    nothing), so `contract.lifetime_ends` is left out when that class states `router`."""
     if discovery is None:
         return {}
-    default = next((item for item in discovery.classes if item.id == "default"), None)
-    if default is not None and default.lifetime_enforced_by == "router":
+    name = class_name or default_class(discovery)
+    chosen = next((item for item in discovery.classes if item.id == name), None)
+    if chosen is not None and chosen.lifetime_enforced_by == "router":
         return {LIFETIME_TEST: LIFETIME_NOT_CLAIMED}
     return {}
 
@@ -252,26 +262,81 @@ def cost_offered(discovery: Discovery | None) -> bool:
     return discovery is not None and discovery.limits.cost_final_within_seconds is not None
 
 
-def _consistent(test: Test, gates: Mapping[str, list[Mapping[str, object]]]) -> bool:
-    """A test of a section variant runs only when a claimed variant has that knob value."""
+_UNRESOLVED = object()
+
+
+def _resolved(test: Test, value: object, fixtures: Mapping[str, object]) -> object:
+    """A proof's value with its `$runner.<name>` parts read from the run's fixtures and the values
+    the run derives from them; `_UNRESOLVED` when one cannot be read (the claim is then not met)."""
+    if isinstance(value, str) and value.startswith("$runner."):
+        try:
+            known = {**fixtures, **proof_fixtures(test, fixtures)}
+        except NotRun:
+            return _UNRESOLVED
+        return known.get(value.removeprefix("$runner."), _UNRESOLVED)
+    if isinstance(value, dict):
+        parts = {key: _resolved(test, item, fixtures) for key, item in value.items()}
+        return _UNRESOLVED if _UNRESOLVED in parts.values() else parts
+    return value
+
+
+def _implied_access(test: Test) -> str | None:
+    """The preview access that the test's own create step asks for, when it names one."""
+    for step in test.steps:
+        if step.get("op") != "create":
+            continue
+        requirements = (step.get("in") or {}).get("requirements")
+        previews = requirements.get("previews") if isinstance(requirements, dict) else None
+        access = previews.get("access") if isinstance(previews, dict) else None
+        if access in ("public", "private"):
+            return str(access)
+    return None
+
+
+def _consistent(
+    test: Test,
+    gates: Mapping[str, list[Mapping[str, object]]],
+    fixtures: Mapping[str, object] | None = None,
+) -> bool:
+    """A test of a section variant runs only when one claimed variant has every knob value that the
+    test proves for that section (and, for previews, the access its sandbox asks for)."""
+    known = fixtures or {}
+    knobs: dict[str, list[tuple[str, object]]] = {}
     for proof in test.proves:
         if "gate" not in proof:
             continue
-        gate = proof["gate"]
+        gate = str(proof["gate"])
         if gate not in gates:
             return False
-        if "knob" not in proof:
-            continue
-        knob: str = proof["knob"]
-        value = proof["value"]
+        if "knob" in proof:
+            knobs.setdefault(gate, []).append(
+                (str(proof["knob"]), _resolved(test, proof["value"], known))
+            )
+    access = _implied_access(test) if "previews" in knobs else None
 
-        def holds(variant: Mapping[str, object], knob: str = knob, value: object = value) -> bool:
-            claimed = variant.get(knob)
-            return claimed == value or (isinstance(claimed, list) and value in claimed)
-
-        if not any(holds(variant) for variant in gates[gate]):
+    def holds(variant: Mapping[str, object], knob: str, value: object) -> bool:
+        claimed = variant.get(knob)
+        if value is _UNRESOLVED:
             return False
-    return True
+        return claimed == value or (isinstance(claimed, list) and value in claimed)
+
+    def offers(variant: Mapping[str, object]) -> bool:
+        listed = variant.get("access")
+        return (
+            access is None
+            or listed is None
+            or listed == access
+            or (isinstance(listed, list) and access in listed)
+        )
+
+    return all(
+        any(
+            all(holds(variant, knob, value) for knob, value in wanted)
+            and (gate != "previews" or offers(variant))
+            for variant in gates[gate]
+        )
+        for gate, wanted in knobs.items()
+    )
 
 
 def _alone(discovery: Discovery, item: SandboxClass) -> Discovery:
@@ -287,12 +352,17 @@ def _gates_needed(test: Test, discovery: Discovery) -> set[str]:
     return needed
 
 
-def _claims(discovery: Discovery, item: SandboxClass, test: Test) -> bool:
+def _claims(
+    discovery: Discovery,
+    item: SandboxClass,
+    test: Test,
+    fixtures: Mapping[str, object] | None = None,
+) -> bool:
     """Whether this one class claims what the test needs: its gates and knob values, the
     operations (or group of operations) that turn its section on."""
     own = _alone(discovery, item)
     gates = claimed_gates(own)
-    if not _gates_needed(test, discovery) <= set(gates) or not _consistent(test, gates):
+    if not _gates_needed(test, discovery) <= set(gates) or not _consistent(test, gates, fixtures):
         return False
     group = OPERATION_GROUPS.get(test.id.split(".", 1)[0])
     if group is not None and not set(group) <= set(item.operations):
@@ -307,18 +377,34 @@ def _needs_a_claim(test: Test, discovery: Discovery) -> bool:
     )
 
 
+def snapshot_keeps(item: SandboxClass) -> str | None:
+    """What a snapshot of this class keeps, for the tests that take one without naming a variant:
+    `files_only` when the class's `snapshots` variants list it, else the first value they list."""
+    listed: list[str] = []
+    for variant in _variants(item.gates, "snapshots"):
+        value = variant.get("keeps")
+        listed += (
+            [str(v) for v in value] if isinstance(value, list) else [str(value)] if value else []
+        )
+    if "files_only" in listed or not listed:
+        return None  # the test's own default is files_only
+    return listed[0]
+
+
 def default_class(discovery: Discovery) -> str:
     """The class that the baseline runs on: `default`, else the first class."""
     names = [item.id for item in discovery.classes]
     return "default" if "default" in names else names[0]
 
 
-def class_for_test(test: Test, discovery: Discovery) -> str:
+def class_for_test(
+    test: Test, discovery: Discovery, fixtures: Mapping[str, object] | None = None
+) -> str:
     """The class that runs a test: the default class when the test claims nothing, else the first
     class in discovery order that claims what it needs (the default class when none does alone)."""
     if _needs_a_claim(test, discovery):
         for item in discovery.classes:
-            if _claims(discovery, item, test):
+            if _claims(discovery, item, test, fixtures):
                 return item.id
     return default_class(discovery)
 
@@ -350,7 +436,7 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         head = test.id.split(".", 1)[0]
         if options.tests:
             wanted = any(test.id.startswith(prefix) for prefix in options.tests) and (
-                head not in gates or _consistent(test, gates)
+                head not in gates or _consistent(test, gates, options.fixtures)
             )
         elif test.id in OPERATION_CLAIMS:
             # A test named for an operation that a claim turns on runs only when it is claimed.
@@ -358,7 +444,7 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         elif head in {"baseline", "contract"}:
             wanted = True
         else:
-            wanted = head in sections and _consistent(test, gates)
+            wanted = head in sections and _consistent(test, gates, options.fixtures)
         if wanted and test.id in CLAIMED_TESTS and discovery is not None:
             # Left out unless the class lists its operation; a test named by its whole id stays.
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
@@ -430,7 +516,7 @@ def _summary(
     by_operation: dict[str, list[str]] = {name: [] for name in OPERATIONS}
     by_section: dict[str, list[str]] = {name: [] for name in sorted(gates)}
     for row in results:
-        head = str(row["id"]).split(".", 1)[0]
+        head = TEST_SECTION.get(str(row["id"])) or str(row["id"]).split(".", 1)[0]
         if head in by_section and _applies(row):
             by_section[head].append(str(row["result"]))
         if head != "baseline":
@@ -469,13 +555,15 @@ def _run_by_class(
         return results, [driver.sandbox_class]
     groups: dict[str, list[Test]] = {}
     for test in suite.tests:
-        groups.setdefault(class_for_test(test, discovery), []).append(test)
+        groups.setdefault(class_for_test(test, discovery, fixtures), []).append(test)
     by_id: dict[str, dict[str, object]] = {}
     for name, tests in groups.items():
         driver.sandbox_class = name
-        for row in run_suite(
-            driver, Suite(suite.digest, tuple(tests), suite.baseline_ids), fixtures
-        ):
+        driver.not_claimed = not_claimed_tests(discovery, name)
+        item = next(item for item in discovery.classes if item.id == name)
+        keeps = snapshot_keeps(item)
+        own = {**fixtures, "snapshot_keeps": keeps} if keeps else fixtures
+        for row in run_suite(driver, Suite(suite.digest, tuple(tests), suite.baseline_ids), own):
             row["class"] = name
             by_id[str(row["id"])] = row
     return [by_id[test.id] for test in suite.tests], list(groups)

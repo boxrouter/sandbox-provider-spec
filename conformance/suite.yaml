@@ -1817,7 +1817,7 @@ tests:
       equals:
         exit_code: 0
 - id: snapshots.v1.get_and_list
-  title: A snapshot reads back ready with its keeps and source, and is listed by label and by sandbox.
+  title: A snapshot reads back ready with the keeps it was asked for and its source, and is listed by label and by sandbox.
   rules:
   - provider-api/snapshot-list
   proves:
@@ -1828,13 +1828,12 @@ tests:
     in:
       requirements:
         snapshots:
-          keeps: files_only
           original_after: any
     as: box
   - op: snapshot.take
     target: box
     in:
-      keeps: files_only
+      keeps: $runner.snapshot_keeps
       labels:
         sps.test.case: snapshot-get-and-list
     as: snap
@@ -1844,9 +1843,15 @@ tests:
     expect:
       equals:
         state: ready
-        keeps: files_only
         labels:
           sps.test.case: snapshot-get-and-list
+  - op: bindings.compare
+    in:
+      left: $info.keeps
+      right: $runner.snapshot_keeps
+    expect:
+      equals:
+        equal: true
   - op: bindings.compare
     in:
       left: $box.identity
@@ -5469,10 +5474,15 @@ tests:
     target: box
     in:
       bash_script: |
-        if [ "$(id -u)" = 0 ]; then
-          useradd --create-home --uid 10001 --shell /bin/bash runner
+        if command -v useradd >/dev/null 2>&1; then
+          add="useradd --create-home --uid 10001 --shell /bin/bash runner"
         else
-          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+          add="adduser -D -u 10001 -s /bin/sh runner"
+        fi
+        if [ "$(id -u)" = 0 ]; then
+          $add
+        else
+          sudo -n $add
         fi
     expect:
       equals:
@@ -5512,10 +5522,15 @@ tests:
     target: box
     in:
       bash_script: |
-        if [ "$(id -u)" = 0 ]; then
-          useradd --create-home --uid 10001 --shell /bin/bash runner
+        if command -v useradd >/dev/null 2>&1; then
+          add="useradd --create-home --uid 10001 --shell /bin/bash runner"
         else
-          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+          add="adduser -D -u 10001 -s /bin/sh runner"
+        fi
+        if [ "$(id -u)" = 0 ]; then
+          $add
+        else
+          sudo -n $add
         fi
     expect:
       equals:
@@ -5553,10 +5568,15 @@ tests:
     target: box
     in:
       bash_script: |
-        if [ "$(id -u)" = 0 ]; then
-          useradd --create-home --uid 10001 --shell /bin/bash runner
+        if command -v useradd >/dev/null 2>&1; then
+          add="useradd --create-home --uid 10001 --shell /bin/bash runner"
         else
-          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+          add="adduser -D -u 10001 -s /bin/sh runner"
+        fi
+        if [ "$(id -u)" = 0 ]; then
+          $add
+        else
+          sudo -n $add
         fi
     expect:
       equals:
