@@ -151,6 +151,7 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "probe.ssh": ("coverage_ssh.py",),
     # Steps that only the 1.0 driver (`v1/suite_driver.py`) implements.
     "discovery": ("v1/suite_driver.py",),
+    "account.stored_artifacts": ("v1/suite_driver_account.py",),
     "discovery.within_static": ("v1/suite_driver.py", "v1/within.py"),
     "destroy.again": ("v1/suite_driver.py",),
     "destroy.unknown": ("v1/suite_driver.py",),

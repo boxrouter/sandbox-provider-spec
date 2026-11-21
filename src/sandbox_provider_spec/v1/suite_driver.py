@@ -41,6 +41,7 @@ from sandbox_provider_spec.driver import (
 )
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
+from sandbox_provider_spec.v1.suite_driver_account import AccountSteps
 from sandbox_provider_spec.v1.suite_driver_images import ImageSteps, image_reference
 from sandbox_provider_spec.v1.suite_driver_processes import ProcessHandle, ProcessSteps
 from sandbox_provider_spec.v1.types import (
@@ -138,7 +139,7 @@ def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
 
-class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
+class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """A `Driver` whose operations call a `Provider`: `SpsError("unsupported")` becomes
     `Unsupported`, any other `SpsError` `NativeFailure(code)`. The provider is async, so the
     driver runs its own event loop in a background thread and waits for each call."""

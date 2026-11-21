@@ -69,6 +69,7 @@ from sandbox_provider_spec.v1.types import (
     SnapshotPage,
     SnapshotRequest,
     StartWindow,
+    StoredArtifacts,
     TcpLink,
     TerminalLink,
     TerminalRequest,
@@ -350,7 +351,7 @@ def _enc_account_cost(value: AccountCost) -> Json:
 
 
 def _enc_account_capacity(value: AccountCapacity) -> Json:
-    return {
+    out: Json = {
         "as_of": _stamp(value.as_of),
         "starts": [
             {
@@ -371,6 +372,12 @@ def _enc_account_capacity(value: AccountCapacity) -> Json:
             lambda item: {"balance_usd": _dec(item.balance_usd), "past_due": item.past_due},
         ),
     }
+    if value.stored_artifacts is not None:
+        out["stored_artifacts"] = {
+            "used": value.stored_artifacts.used,
+            "limit": value.stored_artifacts.limit,
+        }
+    return out
 
 
 def _enc_class(value: SandboxClass) -> Json:
@@ -436,6 +443,7 @@ def _enc_limits(value: Limits) -> Json:
     _put(out, "image_context_bytes", value.image_context_bytes)
     _put(out, "account_cost_window_seconds", value.account_cost_window_seconds)
     _put(out, "image_layout_bytes", value.image_layout_bytes)
+    _put(out, "stored_artifacts_documented", value.stored_artifacts_documented)
     return out
 
 
@@ -669,6 +677,7 @@ def _dec_account_capacity(data: Json) -> AccountCapacity:
             data["prepaid"],
             lambda item: Prepaid(_decimal(item["balance_usd"]), item["past_due"]),
         ),
+        stored_artifacts=_opt(data.get("stored_artifacts"), lambda item: StoredArtifacts(**item)),
     )
 
 

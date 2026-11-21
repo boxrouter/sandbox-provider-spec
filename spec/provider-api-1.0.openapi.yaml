@@ -1707,6 +1707,13 @@ components:
           description: >-
             The largest OCI image layout, in bytes, that a class listing `image.prepare.oci_layout` accepts in the `context`
             part. Required when a class lists it.
+        stored_artifacts_documented:
+          type: integer
+          minimum: 1
+          description: >-
+            The most prepared images and snapshots, counted together, that the provider documents for its default plan.
+            Display only: a consumer never enforces it, never evicts on it and never treats it as a ceiling. The account's
+            own figure is `stored_artifacts.limit` of `account.capacity`.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -2143,8 +2150,26 @@ components:
         prepaid:
           anyOf: [{$ref: "#/components/schemas/Prepaid"}, {type: "null"}]
           description: The account's prepaid balance. Null when unknown or when the account has none.
+        stored_artifacts:
+          anyOf: [{$ref: "#/components/schemas/StoredArtifacts"}, {type: "null"}]
+          description: >-
+            The prepared images and snapshots, counted together, that the account holds and may hold. Optional: absent or
+            null when the provider does not report it.
       description: >-
         What the account may still do, as one read. A null field means unknown; it is never a zero or a guess.
+    StoredArtifacts:
+      type: object
+      required: [used, limit]
+      additionalProperties: false
+      properties:
+        used:
+          type: [integer, "null"]
+          minimum: 0
+          description: Prepared images and snapshots, counted together, that the account holds. Null when not reported.
+        limit:
+          type: [integer, "null"]
+          minimum: 0
+          description: The most that the account may hold at once. Null when not reported.
     StartWindow:
       type: object
       required: [window_seconds, used, limit, remaining]

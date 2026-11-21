@@ -215,6 +215,15 @@ class Prepaid:
 
 
 @dataclass(frozen=True)
+class StoredArtifacts:
+    """The prepared images and snapshots, counted together, that the account holds (`used`) and may
+    hold (`limit`). A `None` field is not reported, never a zero or a guess."""
+
+    used: int | None
+    limit: int | None
+
+
+@dataclass(frozen=True)
 class AccountCapacity:
     """What `account_capacity` returns. A `None` field is unknown, never a zero or a guess."""
 
@@ -224,6 +233,8 @@ class AccountCapacity:
     paid_overage_enabled: bool | None
     concurrency: Concurrency | None
     prepaid: Prepaid | None
+    # Optional: a provider whose API does not report it leaves it out, which reads as None.
+    stored_artifacts: StoredArtifacts | None = None
 
 
 @dataclass(frozen=True)
@@ -535,6 +546,11 @@ class Limits:
     image_context_bytes: int | None = None  # the largest build context `image_prepare` accepts
     account_cost_window_seconds: int | None = None  # stating it offers `account.cost`
     image_layout_bytes: int | None = None  # largest OCI image layout of `image.prepare.oci_layout`
+    # What the provider documents for its default plan: the most prepared images and snapshots,
+    # counted together, that an account may keep. Display only: a consumer never enforces it, never
+    # evicts on it and never treats it as a ceiling (the account's own figure is
+    # `AccountCapacity.stored_artifacts.limit`).
+    stored_artifacts_documented: int | None = None
 
 
 @dataclass(frozen=True)

@@ -727,10 +727,16 @@ passes it.
 | `paid_overage_enabled` | Whether starts beyond a window's limit are allowed and charged, or null. |
 | `concurrency` | `{active, limit}`, the running sandboxes against the cap, or null. |
 | `prepaid` | `{balance_usd, past_due}`, the prepaid balance in US dollars as a decimal string, or null. |
+| `stored_artifacts` | Optional. `{used, limit}`: the prepared images and snapshots, counted together, that the account holds and may hold; each is null when not reported. Absent when the provider reports neither. |
 
 - A provider that lists `account.capacity` **MUST** return every field, and a field whose value it <!-- rule: provider-api/account-capacity -->
-  does not know **MUST** be null, never a zero or a guess. `remaining` is the number of starts left
-  in the window.
+  does not know **MUST** be null, never a zero or a guess; only `stored_artifacts` may be left out.
+  `remaining` is the number of starts left in the window.
+- A provider **MUST** state `stored_artifacts` only from its own API's answer for that account, <!-- rule: provider-api/stored-artifacts -->
+  `used` **MUST NOT** be less than the number of prepared images and snapshots that `image.list` and
+  `snapshot.list` return for the account, and `used` **MUST NOT** exceed `limit` when both are
+  stated. `limits.stored_artifacts_documented` in discovery is the figure that the provider documents
+  for its default plan: a consumer **MUST NOT** enforce it, evict on it or treat it as a ceiling.
 
 ## 24. Static discovery
 

@@ -4827,6 +4827,17 @@ tests:
   rules:
   - provider-api/discovery-within-static
   proves: []
+- id: contract.stored_artifacts
+  title: Where account.capacity reports stored_artifacts, used covers the account's listed images and snapshots and stays within limit.
+  steps:
+  - op: account.stored_artifacts
+    expect:
+      equals:
+        used_covers_listed: true
+        used_within_limit: true
+  rules:
+  - provider-api/stored-artifacts
+  proves: []
 - id: contract.idempotent_create_same_body
   title: A repeated create with the same key and body returns the first sandbox, running.
   steps:

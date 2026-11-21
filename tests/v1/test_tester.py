@@ -998,7 +998,7 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_thirteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_fourteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
@@ -1007,6 +1007,7 @@ def test_there_are_thirteen_contract_tests_and_the_tester_selects_each_by_defaul
         "contract.files_write_missing_parent",
         "contract.lifetime_ends",
         "contract.discovery_within_static",
+        "contract.stored_artifacts",
     }
     chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
     assert ids <= chosen
