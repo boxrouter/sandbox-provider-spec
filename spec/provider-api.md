@@ -535,7 +535,8 @@ provider's own domains.
   arbitrary image (an entrypoint, an init wrapper) is part of its own build.
 - A build context **MUST** travel only in the part `context` and **MUST NOT** be held whole in <!-- rule: provider-api/image-context -->
   memory: a server reads it as a stream. A context over `limits.image_context_bytes` is
-  `too_large`, a context with a source that is not a Dockerfile is `invalid_request`, and a part
+  `too_large`, a context with a source that is not a Dockerfile is `invalid_request` (unless the
+  provider lists `image.prepare.oci_layout`, section 22), and a part
   that follows `context` or a part named otherwise is `invalid_request`. A body cut short is
   `invalid_request` with outcome `unknown`.
 - Within 24 hours, a repeated `image.prepare` with the same key and the same request **MUST NOT** <!-- rule: provider-api/image-idempotent -->
@@ -593,3 +594,60 @@ operations, and it turns on when the tester passes it.
   `invalid_request`, and then no label changes. A sandbox that does not exist is `not_found`.
 - A provider **MAY** refuse to change a label that is part of the sandbox's identity, with <!-- rule: provider-api/labels-update-identity -->
   `conflict`, and then **MUST** change none of the labels of that call.
+
+## 22. What a prepared image needs from the caller, and what it costs
+
+These additions to section 19 are optional. A provider that lists none of them behaves as section 19
+says.
+
+**Image facts.** The caller resolves, from the image itself, what a provider would otherwise read
+from a registry. An OCI source's `config` may also carry `init` (true when the image's CMD starts a
+machine init as process 1), `user_name` and `home` (the name and home directory of a numeric
+`user`, read from the image's `/etc/passwd`). A Dockerfile source may carry `base`, an
+`{oci, digest, config}` for its single `FROM`, in the form of an OCI source. Each is absent when the
+caller could not resolve it.
+
+- A provider **MUST** use these facts where it needs them and **MUST NOT** read a registry or the <!-- rule: provider-api/image-facts -->
+  image to find them.
+
+**OCI layout.** A provider that lists `image.prepare.oci_layout` in `classes[].operations`, next to the
+four image operations, cannot reach the registry that holds the image. The caller reads the image,
+at the digest it states, and sends it as an OCI image layout (a tar archive with `oci-layout`,
+`index.json` and `blobs/sha256/`) in the part `context`. `image.prepare` is not addressed to a
+class, so the claim holds for the provider's image preparation as a whole. The provider states
+`limits.image_layout_bytes`.
+
+- With the claim, every OCI source **MUST** arrive with the part `context`, and a request without it <!-- rule: provider-api/image-oci-layout -->
+  is `invalid_request` with `field` `context`. The layout is bounded by `limits.image_layout_bytes`
+  (`too_large` above it), a Dockerfile's context stays bounded by `limits.image_context_bytes`, and
+  the provider **MUST NOT** need registry credentials for an image that arrives this way.
+
+**Image bindings.** A class that lists `image.prepare` may state `image_binds`, the list of what a
+prepared image of the class is tied to: `cpu_min`, `memory_min_mib`, `disk_min_mib`, `region` and
+`kernel`. A class that does not list `image.prepare` states none, and an absent or empty list means
+that the image fits any size. A prepared image's `resources` holds exactly the fields the list
+names (`cpu`, `memory_mib`, `disk_mib`, `region` and `kernel` for the five), so that a caller can
+set the size of a request before it prepares and tell two preparations apart.
+
+**Image cost.** A provider that lists `image.cost` next to `image.prepare`, and that offers `cost`
+(states `limits.cost_final_within_seconds`), answers `GET /v1/images/{id}/cost` with a cost of
+what preparing the image cost the provider, for a `ready` image and for a `failed` one.
+
+- The cost of an image **MUST** carry `image_id` and no `sandbox_id`, and **MUST** reach `final` <!-- rule: provider-api/image-cost -->
+  within `limits.cost_final_within_seconds` after the preparation has ended. It stays readable at
+  least until it is `final`, as a sandbox's cost does (section 10). `created_at`, the time at which
+  the caller started the preparation, is a lookup hint only: a provider whose records are kept by
+  time may use it to bound where it looks, **MUST NOT** report a cost from before it, and ignores it
+  when it knows the time itself.
+
+**Error fields.** An error body may carry `failed_step` and `field`, and in `PreparedImage.error` it
+tells a caller which side failed.
+
+- `failed_step` **MUST** be the 1-based number of the Dockerfile instruction whose own command <!-- rule: provider-api/error-failed-step -->
+  failed, and a provider **MUST NOT** set it for a failure that the build's own command did not
+  cause (a full disk, a lost connection): a caller routes on it, and does not try another provider
+  for a customer's broken build.
+- `field` **MUST** name a field of the request that is at fault <!-- rule: provider-api/error-field -->
+  (`context`, `source`, `image`). On a `create` that answers `provider_error`, `image` means that the
+  prepared image it named never booted, and a caller retires that image.
+

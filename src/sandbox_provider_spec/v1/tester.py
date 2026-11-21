@@ -94,6 +94,7 @@ OPERATION_CLAIMS = {
     "image.list": ("operations", "image.list"),
     "image.delete": ("operations", "image.delete"),
     "labels.update": ("operations", "labels.update"),
+    "image.cost": ("operations", "image.cost"),
     "snapshot.create": ("gate", "snapshots"),
     "snapshot.get": ("gate", "snapshots"),
     "snapshot.list": ("gate", "snapshots"),
@@ -118,6 +119,10 @@ OPERATION_GROUPS = {
     IMAGES: IMAGE_OPERATIONS,
     LABELS: LABEL_OPERATIONS,
 }
+# Claims that change how the `images` tests run, or that add one test to the section.
+OCI_LAYOUT = "image.prepare.oci_layout"
+# A test of a claimed section that runs only when the class also lists this operation.
+CLAIMED_TESTS = {"images.v1.cost": "image.cost"}
 
 
 # What a run says when discovery cannot be read for one of these reasons: nothing else could run.
@@ -268,6 +273,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             wanted = True
         else:
             wanted = head in sections and _consistent(test, gates)
+        if wanted and test.id in CLAIMED_TESTS and discovery is not None:
+            # Left out unless the class lists its operation; a test named by its whole id stays.
+            wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
         if wanted and not options.tests and discovery is not None and not cost_offered(discovery):
             wanted = not test.id.startswith(COST_TESTS)
         if wanted and not (options.quick and test.id in QUICK_SKIPS):
@@ -369,6 +377,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
                 **{name: why for name, why in missing.items() if name not in COMMAND_FALLBACK},
             }
             driver.command_fallback = set(COMMAND_FALLBACK) & set(missing)
+            driver.oci_layout = OCI_LAYOUT in claimed_operations(discovery)
         suite = select_tests(shared_suite(), discovery, options)
         # The 1 GiB transfer of `contract.files_1gib_roundtrip` is a requirement of the contract,
         # so a run allows it unless the caller says otherwise.

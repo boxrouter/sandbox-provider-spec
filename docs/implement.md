@@ -367,6 +367,32 @@ The tester runs `run.user`, `files.write.user`, `process.start.user` and `run.ba
 claim is made. Your Python `Provider` receives `RunRequest.user` and `RunRequest.output`,
 `ProcessStartRequest.user` and, only when a user is named, a `user` keyword on `files_write`.
 
+### Prepared images: facts, layouts, bindings and cost
+
+A provider that prepares images (section 19 of the provider API) may add five optional things. None
+is needed to be a valid 1.0 provider.
+
+- **Facts the caller resolved.** An OCI source's `config` may carry `init`, `user_name` and `home`,
+  and a Dockerfile source may carry `base` (its resolved `FROM` image). Use them; never read a
+  registry or the image to find what you were told.
+- **OCI layout.** List `image.prepare.oci_layout` in the class's `operations` (and state
+  `limits.image_layout_bytes`) when you cannot reach the registry that holds an image. Every OCI
+  source then arrives with the part `context`, the image as an OCI image-layout tar at the digest
+  it states, and needs no registry credentials. The tester reads the image from its registry and
+  sends it.
+- **Bindings.** State `image_binds` in a class that lists `image.prepare`: the list of `cpu_min`,
+  `memory_min_mib`, `disk_min_mib`, `region` and `kernel` that a prepared image is tied to. An empty
+  list, or none, means any size. A prepared image's `resources` holds exactly those fields.
+- **Image cost.** List `image.cost` in `operations` (it needs `cost`, so state
+  `limits.cost_final_within_seconds`) and answer `GET /v1/images/{id}/cost` with what preparing the
+  image cost you, as a `Cost` that has `image_id` and no `sandbox_id`. It is `final` within
+  `cost_final_within_seconds` after the preparation ends, for a `ready` and a `failed` image. The
+  tester reads it with `images.v1.cost`.
+- **Error fields.** On a failed preparation, `failed_step` is the 1-based Dockerfile instruction
+  whose own command failed. Set it only then: a caller does not try another provider for a broken
+  build. `field` names the request field at fault; on a `create`, `provider_error` with `field`
+  `image` says that the prepared image never booted.
+
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,
 `memory_min_mib`, `region`, and `gpu_model`. Desktops and volumes wait for later 1.x releases.

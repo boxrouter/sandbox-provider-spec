@@ -52,6 +52,7 @@ from sandbox_provider_spec.v1.multipart import (
 from sandbox_provider_spec.v1.server import create_app
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 from sandbox_provider_spec.v1.tester import (
+    CLAIMED_TESTS,
     TestOptions,
     claimed_sections,
     run_tests,
@@ -610,7 +611,7 @@ def test_the_four_operations_claim_the_images_section_and_nothing_else() -> None
     claimed = {
         t.id for t in select_tests(suite, with_operations(IMAGE_OPERATIONS), TestOptions()).tests
     }
-    images = {t.id for t in suite.tests if t.id.startswith("images.")}
+    images = {t.id for t in suite.tests if t.id.startswith("images.") and t.id not in CLAIMED_TESTS}
     assert images and images <= claimed
     assert not any(
         t.id.startswith("directories.")

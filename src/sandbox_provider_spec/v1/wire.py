@@ -249,8 +249,9 @@ def _enc_snapshot(value: Snapshot) -> Json:
 
 
 def _enc_cost(value: Cost) -> Json:
-    out: Json = {
-        "sandbox_id": value.sandbox_id,
+    out: Json = {}
+    _put(out, "sandbox_id", value.sandbox_id)
+    out |= {
         "status": value.status,
         "total_usd": _opt(value.total_usd, _dec),
         "source": value.source,
@@ -258,6 +259,7 @@ def _enc_cost(value: Cost) -> Json:
         "as_of": _stamp(value.as_of),
     }
     _put(out, "snapshot_id", value.snapshot_id)
+    _put(out, "image_id", value.image_id)
     return out
 
 
@@ -266,17 +268,23 @@ def _enc_image_resources(value: ImageResources) -> Json:
     _put(out, "cpu", _opt(value.cpu, _number))
     _put(out, "memory_mib", value.memory_mib)
     _put(out, "disk_mib", value.disk_mib)
+    _put(out, "region", value.region)
+    _put(out, "kernel", value.kernel)
     return out
 
 
 def _enc_image_config(value: ImageConfig) -> Json:
-    return {
+    out: Json = {
         "env": dict(value.env),
         "workdir": value.workdir,
         "user": value.user,
         "entrypoint": _opt(value.entrypoint, list),
         "cmd": _opt(value.cmd, list),
     }
+    _put(out, "init", value.init)
+    _put(out, "user_name", value.user_name)
+    _put(out, "home", value.home)
+    return out
 
 
 def _enc_image_request(value: ImageRequest) -> Json:
@@ -300,6 +308,12 @@ def _enc_image_request(value: ImageRequest) -> Json:
         }
     else:
         body = {"dockerfile": source.dockerfile}
+        if source.base is not None:
+            body["base"] = {
+                "oci": source.base.oci,
+                "digest": source.base.digest,
+                "config": _enc_image_config(source.base.config),
+            }
     return {
         "source": body,
         "resources": _opt(value.resources, _enc_image_resources),
@@ -343,6 +357,7 @@ def _enc_class(value: SandboxClass) -> Json:
     _put(out, "gates", _opt(value.gates, dict))
     if value.operations:
         out["operations"] = list(value.operations)
+    _put(out, "image_binds", _opt(value.image_binds, list))
     out["images"] = [_enc_image(image) for image in value.images]
     out["prices"] = [_enc_price(price) for price in value.prices]
     return out
@@ -380,6 +395,7 @@ def _enc_limits(value: Limits) -> Json:
     _put(out, "cost_final_within_seconds", value.cost_final_within_seconds)
     _put(out, "image_context_bytes", value.image_context_bytes)
     _put(out, "account_cost_window_seconds", value.account_cost_window_seconds)
+    _put(out, "image_layout_bytes", value.image_layout_bytes)
     return out
 
 
@@ -517,19 +533,24 @@ def _dec_cost_line(data: Json) -> CostLine:
 
 def _dec_cost(data: Json) -> Cost:
     return Cost(
-        sandbox_id=data["sandbox_id"],
+        sandbox_id=data.get("sandbox_id"),
         status=data["status"],
         total_usd=_opt(data["total_usd"], _decimal),
         source=data["source"],
         lines=tuple(_dec_cost_line(line) for line in data["lines"]),
         as_of=_time(data["as_of"]),
         snapshot_id=data.get("snapshot_id"),
+        image_id=data.get("image_id"),
     )
 
 
 def _dec_image_resources(data: Json) -> ImageResources:
     return ImageResources(
-        cpu=data.get("cpu"), memory_mib=data.get("memory_mib"), disk_mib=data.get("disk_mib")
+        cpu=data.get("cpu"),
+        memory_mib=data.get("memory_mib"),
+        disk_mib=data.get("disk_mib"),
+        region=data.get("region"),
+        kernel=data.get("kernel"),
     )
 
 
@@ -540,6 +561,9 @@ def _dec_image_config(data: Json) -> ImageConfig:
         user=data.get("user"),
         entrypoint=_opt(data.get("entrypoint"), tuple),
         cmd=_opt(data.get("cmd"), tuple),
+        init=data.get("init"),
+        user_name=data.get("user_name"),
+        home=data.get("home"),
     )
 
 
@@ -556,7 +580,13 @@ def _dec_image_request(data: Json) -> ImageRequest:
             raw["private_oci"], raw["digest"], _dec_image_config(raw["config"]), credentials
         )
     else:
-        source = DockerfileSource(raw["dockerfile"])
+        base = raw.get("base")
+        source = DockerfileSource(
+            raw["dockerfile"],
+            None
+            if base is None
+            else OciSource(base["oci"], base["digest"], _dec_image_config(base["config"])),
+        )
     return ImageRequest(
         source=source,
         resources=_opt(data.get("resources"), _dec_image_resources),
@@ -600,6 +630,7 @@ def _dec_class(data: Json) -> SandboxClass:
         gates=_opt(data.get("gates"), dict),
         unavailable_regions=tuple(data.get("unavailable_regions", ())),
         operations=tuple(data.get("operations", ())),
+        image_binds=_opt(data.get("image_binds"), tuple),
     )
 
 
@@ -928,12 +959,15 @@ def from_json(cls: type[T], data: object) -> T:
 
 
 def _enc_error_body(error: SpsError) -> Json:
-    return {
+    body: Json = {
         "code": error.code,
         "message": error.message[:1024],
         "outcome": error.outcome,
         "retry_after_seconds": error.retry_after_seconds,
     }
+    _put(body, "failed_step", error.failed_step)
+    _put(body, "field", error.field)
+    return body
 
 
 def _dec_error_body(body: Mapping[str, Any]) -> SpsError:
@@ -945,6 +979,8 @@ def _dec_error_body(body: Mapping[str, Any]) -> SpsError:
         body["message"],
         outcome=outcome,
         retry_after_seconds=body.get("retry_after_seconds"),
+        failed_step=body.get("failed_step"),
+        field=body.get("field"),
     )
 
 

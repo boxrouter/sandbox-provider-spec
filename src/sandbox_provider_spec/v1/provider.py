@@ -326,6 +326,11 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     async def image_delete(self, image_id: str) -> ImageDeleteResult:
         raise self._unsupported("image.delete")
 
+    async def image_cost(self, image_id: str, *, created_at: datetime | None = None) -> Cost:
+        """What preparing the image cost (`image.cost`). `created_at` is a lookup hint only: the
+        time that the caller started the preparation."""
+        raise self._unsupported("image.cost")
+
     async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
         raise self._unsupported("terminal.open")
 

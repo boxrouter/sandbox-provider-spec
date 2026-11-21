@@ -744,6 +744,12 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     async def snapshot_delete(self, snapshot_id: str) -> SnapshotDeleteResult:
         return await self._json(SnapshotDeleteResult, "DELETE", self._snapshot_path(snapshot_id))
 
+    async def image_cost(self, image_id: str, *, created_at: datetime | None = None) -> Cost:
+        params = None if created_at is None else (("created_at", timestamp(created_at)),)
+        return await self._json(
+            Cost, "GET", f"/v1/images/{_id(image_id, 'image_id')}/cost", params=params
+        )
+
     async def snapshot_cost(self, snapshot_id: str) -> Cost:
         return await self._json(Cost, "GET", self._snapshot_path(snapshot_id, "/cost"))
 

@@ -2195,6 +2195,32 @@ tests:
         state: absent
   - op: image.delete
     target: image
+- id: images.v1.cost
+  title: A prepared image has its own cost, which is not a sandbox's, and it is final once the preparation has ended.
+  rules:
+  - provider-api/image-cost
+  proves: []
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      config:
+        env:
+          PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        cmd: [/bin/sh]
+    as: image
+  - op: image.cost
+    target: image
+    in:
+      final: true
+    expect:
+      equals:
+        status: final
+        image_matches: true
+        has_no_sandbox: true
+  - op: image.delete
+    target: image
 - id: network_lockdown.deny_all
   title: Native deny all returns no destination data from outbound connections.
   rules:

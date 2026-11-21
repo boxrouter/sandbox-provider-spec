@@ -53,20 +53,28 @@ class SpsError(Exception):
     that it may have taken effect. Caller-fault codes have outcome "failed", except
     `invalid_request`, which may be "unknown" when a streamed file upload's size differs
     from the declared size.
+
+    `failed_step` is the 1-based Dockerfile instruction whose own command failed (on
+    `image_prepare` and in `PreparedImage.error`). `field` is the request field at fault; on a
+    `create` `provider_error`, `image` means the prepared image never booted.
     """
 
     code: ErrorCode
     message: str
     outcome: Outcome
     retry_after_seconds: int | None
+    failed_step: int | None
+    field: str | None
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         code: ErrorCode,
         message: str,
         *,
         outcome: Outcome = "failed",
         retry_after_seconds: int | None = None,
+        failed_step: int | None = None,
+        field: str | None = None,
     ) -> None:
         if code not in ERROR_TABLE:
             raise ValueError(f"unknown error code: {code!r}")
@@ -76,11 +84,17 @@ class SpsError(Exception):
             raise ValueError(f"{code} is a caller fault, so its outcome is always 'failed'")
         if retry_after_seconds is not None and retry_after_seconds < 0:
             raise ValueError("retry_after_seconds cannot be negative")
+        if failed_step is not None and failed_step < 1:
+            raise ValueError("failed_step is 1-based")
+        if field is not None and not field:
+            raise ValueError("field cannot be empty")
         super().__init__(code, message)
         self.code = code
         self.message = message
         self.outcome = outcome
         self.retry_after_seconds = retry_after_seconds
+        self.failed_step = failed_step
+        self.field = field
 
     @property
     def http_status(self) -> int:

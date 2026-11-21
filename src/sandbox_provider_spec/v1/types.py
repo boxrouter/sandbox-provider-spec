@@ -36,6 +36,8 @@ PriceItem = Literal[
 PreviewAccess = Literal["public", "private"]
 PreviewCredential = Literal["link", "header"]
 PriceBasis = Literal["allocated", "used", "max_allocated_used", "fixed", "count"]
+# What a prepared image can be tied to: a size or a place (`classes[].image_binds`).
+ImageBind = Literal["cpu_min", "memory_min_mib", "disk_min_mib", "region", "kernel"]
 
 
 @dataclass(frozen=True)
@@ -164,7 +166,7 @@ class CostLine:
 
 @dataclass(frozen=True)
 class Cost:
-    sandbox_id: str
+    sandbox_id: str | None  # null only for an image's cost, which sets `image_id`
     status: Literal["accruing", "final"]
     # null while `accruing` with nothing metered yet, and always when `source` is `usage`
     total_usd: Decimal | None
@@ -172,6 +174,7 @@ class Cost:
     lines: Sequence[CostLine]
     as_of: datetime  # when the provider stated the figures
     snapshot_id: str | None = None  # set by `snapshot_cost` only
+    image_id: str | None = None  # set by `image_cost` only
 
 
 @dataclass(frozen=True)
@@ -237,6 +240,9 @@ class ImageConfig:
     user: str | None = None
     entrypoint: Sequence[str] | None = None
     cmd: Sequence[str] | None = None
+    init: bool | None = None  # the image's CMD starts a machine init as process 1
+    user_name: str | None = None  # the name of a numeric `user`, resolved from the image
+    home: str | None = None  # the home directory of `user`, resolved from the image
 
 
 @dataclass(frozen=True)
@@ -265,6 +271,7 @@ class PrivateOciSource:
 @dataclass(frozen=True)
 class DockerfileSource:
     dockerfile: str  # the text; the build context is `image_prepare`'s `context`
+    base: OciSource | None = None  # the caller's resolution of the Dockerfile's single FROM
 
 
 ImageSource = OciSource | PrivateOciSource | DockerfileSource
@@ -277,6 +284,8 @@ class ImageResources:
     cpu: float | None = None
     memory_mib: int | None = None
     disk_mib: int | None = None
+    region: str | None = None
+    kernel: str | None = None
 
 
 @dataclass(frozen=True)
@@ -489,6 +498,7 @@ class Limits:
     cost_final_within_seconds: int | None = None  # stating it offers `cost`
     image_context_bytes: int | None = None  # the largest build context `image_prepare` accepts
     account_cost_window_seconds: int | None = None  # stating it offers `account.cost`
+    image_layout_bytes: int | None = None  # largest OCI image layout of `image.prepare.oci_layout`
 
 
 @dataclass(frozen=True)
@@ -521,6 +531,9 @@ class SandboxClass:
     # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
     # `files.remove` and `files.exists`, or none (contract section 10.3); and `labels.update`.
     operations: Sequence[str] = ()
+    # What a prepared image of this class is tied to; null unless the class lists `image.prepare`.
+    # An empty list means that the image fits any size (S15).
+    image_binds: Sequence[ImageBind] | None = None
 
 
 @dataclass(frozen=True)

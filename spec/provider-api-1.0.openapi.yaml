@@ -1159,6 +1159,37 @@ paths:
         "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
+  /v1/images/{image_id}/cost:
+    parameters:
+      - {$ref: "#/components/parameters/ImageId"}
+    get:
+      operationId: image_cost
+      tags: [optional]
+      summary: What preparing the image cost
+      description: >-
+        Claimed by listing `image.cost` in `classes[].operations`, together with `image.prepare`; without it the answer is
+        `unsupported`. The lines are what the provider charged to prepare the image, for a `ready` image and for a `failed`
+        one (the work that ran before it failed is billed). `image_id` is set and `sandbox_id` is absent. The status is
+        `final` once the preparation has ended and the provider's records will not change. The cost stays readable after the
+        image is deleted, at least until it is `final`.
+      parameters:
+        - name: created_at
+          in: query
+          required: false
+          schema: {$ref: "#/components/schemas/Timestamp"}
+          description: >-
+            A lookup hint: the time the caller started the preparation. A provider whose usage records are kept by time may use
+            it to bound where it looks, must not report a cost from before it, and ignores it when it knows the time itself.
+      responses:
+        "200":
+          description: The cost so far, or the final cost.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Cost"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
         "422": {$ref: "#/components/responses/Unsupported"}
         "429": {$ref: "#/components/responses/RateLimited"}
         "500": {$ref: "#/components/responses/ProviderError"}
@@ -1473,6 +1504,19 @@ components:
           type: [integer, "null"]
           minimum: 0
           description: Set when retrying later can work; the same value goes in a `Retry-After` header.
+        failed_step:
+          type: integer
+          minimum: 1
+          description: >-
+            The 1-based Dockerfile instruction whose own command failed, so the customer's build is at fault and another
+            provider would fail the same way. Set on `image.prepare` errors and in `PreparedImage.error`.
+        field:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: >-
+            The request field at fault, for example `image`. On a `create` that answers `provider_error`, `image` means that the
+            prepared image never booted.
     ErrorResponse:
       type: object
       required: [error]
@@ -1604,6 +1648,12 @@ components:
           minimum: 1
           description: >-
             Offers `account.cost`. The longest window, in seconds, that `account.cost` answers. The spec sets no ceiling.
+        image_layout_bytes:
+          type: integer
+          minimum: 1
+          description: >-
+            The largest OCI image layout, in bytes, that a class listing `image.prepare.oci_layout` accepts in the `context`
+            part. Required when a class lists it.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -1620,6 +1670,11 @@ components:
         A wholesale different kind of sandbox, such as a container or a microVM. A declaration's `evidence` and `verified`
         fields are left out: proof comes from the tester's report, not from the provider's own document.
       required: [id, name, ready, resources, lifetime_timer, images, prices]
+      dependentSchemas:
+        image_binds:
+          required: [operations]
+          properties:
+            operations: {contains: {const: image.prepare}}
       properties:
         id: {type: string, minLength: 1, description: "`default` for the main class; `create` names a class by this id."}
         name: {type: string, minLength: 1, description: "The display name."}
@@ -1656,6 +1711,8 @@ components:
               - image.list
               - image.delete
               - labels.update
+              - image.prepare.oci_layout
+              - image.cost
           allOf:
             - if: {contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}}
               then:
@@ -1671,12 +1728,17 @@ components:
                   - {contains: {const: image.get}}
                   - {contains: {const: image.list}}
                   - {contains: {const: image.delete}}
+            - if: {contains: {enum: [image.prepare.oci_layout, image.cost]}}
+              then: {contains: {const: image.prepare}}
           default: []
           description: >-
             Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
             listed all four or none, and so are the image operations `image.prepare`, `image.get`, `image.list` and
             `image.delete` (the class also claims `custom_images` knob `prepared`). `run.base64` says that `run` accepts
-            `output: base64`, and `labels.update` stands alone (it is not part of either group). They turn on when the tester passes them.
+            `output: base64`, and `labels.update` stands alone (it is not part of either group). Two more need
+            `image.prepare`: `image.cost` (`GET /v1/images/{id}/cost`) and `image.prepare.oci_layout` (an OCI image arrives as
+            an image-layout tar in the `context` part, and the provider states `limits.image_layout_bytes`). They turn on when
+            the tester passes them.
         images:
           type: array
           minItems: 1
@@ -1693,9 +1755,40 @@ components:
           type: array
           items: {$ref: "#/components/schemas/Price"}
           description: What this class costs.
+        image_binds:
+          type: array
+          uniqueItems: true
+          items: {enum: [cpu_min, memory_min_mib, disk_min_mib, region, kernel]}
+          description: >-
+            What a prepared image of this class is tied to: a size (`cpu_min`, `memory_min_mib`, `disk_min_mib`), a `region` or
+            a `kernel`. Present only when `operations` lists `image.prepare`; absent or empty means that the image fits any
+            size. A `PreparedImage.resources` object holds exactly these fields and no other.
     Discovery:
       type: object
       required: [spec_version, provider, limits, classes]
+      allOf:
+        - if:
+            properties:
+              classes:
+                contains:
+                  type: object
+                  required: [operations]
+                  properties:
+                    operations: {contains: {const: image.prepare.oci_layout}}
+          then:
+            properties:
+              limits: {required: [image_layout_bytes]}
+        - if:
+            properties:
+              classes:
+                contains:
+                  type: object
+                  required: [operations]
+                  properties:
+                    operations: {contains: {const: image.cost}}
+          then:
+            properties:
+              limits: {required: [cost_final_within_seconds]}
       properties:
         spec_version:
           type: string
@@ -1876,9 +1969,15 @@ components:
           description: Opaque. Null means that this page is the last one.
     Cost:
       type: object
-      required: [sandbox_id, status, total_usd, source, lines, as_of]
+      required: [status, total_usd, source, lines, as_of]
+      anyOf:
+        - required: [sandbox_id]
+        - required: [image_id]
       properties:
-        sandbox_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        sandbox_id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: The sandbox. Absent only for an image's cost, which sets `image_id` instead.
         status:
           enum: [accruing, final]
           description: >-
@@ -1912,6 +2011,11 @@ components:
           pattern: "^[A-Za-z0-9._:-]{1,128}$"
           description: >-
             Set by `snapshot_cost` only: the snapshot whose own charges these are. `sandbox_id` is then the saved sandbox.
+        image_id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: >-
+            Set by `image_cost` only: the prepared image whose preparation these charges are. There is no `sandbox_id`.
       description: >-
         The sandbox's cost. Quantities come from the provider's own records of the sandbox, never from a clock in the consumer
         or in an adapter. "The sandbox ends" is when `get` reports it `destroyed` or it is gone.
@@ -2050,6 +2154,23 @@ components:
         cmd:
           anyOf: [{type: array, items: {type: string}, maxItems: 1024}, {type: "null"}]
           default: null
+        init:
+          type: [boolean, "null"]
+          default: null
+          description: >-
+            True when the image's CMD starts a machine init (systemd or similar) as process 1. The caller resolves it from the
+            image; the provider never reads the image to find out. Absent or null: not known.
+        user_name:
+          type: [string, "null"]
+          default: null
+          description: >-
+            The name of the numeric `user`, resolved by the caller from the image's `/etc/passwd`. Absent or null: `user` is
+            a name already, or the caller could not resolve it.
+        home:
+          anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
+          default: null
+          description: >-
+            The home directory of `user`, resolved by the caller from the image. Absent or null means that it is not known.
     ImageRequest:
       type: object
       additionalProperties: false
@@ -2088,6 +2209,17 @@ components:
               required: [dockerfile]
               properties:
                 dockerfile: {type: string, minLength: 1, maxLength: 1048576, description: "The Dockerfile text."}
+                base:
+                  type: object
+                  additionalProperties: false
+                  required: [oci, digest, config]
+                  description: >-
+                    The caller's resolution of the Dockerfile's single `FROM` image, so that the provider reaches no registry to
+                    read it. Absent when the caller did not resolve it.
+                  properties:
+                    oci: {type: string, minLength: 1, maxLength: 1024, description: "The FROM image reference."}
+                    digest: {$ref: "#/components/schemas/ImageDigest"}
+                    config: {$ref: "#/components/schemas/ImageConfig"}
         resources:
           anyOf: [{$ref: "#/components/schemas/ImageResources"}, {type: "null"}]
           default: null
@@ -2106,7 +2238,12 @@ components:
         cpu: {type: number, exclusiveMinimum: 0}
         memory_mib: {type: integer, minimum: 1}
         disk_mib: {type: integer, minimum: 1}
-      description: A size. A field that is absent is not bound.
+        region: {type: string, minLength: 1}
+        kernel: {type: string, minLength: 1}
+      description: >-
+        What a prepared image is tied to. A field that is absent is not bound. In a class's `image_binds`, `cpu_min` names
+        `cpu`, `memory_min_mib` names `memory_mib` and `disk_min_mib` names `disk_mib`; `region` and `kernel` name
+        themselves.
     PreparedImage:
       type: object
       required: [id, state, error, resources, stored_bytes, labels, created_at]

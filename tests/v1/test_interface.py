@@ -79,6 +79,7 @@ OPTIONAL = {
         "account.cost",
         (datetime(2026, 11, 13, tzinfo=UTC), datetime(2026, 11, 14, tzinfo=UTC)),
     ),
+    "image_cost": ("image.cost", ("i",)),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
 
@@ -99,7 +100,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 37
+    assert len(ids) == 38
 
 
 def test_error_table_is_the_openapi_table() -> None:

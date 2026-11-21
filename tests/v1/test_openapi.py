@@ -38,6 +38,7 @@ OPERATION_IDS = [
     "files_remove",
     "files_write",
     "get",
+    "image_cost",
     "image_delete",
     "image_get",
     "image_list",

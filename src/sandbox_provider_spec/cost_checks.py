@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import time
 from collections import Counter
+from collections.abc import Awaitable, Callable
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -38,6 +39,21 @@ def final_wait_seconds(driver: ProviderDriver, inputs: Inputs) -> float:
     if stated + _FINAL_GRACE_SECONDS > MAX_FINAL_WAIT_SECONDS:
         raise NotRun("cost_final_beyond_tester_limit")
     return stated + _FINAL_GRACE_SECONDS
+
+
+def read_cost(driver: ProviderDriver, read: Callable[[], Awaitable[Cost]], inputs: Inputs) -> Cost:
+    """Read a cost with `read`; `final: true` reads until it is final, up to the step's
+    `timeout_ms` (else what discovery states)."""
+    until_final = inputs.get("final") is True
+    window = final_wait_seconds(driver, inputs) if until_final else 0
+    deadline = time.monotonic() + window
+    while True:
+        cost = driver.wait(read())
+        if not until_final or cost.status == "final":
+            return cost
+        if time.monotonic() >= deadline:
+            raise NotRun("cost_not_final_in_window")
+        time.sleep(poll_seconds(window))
 
 
 def poll_seconds(window: float) -> float:

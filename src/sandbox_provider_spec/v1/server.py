@@ -461,6 +461,13 @@ async def _account_cost(p: Provider, r: _Request) -> Reply:
     return 200, to_json(await p.account_cost(start, end))
 
 
+async def _image_cost(p: Provider, r: _Request) -> Reply:
+    image_id = _entity(r.path_params[0], "image_id")
+    created_at = _time_param(r, "created_at")
+    r.check_query_used()
+    return 200, to_json(await p.image_cost(image_id, created_at=created_at))
+
+
 async def _files_write(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     path = _file_path(r)
@@ -758,6 +765,7 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("GET", "/v1/images", _image_list),
         ("GET", _I, _image_get),
         ("DELETE", _I, _image_delete),
+        ("GET", f"{_I}/cost", _image_cost),
         ("POST", f"{_S}/terminals", _terminal_open),
     ]
 ]

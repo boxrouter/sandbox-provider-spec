@@ -18,11 +18,17 @@ from sandbox_provider_spec.v1.multipart import (
     boundary_of,
 )
 from sandbox_provider_spec.v1.provider import Provider
-from sandbox_provider_spec.v1.types import DockerfileSource, ImageRequest, PreparedImage
+from sandbox_provider_spec.v1.types import (
+    Discovery,
+    DockerfileSource,
+    ImageRequest,
+    PreparedImage,
+)
 from sandbox_provider_spec.v1.wire import WireError, from_json
 
 MAX_REQUEST_BYTES = 1024 * 1024 + 4096  # the part `request`: a Dockerfile of 1 MiB at most
 DEFAULT_CONTEXT_BYTES = 512 * 1024 * 1024  # the floor of `limits.image_context_bytes`
+OCI_LAYOUT = "image.prepare.oci_layout"
 FRAMING_BYTES = MAX_REQUEST_BYTES + 64 * 1024  # what a body may hold beyond its context
 
 
@@ -81,11 +87,25 @@ async def _read_request(part: Part) -> ImageRequest:
         raise SpsError("invalid_request", "The part `request` does not fit its schema") from None
 
 
+def takes_layouts(discovery: Discovery) -> bool:
+    """Whether the provider lists `image.prepare.oci_layout`: then an OCI source arrives as an
+    image layout in the part `context`. `image_prepare` is not addressed to a class, so the claim
+    holds for the provider's image preparation as a whole."""
+    return any(OCI_LAYOUT in item.operations for item in discovery.classes)
+
+
 async def open_upload(
-    content_type: str | None, body: AsyncIterator[bytes], *, limit: int
+    content_type: str | None,
+    body: AsyncIterator[bytes],
+    *,
+    limit: int,
+    layout_limit: int | None = None,
 ) -> ImageUpload:
     """Read the part `request` and find the part `context`, if any; the context is not read
-    yet. Raises `SpsError` for a body that is not what `image_prepare` takes."""
+    yet. `limit` bounds a Dockerfile's build context. `layout_limit` is set only for a provider
+    that lists `image.prepare.oci_layout`: it bounds the layout of an OCI source, and that source
+    then needs the part `context`. Raises `SpsError` for a body that is not what
+    `image_prepare` takes."""
     boundary = boundary_of(content_type)
     if boundary is None:
         raise SpsError("invalid_request", "The body must be multipart/form-data with a boundary")
@@ -98,12 +118,22 @@ async def open_upload(
         second = await reader.next_part()
     except MultipartError as error:
         raise SpsError("invalid_request", str(error)) from None
+    is_oci = not isinstance(request.source, DockerfileSource)
     if second is None:
+        if is_oci and layout_limit is not None:
+            raise SpsError(
+                "invalid_request",
+                "An OCI source needs the part `context`, its image layout",
+                field="context",
+            )
         return ImageUpload(request, None, None, reader=reader)
     if second.name != "context":
         raise SpsError("invalid_request", "The only other part is `context`")
-    if not isinstance(request.source, DockerfileSource):
+    if is_oci and layout_limit is None:
         raise SpsError("invalid_request", "Only a Dockerfile source takes a build context")
+    if is_oci:
+        assert layout_limit is not None
+        limit = layout_limit
     declared = second.headers.get("content-length")
     if declared is not None and not re.fullmatch(r"[0-9]{1,18}", declared):
         raise SpsError("invalid_request", "The context's Content-Length is not a number")
@@ -144,9 +174,13 @@ async def prepare_image(
     itself (a dropped connection), which wins over whatever the provider then raised."""
     if type(provider).image_prepare is Provider.image_prepare:
         raise SpsError("unsupported", "The provider does not support image.prepare")
-    limit = (await provider.discovery()).limits.image_context_bytes or DEFAULT_CONTEXT_BYTES
-    check_declared_size(headers.get("content-length"), limit)
-    upload = await open_upload(headers.get("content-type"), body, limit=limit)
+    discovery = await provider.discovery()
+    limit = discovery.limits.image_context_bytes or DEFAULT_CONTEXT_BYTES
+    layout_limit = discovery.limits.image_layout_bytes if takes_layouts(discovery) else None
+    check_declared_size(headers.get("content-length"), max(limit, layout_limit or 0))
+    upload = await open_upload(
+        headers.get("content-type"), body, limit=limit, layout_limit=layout_limit
+    )
     try:
         image = await provider.image_prepare(
             upload.request,

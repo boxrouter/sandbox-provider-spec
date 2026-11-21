@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 from uuid import uuid4
 
+from sandbox_provider_spec import cost_checks
 from sandbox_provider_spec.driver import (
     Inputs,
     NativeFailure,
@@ -28,6 +29,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.v1.oci_layout import LayoutError, build_layout
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
     DockerfileSource,
@@ -41,6 +43,9 @@ from sandbox_provider_spec.v1.types import (
     RegistryCredentials,
 )
 from sandbox_provider_spec.v1.wire import to_json
+
+if TYPE_CHECKING:
+    from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 
 T = TypeVar("T")
 
@@ -144,6 +149,10 @@ async def _chunks(data: bytes) -> AsyncIterator[bytes]:
 class ImageSteps:
     """The image steps of `ProviderDriver`, which inherits them."""
 
+    # Whether some class lists `image.prepare.oci_layout`: the tester then reads each OCI image
+    # from its registry, as the caller would, and sends it as the part `context`.
+    oci_layout = False
+
     if TYPE_CHECKING:
         api: Provider
         run_id: str
@@ -216,6 +225,8 @@ class ImageSteps:
         if not isinstance(source, DockerfileSource) and "context" in inputs:
             raise ValueError("only a dockerfile takes a context")
         context = _tar(inputs["context"]) if "context" in inputs else None
+        if self.oci_layout and not isinstance(source, DockerfileSource):
+            context = self._layout(source)
         request = ImageRequest(
             source=source,
             resources=_resources(inputs),
@@ -246,6 +257,29 @@ class ImageSteps:
             "identity": created.id,
             "key": digest,
             "resources": None if image.resources is None else _resources_json(image.resources),
+        }
+
+    @staticmethod
+    def _layout(source: OciSource | PrivateOciSource) -> bytes:
+        """The image layout that a provider listing `image.prepare.oci_layout` is sent."""
+        if isinstance(source, PrivateOciSource):
+            raise NotRun("a_private_image_cannot_be_read_without_its_credentials")
+        try:
+            return build_layout(source.oci, source.digest)
+        except LayoutError:
+            raise NotRun("oci_layout_could_not_be_built") from None
+
+    def image_cost(self, target: object, inputs: Inputs) -> Observation:
+        """Read what preparing an image cost; `final: true` reads until final, up to `timeout_ms`
+        (else `cost_final_within_seconds`)."""
+        handle = self._image_handle(target)
+        cost = cost_checks.read_cost(
+            cast("ProviderDriver", self), lambda: self.api.image_cost(handle.id), inputs
+        )
+        return {
+            "status": cost.status,
+            "image_matches": cost.image_id == handle.id,
+            "has_no_sandbox": cost.sandbox_id is None and cost.snapshot_id is None,
         }
 
     def image_state(self, target: object, inputs: Inputs) -> Observation:

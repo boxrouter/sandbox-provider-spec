@@ -87,3 +87,14 @@ untested:
     (provider-api/cost-priced-from-discovery).
   provider-api/cost-stated-at: >-
     The time up to which a provider's figures count usage cannot be observed from outside.
+  provider-api/image-facts: >-
+    Whether a provider read the image or a registry to find a fact it was handed cannot be seen
+    from outside: the provider reaches only its own domains, and the result is the same either
+    way.
+  provider-api/error-failed-step: >-
+    Whose command failed in a build cannot be told from outside without a provider that builds the
+    Dockerfile steps of this suite's image. The wire form is checked (tests/v1/test_image_facts.py);
+    a provider that cannot tell leaves `failed_step` out.
+  provider-api/error-field: >-
+    Which request field a provider blames, and whether a prepared image never booted, cannot be
+    caused on demand. The wire form is checked (tests/v1/test_image_facts.py).

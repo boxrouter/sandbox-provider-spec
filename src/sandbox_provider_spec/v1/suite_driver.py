@@ -839,15 +839,7 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         """Read a snapshot's cost; `final: true` reads until final, up to `timeout_ms` (else
         `cost_final_within_seconds`)."""
         handle = self._snapshot_handle(target)
-        window = cost_checks.final_wait_seconds(self, inputs) if inputs.get("final") is True else 0
-        deadline = time.monotonic() + window
-        while True:
-            cost = self.wait(self.api.snapshot_cost(handle.id))
-            if inputs.get("final") is not True or cost.status == "final":
-                break
-            if time.monotonic() >= deadline:
-                raise NotRun("cost_not_final_in_window")
-            time.sleep(cost_checks.poll_seconds(window))
+        cost = cost_checks.read_cost(self, lambda: self.api.snapshot_cost(handle.id), inputs)
         return {
             "status": cost.status,
             "snapshot_matches": cost.snapshot_id == handle.id,
