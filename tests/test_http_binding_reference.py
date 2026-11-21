@@ -218,7 +218,7 @@ def test_discovery_and_all_nine_operations(harness: Harness) -> None:
     )
     assert base64.b64decode(read["data_base64"]) == data
     process = harness.start(sandbox)
-    output = harness.send(harness.output_request(process))
+    output = harness.send(harness.output_request(process, observation_timeout_ms=5000))
     assert output["frames"][0]["text"] == "ready\n"
     assert output["execution_state"] == "running" and output["exit_code"] is None
     assert harness.send(harness.request("destroy", sandbox=sandbox))["state"] == "destroyed"
@@ -567,7 +567,8 @@ def test_small_output_limit_does_not_mutate_frame_or_cursor(harness: Harness) ->
         harness.send(harness.output_request(process, limit_bytes=1), status=413)["error"]["code"]
         == "limit_exceeded"
     )
-    assert harness.send(harness.output_request(process))["frames"][0]["text"] == "ready\n"
+    ready = harness.send(harness.output_request(process, observation_timeout_ms=5000))
+    assert ready["frames"][0]["text"] == "ready\n"
 
 
 def test_failed_lookup_is_not_absence(harness: Harness) -> None:
