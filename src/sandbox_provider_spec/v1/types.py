@@ -19,6 +19,7 @@ from sandbox_provider_spec.v1.errors import SpsError
 
 SandboxState = Literal["running", "paused", "stopped", "destroyed"]
 EndState = Literal["destroyed", "paused"]
+LifetimeEnforcer = Literal["provider", "router"]
 PriceItem = Literal[
     "cpu",
     "memory",
@@ -560,6 +561,9 @@ class SandboxClass:
     prices: Sequence[Price]
     gates: Mapping[str, object] | None = None
     unavailable_regions: Sequence[str] = ()
+    # Who ends a sandbox when its lifetime runs out: the provider (the default, rule
+    # `provider-api/lifetime-enforced`) or the caller, the router, through its lease and sweeper.
+    lifetime_enforced_by: LifetimeEnforcer = "provider"
     # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
     # `files.remove` and `files.exists`, or none (contract section 10.3); and `labels.update`.
     operations: Sequence[str] = ()

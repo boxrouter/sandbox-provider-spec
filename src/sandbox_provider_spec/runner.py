@@ -723,6 +723,8 @@ class Runner:
                 ):
                     raise Unsupported(self.driver.unsupported[operation])
             operation = "prepare"
+            if reason := getattr(self.driver, "not_claimed", {}).get(test.id):
+                raise NotRun(reason)
             idle_budget = self._idle_budget(test)
             for step in test.steps:
                 if (

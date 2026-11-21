@@ -57,6 +57,7 @@ from sandbox_provider_spec.v1 import (
     SnapshotRequest,
     SpsError,
     from_json,
+    to_json,
 )
 from sandbox_provider_spec.v1 import tester as tester_module
 from sandbox_provider_spec.v1.suite_driver import RUN_LABEL, ProviderDriver
@@ -1619,3 +1620,82 @@ def test_a_class_that_does_not_claim_run_base64_has_its_test_unsupported() -> No
     assert {str(row["id"]): str(row["result"]) for row in report["tests"]} == {
         "run.base64": "unsupported"
     }
+
+
+class TimedProvider(ContractProvider, manifest=False):
+    """A provider whose timer ends a sandbox created with a 60-second lifetime, at once."""
+
+    enforced_by = "provider"
+
+    async def discovery(self) -> Discovery:
+        found = await super().discovery()
+        first = dataclasses.replace(found.classes[0], lifetime_enforced_by=self.enforced_by)  # type: ignore[arg-type]
+        return dataclasses.replace(found, classes=[first, *found.classes[1:]])
+
+    async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
+        box = await super().create(request, idempotency_key=idempotency_key)
+        if request.lifetime_seconds == 60:
+            self.boxes[box.id] = dataclasses.replace(box, state="destroyed")
+        return box
+
+
+def without_the_wait(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Run `contract.lifetime_ends` without its 60-second wait."""
+    suite = shared_suite()
+    tests = tuple(
+        dataclasses.replace(
+            test, steps=tuple(step for step in test.steps if step.get("wait_ms") != 60000)
+        )
+        if test.id == "contract.lifetime_ends"
+        else test
+        for test in suite.tests
+    )
+    monkeypatch.setattr(
+        tester_module, "shared_suite", lambda: dataclasses.replace(suite, tests=tests)
+    )
+
+
+@pytest.mark.rule("provider-api/lifetime-router-enforced")
+def test_a_router_class_skips_the_lifetime_test_as_not_claimed_and_a_provider_class_runs_it(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    without_the_wait(monkeypatch)
+    ran = run_tests(TimedProvider(), TestOptions(tests=("contract.lifetime_ends",)))
+    assert [row["result"] for row in ran["tests"]] == ["passed"]
+    assert ran.lines[0] == "contract.lifetime_ends passed"
+
+    class Routed(TimedProvider, manifest=False):
+        enforced_by = "router"
+
+        async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
+            assert request.lifetime_seconds != 60, (
+                "the lifetime check is not run for a router class"
+            )
+            return await super().create(request, idempotency_key=idempotency_key)
+
+    routed = Routed()
+    skipped = run_tests(routed, TestOptions(tests=("contract.lifetime_ends",)))
+    (row,) = skipped["tests"]
+    assert row["result"] == "not_run" and row["reason"].startswith("not_claimed: ")
+    assert skipped.lines[0] == "contract.lifetime_ends not_claimed"
+    assert skipped.all_passed  # not claimed is neither a pass nor a failure
+    jsonschema.validate(
+        json.loads(json.dumps(skipped)),
+        json.loads((ROOT / "spec" / "report-schema.json").read_text()),
+    )
+
+
+def test_the_lifetime_enforcer_round_trips_on_the_wire_and_defaults_to_the_provider() -> None:
+    discovery = example(Discovery)
+    assert discovery.classes[0].lifetime_enforced_by == "provider"
+    assert "lifetime_enforced_by" not in to_json(discovery)["classes"][0]
+    routed = dataclasses.replace(
+        discovery,
+        classes=[
+            dataclasses.replace(discovery.classes[0], lifetime_enforced_by="router"),
+            *discovery.classes[1:],
+        ],
+    )
+    wire = to_json(routed)
+    assert wire["classes"][0]["lifetime_enforced_by"] == "router"
+    assert from_json(Discovery, wire).classes[0].lifetime_enforced_by == "router"

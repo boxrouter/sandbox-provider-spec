@@ -33,9 +33,17 @@ QUICK_SKIPS = frozenset(
     }
 )
 
+# The lifetime test is not claimed by a class that states `lifetime_enforced_by: router`: the
+# router ends its sandboxes, so no timer of the provider's is there to check. It is `not_run`
+# in the report schema, with this reason, and counts for neither its section nor the run.
+LIFETIME_TEST = "contract.lifetime_ends"
+LIFETIME_NOT_CLAIMED = (
+    "not_claimed: the class states lifetime_enforced_by router, so the router ends its sandboxes"
+)
+
 # A test that cannot apply to this form of the provider says so with one of these reasons, and
 # then counts for neither its section nor the run: the Python form has no link to reuse.
-NOT_APPLICABLE = frozenset({"the Python form has no link"})
+NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED})
 
 # The tests that need an offered `cost` (contract section 10): a run leaves them out, and the
 # `cost` operation reports `unsupported`, when discovery states no `cost_final_within_seconds`.
@@ -222,6 +230,17 @@ def unsupported_operations(discovery: Discovery) -> dict[str, str]:
     return missing
 
 
+def not_claimed_tests(discovery: Discovery | None) -> dict[str, str]:
+    """The tests that a claim leaves out, each with its reason. The tests create in the `default`
+    class, so `contract.lifetime_ends` is left out when that class states `router`."""
+    if discovery is None:
+        return {}
+    default = next((item for item in discovery.classes if item.id == "default"), None)
+    if default is not None and default.lifetime_enforced_by == "router":
+        return {LIFETIME_TEST: LIFETIME_NOT_CLAIMED}
+    return {}
+
+
 def cost_offered(discovery: Discovery | None) -> bool:
     """Whether discovery states `cost_final_within_seconds`, which is how a provider offers cost."""
     return discovery is not None and discovery.limits.cost_final_within_seconds is not None
@@ -297,6 +316,11 @@ def _applies(row: Mapping[str, Any]) -> bool:
     return not (row["result"] == "not_run" and row.get("reason") in NOT_APPLICABLE)
 
 
+def _shown(row: Mapping[str, Any]) -> str:
+    """The status a summary line prints: a test that a claim leaves out reads `not_claimed`."""
+    return "not_claimed" if row.get("reason") == LIFETIME_NOT_CLAIMED else str(row["result"])
+
+
 def _worst(statuses: Sequence[str]) -> str:
     return next((status for status in SEVERITY if status in statuses), "not_run")
 
@@ -336,7 +360,7 @@ def _summary(
     cost_status: str,
     gates: Mapping[str, object],
 ) -> list[str]:
-    lines = [f"{row['id']} {row['result']}" for row in results]
+    lines = [f"{row['id']} {_shown(row)}" for row in results]
     by_operation: dict[str, list[str]] = {name: [] for name in OPERATIONS}
     by_section: dict[str, list[str]] = {name: [] for name in sorted(gates)}
     for row in results:
@@ -385,6 +409,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             }
             driver.command_fallback = set(COMMAND_FALLBACK) & set(missing)
             driver.oci_layout = OCI_LAYOUT in claimed_operations(discovery)
+            driver.not_claimed = not_claimed_tests(discovery)
         suite = select_tests(shared_suite(), discovery, options)
         # The 1 GiB transfer of `contract.files_1gib_roundtrip` is a requirement of the contract,
         # so a run allows it unless the caller says otherwise.

@@ -1746,6 +1746,13 @@ components:
         lifetime_timer:
           $ref: "declaration-schema.json#/properties/lifetime_timer"
           description: How the provider ends a sandbox when its lifetime runs out.
+        lifetime_enforced_by:
+          enum: [provider, router]
+          default: provider
+          description: >-
+            Who ends a sandbox in this class when its lifetime runs out. `provider` (the default) means the provider does, and
+            the rule `provider-api/lifetime-enforced` applies. `router` means the caller, the router, ends it through its
+            lease and sweeper; the provider still honours `destroy`, and the tester does not check the lifetime timer.
         gates:
           $ref: "declaration-schema.json#/properties/gates"
           description: The optional sections claimed, with their variants and knob values. A claim alone turns on nothing.

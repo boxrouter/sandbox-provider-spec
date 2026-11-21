@@ -64,7 +64,13 @@ creates with one key at the same time.
 - A provider **MUST** return from `create` only when the sandbox can serve `run`, `files.*` and <!-- rule: provider-api/create-returns-running -->
   `process.*`, and the result's state **MUST** then be `running`.
 - A provider **MUST** end the sandbox in the `at_end` state no later than `lifetime_seconds` after <!-- rule: provider-api/lifetime-enforced -->
-  `create` returns, even if the consumer has gone away.
+  `create` returns, even if the consumer has gone away. This applies to a class whose discovery
+  states `lifetime_enforced_by: provider` or states nothing about it.
+- A provider **MUST** still honour `destroy` at any time for a class whose discovery states <!-- rule: provider-api/lifetime-router-enforced -->
+  `lifetime_enforced_by: router`: such a class has no timer of its own, and the caller (the
+  router) ends each of its sandboxes no later than `lifetime_seconds` after `create` returns. The
+  tester does not run `contract.lifetime_ends` for it and reports it as `not_claimed` (in the
+  JSON report a `not_run` whose reason begins `not_claimed:`), never as `passed`.
 
 A provider refuses a lifetime above the class's `max_lifetime_seconds` with `unsupported`. A
 provider that cannot run a sandbox without a lifetime refuses `lifetime_seconds: null` with

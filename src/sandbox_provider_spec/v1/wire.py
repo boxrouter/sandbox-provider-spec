@@ -383,6 +383,8 @@ def _enc_class(value: SandboxClass) -> Json:
         "lifetime_timer": dict(value.lifetime_timer),
     }
     _put(out, "gates", _opt(value.gates, dict))
+    if value.lifetime_enforced_by != "provider":
+        out["lifetime_enforced_by"] = value.lifetime_enforced_by
     if value.operations:
         out["operations"] = list(value.operations)
     _put(out, "image_binds", _opt(value.image_binds, list))
@@ -671,6 +673,7 @@ def _dec_class(data: Json) -> SandboxClass:
         prices=tuple(_dec_price(price) for price in data["prices"]),
         gates=_opt(data.get("gates"), dict),
         unavailable_regions=tuple(data.get("unavailable_regions", ())),
+        lifetime_enforced_by=data.get("lifetime_enforced_by", "provider"),
         operations=tuple(data.get("operations", ())),
         image_binds=_opt(data.get("image_binds"), tuple),
     )

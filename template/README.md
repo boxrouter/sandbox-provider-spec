@@ -72,7 +72,8 @@ $ uv run --no-project --with '.[http]' --with ./template sandbox-provider-spec t
 ```
 
 A full run takes a few minutes: it moves a 1 GiB file, waits for a final cost and waits for a
-60-second lifetime to end. Add `--quick` to skip those while you iterate.
+60-second lifetime to end. Add `--quick` to skip those while you iterate. A provider with no
+timer of its own sets `lifetime_enforced_by="router"` on its class, and the tester then skips the lifetime wait.
 
 Or serve the adapter over the standard HTTP API and test it as a native provider. A served adapter
 with several credential fields takes one token: `sps1.` and the unpadded base64url encoding of a

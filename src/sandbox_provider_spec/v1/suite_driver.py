@@ -178,6 +178,8 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         self.run_id = run or uuid4().hex
         self.sdk_versions = {"sandbox-provider-spec": version("sandbox-provider-spec")}
         self.unsupported = {**NOT_IN_1_0, **(unsupported or {})}
+        # Tests that discovery leaves out of the claim, by id; the runner reports each `not_run`.
+        self.not_claimed: Mapping[str, str] = {}
         # Operations that have a command to run when discovery does not claim them. Nothing is
         # claimed until the tester has read discovery, so it starts with all of them.
         self.command_fallback: set[str] = {"files.exists"}
