@@ -354,7 +354,7 @@ GOOD_MANIFEST = {
     "name": "Example Cloud",
     "spec_version": "1.0",
     "credential_fields": [
-        {"name": "api_key", "description": "API key"},
+        {"name": "api_key", "description": "API key", "public_prefix": "ex_"},
         {
             "name": "endpoint",
             "secret": False,
@@ -378,6 +378,7 @@ def test_subclass_loads_its_manifest(tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert (impl.provider_id, impl.name, impl.spec_version) == ("example", "Example Cloud", "1.0")
     assert [f.name for f in impl.credential_fields] == ["api_key", "endpoint"]
     assert impl.credential_fields[0].secret is True
+    assert [f.public_prefix for f in impl.credential_fields] == ["ex_", None]
     assert impl.credential_fields[1].default == "https://x.example.test"
     assert impl.api_domains == ("api.example.com", ".example.net")
 
@@ -417,6 +418,10 @@ def test_a_class_in_this_test_package_has_no_manifest() -> None:
         {"spec_version": "2.0"},
         {"credential_fields": []},
         {"credential_fields": [{"name": "k", "default": "v"}]},  # a secret has no default
+        {"credential_fields": [{"name": "k", "public_prefix": "Bad"}]},  # a prefix ends in _ or -
+        {
+            "credential_fields": [{"name": "k", "secret": False, "public_prefix": "ok_"}]
+        },  # secret only
         {"api_domains": ["https://api.example.com"]},
         {"api_domains": []},
         {"surprise": 1},

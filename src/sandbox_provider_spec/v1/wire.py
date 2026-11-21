@@ -394,6 +394,8 @@ def _enc_class(value: SandboxClass) -> Json:
         out["lifetime_enforced_by"] = value.lifetime_enforced_by
     if value.ordered_sessions:
         out["ordered_sessions"] = True
+    if value.memory_totals_untrusted:
+        out["memory_totals_untrusted"] = True
     if value.operations:
         out["operations"] = list(value.operations)
     _put(out, "image_binds", _opt(value.image_binds, list))
@@ -694,6 +696,7 @@ def _dec_class(data: Json) -> SandboxClass:
         unavailable_regions=tuple(data.get("unavailable_regions", ())),
         lifetime_enforced_by=data.get("lifetime_enforced_by", "provider"),
         ordered_sessions=data.get("ordered_sessions", False),
+        memory_totals_untrusted=data.get("memory_totals_untrusted", False),
         operations=tuple(data.get("operations", ())),
         image_binds=_opt(data.get("image_binds"), tuple),
         image_labels_kept_by=data.get("image_labels_kept_by", "provider"),

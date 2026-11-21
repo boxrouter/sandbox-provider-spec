@@ -1765,6 +1765,22 @@ def test_ordered_sessions_round_trips_and_defaults_to_nothing() -> None:
     assert from_json(Discovery, wire).classes[0].ordered_sessions is True
 
 
+def test_memory_totals_untrusted_round_trips_and_defaults_to_nothing() -> None:
+    discovery = example(Discovery)
+    assert discovery.classes[0].memory_totals_untrusted is False
+    assert "memory_totals_untrusted" not in to_json(discovery)["classes"][0]
+    stated = dataclasses.replace(
+        discovery,
+        classes=[
+            dataclasses.replace(discovery.classes[0], memory_totals_untrusted=True),
+            *discovery.classes[1:],
+        ],
+    )
+    wire = to_json(stated)
+    assert wire["classes"][0]["memory_totals_untrusted"] is True
+    assert from_json(Discovery, wire).classes[0].memory_totals_untrusted is True
+
+
 @pytest.mark.rule("provider-api/discovery-within-static")
 def test_discovery_within_static_row_passes_fails_and_skips() -> None:
     row = ("contract.discovery_within_static",)

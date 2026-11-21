@@ -31,10 +31,19 @@
           "secret": {"type": "boolean", "default": true, "description": "True when the value must never be logged or returned."},
           "required": {"type": "boolean", "default": true},
           "default": {"type": "string", "description": "The value used when the consumer gives none. Only for a field that is not secret."},
-          "description": {"type": "string"}
+          "description": {"type": "string"},
+          "public_prefix": {"type": "string", "pattern": "^[a-z0-9]{2,8}[_-]$", "description": "How the values of a secret field start, such as `dtn_`. Only for a secret field."}
         },
-        "if": {"required": ["default"]},
-        "then": {"required": ["secret"], "properties": {"secret": {"const": false}}}
+        "allOf": [
+          {
+            "if": {"required": ["default"]},
+            "then": {"required": ["secret"], "properties": {"secret": {"const": false}}}
+          },
+          {
+            "if": {"required": ["public_prefix"]},
+            "then": {"properties": {"secret": {"const": true}}}
+          }
+        ]
       }
     },
     "api_domains": {

@@ -78,6 +78,11 @@ overlap: the caller records each one's outcome before it sends the next. A class
 serves them concurrently. The provider is not asked to refuse an overlap, and the tester does not
 check the property, so a provider that states it cites its evidence in its README.
 
+A class whose discovery states `memory_totals_untrusted: true` tells the caller that the memory
+total a sandbox reports about itself is not the memory it can use, so the caller takes no total
+from the sandbox. A class that states nothing has a total that is its own. The tester does not
+check it, so a provider that states it cites its evidence in its README.
+
 A provider refuses a lifetime above the class's `max_lifetime_seconds` with `unsupported`. A
 provider that cannot run a sandbox without a lifetime refuses `lifetime_seconds: null` with
 `unsupported`. A request that no size, region, image, class or section can meet is refused with
@@ -331,7 +336,8 @@ a new path (`/v2`), served beside `/v1` for a transition period.
 
 Each adapter's Python package holds `sps-provider.yaml`, with `provider_id` (`a-z 0-9 -`, 2 to 32
 characters, the entry point's name), `name`, `spec_version`, `credential_fields` (each with
-`name`, `secret` and `description`) and `api_domains`. Each `api_domains` entry is an exact host
+`name`, `secret`, `description` and, for a secret, an optional `public_prefix` such as `dtn_` that
+its values start with) and `api_domains`. Each `api_domains` entry is an exact host
 name or a suffix written with a leading dot (`.example.com`), which matches every host under it.
 The package validates the manifest against a schema when a `Provider` subclass is defined. Release
 tools, the tester and hosts read the file without importing the adapter.

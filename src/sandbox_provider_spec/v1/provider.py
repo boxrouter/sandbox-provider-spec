@@ -123,6 +123,7 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
                 required=item.get("required", True),
                 default=item.get("default"),
                 description=item.get("description", ""),
+                public_prefix=item.get("public_prefix"),
             )
             for item in data["credential_fields"]
         )

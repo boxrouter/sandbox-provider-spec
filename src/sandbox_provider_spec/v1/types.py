@@ -51,6 +51,9 @@ class CredentialField:
     required: bool = True
     default: str | None = None  # only for a field that is not secret
     description: str = ""
+    # How a secret's values start (`dtn_`, `ak-`): 2 to 8 lowercase letters or digits and `_` or
+    # `-`. A consumer checks a key against it before any call and redacts what starts with it.
+    public_prefix: str | None = None
 
 
 @dataclass(frozen=True)
@@ -607,6 +610,10 @@ class SandboxClass:
     # caller orders them (a command's outcome is recorded before the next transition, and a
     # transition's before the next command). False: the provider serves them concurrently.
     ordered_sessions: bool = False
+    # True: the memory total a sandbox of the class reports about itself is not the memory it
+    # can use (a sandbox runtime that shows the host's), so the caller does not take the total
+    # from the sandbox. False (the default): the total is the sandbox's own.
+    memory_totals_untrusted: bool = False
     # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
     # `files.remove` and `files.exists`, or none (contract section 10.3); and `labels.update`.
     operations: Sequence[str] = ()

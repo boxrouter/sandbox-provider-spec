@@ -1870,6 +1870,13 @@ components:
             sandbox of this class must not overlap: the caller records a command's outcome before it sends the next
             transition, and a transition's before the next command. False (the default) means the provider serves them
             concurrently. The provider is not asked to refuse an overlap.
+        memory_totals_untrusted:
+          type: boolean
+          default: false
+          description: >-
+            True means that the memory total a sandbox of this class reports about itself (what its own tools read) is not
+            the memory the sandbox can use, as when a sandbox runtime shows the host's total, so the caller does not take a
+            total from the sandbox. False (the default) means the total is the sandbox's own. The tester does not check it.
         gates:
           $ref: "declaration-schema.json#/properties/gates"
           description: The optional sections claimed, with their variants and knob values. A claim alone turns on nothing.
