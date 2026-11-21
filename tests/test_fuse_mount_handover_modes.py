@@ -429,11 +429,14 @@ def test_sps123_source_and_check_digest_are_unchanged() -> None:
     test = tests["fuse_mount.provider_terminal_handover"]
     assert check_digests((test,)) == {
         "fuse_mount.provider_terminal_handover": (
-            "sha256:cb5ee12e5342e8d4745009eaffce9eccd59869f33f7c0d03659b696d6678de67"
+            "sha256:b523fa24bdb25085386f72c69dd2c0eeedbe7954503e0ceead1d62fda8bd515d"
         )
     }
-    # SPS 0.5.10 (libyaml) and 0.5.32 (failed-step report fields) changed the shared digest; the
-    # digest recorded before each stands.
+    # SPS 0.5.10 (libyaml), 0.5.32 (failed-step report fields) and 0.5.41 (not_claimed tests)
+    # changed the shared digest; the digest recorded before each stands.
+    assert check_digest_stands(
+        test, "sha256:cb5ee12e5342e8d4745009eaffce9eccd59869f33f7c0d03659b696d6678de67", None
+    )
     assert check_digest_stands(
         test, "sha256:266798e569eec7bfc42bad161da340a1e981639ecc136b356239fe8f25522790", None
     )

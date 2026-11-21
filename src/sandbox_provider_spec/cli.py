@@ -303,7 +303,7 @@ def _test(args: argparse.Namespace) -> int:
                 )
                 return 1
             provider = provider_class(credentials)
-            new_client = lambda: provider_class(credentials)  # noqa: E731
+            new_client = lambda: provider_class(credentials)  # noqa: E731  # pylint: disable=unnecessary-lambda-assignment
     except ModuleNotFoundError as error:
         if error.name != "httpx":
             raise

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sandbox-provider-spec"
-version = "0.5.52"
+version = "0.5.53"
 description = "The Sandbox Provider Specification: what a sandbox provider guarantees, how it declares it, and how conformance proves it"
 readme = "README.md"
 license = "Apache-2.0"
@@ -126,6 +126,8 @@ py-version = "3.11"
 
 [tool.pylint.format]
 max-line-length = 100
+# The server and the wire codecs hold one operation's code per section, in the spec's order.
+max-module-lines = 1200
 
 [tool.pylint.messages_control]
 disable = [

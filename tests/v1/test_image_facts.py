@@ -104,7 +104,8 @@ def test_an_error_without_them_writes_neither_field() -> None:
 
 
 def test_failed_step_counts_from_one_and_field_is_not_empty() -> None:
-    for bad in ({"failed_step": 0}, {"field": ""}):
+    bad_kwargs: tuple[dict[str, Any], ...] = ({"failed_step": 0}, {"field": ""})
+    for bad in bad_kwargs:
         with pytest.raises(ValueError):
             SpsError("invalid_request", "x", **bad)
     for bad_body in ({"failed_step": 0}, {"failed_step": "2"}, {"field": ""}):
@@ -213,7 +214,7 @@ def layout_provider_fixture() -> Any:
 def laid_fixture() -> Any:
     ImageProvider.reset()
     app = create_app(LayoutProvider)
-    transport = httpx.ASGITransport(app=app)  # type: ignore[arg-type]
+    transport = httpx.ASGITransport(app=app)
     client = HttpProvider("http://localhost", "token", transport=transport)
     yield client
     asyncio.run(client.aclose())
@@ -396,7 +397,9 @@ class Imager(Provider, manifest=False):
     async def files_read(self, sandbox_id: str, path: str) -> Any:
         raise NotImplementedError
 
-    async def files_write(self, sandbox_id: str, path: str, data: Any, *, size: int) -> Any:
+    async def files_write(
+        self, sandbox_id: str, path: str, data: Any, *, size: int, user: str | None = None
+    ) -> Any:
         raise NotImplementedError
 
     async def process_start(self, sandbox_id: str, request: Any) -> Any:
@@ -671,7 +674,9 @@ def outcomes(report: Any) -> dict[str, str]:
 
 def test_the_images_cost_test_runs_only_for_a_class_that_lists_image_cost() -> None:
     suite = shared_suite()
-    plain = {t.id for t in select_tests(suite, with_operations(IMAGE_OPS), TestOptions()).tests}
+    plain = {
+        t.id for t in select_tests(suite, with_operations(tuple(IMAGE_OPS)), TestOptions()).tests
+    }
     found = asyncio.run(CostingImages().discovery())
     listed = {t.id for t in select_tests(suite, found, TestOptions()).tests}
     assert "images.v1.cost" not in plain
@@ -694,7 +699,7 @@ def test_image_cost_that_names_the_wrong_image_fails_its_test(costing: CostingIm
         cost = await original(self, image_id)
         return dataclasses.replace(cost, image_id="img-other")
 
-    CostingImages.image_cost = wrong  # type: ignore[method-assign,assignment]
+    CostingImages.image_cost = wrong  # type: ignore[method-assign]
     try:
         report = run_tests(costing, TestOptions(tests=("images.v1.cost",)))
     finally:

@@ -181,7 +181,13 @@ class LocalProvider(Provider, manifest=False):
         return FileStream(size=len(data), chunks=chunks())
 
     async def files_write(
-        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
     ) -> FileInfo:
         await self.get(sandbox_id)
         written = 0
@@ -1157,7 +1163,7 @@ def test_a_calculated_line_without_a_quantity_or_unit_differs() -> None:
     assert final_results(bare) == {"contract.cost_final": "differs"}
 
 
-def _usage(cost: Cost, **changes: object) -> Cost:
+def _usage(cost: Cost, **changes: Any) -> Cost:
     lines = [dataclasses.replace(line, amount_usd=None) for line in cost.lines]
     return dataclasses.replace(cost, source="usage", total_usd=None, lines=lines, **changes)
 
@@ -1199,7 +1205,9 @@ def test_a_reported_line_may_leave_out_its_quantity_and_unit() -> None:
 
 def test_a_calculated_amount_must_be_its_quantity_times_the_discovery_price() -> None:
     def tenfold(cost: Cost, _: int) -> Cost:
-        line = dataclasses.replace(cost.lines[0], amount_usd=cost.lines[0].amount_usd * 10)
+        amount = cost.lines[0].amount_usd
+        assert amount is not None
+        line = dataclasses.replace(cost.lines[0], amount_usd=amount * 10)
         return dataclasses.replace(cost, lines=[line], total_usd=line.amount_usd)
 
     assert final_results(tenfold) == {"contract.cost_final": "differs"}
@@ -1337,7 +1345,13 @@ class DirectoryProvider(ContractProvider, manifest=False):
         return "symlink" if stat.S_ISLNK(mode) else "other"
 
     async def files_write(
-        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
     ) -> FileInfo:
         if not Path(path).parent.is_dir():  # one of the two behaviors that the contract allows
             raise SpsError("not_found", "no parent directory")
@@ -1514,7 +1528,13 @@ def test_a_provider_that_breaks_a_directory_rule_fails_its_test(
 def test_a_write_under_a_missing_parent_may_create_or_refuse_but_nothing_else() -> None:
     class Refuses(DirectoryProvider, manifest=False):
         async def files_write(
-            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+            self,
+            sandbox_id: str,
+            path: str,
+            data: AsyncIterable[bytes],
+            *,
+            size: int,
+            user: str | None = None,
         ) -> FileInfo:
             if not Path(path).parent.exists():
                 raise SpsError("not_found", "no parent")
@@ -1522,14 +1542,26 @@ def test_a_write_under_a_missing_parent_may_create_or_refuse_but_nothing_else() 
 
     class Creates(DirectoryProvider, manifest=False):
         async def files_write(
-            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+            self,
+            sandbox_id: str,
+            path: str,
+            data: AsyncIterable[bytes],
+            *,
+            size: int,
+            user: str | None = None,
         ) -> FileInfo:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
             return await super().files_write(sandbox_id, path, data, size=size)
 
     class Half(DirectoryProvider, manifest=False):
         async def files_write(
-            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+            self,
+            sandbox_id: str,
+            path: str,
+            data: AsyncIterable[bytes],
+            *,
+            size: int,
+            user: str | None = None,
         ) -> FileInfo:
             Path(path).parent.parent.mkdir(parents=True, exist_ok=True)
             raise SpsError("not_found", "no parent")

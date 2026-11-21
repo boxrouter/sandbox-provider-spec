@@ -16,9 +16,10 @@ import json
 import re
 import tarfile
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import httpx
+if TYPE_CHECKING:  # `httpx` comes with the `http` extra; the base install never reaches it
+    import httpx
 
 MANIFEST_TYPES = (
     "application/vnd.oci.image.index.v1+json",
@@ -124,6 +125,8 @@ def build_layout(reference: str, digest: str, *, client: httpx.Client | None = N
     if not _DIGEST.fullmatch(digest):
         raise LayoutError("the digest is not sha256:<64 hex digits>")
     host, repository = split_reference(reference)
+    import httpx  # noqa: PLC0415  # pylint: disable=import-outside-toplevel,redefined-outer-name
+
     own = client is None
     http = client or httpx.Client(timeout=60.0)
     try:

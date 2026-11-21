@@ -129,7 +129,7 @@ class Recorder(Provider, manifest=False):
 
         return FileStream(size=11, chunks=chunks())
 
-    async def files_write(
+    async def files_write(  # type: ignore[override]  # an older provider: no `user`
         self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
     ) -> FileInfo:
         self._note("files_write", sandbox_id, path, size)
@@ -715,7 +715,13 @@ def test_a_directory_operation_that_the_provider_lacks_is_unsupported() -> None:
         async def run(self, sandbox_id: str, request: Any) -> Any: ...
         async def files_read(self, sandbox_id: str, path: str) -> Any: ...
         async def files_write(
-            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+            self,
+            sandbox_id: str,
+            path: str,
+            data: AsyncIterable[bytes],
+            *,
+            size: int,
+            user: str | None = None,
         ) -> Any: ...
         async def process_start(self, sandbox_id: str, request: Any) -> Any: ...
         async def process_output(
@@ -1206,7 +1212,13 @@ def test_a_real_uvicorn_server_carries_a_large_round_trip_in_chunks() -> None:
         blob = bytearray()
 
         async def files_write(
-            self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+            self,
+            sandbox_id: str,
+            path: str,
+            data: AsyncIterable[bytes],
+            *,
+            size: int,
+            user: str | None = None,
         ) -> FileInfo:
             type(self).blob = bytearray()
             async for chunk in data:

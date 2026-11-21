@@ -370,7 +370,7 @@ can supply (an image a registry serves, a URL a sandbox may reach, a size to ask
 from a **fixture**. A test whose fixture is missing is `not_run` with the reason
 `fixture_missing`, never failed; it can then not be claimed. `test` takes fixtures in two ways:
 
-```
+```text
 sandbox-provider-spec test <provider> --credential api_key=MY_KEY \
   --fixture oci_image=docker.io/library/alpine@sha256:<digest> \
   --fixture image_marker="Alpine Linux" \

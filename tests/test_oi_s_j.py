@@ -12,7 +12,7 @@ import shutil
 import stat
 import subprocess
 import threading
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -267,7 +267,7 @@ def _with_gates(gates: dict[str, object]) -> Discovery:
     )
 
 
-def _selected(discovery: Discovery, fixtures: dict[str, object] | None = None) -> set[str]:
+def _selected(discovery: Discovery, fixtures: Mapping[str, object] | None = None) -> set[str]:
     options = TestOptions(fixtures=fixtures or {})
     return {test.id for test in select_tests(shared_suite(), discovery, options).tests}
 

@@ -106,7 +106,13 @@ class Recording(Provider, manifest=False):
         raise NotImplementedError
 
     async def files_write(
-        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
     ) -> FileInfo:
         raise NotImplementedError
 
