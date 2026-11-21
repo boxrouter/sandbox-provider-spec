@@ -305,7 +305,7 @@ def test_a_named_terminal_outlives_its_connection_and_is_reached_by_its_id() -> 
     ReattachProvider.opened, ReattachProvider.named, ReattachProvider.ended = [], {}, []
     for served in serve(ReattachProvider):
 
-        async def main() -> None:
+        async def main(served: Served = served) -> None:
             provider = client(served)
             try:
                 first = await provider.terminal_open(
