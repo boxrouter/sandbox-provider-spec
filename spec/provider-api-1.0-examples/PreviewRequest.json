@@ -1,3 +1,5 @@
 {
-  "port": 3000
+  "port": 3000,
+  "access": "private",
+  "lifetime_seconds": 3600
 }

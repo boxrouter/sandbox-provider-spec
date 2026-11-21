@@ -166,6 +166,22 @@ OPERATIONS: list[tuple[str, Callable[[HttpProvider], Awaitable[Any]], str, str, 
         200,
     ),
     (
+        "preview_revoke",
+        lambda p: p.preview_revoke("sbx-17", "prv-3000-1"),
+        "DELETE",
+        "/v1/sandboxes/sbx-17/previews/prv-3000-1",
+        "EmptyObject",
+        200,
+    ),
+    (
+        "labels_update",
+        lambda p: p.labels_update("sbx-17", {"team": "a", "old": ""}),
+        "PATCH",
+        "/v1/sandboxes/sbx-17/labels",
+        "Sandbox",
+        200,
+    ),
+    (
         "tcp_link",
         lambda p: p.tcp_link("sbx-17", 5432),
         "POST",
@@ -247,7 +263,7 @@ def test_is_a_provider() -> None:
 
 def test_files_read_is_the_twenty_ninth_operation() -> None:
     # files_read returns a stream and has its own tests below; the other 28 are in OPERATIONS.
-    assert len(OPERATIONS) == 28
+    assert len(OPERATIONS) == 30
 
 
 @pytest.mark.parametrize(("name", "run", "method", "path", "body", "status"), OPERATIONS)
@@ -301,6 +317,38 @@ def test_snapshot_list_and_create_send_their_parameters() -> None:
     assert json.loads(seen[1].content) == {"keeps": "files_only", "labels": {"k": "v"}}
     with pytest.raises(SpsError):
         call(lambda p: p.snapshot_get("../x"), handler)
+
+
+def test_preview_link_sends_access_and_lifetime_only_when_set() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("PreviewLink", 200)
+
+    result = call(lambda p: p.preview_link("sbx-17", 8080), handler)
+    call(lambda p: p.preview_link("sbx-17", 8080, access="private", lifetime_seconds=60), handler)
+    assert json.loads(seen[0].content) == {"port": 8080}
+    assert json.loads(seen[1].content) == {
+        "port": 8080,
+        "access": "private",
+        "lifetime_seconds": 60,
+    }
+    assert (result.id, result.access) == ("prv-3000-1", "public")
+
+
+def test_labels_update_sends_the_labels_and_a_bad_preview_id_is_refused() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("Sandbox", 200)
+
+    call(lambda p: p.labels_update("sbx-17", {"a": "b", "gone": ""}), handler)
+    assert json.loads(seen[0].content) == {"labels": {"a": "b", "gone": ""}}
+    with pytest.raises(SpsError):
+        call(lambda p: p.preview_revoke("sbx-17", "../x"), handler)
+    assert len(seen) == 1
 
 
 def test_files_read_method_and_path() -> None:

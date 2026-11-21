@@ -39,6 +39,7 @@ from sandbox_provider_spec.v1.types import (
     OutputPage,
     PathInfo,
     PreparedImage,
+    PreviewAccess,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -627,9 +628,33 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     async def process_cancel(self, sandbox_id: str, process_id: str) -> None:
         await self._ack("POST", self._process_path(sandbox_id, process_id, "/cancel"), body={})
 
-    async def preview_link(self, sandbox_id: str, port: int) -> PreviewLink:
+    async def preview_link(
+        self,
+        sandbox_id: str,
+        port: int,
+        *,
+        access: PreviewAccess = "public",
+        lifetime_seconds: int | None = None,
+    ) -> PreviewLink:
+        body: dict[str, Any] = {"port": port}
+        if access != "public":
+            body["access"] = access
+        if lifetime_seconds is not None:
+            body["lifetime_seconds"] = lifetime_seconds
         return await self._json(
-            PreviewLink, "POST", self._sandbox_path(sandbox_id, "/previews"), body={"port": port}
+            PreviewLink, "POST", self._sandbox_path(sandbox_id, "/previews"), body=body
+        )
+
+    async def preview_revoke(self, sandbox_id: str, preview_id: str) -> None:
+        path = self._sandbox_path(sandbox_id, f"/previews/{_id(preview_id, 'preview_id')}")
+        await self._ack("DELETE", path)
+
+    async def labels_update(self, sandbox_id: str, labels: Mapping[str, str]) -> Sandbox:
+        return await self._json(
+            Sandbox,
+            "PATCH",
+            self._sandbox_path(sandbox_id, "/labels"),
+            body={"labels": dict(labels)},
         )
 
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:

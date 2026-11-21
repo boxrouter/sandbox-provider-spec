@@ -301,7 +301,7 @@ adapter, each optional method raises `unsupported` until you implement it.
 | `extendable_lifetime` | `lifetime.extend` | Lets a sandbox run longer; never shortens its lifetime |
 | `processes` with `input` | `process.write_stdin`, `process.close_stdin` | Input to a running process |
 | `processes` with `cancel` | `process.cancel` | Ends a process and its children |
-| `previews` | `preview.link` | An HTTPS URL that reaches a port in the sandbox |
+| `previews` | `preview.link`, and with `revocable` `preview.revoke` | An HTTPS URL that reaches a port in the sandbox; `preview.link` may ask for `access` (`public` or `private`) and a `lifetime_seconds`, and returns the link's `id`, `access` and `credential`; `preview.revoke` stops one link |
 | `tcp_ports` | `tcp.link` | A host and port that reach a TCP port in the sandbox |
 | `terminal` | `terminal.open` | A terminal over one WebSocket: input, output, resize and the exit status |
 | `snapshots` | `snapshot.create`, `snapshot.get`, `snapshot.list`, `snapshot.delete`, `snapshot.cost`, and `create` with `snapshot` | Save a sandbox and start new sandboxes from the save |
@@ -318,6 +318,10 @@ Each result must be the one that the equivalent commands, run as the class's def
 same moment, would give: `files.list` returns the immediate entries sorted by the bytes of their
 names and never follows a symbolic link, `files.remove` removes a link and never its target, and
 `files.exists` reports a dangling link as existing.
+
+`labels.update` is a separate operation of the same kind: list it in `operations` and the tester's
+`labels.` test runs. It sets the labels that it is given, removes those given as the empty string,
+and leaves the rest, so that a reaper or a caller can mark a sandbox after it was created.
 
 ### Prepared images
 

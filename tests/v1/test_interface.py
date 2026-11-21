@@ -48,6 +48,8 @@ OPTIONAL = {
     "process_close_stdin": ("process.close_stdin", ("s", "p")),
     "process_cancel": ("process.cancel", ("s", "p")),
     "preview_link": ("preview.link", ("s", 3000)),
+    "preview_revoke": ("preview.revoke", ("s", "p")),
+    "labels_update": ("labels.update", ("s", ())),  # the stub ignores the labels
     "tcp_link": ("tcp.link", ("s", 5432)),
     "files_list": ("files.list", ("s", "/d")),
     "files_mkdir": ("files.mkdir", ("s", "/d")),
@@ -89,10 +91,10 @@ def test_operation_ids_equal_provider_methods() -> None:
         item["operationId"]
         for methods in OPENAPI["paths"].values()
         for method, item in methods.items()
-        if method in {"get", "put", "post", "delete"}
+        if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 34
+    assert len(ids) == 36
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -129,7 +131,7 @@ def test_every_json_object_type_is_covered() -> None:
     plain = {
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
-        "PreviewRequest", "TcpLinkRequest",
+        "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest",
         "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}

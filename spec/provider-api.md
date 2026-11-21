@@ -115,7 +115,7 @@ A timeout is a result, not an error. A missing `cwd` is refused with `not_found`
 `run` and `process.start` take an optional `user`, and `files.write` an optional `user` query
 parameter. They name the operating-system user who runs the command, starts the process or
 creates the file. Null or omitted means the class's default user, and the rules of
-`user_selection` (`vocabulary.md`) say what a class that claims a knob **MUST** do. A class that
+`user_selection` (`vocabulary.md`) say what a class that claims a knob does. A class that
 does not claim the knob answers `unsupported` to a request that names a user. A user that the
 sandbox does not have is `not_found`.
 
@@ -518,3 +518,42 @@ provider's own domains.
   a `create` from the image **MUST** answer `not_found`. A repeated delete **MUST** succeed with
   state `deleted`, and an id that the provider has no record of is `not_found`. Deleting an image
   never affects a sandbox that was made from it.
+
+## 20. Preview access, lifetime and revocation
+
+`preview.link` makes an HTTPS URL that reaches one port of a sandbox. It is the section `previews`;
+this part adds two optional request fields, three optional result fields and one operation. A
+provider that does not claim them is still a valid 1.0 provider.
+
+- `preview.link` **MAY** carry `access` (`public` or `private`, default `public`) and <!-- rule: provider-api/preview-access -->
+  `lifetime_seconds`. A class **MUST** answer `unsupported` for an `access` that its `previews`
+  claim does not list. A `public` link serves any client that has the URL. A `private` link serves
+  only a request that carries the credential in the result, and **MUST NOT** serve one without it.
+- The result **MAY** carry `access` (what the link is; absent means `public`) and `credential`: <!-- rule: provider-api/preview-credential -->
+  `link` when a private link's credential is inside the URL, `header` when it is among `headers`,
+  and null for a public link. The URL and the headers are sensitive and never logged.
+- A link **MUST** stop working no later than `expires_at`, and a link made with <!-- rule: provider-api/preview-lifetime -->
+  `lifetime_seconds` **MUST** have an `expires_at` no later than that many seconds after the call
+  returns, plus the provider's own clock skew. Without `lifetime_seconds` the provider chooses the
+  lifetime, and `expires_at` is null when the link does not expire.
+- A class whose `previews` claim has `revocable: true` **MUST** return an `id` for each link and <!-- rule: provider-api/preview-revoke -->
+  answer `preview.revoke` (`DELETE /v1/sandboxes/{sandbox_id}/previews/{preview_id}`). It returns
+  once the provider has accepted the revoke; afterwards that link **MUST NOT** serve, and no other
+  link of the sandbox is affected. An id that is already revoked, expired or gone is success. A
+  sandbox that does not exist is `not_found`. A class that is not `revocable` **MAY** return a null
+  `id` and answers `unsupported`.
+
+## 21. Updating labels
+
+`labels.update` (`PATCH /v1/sandboxes/{sandbox_id}/labels`) changes a sandbox's labels after it was
+created, so that a reaper or a caller can mark it. It is not an SPS gate: a provider lists
+`labels.update` in `classes[].operations` of each class that has it, apart from the four directory
+operations, and it turns on when the tester passes it.
+
+- The body is `{"labels": {...}}`. The provider **MUST** set each key given to its value, remove <!-- rule: provider-api/labels-update -->
+  each key given with the value `""`, and leave every other label as it was. The result is the
+  sandbox with its labels, and `get` and `list` **MUST** show the new labels from then on, within
+  the time that a `list` after a `create` may take. A result that would have more than 32 labels is
+  `invalid_request`, and then no label changes. A sandbox that does not exist is `not_found`.
+- A provider **MAY** refuse to change a label that is part of the sandbox's identity, with <!-- rule: provider-api/labels-update-identity -->
+  `conflict`, and then **MUST** change none of the labels of that call.

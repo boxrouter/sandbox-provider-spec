@@ -62,7 +62,6 @@ RUN_LABEL = "sps.test.run"
 NOT_IN_1_0 = {
     "process.reattach": "SPS 1.0 has no operation to reattach to a process",
     "process.disconnect": "SPS 1.0 has no operation to disconnect from a process",
-    "preview.revoke": "SPS 1.0 has no operation to revoke a preview link",
     "terminal.disconnect": "SPS 1.0 has no operation to disconnect from a terminal",
     "terminal.reattach": "SPS 1.0 has no operation to reattach to a terminal",
 }
@@ -118,6 +117,14 @@ class ProcessHandle:  # pylint: disable=too-many-instance-attributes
     stderr_closed: bool = False
     state: str = "running"
     exit_code: int | None = None
+
+
+@dataclass
+class PreviewHandle:
+    """What a preview link keeps in memory: its sandbox and the id that revokes it."""
+
+    sandbox_id: str
+    id: str | None
 
 
 @dataclass
@@ -636,8 +643,63 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         return {"ends_at": _iso(sandbox.ends_at)}
 
     def preview_link(self, target: object, inputs: Inputs) -> Observation:
-        link = self.wait(self.api.preview_link(self._sandbox(target), number(inputs, "port", 0)))
-        return {"url": link.url, "headers": dict(link.headers), "expires_at": _iso(link.expires_at)}
+        """Make a link. `access` and `lifetime_seconds` go to the provider only when a test
+        sets them; the link is a resource, so `preview.revoke` can name it and a run revokes
+        what it made."""
+        sandbox_id = self._sandbox(target)
+        options: dict[str, Any] = {}
+        access = inputs.get("access")
+        if access is not None:
+            if access not in ("public", "private"):
+                raise ValueError("access must be public or private")
+            options["access"] = access
+        if "lifetime_seconds" in inputs:
+            options["lifetime_seconds"] = number(inputs, "lifetime_seconds", 0)
+        link = self.wait(self.api.preview_link(sandbox_id, number(inputs, "port", 0), **options))
+        handle = PreviewHandle(sandbox_id, link.id)
+        owned = self.own("preview", handle, lambda: self._revoke_preview(handle))
+        return {
+            "resource": owned,
+            "url": link.url,
+            "headers": dict(link.headers),
+            "expires_at": _iso(link.expires_at),
+            "access": link.access,
+            "credential": link.credential,
+        }
+
+    def _revoke_preview(self, handle: PreviewHandle) -> Observation:
+        """Cleanup for a link: nothing to do when it has no id, and a link that is already
+        gone (or whose sandbox is) counts as revoked."""
+        if handle.id is not None:
+            try:
+                self.wait(self.api.preview_revoke(handle.sandbox_id, handle.id))
+            except NativeFailure as error:
+                if error.code != "not_found":
+                    raise
+            except Unsupported:
+                pass  # a link that cannot be revoked ends with its sandbox
+        return {"result": "deleted"}
+
+    def preview_revoke(self, target: object, inputs: Inputs) -> Observation:
+        """Revoke the link and wait for nothing: the test probes the URL itself."""
+        del inputs
+        handle = resource(target).native
+        if not isinstance(handle, PreviewHandle):
+            raise ValueError("operation requires a preview link")
+        if handle.id is None:
+            raise Unsupported("the provider returned no id for this link, so it cannot be revoked")
+        self.wait(self.api.preview_revoke(handle.sandbox_id, handle.id))
+        return {}
+
+    def labels_update(self, target: object, inputs: Inputs) -> Observation:
+        """Set and remove labels, and report what the sandbox now carries (not the run's own)."""
+        sandbox = self.wait(
+            self.api.labels_update(self._sandbox(target), strings(inputs, "labels"))
+        )
+        labels = dict(sandbox.labels)
+        if labels.get(RUN_LABEL) == self.run_id:
+            del labels[RUN_LABEL]
+        return {"labels": labels}
 
     def tcp_link(self, target: object, inputs: Inputs) -> Observation:
         link = self.wait(self.api.tcp_link(self._sandbox(target), number(inputs, "port", 0)))

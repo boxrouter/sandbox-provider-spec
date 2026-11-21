@@ -172,6 +172,38 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/labels:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    patch:
+      operationId: labels_update
+      tags: [optional]
+      summary: Set and remove labels of a sandbox
+      description: >-
+        Listed as `labels.update` in `classes[].operations`. Each key in `labels` is set to its value, and an empty
+        string removes the key; keys that are not named stay as they are. The result has at most 32 labels. A provider may
+        refuse to change a label that is part of the sandbox's identity with `conflict`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/LabelsUpdateRequest"}
+      responses:
+        "200":
+          description: The sandbox with its new labels.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Sandbox"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
   /v1/sandboxes/{sandbox_id}/run:
     parameters:
       - {$ref: "#/components/parameters/SandboxId"}
@@ -709,6 +741,8 @@ paths:
       summary: An HTTPS URL that reaches a port of the sandbox
       description: >-
         Section `previews`. The knobs (`access`, `websocket`, and the others) are claimed in discovery and named at create.
+        `access` and `lifetime_seconds` are optional: a link is `public` and has the provider's own lifetime when they are
+        absent. A class that does not claim the `access` value that is asked for answers `unsupported`.
       requestBody:
         required: true
         content:
@@ -720,6 +754,33 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/PreviewLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/previews/{preview_id}:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/PreviewId"}
+    delete:
+      operationId: preview_revoke
+      tags: [optional]
+      summary: Revoke a preview link
+      description: >-
+        Section `previews` with the knob `revocable`. Returns once the provider has accepted it; afterwards the link no
+        longer serves. An id that is already revoked, expired or gone succeeds. The `id` is the one that `preview_link` returned.
+      responses:
+        "200":
+          description: The revoke was accepted.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
         "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
@@ -1145,6 +1206,12 @@ components:
       required: true
       description: The sandbox id that the provider chose.
       schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    PreviewId:
+      name: preview_id
+      in: path
+      required: true
+      description: The preview id that `preview_link` returned.
+      schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
     SnapshotId:
       name: snapshot_id
       in: path
@@ -1534,6 +1601,7 @@ components:
               - image.get
               - image.list
               - image.delete
+              - labels.update
           allOf:
             - if: {contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}}
               then:
@@ -1554,7 +1622,7 @@ components:
             Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
             listed all four or none, and so are the image operations `image.prepare`, `image.get`, `image.list` and
             `image.delete` (the class also claims `custom_images` knob `prepared`). `run.base64` says that `run` accepts
-            `output: base64`. They turn on when the tester passes them.
+            `output: base64`, and `labels.update` stands alone (it is not part of either group). They turn on when the tester passes them.
         images:
           type: array
           minItems: 1
@@ -2136,6 +2204,14 @@ components:
       required: [port]
       properties:
         port: {$ref: "#/components/schemas/Port"}
+        access:
+          enum: [public, private]
+          default: public
+          description: "`public`: anyone with the URL reaches the port. `private`: the request must carry the link's credential."
+        lifetime_seconds:
+          type: [integer, "null"]
+          minimum: 1
+          description: "The link stops working this many seconds after it is made. Null or absent: the provider's own lifetime."
     PreviewLink:
       type: object
       required: [url, headers, expires_at]
@@ -2145,6 +2221,29 @@ components:
         expires_at:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
           description: When the link stops working; null when it does not expire.
+        id:
+          type: [string, "null"]
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: "Names the link for `preview_revoke`; null when the class cannot revoke a link."
+        access:
+          enum: [public, private]
+          description: "What the link is. Absent means `public`."
+        credential:
+          enum: [link, header, null]
+          description: >-
+            Where a private link's credential travels: `link` inside the URL, `header` in `headers`. Null for a public link
+            and when absent.
+    LabelsUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [labels]
+      properties:
+        labels:
+          type: object
+          maxProperties: 32
+          propertyNames: {pattern: "^[A-Za-z0-9_./-]{1,63}$"}
+          additionalProperties: {type: string, maxLength: 255}
+          description: "Each key is set to its value; an empty string removes the key. At most 32 entries."
     TcpLinkRequest:
       type: object
       additionalProperties: false

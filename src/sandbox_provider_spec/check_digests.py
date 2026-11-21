@@ -157,6 +157,7 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "files.list": ("v1/suite_driver.py",),
     "files.mkdir": ("v1/suite_driver.py",),
     "files.remove": ("v1/suite_driver.py",),
+    "labels.update": ("v1/suite_driver.py",),
     "fixture.files_write_missing_parent": ("v1/suite_driver.py",),
     "image.delete_again": ("v1/suite_driver_images.py",),
     "image.list": ("v1/suite_driver_images.py",),

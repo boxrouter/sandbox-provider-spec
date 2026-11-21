@@ -2440,6 +2440,7 @@ tests:
   title: A public preview serves only the appropriate client.
   rules:
   - previews/public-serves-anyone
+  - provider-api/preview-access
   proves:
   - gate: previews
     knob: access
@@ -2493,6 +2494,7 @@ tests:
   title: A private preview serves only the appropriate client.
   rules:
   - previews/private-needs-credential
+  - provider-api/preview-access
   proves:
   - gate: previews
     knob: access
@@ -2553,6 +2555,7 @@ tests:
   title: Private previews authenticate with a scoped link credential.
   rules:
   - previews/credential-link
+  - provider-api/preview-credential
   proves:
   - gate: previews
     knob: credential
@@ -2613,6 +2616,7 @@ tests:
   title: Private previews authenticate with a scoped header credential.
   rules:
   - previews/credential-header
+  - provider-api/preview-credential
   proves:
   - gate: previews
     knob: credential
@@ -2673,6 +2677,7 @@ tests:
   title: A preview credential is individually revocable.
   rules:
   - previews/revocable
+  - provider-api/preview-revoke
   proves:
   - gate: previews
     knob: revocable
@@ -2834,6 +2839,7 @@ tests:
   title: An issued preview remains usable for the requested bounded lifetime.
   rules:
   - previews/link-lifetime
+  - provider-api/preview-lifetime
   proves:
   - gate: previews
     knob: link_lifetime_seconds
@@ -5586,3 +5592,54 @@ tests:
   rules:
   - provider-api/files-write-parents
   proves: []
+- id: labels.update
+  title: Updating labels sets the given keys, removes the keys given as an empty string, and leaves the others.
+  rules:
+  - provider-api/labels-update
+  proves: []
+  steps:
+  - op: create
+    in:
+      labels:
+        sps.keep: one
+        sps.change: before
+        sps.drop: gone
+    as: box
+  - op: labels.update
+    target: box
+    in:
+      labels:
+        sps.change: after
+        sps.drop: ''
+        sps.add: new
+    expect:
+      equals:
+        labels:
+          sps.keep: one
+          sps.change: after
+          sps.add: new
+  - op: get
+    target: box
+    expect:
+      equals:
+        labels:
+          sps.keep: one
+          sps.change: after
+          sps.add: new
+  - op: list
+    in:
+      labels:
+        sps.change: after
+        sps.add: new
+    expect:
+      equals:
+        count: 1
+      eventually_ms: 10000
+  - op: list
+    in:
+      labels:
+        sps.change: before
+    expect:
+      equals:
+        count: 0
+      eventually_ms: 10000

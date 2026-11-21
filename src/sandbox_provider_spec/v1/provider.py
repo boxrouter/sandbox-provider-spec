@@ -33,6 +33,7 @@ from sandbox_provider_spec.v1.types import (
     OutputPage,
     PathInfo,
     PreparedImage,
+    PreviewAccess,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -225,8 +226,27 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     async def process_cancel(self, sandbox_id: str, process_id: str) -> None:
         raise self._unsupported("process.cancel")
 
-    async def preview_link(self, sandbox_id: str, port: int) -> PreviewLink:
+    async def preview_link(
+        self,
+        sandbox_id: str,
+        port: int,
+        *,
+        access: PreviewAccess = "public",
+        lifetime_seconds: int | None = None,
+    ) -> PreviewLink:
+        """A provider written before `access` and `lifetime_seconds` may keep the shorter
+        signature `(sandbox_id, port)`: the server passes the two only when a caller sets them."""
         raise self._unsupported("preview.link")
+
+    async def preview_revoke(self, sandbox_id: str, preview_id: str) -> None:
+        """Stop the link that `preview_link` returned under this `id` from serving. An id that is
+        already revoked, expired or gone succeeds."""
+        raise self._unsupported("preview.revoke")
+
+    async def labels_update(self, sandbox_id: str, labels: Mapping[str, str]) -> Sandbox:
+        """Set each given label; an empty value removes the key. Returns the sandbox. A provider
+        may refuse a label that is part of the sandbox's identity with `conflict`."""
+        raise self._unsupported("labels.update")
 
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:
         raise self._unsupported("tcp.link")

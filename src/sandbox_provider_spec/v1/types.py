@@ -33,6 +33,8 @@ PriceItem = Literal[
     "request",
     "feature",
 ]
+PreviewAccess = Literal["public", "private"]
+PreviewCredential = Literal["link", "header"]
 PriceBasis = Literal["allocated", "used", "max_allocated_used", "fixed", "count"]
 
 
@@ -341,6 +343,9 @@ class PreviewLink:
     url: str  # sensitive: never log it
     headers: Mapping[str, str]
     expires_at: datetime | None
+    id: str | None = None  # names the link for `preview_revoke`; None when it cannot be revoked
+    access: PreviewAccess = "public"
+    credential: PreviewCredential | None = None  # where a private link's credential travels
 
 
 @dataclass(frozen=True)
@@ -452,7 +457,7 @@ class SandboxClass:
     gates: Mapping[str, object] | None = None
     unavailable_regions: Sequence[str] = ()
     # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
-    # `files.remove` and `files.exists`, or none (contract section 10.3).
+    # `files.remove` and `files.exists`, or none (contract section 10.3); and `labels.update`.
     operations: Sequence[str] = ()
 
 

@@ -30,6 +30,7 @@ from sandbox_provider_spec.v1 import (
     FileStream,
     OutputPage,
     PathInfo,
+    PreviewAccess,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -174,9 +175,23 @@ class Recorder(Provider, manifest=False):
     async def process_cancel(self, sandbox_id: str, process_id: str) -> None:
         self._note("process_cancel", sandbox_id, process_id)
 
-    async def preview_link(self, sandbox_id: str, port: int) -> PreviewLink:
-        self._note("preview_link", sandbox_id, port)
+    async def preview_link(
+        self,
+        sandbox_id: str,
+        port: int,
+        *,
+        access: PreviewAccess = "public",
+        lifetime_seconds: int | None = None,
+    ) -> PreviewLink:
+        self._note("preview_link", sandbox_id, port, access, lifetime_seconds)
         return example(PreviewLink)
+
+    async def preview_revoke(self, sandbox_id: str, preview_id: str) -> None:
+        self._note("preview_revoke", sandbox_id, preview_id)
+
+    async def labels_update(self, sandbox_id: str, labels: Mapping[str, str]) -> Sandbox:
+        self._note("labels_update", sandbox_id, dict(labels))
+        return example(Sandbox)
 
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:
         self._note("tcp_link", sandbox_id, port)
@@ -397,6 +412,14 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
         request_json("PreviewRequest"),
         "preview_link",
     ),
+    ("preview_revoke", "DELETE", "/v1/sandboxes/sbx-1/previews/prv-1", None, "preview_revoke"),
+    (
+        "labels_update",
+        "PATCH",
+        "/v1/sandboxes/sbx-1/labels",
+        request_json("LabelsUpdateRequest"),
+        "labels_update",
+    ),
     (
         "tcp_link",
         "POST",
@@ -436,7 +459,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
 
 
 def test_the_route_table_covers_all_operations() -> None:
-    assert len({operation for operation, *_ in ROUTES}) == 29
+    assert len({operation for operation, *_ in ROUTES}) == 31
 
 
 @pytest.mark.parametrize(("operation", "method", "path", "body", "called"), ROUTES)
@@ -456,6 +479,67 @@ def test_each_route_reaches_its_method(
         assert reply.headers["content-length"] == "11"
     else:
         assert isinstance(reply.json(), dict)
+
+
+def test_a_preview_request_passes_access_and_lifetime_only_when_they_are_set() -> None:
+    app = create_app(Recorder)
+    path = "/v1/sandboxes/sbx-1/previews"
+    asyncio.run(call(app, "POST", path, body=j({"port": 3000})))
+    asyncio.run(
+        call(app, "POST", path, body=j({"port": 3000, "access": "private", "lifetime_seconds": 60}))
+    )
+    assert Recorder.calls == [
+        ("preview_link", ("sbx-1", 3000, "public", None)),
+        ("preview_link", ("sbx-1", 3000, "private", 60)),
+    ]
+
+
+def test_a_provider_with_the_short_preview_signature_still_serves_a_plain_request() -> None:
+    class Short(Recorder, manifest=False):
+        async def preview_link(  # type: ignore[override]  # pylint: disable=arguments-differ
+            self, sandbox_id: str, port: int
+        ) -> PreviewLink:
+            self._note("preview_link", sandbox_id, port)
+            return example(PreviewLink)
+
+    app = create_app(Short)
+    reply = asyncio.run(call(app, "POST", "/v1/sandboxes/sbx-1/previews", body=j({"port": 3000})))
+    assert reply.status == 200
+    assert reply.json()["access"] == "public"
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"port": 3000, "access": "secret"},
+        {"port": 3000, "lifetime_seconds": 0},
+    ],
+)
+def test_a_preview_request_with_a_bad_access_or_lifetime_is_refused(body: dict[str, Any]) -> None:
+    app = create_app(Recorder)
+    reply = asyncio.run(call(app, "POST", "/v1/sandboxes/sbx-1/previews", body=j(body)))
+    assert reply.status == 400 and Recorder.calls == []
+
+
+def test_labels_update_passes_the_labels_and_refuses_bad_ones() -> None:
+    app = create_app(Recorder)
+    path = "/v1/sandboxes/sbx-1/labels"
+    reply = asyncio.run(call(app, "PATCH", path, body=j({"labels": {"a": "b", "gone": ""}})))
+    assert reply.status == 200
+    assert Recorder.calls == [("labels_update", ("sbx-1", {"a": "b", "gone": ""}))]
+    Recorder.calls.clear()
+    for bad in ({}, {"labels": {"bad key": "x"}}, {"labels": {"a": "x" * 256}}, {"labels": 1}):
+        refused = asyncio.run(call(app, "PATCH", path, body=j(bad)))
+        assert refused.status == 400
+    too_many = {f"k{i}": "v" for i in range(33)}
+    assert asyncio.run(call(app, "PATCH", path, body=j({"labels": too_many}))).status == 400
+    assert Recorder.calls == []
+
+
+def test_a_preview_revoke_of_a_bad_id_is_refused() -> None:
+    app = create_app(Recorder)
+    reply = asyncio.run(call(app, "DELETE", "/v1/sandboxes/sbx-1/previews/a%20b"))
+    assert reply.status == 400 and Recorder.calls == []
 
 
 def test_arguments_arrive_as_typed_values() -> None:

@@ -554,7 +554,26 @@ async def _cancel(p: Provider, r: _Request) -> Reply:
 async def _preview(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     body = await r.json_body("PreviewRequest")
-    return 200, to_json(await p.preview_link(sandbox_id, body["port"]))
+    # `access` and `lifetime_seconds` reach the provider only when the caller set them, so a
+    # provider with the shorter signature keeps working.
+    options = {
+        key: body[key] for key in ("access", "lifetime_seconds") if body.get(key) is not None
+    }
+    return 200, to_json(await p.preview_link(sandbox_id, body["port"], **options))
+
+
+async def _preview_revoke(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    preview_id = _entity(r.path_params[1], "preview_id")
+    r.check_query_used()
+    await p.preview_revoke(sandbox_id, preview_id)
+    return 200, {}
+
+
+async def _labels_update(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    body = await r.json_body("LabelsUpdateRequest")
+    return 200, to_json(await p.labels_update(sandbox_id, body["labels"]))
 
 
 async def _tcp(p: Provider, r: _Request) -> Reply:
@@ -692,6 +711,8 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("DELETE", f"{_P}/stdin", _close_stdin),
         ("POST", f"{_P}/cancel", _cancel),
         ("POST", f"{_S}/previews", _preview),
+        ("DELETE", f"{_S}/previews/{_ID}", _preview_revoke),
+        ("PATCH", f"{_S}/labels", _labels_update),
         ("POST", f"{_S}/tcp-links", _tcp),
         ("POST", f"{_S}/snapshots", _snapshot_create),
         ("GET", "/v1/snapshots", _snapshot_list),
