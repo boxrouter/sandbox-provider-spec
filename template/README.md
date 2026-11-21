@@ -19,7 +19,7 @@ in `pyproject.toml`. Set the provider entry-point key there and `provider_id` in
 `src/<package>/sps-provider.yaml` to the same id, and set the display name in that manifest.
 Discovery reads its provider id and name from the manifest. Replace each Example Cloud call
 with your own API's. An adapter contributed to
-[sandbox-providers](https://github.com/boxrouter/sandbox-providers) carries that
+[sandbox-provider-adapters](https://github.com/boxrouter/sandbox-provider-adapters) carries that
 repository's licence, the PolyForm Shield License 1.0.0: set `license = "LicenseRef-PolyForm-Shield-1.0.0"`
 in `pyproject.toml` (that repository's `providers/example/` has it already). A provider keeps
 ownership of its adapter and may use it anywhere.
