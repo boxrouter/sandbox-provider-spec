@@ -358,16 +358,16 @@ def _resolved(test: Test, value: object, fixtures: Mapping[str, object]) -> obje
     return value
 
 
-def _implied_access(test: Test) -> str | None:
-    """The preview access that the test's own create step asks for, when it names one."""
+def _implied(test: Test, knob: str, allowed: tuple[str, ...]) -> str | None:
+    """The preview `knob` value that the test's own create step asks for, when it names one."""
     for step in test.steps:
         if step.get("op") != "create":
             continue
         requirements = (step.get("in") or {}).get("requirements")
         previews = requirements.get("previews") if isinstance(requirements, dict) else None
-        access = previews.get("access") if isinstance(previews, dict) else None
-        if access in ("public", "private"):
-            return str(access)
+        value = previews.get(knob) if isinstance(previews, dict) else None
+        if value in allowed:
+            return str(value)
     return None
 
 
@@ -390,7 +390,8 @@ def _consistent(
             knobs.setdefault(gate, []).append(
                 (str(proof["knob"]), _resolved(test, proof["value"], known))
             )
-    access = _implied_access(test) if "previews" in knobs else None
+    access = _implied(test, "access", ("public", "private"))
+    credential = _implied(test, "credential", ("link", "header"))
 
     def holds(variant: Mapping[str, object], knob: str, value: object) -> bool:
         claimed = variant.get(knob)
@@ -398,15 +399,23 @@ def _consistent(
             return False
         return claimed == value or (isinstance(claimed, list) and value in claimed)
 
-    def offers(variant: Mapping[str, object]) -> bool:
-        listed = variant.get("access")
+    def listed_or_open(variant: Mapping[str, object], knob: str, wanted: str | None) -> bool:
+        listed = variant.get(knob)
         return (
-            access is None
+            wanted is None
             or listed is None
-            or listed == access
-            or (isinstance(listed, list) and access in listed)
+            or listed == wanted
+            or (isinstance(listed, list) and wanted in listed)
         )
 
+    def offers(variant: Mapping[str, object]) -> bool:
+        return listed_or_open(variant, "access", access) and listed_or_open(
+            variant, "credential", credential
+        )
+
+    if (access or credential) and "previews" in gates and "previews" not in knobs:
+        # A test that proves no preview knob still needs a variant for the link it asks for.
+        knobs["previews"] = []
     return all(
         any(
             all(holds(variant, knob, value) for knob, value in wanted)

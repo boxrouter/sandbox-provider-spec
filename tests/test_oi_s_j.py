@@ -23,6 +23,7 @@ from sandbox_provider_spec.proofs import proof_fixtures
 from sandbox_provider_spec.runner import http
 from sandbox_provider_spec.suite import Test as Scenario
 from sandbox_provider_spec.v1 import Discovery, SandboxClass, from_json
+from sandbox_provider_spec.v1.suite_driver import _without_credential
 from sandbox_provider_spec.v1.tester import (
     LIFETIME_NOT_CLAIMED,
     LIFETIME_TEST,
@@ -299,3 +300,26 @@ def test_a_preview_test_runs_for_the_access_level_whose_revocability_is_claimed(
     assert "previews.revocable.true.public" not in chosen  # the public link is not
     private_false = _with_gates({"previews": [{"access": ["private"], "revocable": False}]})
     assert "previews.revocable.false" in _selected(private_false)
+
+
+def test_a_preview_test_needs_a_variant_that_offers_the_credential_it_asks_for() -> None:
+    link_only = _with_gates({"previews": [{"access": ["private"], "credential": "link"}]})
+    chosen = _selected(link_only)
+    assert "previews.credential.link" in chosen
+    assert "previews.credential.header" not in chosen
+    assert "previews.credential_scope" not in chosen  # it creates a header-credential link
+    header = _with_gates({"previews": [{"access": ["private"], "credential": "header"}]})
+    assert "previews.credential_scope" in _selected(header)
+
+
+def test_the_control_url_of_a_link_credential_in_the_host_spoils_the_token() -> None:
+    token = "a1b2c3d4e5f6g7h8i9j0k1l2"
+    assert (
+        _without_credential(f"https://3000-{token}.proxy.example.test/", "link")
+        == "https://3000-" + "x" * len(token) + ".proxy.example.test/"
+    )
+    assert _without_credential("https://h.test/p?token=abc#frag", "link") == "https://h.test/p"
+    assert _without_credential(f"https://h.test/{token}/x", "link") == (
+        "https://h.test/" + "x" * len(token) + "/x"
+    )
+    assert _without_credential("https://h.test/p", "header") == "https://h.test/p"

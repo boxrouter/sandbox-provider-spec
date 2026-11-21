@@ -13,6 +13,7 @@ import asyncio
 import base64
 import builtins
 import contextlib
+import re
 import threading
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
@@ -1010,7 +1011,16 @@ def _without_credential(url: str, credential: str | None) -> str:
     is not in the URL; a `link` credential (or none reported) is in the query or fragment."""
     if credential == "header":
         return url
-    return urlunsplit(urlsplit(url)._replace(query="", fragment=""))
+    parts = urlsplit(url)
+    plain = urlunsplit(parts._replace(query="", fragment=""))
+    if plain != url or credential != "link":
+        return plain
+    # The credential is in the host or the path: spoil its longest run of letters and digits.
+    runs = re.findall(r"[A-Za-z0-9]{16,}", f"{parts.netloc}{parts.path}")
+    if not runs:
+        return plain
+    token = max(runs, key=len)
+    return url.replace(token, "x" * len(token), 1)
 
 
 def _size(size: Any) -> dict[str, object]:
