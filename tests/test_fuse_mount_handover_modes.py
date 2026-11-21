@@ -429,7 +429,7 @@ def test_sps123_source_and_check_digest_are_unchanged() -> None:
     test = tests["fuse_mount.provider_terminal_handover"]
     assert check_digests((test,)) == {
         "fuse_mount.provider_terminal_handover": (
-            "sha256:b523fa24bdb25085386f72c69dd2c0eeedbe7954503e0ceead1d62fda8bd515d"
+            "sha256:4e62fb1056342e9e7b80eebf1989c6c138d41ccb385f4abfed3f11a1e9576d40"
         )
     }
     # SPS 0.5.10 (libyaml), 0.5.32 (failed-step report fields) and 0.5.41 (not_claimed tests)
@@ -442,6 +442,13 @@ def test_sps123_source_and_check_digest_are_unchanged() -> None:
     )
     assert check_digest_stands(
         test, "sha256:bad431fde9cac10cfd9cdff1ddee2f72d990d720eb73a8b953ac03467de93df5", None
+    )
+    # SPS 0.5.52 and 0.5.54 (runner.py derived values and `dockerfile_from`) moved it twice more.
+    assert check_digest_stands(
+        test, "sha256:224abb346b1056e49790d9844ecdbe4ed8bcd37d35e2a4c7eef7742d819d2b17", None
+    )
+    assert check_digest_stands(
+        test, "sha256:e672c733497daf058ac9238d3beaf2e16682a255074a380383dbdbf94d25744d", None
     )
 
 

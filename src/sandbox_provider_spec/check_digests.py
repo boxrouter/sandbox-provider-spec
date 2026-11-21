@@ -173,7 +173,7 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
 }
 
 # Fixture files that no step executes: deployment assets for the hosted endpoints.
-NON_EXECUTION_FIXTURES = ("endpoints/", "endpoints-worker/")
+NON_EXECUTION_FIXTURES = ("endpoints/", "endpoints-worker/", "runner-images.yaml")
 
 _IMPORT = re.compile(r"sandbox_provider_spec(?:\.(\w+))?")
 _FIXTURE = re.compile(r"fixtures/([\w.-]+)")

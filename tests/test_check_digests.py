@@ -576,23 +576,34 @@ def test_refusals_match_the_strict_loader(monkeypatch: pytest.MonkeyPatch, tmp_p
 SHARED_BEFORE_0_5_10 = "sha256:857eed51f2b715399c2b8e69a6b61303ff7e8e17f1e39a5fcf858434d12fae6e"
 SHARED_BEFORE_0_5_32 = "sha256:3c9d42eeab273f1fe8e0681634feec609eedbdd1bef541c579173a46952c7116"
 SHARED_BEFORE_0_5_41 = "sha256:b4b8c5b47aec5d1ffd2e44cd7029fa8c13cd77b519a3f152fb1b0145d936e6e0"
+SHARED_BEFORE_0_5_52 = "sha256:b5ef01c3193a64dcd56431ea3d707c550b7390d1bd3f37f1cd9f08a03f6f8d93"
+SHARED_BEFORE_0_5_54 = "sha256:c094f7dd75cebd1c7c22fc18a057a31ef31ff756ea1afed10ea7efd64cd43492"
 
 
 def test_only_the_recorded_previous_shared_digests_count() -> None:
     """SPS 0.5.10 changed load.py (libyaml), SPS 0.5.32 changed runner.py (the report of a
-    failed step) and SPS 0.5.41 changed runner.py (a driver may name tests it does not claim), each
-    with no change to any check result.
+    failed step), SPS 0.5.41 changed runner.py (a driver may name tests it does not claim), SPS
+    0.5.52 changed runner.py (derived prepared-image, lifetime and size values) and SPS 0.5.54
+    changed it again (`dockerfile_from`), each with no change to any check result.
 
     A digest recorded under a shared digest from before either stands; one recorded under any
     other shared digest stays stale.
     """
     history = json.loads((suite_path().parent / "historical-shared-digests.json").read_text())
-    assert list(history) == [SHARED_BEFORE_0_5_10, SHARED_BEFORE_0_5_32, SHARED_BEFORE_0_5_41]
+    assert list(history) == [
+        SHARED_BEFORE_0_5_10,
+        SHARED_BEFORE_0_5_32,
+        SHARED_BEFORE_0_5_41,
+        SHARED_BEFORE_0_5_52,
+        SHARED_BEFORE_0_5_54,
+    ]
     assert all(isinstance(reason, str) and "\n" not in reason for reason in history.values())
     assert digests.shared_digest() not in {
         SHARED_BEFORE_0_5_10,
         SHARED_BEFORE_0_5_32,
         SHARED_BEFORE_0_5_41,
+        SHARED_BEFORE_0_5_52,
+        SHARED_BEFORE_0_5_54,
     }
 
     catalog = load(spec_dir() / "catalog.yaml")
@@ -602,12 +613,16 @@ def test_only_the_recorded_previous_shared_digests_count() -> None:
         old = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_10)
         older = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_32)
         before_0_5_41 = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_41)
+        before_0_5_52 = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_52)
+        before_0_5_54 = digests.check_digest(test, catalog, SHARED_BEFORE_0_5_54)
         unknown = digests.check_digest(test, catalog, "sha256:" + "0" * 64)
         assert old != current
         assert digests.check_digest_stands(test, current, suite.digest)
         assert digests.check_digest_stands(test, old, suite.digest)
         assert digests.check_digest_stands(test, older, suite.digest)
         assert digests.check_digest_stands(test, before_0_5_41, suite.digest)
+        assert digests.check_digest_stands(test, before_0_5_52, suite.digest)
+        assert digests.check_digest_stands(test, before_0_5_54, suite.digest)
         assert not digests.check_digest_stands(test, unknown, suite.digest)
         assert not digests.check_digest_stands(test, None, suite.digest)
 
