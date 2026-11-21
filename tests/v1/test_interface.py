@@ -120,7 +120,7 @@ def test_every_json_object_type_is_covered() -> None:
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
         "PreviewRequest", "TcpLinkRequest",
-        "MkdirRequest", "EntryType",
+        "MkdirRequest", "EntryType", "UserName",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}
     assert set(example_names()) == every - plain

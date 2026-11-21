@@ -704,3 +704,58 @@ def test_a_directory_operation_error_becomes_sps_error(code: str) -> None:
             lambda request: httpx.Response(status, json=body),
         )
     assert raised.value.code == code
+
+
+def test_run_and_process_start_send_user_and_output_only_when_set() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("RunResult") if request.url.path.endswith("/run") else reply("Process")
+
+    call(lambda p: p.run("sbx-17", RunRequest(argv=["id"])), handler)
+    call(
+        lambda p: p.run("sbx-17", RunRequest(argv=["id"], user="runner", output="base64")), handler
+    )
+    call(
+        lambda p: p.process_start("sbx-17", ProcessStartRequest(argv=["id"], user="runner")),
+        handler,
+    )
+    plain, named, process = (json.loads(request.content) for request in seen)
+    assert "user" not in plain and "output" not in plain
+    assert (named["user"], named["output"]) == ("runner", "base64")
+    assert process["user"] == "runner"
+
+
+def test_run_returns_the_base64_streams() -> None:
+    body = {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdout_truncated": False,
+        "stderr_truncated": False,
+        "timed_out": False,
+        "stdout_base64": "/wD+",
+        "stderr_base64": "",
+    }
+    result = call(
+        lambda p: p.run("sbx-17", RunRequest(argv=["id"], output="base64")),
+        lambda request: httpx.Response(200, json=body),
+    )
+    assert (result.stdout_base64, result.stderr_base64) == ("/wD+", "")
+
+
+def test_files_write_sends_the_user_query_only_when_named() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return reply("FileInfo")
+
+    async def data() -> AsyncIterator[bytes]:
+        yield b"abc"
+
+    call(lambda p: p.files_write("sbx-17", "/f", data(), size=3), handler)
+    call(lambda p: p.files_write("sbx-17", "/f", data(), size=3, user="runner"), handler)
+    assert dict(seen[0].url.params) == {"path": "/f"}
+    assert dict(seen[1].url.params) == {"path": "/f", "user": "runner"}

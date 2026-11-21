@@ -342,19 +342,35 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
 
     # Commands and files
 
+    def _user(self, inputs: Inputs, operation: str) -> str | None:
+        """The user a step names, or Unsupported when discovery does not claim `operation`."""
+        user = inputs.get("run_as", inputs.get("user"))
+        if user is not None and operation in self.unsupported:
+            raise Unsupported(self.unsupported[operation])
+        return None if user is None else str(user)
+
     def run(self, target: object, inputs: Inputs) -> Observation:
-        if "run_as" in inputs or "user" in inputs:
-            raise Unsupported("SPS 1.0 has no operation-level user selection")
+        user = self._user(inputs, "run.user")
+        base64_output = inputs.get("output") == "base64"
+        if base64_output and "run.base64" in self.unsupported:
+            raise Unsupported(self.unsupported["run.base64"])
         request = RunRequest(
             argv=["bash", "-c", text(inputs, "bash_script")],
             cwd=cast("str | None", inputs.get("cwd")),
             env=strings(inputs, "environment"),
             timeout_ms=number(inputs, "timeout_ms", 60_000),
+            user=user,
+            output="base64" if base64_output else "text",
         )
         result = self.wait(self.api.run(self._sandbox(target), request))
+        if base64_output:
+            stdout = base64.b64decode(result.stdout_base64 or "", validate=True)
+            stderr = base64.b64decode(result.stderr_base64 or "", validate=True)
+        else:
+            stdout, stderr = result.stdout.encode(), result.stderr.encode()
         return {
-            "stdout": result.stdout.encode(),
-            "stderr": result.stderr.encode(),
+            "stdout": stdout,
+            "stderr": stderr,
             "exit_code": result.exit_code,
             "timed_out": result.timed_out,
         }
@@ -463,9 +479,11 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         async def chunks() -> AsyncIterator[bytes]:
             yield data
 
+        user = self._user(inputs, "files.write.user")
+        extra = {} if user is None else {"user": user}
         self.wait(
             self.api.files_write(
-                self._sandbox(target), text(inputs, "path"), chunks(), size=len(data)
+                self._sandbox(target), text(inputs, "path"), chunks(), size=len(data), **extra
             )
         )
         return {}
@@ -529,6 +547,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
             cwd=cast("str | None", inputs.get("cwd")),
             env=strings(inputs, "environment"),
             stdin="process.write_stdin" not in self.unsupported,
+            user=self._user(inputs, "process.start.user"),
         )
         started = self.wait(self.api.process_start(sandbox_id, request))
         handle = ProcessHandle(sandbox_id, started.id)

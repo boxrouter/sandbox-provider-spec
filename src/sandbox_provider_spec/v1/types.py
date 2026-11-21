@@ -170,6 +170,8 @@ class RunRequest:
     env: Mapping[str, str] = field(default_factory=dict)
     timeout_ms: int = 60_000
     output_limit_bytes: int = 16 * 1024 * 1024
+    user: str | None = None  # None is the class's default user
+    output: Literal["text", "base64"] = "text"
 
 
 @dataclass(frozen=True)
@@ -180,6 +182,10 @@ class RunResult:
     stdout_truncated: bool = False
     stderr_truncated: bool = False
     timed_out: bool = False
+    # With `RunRequest.output == "base64"` these hold the exact bytes of each stream, and
+    # `stdout` and `stderr` are empty. They are None when the output is text.
+    stdout_base64: str | None = None
+    stderr_base64: str | None = None
 
 
 @dataclass(frozen=True)
@@ -200,6 +206,7 @@ class ProcessStartRequest:
     cwd: str | None = None
     env: Mapping[str, str] = field(default_factory=dict)
     stdin: bool = False
+    user: str | None = None  # None is the class's default user
 
 
 @dataclass(frozen=True)

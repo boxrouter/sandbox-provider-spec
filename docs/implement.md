@@ -319,6 +319,26 @@ same moment, would give: `files.list` returns the immediate entries sorted by th
 names and never follows a symbolic link, `files.remove` removes a link and never its target, and
 `files.exists` reports a dangling link as existing.
 
+### Run as a named user, exact output bytes
+
+Two optional additions change `run`, `process.start` and `files.write`; a provider that skips them
+is still a valid 1.0 provider.
+
+- **A named user.** `run` and `process.start` take `user` in the request, and `files.write` takes
+  a `user` query parameter. Omitted or null means the class's default user. A provider claims it
+  with the `user_selection` section and its knobs `commands`, `process_start` and `files_write`.
+  A user that the sandbox does not have is `not_found` (the command does not run), and a class
+  that does not claim the knob answers `unsupported`. A written file is owned by that user from
+  its creation.
+- **Exact bytes.** `run` takes `output`, `text` (the default) or `base64`. With `base64` the
+  result carries `stdout_base64` and `stderr_base64`, the exact bytes of each stream, and
+  `stdout` and `stderr` are empty. A provider claims it by listing `run.base64` in the
+  `operations` of a class, beside the directory operations or alone.
+
+The tester runs `run.user`, `files.write.user`, `process.start.user` and `run.base64` only when the
+claim is made. Your Python `Provider` receives `RunRequest.user` and `RunRequest.output`,
+`ProcessStartRequest.user` and, only when a user is named, a `user` keyword on `files_write`.
+
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,
 `memory_min_mib`, `region`, and `gpu_model`. Desktops and volumes wait for later 1.x releases.

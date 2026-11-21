@@ -418,12 +418,18 @@ async def _cost(p: Provider, r: _Request) -> Reply:
 async def _files_write(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     path = _file_path(r)
+    user = r.query_one("user")
+    if user is not None:
+        _check("UserName", user, "The user")
     r.check_query_used()
     size = r.content_length()
     if size is None:
         raise SpsError("invalid_request", "files.write needs a Content-Length header")
+    # A provider written before `user` existed does not take the argument, so it is sent only when
+    # the caller named a user.
+    extra = {} if user is None else {"user": user}
     try:
-        info = await p.files_write(sandbox_id, path, r.upload(size), size=size)
+        info = await p.files_write(sandbox_id, path, r.upload(size), size=size, **extra)
     except Exception:
         if r.stream_error is not None:
             raise r.stream_error from None

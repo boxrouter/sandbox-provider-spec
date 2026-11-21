@@ -249,6 +249,14 @@ paths:
           required: true
           description: The size of the body in bytes, at most `limits.file_bytes`.
           schema: {type: integer, minimum: 0}
+        - name: user
+          in: query
+          required: false
+          description: >-
+            The named user who creates the file, so that the file is owned by that user. Omitted means the class's default
+            user. A user the sandbox does not have is `not_found`. A class that does not claim `user_selection` with
+            `files_write: true` answers `unsupported`.
+          schema: {$ref: "#/components/schemas/UserName"}
       requestBody:
         required: true
         content:
@@ -1116,6 +1124,10 @@ components:
       additionalProperties: {type: string}
       description: >-
         Environment variables. Names and values together are at most 65536 bytes, counting 2 bytes of overhead per variable.
+    UserName:
+      type: string
+      pattern: "^[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}$"
+      description: The name of an operating-system user in the sandbox.
     FilePath:
       type: string
       minLength: 1
@@ -1359,14 +1371,20 @@ components:
         operations:
           type: array
           uniqueItems: true
-          items: {enum: [files.list, files.mkdir, files.remove, files.exists]}
-          oneOf:
-            - {maxItems: 0}
-            - {minItems: 4}
+          items: {enum: [files.list, files.mkdir, files.remove, files.exists, run.base64]}
+          if:
+            contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}
+          then:
+            allOf:
+              - {contains: {const: files.list}}
+              - {contains: {const: files.mkdir}}
+              - {contains: {const: files.remove}}
+              - {contains: {const: files.exists}}
           default: []
           description: >-
-            Optional operations that no SPS gate covers: `files.list`, `files.mkdir`, `files.remove` and `files.exists`,
-            listed all four or none. They turn on when the tester passes them.
+            Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
+            listed all four or none. `run.base64` says that `run` accepts `output: base64`. They turn on when the tester
+            passes them.
         images:
           type: array
           minItems: 1
@@ -1645,6 +1663,20 @@ components:
           minimum: 0
           default: 16777216
           description: Bytes kept per stream, at most `limits.output_bytes`.
+        user:
+          anyOf: [{$ref: "#/components/schemas/UserName"}, {type: "null"}]
+          default: null
+          description: >-
+            The named user who runs the command. Null means the class's default user. A user the sandbox does not have is
+            `not_found`, and the command does not run. A class that does not claim `user_selection` with `commands: true`
+            answers `unsupported`.
+        output:
+          enum: [text, base64]
+          default: text
+          description: >-
+            `text` returns `stdout` and `stderr` as UTF-8 text. `base64` returns the exact bytes of each stream as
+            `stdout_base64` and `stderr_base64`, and leaves `stdout` and `stderr` empty. A class that does not list
+            `run.base64` in `operations` answers `unsupported` to `base64`.
     RunResult:
       type: object
       required: [exit_code, stdout, stderr, stdout_truncated, stderr_truncated, timed_out]
@@ -1654,6 +1686,14 @@ components:
           description: The exit status; 128 + N when signal N ended it; null only when `timed_out`.
         stdout: {type: string, description: "The first `output_limit_bytes` bytes of stdout, decoded as UTF-8 with invalid bytes replaced by U+FFFD."}
         stderr: {type: string, description: "The first `output_limit_bytes` bytes of stderr, decoded as UTF-8 with invalid bytes replaced by U+FFFD."}
+        stdout_base64:
+          type: string
+          contentEncoding: base64
+          description: "Present only when the request asked for `output: base64`: the first `output_limit_bytes` bytes of stdout, exactly. `stdout` is then empty."
+        stderr_base64:
+          type: string
+          contentEncoding: base64
+          description: "Present only when the request asked for `output: base64`: the first `output_limit_bytes` bytes of stderr, exactly. `stderr` is then empty."
         stdout_truncated: {type: boolean, description: "True when stdout was longer than the limit."}
         stderr_truncated: {type: boolean, description: "True when stderr was longer than the limit."}
         timed_out:
@@ -1729,6 +1769,11 @@ components:
           type: boolean
           default: false
           description: Keep stdin open for `process.write_stdin` (needs the `processes` section with `input`).
+        user:
+          anyOf: [{$ref: "#/components/schemas/UserName"}, {type: "null"}]
+          default: null
+          description: >-
+            As for `run`, with the `process_start` knob of `user_selection` in place of `commands`.
     Process:
       type: object
       required: [id, sandbox_id, started_at]

@@ -10,6 +10,8 @@ shaped like the standard, so `src/sps_provider_example/__init__.py` shows a real
 translation: a comment above each method names the Example Cloud call it maps.
 It also implements two optional sections: the directory operations and a terminal
 (`terminal_open`, over Example Cloud's own WebSocket), and claims both in discovery.
+It does not claim two small additions that a provider with the means may add: running as a named
+user (`user_selection`) and exact output bytes (`run.base64`); `docs/implement.md` says how.
 
 To ship a real provider, copy this directory and rename its Python package and distribution
 in `pyproject.toml`. Set the provider entry-point key there and `provider_id` in

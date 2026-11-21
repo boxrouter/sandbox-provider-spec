@@ -480,7 +480,13 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
         return FileStream(size=size, chunks=_BodyStream(response, size))
 
     async def files_write(
-        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
     ) -> FileInfo:
         if size < 0:
             raise SpsError("invalid_request", "size cannot be negative")
@@ -501,7 +507,7 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
             FileInfo,
             "PUT",
             self._sandbox_path(sandbox_id, "/files"),
-            params=[("path", path)],
+            params=[("path", path), *([("user", user)] if user is not None else [])],
             content=body(),
             headers={"Content-Type": "application/octet-stream", "Content-Length": str(size)},
         )

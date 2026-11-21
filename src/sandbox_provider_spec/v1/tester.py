@@ -84,6 +84,10 @@ OPERATION_CLAIMS = {
     "files.mkdir": ("operations", "files.mkdir"),
     "files.remove": ("operations", "files.remove"),
     "files.exists": ("operations", "files.exists"),
+    "run.user": ("knob", ("user_selection", "commands")),
+    "files.write.user": ("knob", ("user_selection", "files_write")),
+    "process.start.user": ("knob", ("user_selection", "process_start")),
+    "run.base64": ("operations", "run.base64"),
     "snapshot.create": ("gate", "snapshots"),
     "snapshot.get": ("gate", "snapshots"),
     "snapshot.list": ("gate", "snapshots"),
@@ -97,6 +101,7 @@ COMMAND_FALLBACK = frozenset({"files.exists"})
 
 # The section of tests that discovery's `classes[].operations` turns on, in place of a gate.
 DIRECTORIES = "directories"
+DIRECTORY_OPERATIONS = ("files.list", "files.mkdir", "files.remove", "files.exists")
 
 
 # What a run says when discovery cannot be read for one of these reasons: nothing else could run.
@@ -164,8 +169,7 @@ def claimed_sections(discovery: Discovery | None) -> list[str]:
     if discovery is None:
         return []
     found = list(claimed_gates(discovery))
-    wanted = {name for name, (kind, _) in OPERATION_CLAIMS.items() if kind == "operations"}
-    if wanted <= claimed_operations(discovery):
+    if set(DIRECTORY_OPERATIONS) <= claimed_operations(discovery):
         found.append(DIRECTORIES)
     return found
 
@@ -233,6 +237,7 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
     """The baseline tests, every `contract.` test, and the tests of each claimed section."""
     gates = claimed_gates(discovery) if discovery is not None else {}
     sections = set(claimed_sections(discovery))
+    unsupported = unsupported_operations(discovery) if discovery is not None else {}
     chosen: list[Test] = []
     for test in suite.tests:
         head = test.id.split(".", 1)[0]
@@ -240,6 +245,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             wanted = any(test.id.startswith(prefix) for prefix in options.tests) and (
                 head not in gates or _consistent(test, gates)
             )
+        elif test.id in OPERATION_CLAIMS:
+            # A test named for an operation that a claim turns on runs only when it is claimed.
+            wanted = discovery is not None and test.id not in unsupported
         elif head in {"baseline", "contract"}:
             wanted = True
         else:

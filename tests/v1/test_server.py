@@ -1126,3 +1126,87 @@ def test_a_real_uvicorn_server_carries_a_large_round_trip_in_chunks() -> None:
     finally:
         server.should_exit = True
         thread.join(timeout=10)
+
+
+class UserRecorder(Recorder, manifest=False):
+    async def files_write(
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
+    ) -> FileInfo:
+        self._note("files_write_user", sandbox_id, path, size, user)
+        async for _ in data:
+            pass
+        return FileInfo(path, size)
+
+
+def test_a_named_user_and_the_base64_output_reach_the_provider() -> None:
+    app = create_app(UserRecorder)
+    body = {"argv": ["id"], "user": "runner", "output": "base64"}
+    asyncio.run(call(app, "POST", "/v1/sandboxes/s1/run", body=j(body)))
+    asyncio.run(
+        call(app, "POST", "/v1/sandboxes/s1/processes", body=j({"argv": ["id"], "user": "runner"}))
+    )
+    asyncio.run(
+        call(
+            app,
+            "PUT",
+            "/v1/sandboxes/s1/files",
+            body=b"abc",
+            length=3,
+            query="path=/f&user=runner",
+        )
+    )
+    asyncio.run(call(app, "PUT", "/v1/sandboxes/s1/files", body=b"abc", length=3, query="path=/f"))
+    run, process, named, unnamed = UserRecorder.calls
+    run_request, process_request = run[1][1], process[1][1]
+    assert (run_request.user, run_request.output) == ("runner", "base64")
+    assert process_request.user == "runner"
+    assert named == ("files_write_user", ("s1", "/f", 3, "runner"))
+    assert unnamed == ("files_write_user", ("s1", "/f", 3, None))
+
+
+def test_files_write_sends_user_only_when_named_so_an_older_provider_still_works() -> None:
+    app = create_app(Recorder)  # its files_write takes no `user`
+    plain = asyncio.run(
+        call(app, "PUT", "/v1/sandboxes/s1/files", body=b"abc", length=3, query="path=/f")
+    )
+    assert plain.status == 200
+    with_user = asyncio.run(
+        call(app, "PUT", "/v1/sandboxes/s1/files", body=b"abc", length=3, query="path=/f&user=x")
+    )
+    assert (
+        with_user.status == 500
+    )  # a provider that cannot take `user` is a fault, not a silent run
+
+
+@pytest.mark.parametrize("user", ["", "a b", "-x", "x" * 65, "a;b"])
+def test_a_malformed_user_is_invalid_request(user: str) -> None:
+    app = create_app(UserRecorder)
+    reply = asyncio.run(
+        call(
+            app, "PUT", "/v1/sandboxes/s1/files", body=b"a", length=1, query=f"path=/f&user={user}"
+        )
+    )
+    assert (reply.status, reply.json()["error"]["code"]) == (400, "invalid_request")
+    run = asyncio.run(
+        call(
+            app,
+            "POST",
+            "/v1/sandboxes/s1/run",
+            body=j({"argv": ["id"], "user": user}),
+        )
+    )
+    assert (run.status, run.json()["error"]["code"]) == (400, "invalid_request")
+
+
+def test_an_unknown_output_form_is_invalid_request() -> None:
+    app = create_app(UserRecorder)
+    reply = asyncio.run(
+        call(app, "POST", "/v1/sandboxes/s1/run", body=j({"argv": ["id"], "output": "hex"}))
+    )
+    assert (reply.status, reply.json()["error"]["code"]) == (400, "invalid_request")

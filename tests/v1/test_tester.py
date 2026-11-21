@@ -9,6 +9,7 @@ in a local subprocess, so they need no Docker and no network.
 from __future__ import annotations
 
 import asyncio
+import base64
 import contextlib
 import dataclasses
 import fcntl
@@ -1497,3 +1498,93 @@ def test_a_write_under_a_missing_parent_may_create_or_refuse_but_nothing_else() 
         if text is not None:
             assert text in json.dumps(row), cls.__name__
         shutil.rmtree("/tmp/sps-np", ignore_errors=True)
+
+
+NAMED_USER_TESTS = ("run.user", "files.write.user", "process.start.user", "run.base64")
+
+
+def with_claims(*, knobs: tuple[str, ...] = (), operations: tuple[str, ...] = ()) -> Discovery:
+    discovery = with_operations(operations)
+    first = discovery.classes[0]
+    gates = dict(first.gates or {})
+    if knobs:
+        gates["user_selection"] = {knob: True for knob in knobs}
+    first = dataclasses.replace(first, gates=gates)
+    return dataclasses.replace(discovery, classes=[first, *discovery.classes[1:]])
+
+
+def test_the_user_and_base64_tests_run_only_when_their_claim_is_made() -> None:
+    suite = shared_suite()
+    assert {test.id for test in suite.tests} >= set(NAMED_USER_TESTS)
+
+    def chosen(discovery: Discovery) -> set[str]:
+        return {test.id for test in select_tests(suite, discovery, TestOptions()).tests}
+
+    assert chosen(with_claims()).isdisjoint(NAMED_USER_TESTS)
+    assert chosen(with_claims(knobs=("commands",))) & set(NAMED_USER_TESTS) == {"run.user"}
+    assert chosen(with_claims(knobs=("files_write", "process_start"))) & set(NAMED_USER_TESTS) == {
+        "files.write.user",
+        "process.start.user",
+    }
+    assert chosen(with_claims(operations=("run.base64",))) & set(NAMED_USER_TESTS) == {"run.base64"}
+    # The directory operations and `run.base64` are claimed apart, and the four stay all or none.
+    both = with_claims(operations=(*FOUR_OPERATIONS, "run.base64"))
+    assert "run.base64" in chosen(both) and "directories.list" in chosen(both)
+    assert "directories.list" not in chosen(with_claims(operations=("run.base64",)))
+    unclaimed = unsupported_operations(with_claims())
+    assert set(NAMED_USER_TESTS) <= set(unclaimed)
+    assert set(NAMED_USER_TESTS).isdisjoint(
+        unsupported_operations(
+            with_claims(
+                knobs=("commands", "files_write", "process_start"), operations=("run.base64",)
+            )
+        )
+    )
+
+
+class Base64Provider(ContractProvider, manifest=False):
+    """Claims `run.base64` and answers it with the exact bytes of the local command."""
+
+    async def discovery(self) -> Discovery:
+        return with_claims(operations=("run.base64",))
+
+    async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
+        if request.output != "base64":
+            return await super().run(sandbox_id, request)
+        await self.get(sandbox_id)
+        process = await asyncio.create_subprocess_exec(
+            *request.argv,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        out, err = await process.communicate()
+        return RunResult(
+            exit_code=process.returncode,
+            stdout="",
+            stderr="",
+            stdout_base64=base64.b64encode(out).decode(),
+            stderr_base64=base64.b64encode(err).decode(),
+        )
+
+
+def test_a_provider_that_claims_run_base64_passes_its_test_with_the_exact_bytes() -> None:
+    found = results(Base64Provider(), ("run.base64",))
+    assert found == {"run.base64": "passed"}
+
+
+def test_a_provider_that_claims_run_base64_but_returns_text_fails_its_test() -> None:
+    class Lossy(Base64Provider, manifest=False):
+        async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
+            out = await super().run(sandbox_id, request)
+            text = base64.b64decode(out.stdout_base64 or "").decode(errors="replace")
+            return dataclasses.replace(out, stdout_base64=base64.b64encode(text.encode()).decode())
+
+    assert results(Lossy(), ("run.base64",)) == {"run.base64": "differs"}
+
+
+def test_a_class_that_does_not_claim_run_base64_has_its_test_unsupported() -> None:
+    # `run.user` is not run here: its setup steps would add a user on this machine.
+    report = run_tests(ContractProvider(), TestOptions(tests=("run.base64",)))
+    assert {str(row["id"]): str(row["result"]) for row in report["tests"]} == {
+        "run.base64": "unsupported"
+    }

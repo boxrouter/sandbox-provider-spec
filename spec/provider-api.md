@@ -112,6 +112,22 @@ signal N ended the command.
 
 A timeout is a result, not an error. A missing `cwd` is refused with `not_found`.
 
+`run` and `process.start` take an optional `user`, and `files.write` an optional `user` query
+parameter. They name the operating-system user who runs the command, starts the process or
+creates the file. Null or omitted means the class's default user, and the rules of
+`user_selection` (`vocabulary.md`) say what a class that claims a knob **MUST** do. A class that
+does not claim the knob answers `unsupported` to a request that names a user. A user that the
+sandbox does not have is `not_found`.
+
+`run` takes an optional `output`, `text` (the default) or `base64`. With `base64`, the result holds
+the exact bytes of each stream as `stdout_base64` and `stderr_base64`, and its `stdout` and
+`stderr` are empty.
+
+- A class that lists `run.base64` in `classes[].operations` **MUST** answer `output: base64` <!-- rule: provider-api/run-base64 -->
+  with the exact bytes that the command wrote to each stream, up to `output_limit_bytes`, in
+  `stdout_base64` and `stderr_base64`, and **MUST** leave `stdout` and `stderr` empty. A class that
+  does not list it answers `unsupported`.
+
 ## 8. Files
 
 Both file operations stream raw bytes (`application/octet-stream`), so that one operation serves a
@@ -427,9 +443,9 @@ commands give the same result on every provider. A request cannot ask for them, 
 never compares them. A provider claims them in discovery, and they turn on when the tester
 passes them. Where they are off, a consumer runs the commands instead.
 
-- A provider that offers the directory operations **MUST** list all four, and no others, in <!-- rule: provider-api/directory-operations-claimed -->
-  `classes[].operations` of each class that has them, and **MUST NOT** list some but not all of
-  them. Each operation acts with the permissions of the class's default user, and a path that the
+- A provider that offers the directory operations **MUST** list all four, and no other directory <!-- rule: provider-api/directory-operations-claimed -->
+  operation, in `classes[].operations` of each class that has them, and **MUST NOT** list some but
+  not all of them. Each operation acts with the permissions of the class's default user, and a path that the
   user may not read or change is `forbidden`. Each result **MUST** be the result that the
   equivalent commands, run as that user at the same moment, would give.
 - `files.list` **MUST** return the immediate entries of the directory at `path`, without `.` and <!-- rule: provider-api/files-list -->

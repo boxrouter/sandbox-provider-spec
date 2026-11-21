@@ -172,7 +172,13 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     @abstractmethod
     async def files_write(
-        self, sandbox_id: str, path: str, data: AsyncIterable[bytes], *, size: int
+        self,
+        sandbox_id: str,
+        path: str,
+        data: AsyncIterable[bytes],
+        *,
+        size: int,
+        user: str | None = None,
     ) -> FileInfo: ...
 
     @abstractmethod

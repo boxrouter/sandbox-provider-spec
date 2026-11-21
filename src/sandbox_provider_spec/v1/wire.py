@@ -480,6 +480,8 @@ _CODECS: dict[type, _Codec] = {
             "env": dict(v.env),
             "timeout_ms": v.timeout_ms,
             "output_limit_bytes": v.output_limit_bytes,
+            **({"user": v.user} if v.user is not None else {}),
+            **({"output": v.output} if v.output != "text" else {}),
         },
         lambda d: RunRequest(
             argv=tuple(d["argv"]),
@@ -487,6 +489,8 @@ _CODECS: dict[type, _Codec] = {
             env=dict(d.get("env", {})),
             timeout_ms=d.get("timeout_ms", 60_000),
             output_limit_bytes=d.get("output_limit_bytes", 16 * 1024 * 1024),
+            user=d.get("user"),
+            output=d.get("output", "text"),
         ),
     ),
     RunResult: _Codec(
@@ -498,6 +502,11 @@ _CODECS: dict[type, _Codec] = {
             "stdout_truncated": v.stdout_truncated,
             "stderr_truncated": v.stderr_truncated,
             "timed_out": v.timed_out,
+            **(
+                {"stdout_base64": v.stdout_base64, "stderr_base64": v.stderr_base64}
+                if v.stdout_base64 is not None or v.stderr_base64 is not None
+                else {}
+            ),
         },
         lambda d: RunResult(**d),
     ),
@@ -513,12 +522,14 @@ _CODECS: dict[type, _Codec] = {
             "cwd": v.cwd,
             "env": dict(v.env),
             "stdin": v.stdin,
+            **({"user": v.user} if v.user is not None else {}),
         },
         lambda d: ProcessStartRequest(
             argv=tuple(d["argv"]),
             cwd=d.get("cwd"),
             env=dict(d.get("env", {})),
             stdin=d.get("stdin", False),
+            user=d.get("user"),
         ),
     ),
     Process: _Codec(

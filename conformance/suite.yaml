@@ -5277,6 +5277,149 @@ tests:
   rules:
   - provider-api/files-exists
   proves: []
+- id: run.user
+  title: A command runs as the named user, and a user the sandbox does not have is not_found and runs nothing.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: |
+        if [ "$(id -u)" = 0 ]; then
+          useradd --create-home --uid 10001 --shell /bin/bash runner
+        else
+          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+        fi
+    expect:
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: id -un
+      run_as: runner
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "runner\n"}
+  - op: run
+    target: box
+    in:
+      bash_script: touch /tmp/sps-run-user-missing
+      run_as: sps-no-such-user
+    expect:
+      error: not_found
+  - op: run
+    target: box
+    in:
+      bash_script: test ! -e /tmp/sps-run-user-missing
+    expect:
+      equals:
+        exit_code: 0
+  rules:
+  - user-selection/commands
+  proves: []
+- id: files.write.user
+  title: A file written as the named user is owned by that user.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: |
+        if [ "$(id -u)" = 0 ]; then
+          useradd --create-home --uid 10001 --shell /bin/bash runner
+        else
+          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+        fi
+    expect:
+      equals:
+        exit_code: 0
+  - op: files.write
+    target: box
+    in:
+      path: /tmp/sps-write-user-file
+      data: Y29uZm9ybWFuY2UK
+      user: runner
+  - op: run
+    target: box
+    in:
+      bash_script: test "$(stat -c '%u' /tmp/sps-write-user-file)" = "$(id -u runner)"
+    expect:
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: cat /tmp/sps-write-user-file
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "conformance\n"}
+  rules:
+  - user-selection/files-write
+  proves: []
+- id: process.start.user
+  title: A background process starts as the named user.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: |
+        if [ "$(id -u)" = 0 ]; then
+          useradd --create-home --uid 10001 --shell /bin/bash runner
+        else
+          sudo -n useradd --create-home --uid 10001 --shell /bin/bash runner
+        fi
+    expect:
+      equals:
+        exit_code: 0
+  - op: process.start
+    target: box
+    as: process
+    in:
+      bash_script: id -un > /tmp/sps-process-user
+      run_as: runner
+  - op: process.wait
+    target: process
+    in:
+      timeout_ms: 30000
+    expect:
+      equals:
+        exit_code: 0
+  - op: run
+    target: box
+    in:
+      bash_script: cat /tmp/sps-process-user
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8: "runner\n"}
+  rules:
+  - user-selection/process-start
+  proves: []
+- id: run.base64
+  title: With output base64 a command's streams come back as exactly the bytes it wrote, bytes that are not UTF-8 included.
+  steps:
+  - op: create
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: printf '\377\000\376out' ; printf 'er\200\000r' >&2
+      output: base64
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {b64: /wD+b3V0}
+        stderr: {b64: ZXKAAHI=}
+  rules:
+  - provider-api/run-base64
+  proves: []
 - id: contract.files_write_missing_parent
   title: A write under a missing parent either creates the parents and the bytes read back, or is not_found and creates nothing.
   steps:
