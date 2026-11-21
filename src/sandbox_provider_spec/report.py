@@ -19,6 +19,8 @@ from sandbox_provider_spec.installed import installed_declaration_path
 from sandbox_provider_spec.run_id import run_id
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import SPEC, Suite
+from sandbox_provider_spec.v1.digest import report_subject
+from sandbox_provider_spec.v1.types import Discovery
 
 __all__ = ["DEVELOPMENT_REVISION", "recorded_sdk_versions", "report", "revision", "write_report"]
 
@@ -75,6 +77,7 @@ def report(
     *,
     spec_revision: str,
     started_at: str,
+    discovery: Discovery | None = None,
 ) -> dict[str, object]:
     selected = [test.id for test in suite.tests]
     actual = [str(item["id"]) for item in results]
@@ -114,6 +117,9 @@ def report(
     }
     if driver.execution_class is not None:
         document["class"] = driver.execution_class
+    subject = report_subject(type(getattr(driver, "api", driver)), discovery)
+    if subject is not None:
+        document["subject"] = subject
     return document
 
 

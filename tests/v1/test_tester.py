@@ -8,6 +8,7 @@ in a local subprocess, so they need no Docker and no network.
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import base64
 import contextlib
@@ -27,7 +28,7 @@ from typing import Any, ClassVar, TypeVar
 import jsonschema
 import pytest
 
-from sandbox_provider_spec import cost_checks
+from sandbox_provider_spec import cli, cost_checks
 from sandbox_provider_spec.cli import main
 from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported, resource
 from sandbox_provider_spec.v1 import (
@@ -997,7 +998,7 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_twelve_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_thirteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
@@ -1005,6 +1006,7 @@ def test_there_are_twelve_contract_tests_and_the_tester_selects_each_by_default(
         "contract.files_1gib_roundtrip",
         "contract.files_write_missing_parent",
         "contract.lifetime_ends",
+        "contract.discovery_within_static",
     }
     chosen = {test.id for test in select_tests(suite, None, TestOptions()).tests}
     assert ids <= chosen
@@ -1715,3 +1717,66 @@ def test_ordered_sessions_round_trips_and_defaults_to_nothing() -> None:
     wire = to_json(stated)
     assert wire["classes"][0]["ordered_sessions"] is True
     assert from_json(Discovery, wire).classes[0].ordered_sessions is True
+
+
+@pytest.mark.rule("provider-api/discovery-within-static")
+def test_discovery_within_static_row_passes_fails_and_skips() -> None:
+    row = ("contract.discovery_within_static",)
+    absent = run_tests(ContractProvider(), TestOptions(tests=row))
+    assert [r["result"] for r in absent["tests"]] == ["unsupported"]  # no static discovery stated
+
+    class Stated(ContractProvider, manifest=False):
+        extra_region = False
+
+        @classmethod
+        def static_discovery(cls) -> Discovery:
+            return asyncio.run(ContractProvider().discovery())
+
+        async def discovery(self) -> Discovery:
+            found = await super().discovery()
+            if not self.extra_region:
+                return found
+            first = found.classes[0]
+            wider = dataclasses.replace(first, resources={**first.resources, "regions": ["zz"]})
+            return dataclasses.replace(found, classes=[wider, *found.classes[1:]])
+
+    passed = run_tests(Stated(), TestOptions(tests=row))
+    assert [r["result"] for r in passed["tests"]] == ["passed"]
+
+    class Wider(Stated, manifest=False):
+        extra_region = True
+
+    failed = run_tests(Wider(), TestOptions(tests=row))
+    assert [r["result"] for r in failed["tests"]] == ["differs"]
+
+
+def test_reports_dir_names_one_class_and_one_selection(tmp_path: Path) -> None:
+    suite_args = argparse.Namespace
+    named = cli._report_name("baseline", {"tests": [{"class": "box"}, {"class": "box"}]})
+    assert named == "tester-box-baseline.json"
+    with pytest.raises(cli._InputError, match="one class per report"):
+        cli._report_name("core", {"tests": [{"class": "a"}, {"class": "b"}]})
+    assert cli._report_suite(suite_args(reports_dir=None, quick=False, test=[])) is None
+    assert cli._report_suite(suite_args(reports_dir="d", quick=False, test=[])) == "core"
+    assert cli._report_suite(suite_args(reports_dir="d", quick=False, test=["coverage."])) == (
+        "coverage"
+    )
+    for quick, selection in ((True, []), (False, ["contract."]), (False, ["baseline.", "x"])):
+        with pytest.raises(cli._InputError):
+            cli._report_suite(suite_args(reports_dir="d", quick=quick, test=selection))
+    out = tmp_path / "kept"
+    assert (
+        main(
+            [
+                "test",
+                "http://127.0.0.1:9",
+                "--credential",
+                "token=SPS_SET",
+                "--quick",
+                "--reports-dir",
+                str(out),
+            ]
+        )
+        == 1
+    )
+    assert not out.exists()

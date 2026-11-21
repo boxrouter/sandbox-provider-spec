@@ -8,7 +8,7 @@ import argparse
 import json
 import os
 import sys
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from importlib.metadata import entry_points
 from pathlib import Path
@@ -236,8 +236,37 @@ def _on_class(row: dict[str, Any]) -> str:
     return f" (class {row['class']})" if "class" in row else ""
 
 
+def _report_suite(args: argparse.Namespace) -> str | None:
+    """The suite a `--reports-dir` report is named for: `baseline` (only `--test baseline.`),
+    `coverage` (only `--test coverage.`) or `core` (no `--test`). None without `--reports-dir`. A
+    `--quick` run and any other selection are refused: proof reads whole selections."""
+    if args.reports_dir is None:
+        return None
+    if args.quick:
+        raise _InputError("test: --reports-dir keeps whole selections; drop --quick")
+    if not args.test:
+        return "core"
+    if args.test in (["baseline."], ["coverage."]):
+        return str(args.test[0]).rstrip(".")
+    raise _InputError(
+        "test: --reports-dir takes no --test, or exactly --test baseline. or coverage."
+    )
+
+
+def _report_name(suite: str, result: Mapping[str, Any]) -> str:
+    """`tester-<class>-<suite>.json`: one report per class, never several classes in one."""
+    classes = sorted({str(row["class"]) for row in result["tests"] if "class" in row})
+    if len(classes) != 1:
+        raise _InputError(
+            f"test: --reports-dir keeps one class per report; this run used {len(classes)} "
+            "(pin one with --class)"
+        )
+    return f"tester-{classes[0]}-{suite}.json"
+
+
 def _test(args: argparse.Namespace) -> int:
     """Run the shared tests against an installed provider or a base URL."""
+    suite = _report_suite(args)
     credentials = _credentials(args.credential)
     if credentials is None:
         return 1
@@ -319,6 +348,10 @@ def _test(args: argparse.Namespace) -> int:
         )
     write_report(Path(args.output), result)
     print(f"report: {args.output}", file=sys.stderr)
+    if suite is not None:
+        kept = Path(args.reports_dir) / _report_name(suite, result)
+        write_report(kept, result)
+        print(f"report: {kept}", file=sys.stderr)
     if not result.all_passed:
         return 1
     return 3 if args.quick else 0
@@ -461,6 +494,14 @@ def main(argv: list[str] | None = None) -> int:
         "--output",
         default="sps-report.json",
         help="where to write the report (default sps-report.json)",
+    )
+    test_cmd.add_argument(
+        "--reports-dir",
+        default=None,
+        metavar="DIR",
+        help="also write the report to DIR/tester-<class>-<suite>.json, <suite> being baseline "
+        "(--test baseline.), coverage (--test coverage.) or core (no --test); one class, "
+        "no --quick",
     )
     test_cmd.set_defaults(run=_test)
     args = parser.parse_args(argv)

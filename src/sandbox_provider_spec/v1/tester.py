@@ -567,6 +567,15 @@ def _source_revision() -> str:
         return DEVELOPMENT_REVISION
 
 
+def _subject_discovery(provider: Provider, live: Discovery | None) -> Discovery | None:
+    """The discovery a report is bound to: the provider's static discovery where it states one,
+    else the live document."""
+    try:
+        return type(provider).static_discovery()
+    except NotImplementedError:
+        return live
+
+
 def _probe_cost(driver: ProviderDriver, discovery: Discovery | None) -> str:
     """Create a sandbox, read its cost, destroy it: the one operation no baseline test uses. A
     provider that does not offer cost has `unsupported`."""
@@ -707,7 +716,14 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         if leftovers and results:
             cast("list[Any]", results[-1].setdefault("cleanup", [])).extend(leftovers)
         document = Report(
-            report(driver, suite, results, spec_revision=_source_revision(), started_at=started)
+            report(
+                driver,
+                suite,
+                results,
+                spec_revision=_source_revision(),
+                started_at=started,
+                discovery=_subject_discovery(provider, discovery),
+            )
         )
         sections: dict[str, list[str]] = {name: [] for name in claimed_sections(discovery)}
         document.lines = _summary(results, discovery_status, cost_status, sections)

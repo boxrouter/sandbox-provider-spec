@@ -4,8 +4,9 @@
 
 from __future__ import annotations
 
+from sandbox_provider_spec.v1.digest import discovery_digest, package_digest, report_subject
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, PROVIDER_FAULT, ErrorCode, SpsError
-from sandbox_provider_spec.v1.provider import Provider, read_manifest
+from sandbox_provider_spec.v1.provider import Provider, installed, read_manifest
 from sandbox_provider_spec.v1.types import (
     AccountCapacity,
     AccountCost,
@@ -35,6 +36,7 @@ from sandbox_provider_spec.v1.types import (
     ImageSource,
     LabelKeeper,
     LifetimeEnforcer,
+    LifetimeTimerView,
     Limits,
     OciSource,
     OutputChunk,
@@ -79,6 +81,7 @@ from sandbox_provider_spec.v1.wire import (
     from_json,
     to_json,
 )
+from sandbox_provider_spec.v1.within import within
 
 __all__ = [
     "ERROR_TABLE",
@@ -98,6 +101,7 @@ __all__ = [
     "EndState",
     "LabelKeeper",
     "LifetimeEnforcer",
+    "LifetimeTimerView",
     "EntryType",
     "ErrorCode",
     "FileInfo",
@@ -153,7 +157,12 @@ __all__ = [
     "WireError",
     "error_from_json",
     "error_to_json",
+    "discovery_digest",
     "from_json",
+    "package_digest",
+    "report_subject",
+    "installed",
+    "within",
     "read_manifest",
     "to_json",
 ]

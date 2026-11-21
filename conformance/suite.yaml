@@ -4817,6 +4817,16 @@ tests:
   rules:
   - provider-api/files-limit-floor
   proves: []
+- id: contract.discovery_within_static
+  title: Discovery stays within the provider's static discovery, where the provider states one.
+  steps:
+  - op: discovery.within_static
+    expect:
+      equals:
+        outside: []
+  rules:
+  - provider-api/discovery-within-static
+  proves: []
 - id: contract.idempotent_create_same_body
   title: A repeated create with the same key and body returns the first sandbox, running.
   steps:

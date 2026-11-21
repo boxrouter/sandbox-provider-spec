@@ -8,6 +8,7 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Mapping
 from datetime import datetime
+from importlib.metadata import entry_points
 from importlib.resources import as_file, files
 from types import MappingProxyType
 from typing import Any, ClassVar
@@ -52,6 +53,8 @@ from sandbox_provider_spec.v1.types import (
     Terminal,
     TerminalRequest,
 )
+
+PROVIDERS_GROUP = "sandbox_provider_spec.providers"
 
 MANIFEST_NAME = "sps-provider.yaml"
 MANIFEST_SCHEMA = "sps-provider.schema.json"
@@ -153,6 +156,16 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     @abstractmethod
     async def discovery(self) -> Discovery: ...
+
+    @classmethod
+    def static_discovery(cls) -> Discovery:
+        """Optional. What the provider's code says about every account: the ceiling that each
+        account's `discovery()` stays within (rule `provider-api/discovery-within-static`).
+
+        No I/O and no credentials, so a caller reads the facts from the installed package alone.
+        A provider that does not state it leaves this unimplemented, and the caller sees
+        `NotImplementedError`."""
+        raise NotImplementedError(f"{cls.__name__} states no static discovery")
 
     @abstractmethod
     async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox: ...
@@ -349,3 +362,18 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     async def aclose(self) -> None:
         """Release HTTP clients; the host calls it once when it is done with the adapter."""
         return None
+
+
+def installed() -> Mapping[str, type[Provider]]:
+    """Every installed `Provider` by provider id: the one resolver of the
+    `sandbox_provider_spec.providers` entry-point group. Loads each package. An id named twice,
+    or an entry that is not a `Provider` subclass, is a `ValueError`."""
+    found: dict[str, type[Provider]] = {}
+    for entry in entry_points(group=PROVIDERS_GROUP):
+        if entry.name in found:
+            raise ValueError(f"provider id {entry.name!r} is registered twice in {PROVIDERS_GROUP}")
+        loaded = entry.load()
+        if not (isinstance(loaded, type) and issubclass(loaded, Provider)):
+            raise ValueError(f"{PROVIDERS_GROUP} entry {entry.name!r} is not a Provider subclass")
+        found[entry.name] = loaded
+    return MappingProxyType(found)

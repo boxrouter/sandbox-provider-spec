@@ -731,3 +731,23 @@ passes it.
 - A provider that lists `account.capacity` **MUST** return every field, and a field whose value it <!-- rule: provider-api/account-capacity -->
   does not know **MUST** be null, never a zero or a guess. `remaining` is the number of starts left
   in the window.
+
+## 24. Static discovery
+
+A provider that ships a Python package may also state what the package says about every account,
+before any call: `Provider.static_discovery()`, an optional classmethod that returns the same
+`Discovery` document as `discovery()`, with no I/O and no credentials. A consumer that runs the
+package reads the provider's facts from it alone, with nothing recorded that can go stale. A
+provider that does not state it leaves the method unimplemented, and the rule below does not apply.
+The sandbox-provider-spec package's `within(discovery, ceiling)` is the one comparison: it returns
+the path of every value of `discovery` that steps outside `ceiling`, one per line, and nothing when
+`discovery` is within it.
+
+- When a class states `static_discovery()`, every account's `discovery()` **MUST** return the same <!-- rule: provider-api/discovery-within-static -->
+  classes or fewer, each with equal or narrower values: fewer regions, sizes, images, variants or
+  operations, smaller limits, `ready` false where the static one is true, and the same price where
+  both state one. A value that only the live document states is outside it.
+
+`sandbox_provider_spec.v1.installed()` returns the installed packages' `Provider` classes by
+provider id, from the `sandbox_provider_spec.providers` entry-point group; an id named twice is
+refused.

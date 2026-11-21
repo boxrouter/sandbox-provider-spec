@@ -54,6 +54,7 @@ from sandbox_provider_spec.v1.types import (
     TerminalRequest,
 )
 from sandbox_provider_spec.v1.wire import WireError, to_json
+from sandbox_provider_spec.v1.within import within
 
 T = TypeVar("T")
 
@@ -341,6 +342,16 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
             "priced": bool(found.classes) and all(item.prices for item in found.classes),
             "file_limit_floor": found.limits.file_bytes >= _ONE_GIB,
         }
+
+    def discovery_within_static(self, target: object, inputs: Inputs) -> Observation:
+        """Whether the live discovery is within the provider's `static_discovery()`: skipped for a
+        provider that does not state one (an HTTP form has no package to read it from)."""
+        del target, inputs
+        try:
+            ceiling = type(self.api).static_discovery()
+        except NotImplementedError:
+            raise Unsupported("the provider states no static_discovery()") from None
+        return {"outside": within(self.wait(self.api.discovery()), ceiling)}
 
     def cost_final(self, target: object, inputs: Inputs) -> Observation:
         """Read a destroyed sandbox's cost until it is final, within `cost_final_within_seconds`."""

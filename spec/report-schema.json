@@ -64,6 +64,17 @@
           "pattern": "^sha256:[0-9a-f]{64}$"
         },
         "implementation": {"type": "string", "minLength": 1},
+        "subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["package", "version", "package_digest"],
+          "properties": {
+            "package": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1},
+            "package_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "discovery_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
         "clean": {
           "type": "boolean"
         },

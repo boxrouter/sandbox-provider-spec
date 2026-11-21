@@ -551,6 +551,23 @@ class Image:
     description: str
 
 
+LifetimeEnding = Literal["destroyed", "paused", "stopped"]
+_ENFORCERS = ("provider", "router", "none")
+_ENDINGS = ("destroyed", "paused", "stopped")
+
+
+@dataclass(frozen=True)
+class LifetimeTimerView:
+    """A class's declared lifetime timer (`SandboxClass.timer()`). `enforced_by` says who ends a
+    sandbox whose lifetime ran out (`none`: nobody), `counts_paused_time` whether the provider's
+    timer runs while the sandbox is paused, and `at_end` the states the timer can leave it in:
+    one entry for a fixed ending, several where the caller chooses at creation."""
+
+    enforced_by: Literal["provider", "router", "none"]
+    counts_paused_time: bool
+    at_end: tuple[LifetimeEnding, ...]
+
+
 @dataclass(frozen=True)
 class SandboxClass:
     id: str
@@ -591,6 +608,47 @@ class SandboxClass:
     # rule `provider-api/image-delete`) or answers `conflict` until those sandboxes end
     # (`provider-api/image-delete-in-use`).
     image_delete_in_use: ImageDeleteInUse = "accepted"
+
+    # Typed views of the plain-mapping fields above. Pure, no I/O.
+    def claims(self, gate: str) -> tuple[Mapping[str, object], ...]:
+        """The variants this class claims for `gate`, in order: a gate's body is one mapping or a
+        list of them. Empty when the gate is unclaimed; non-mapping entries are dropped."""
+        value = (self.gates or {}).get(gate)
+        if value is None:
+            return ()
+        items = value if isinstance(value, Sequence) and not isinstance(value, str) else (value,)
+        return tuple(entry for entry in items if isinstance(entry, Mapping))
+
+    def lists(self, *operations: str) -> bool:
+        """Whether this class lists every one of `operations` in `operations`."""
+        return set(operations) <= set(self.operations)
+
+    def labels_kept_by(self, kind: Literal["image", "snapshot"]) -> LabelKeeper:
+        """Who keeps the labels of this class's prepared images or snapshots: the provider, or the
+        router (which then keeps them itself)."""
+        return self.image_labels_kept_by if kind == "image" else self.snapshot_labels_kept_by
+
+    def timer(self) -> LifetimeTimerView | None:
+        """The lifetime timer, or None where the declaration is not one the spec defines (an
+        unknown enforcer or ending says nothing, so nothing is enforced). A missing `enforced_by`
+        is `none`, a missing `at_end` is `destroyed`."""
+        body = self.lifetime_timer
+        enforced_by = body.get("enforced_by", "none")
+        at_end = body.get("at_end", "destroyed")
+        endings = (
+            tuple(at_end)
+            if isinstance(at_end, Sequence) and not isinstance(at_end, str)
+            else (at_end,)
+        )
+        paused = body.get("counts_paused_time", False)
+        if (
+            enforced_by not in _ENFORCERS
+            or not endings
+            or any(entry not in _ENDINGS for entry in endings)
+            or not isinstance(paused, bool)
+        ):
+            return None
+        return LifetimeTimerView(enforced_by, paused, endings)  # type: ignore[arg-type]
 
 
 @dataclass(frozen=True)
