@@ -219,7 +219,7 @@ class LocalProvider(Provider, manifest=False):
             process.returncode,
         )
 
-    async def cost(self, sandbox_id: str) -> Cost:
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
         box = await self.get(sandbox_id)
         return dataclasses.replace(
             example(Cost),
@@ -693,7 +693,7 @@ def test_the_command_exit_code_includes_the_cost_probe(
     code: int,
 ) -> None:
     class CostFailure(LocalProvider, manifest=False):
-        async def cost(self, sandbox_id: str) -> Cost:
+        async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
             raise SpsError("unavailable", "cost is unavailable")
 
     provider_class = CostFailure if cost_fails else LocalProvider
@@ -1087,7 +1087,7 @@ def test_the_cost_test_needs_a_final_cost_that_adds_up(
     monkeypatch: pytest.MonkeyPatch, change: dict[str, str]
 ) -> None:
     class Costly(ContractProvider, manifest=False):
-        async def cost(self, sandbox_id: str) -> Cost:
+        async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
             base = await super().cost(sandbox_id)
             return dataclasses.replace(
                 base,
@@ -1117,7 +1117,7 @@ class _Final(ContractProvider, manifest=False):
     change: ClassVar[Callable[[Cost, int], Cost | None]] = staticmethod(lambda cost, _: cost)
     reads = 0
 
-    async def cost(self, sandbox_id: str) -> Cost:
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
         base = await super().cost(sandbox_id)
         if base.status != "final":
             return base
@@ -1221,7 +1221,7 @@ def test_a_provider_that_states_no_final_window_does_not_offer_cost() -> None:
                 found, limits=dataclasses.replace(found.limits, cost_final_within_seconds=None)
             )
 
-        async def cost(self, sandbox_id: str) -> Cost:
+        async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
             raise SpsError("unsupported", "no cost")
 
     report = run_tests(NoCost(), TestOptions(tests=("contract.discovery_valid",)))

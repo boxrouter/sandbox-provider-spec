@@ -71,6 +71,20 @@ provider that cannot run a sandbox without a lifetime refuses `lifetime_seconds:
 `unsupported`. A request that no size, region, image, class or section can meet is refused with
 `unsupported`, and nothing is created.
 
+`create` takes `secrets` when its request names the `hidden_secrets` section (without that
+requirement the request is `invalid_request`). Each secret is a `placeholder` that code in the sandbox sees, the
+`value` that the provider adds to requests for its `hosts`, and optionally the `headers` that carry
+it. The value is write-only: the provider returns it from no operation, and neither a log line nor an
+error body of the server or the client holds it, so the reference server and client cut it out of
+every validation message. Code in the sandbox never reads it.
+
+`get` returns a sandbox's `times` when the provider keeps any: each is a `kind` (`created`,
+`started`, `ready`, `paused`, `resumed`, `stopped`, `ended`, `deadline`, `billed_start`,
+`billed_end`, `requested`, `stop_requested`, `updated` or `checkpointed`), the time `at`, and the
+provider's own field name as `source`. `list` may leave them out. They are the provider's own
+statements, never a clock of the consumer or the adapter; a cost read places the provider's bill
+against them.
+
 ## 5. Labels and `list`
 
 Labels are a map of at most 32 entries. A key is 1 to 63 bytes from `A-Z a-z 0-9 _ . / -`; a value
@@ -214,6 +228,19 @@ true zero, never "not counted yet".
 
 While the sandbox exists, `cost` returns the cost so far with status `accruing`. SPS defines no
 correction after `final`: a consumer that finds a later difference reconciles it itself.
+
+`cost` takes the optional query parameter `created_at`, the time that `create` or `get` returned
+for the sandbox. It is a lookup hint only. A provider whose usage records are kept by time may use
+it to bound where it looks, does not report a cost from before it, and ignores it when it knows the
+time itself. A provider that needs the time and gets none answers with an error of its own.
+
+A provider that states `limits.account_cost_window_seconds` offers `account.cost`
+(`GET /v1/cost?start=&end=`), which returns what the whole account was charged between `start`
+(inclusive) and `end` (exclusive): `status`, `total_usd`, `source`, `lines` and `as_of`, with the
+amounts and the sources of a sandbox cost but no quantities required. It needs no sandbox, so it
+counts charges for sandboxes that are gone, and a billing true-up compares it with the sum of the
+sandbox costs. A window that is empty, reversed or longer than the stated limit is `invalid_request`.
+Without the limit `account.cost` answers `unsupported`.
 
 ## 11. Errors
 

@@ -13,6 +13,7 @@ import json
 import re
 import secrets
 from collections.abc import AsyncIterable, AsyncIterator, Mapping, Sequence
+from datetime import datetime
 from types import MappingProxyType
 from typing import Any, TypeVar
 from urllib.parse import urlsplit
@@ -24,6 +25,7 @@ import websockets.exceptions
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, ErrorCode, SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
+    AccountCost,
     Cost,
     CreateRequest,
     DestroyResult,
@@ -56,7 +58,13 @@ from sandbox_provider_spec.v1.types import (
     TerminalLink,
     TerminalRequest,
 )
-from sandbox_provider_spec.v1.wire import WireError, error_from_json, from_json, to_json
+from sandbox_provider_spec.v1.wire import (
+    WireError,
+    error_from_json,
+    from_json,
+    timestamp,
+    to_json,
+)
 
 T = TypeVar("T")
 
@@ -587,8 +595,13 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
             read_seconds=wait_ms / 1000 + _SLACK_SECONDS,
         )
 
-    async def cost(self, sandbox_id: str) -> Cost:
-        return await self._json(Cost, "GET", self._sandbox_path(sandbox_id, "/cost"))
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
+        params = None if created_at is None else [("created_at", timestamp(created_at))]
+        return await self._json(Cost, "GET", self._sandbox_path(sandbox_id, "/cost"), params=params)
+
+    async def account_cost(self, start: datetime, end: datetime) -> AccountCost:
+        params = [("start", timestamp(start)), ("end", timestamp(end))]
+        return await self._json(AccountCost, "GET", "/v1/cost", params=params)
 
     # --- optional operations ----------------------------------------------------------------
 

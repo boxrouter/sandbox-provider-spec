@@ -10,6 +10,7 @@ import socket
 import threading
 import time
 from collections.abc import AsyncIterable, AsyncIterator, Mapping, MutableMapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any, ClassVar, TypeVar
 
@@ -17,6 +18,7 @@ import pytest
 
 from sandbox_provider_spec.cli import main
 from sandbox_provider_spec.v1 import (
+    AccountCost,
     Cost,
     CreateRequest,
     CredentialField,
@@ -146,9 +148,13 @@ class Recorder(Provider, manifest=False):
         self._note("process_output", sandbox_id, process_id, cursor, wait_ms)
         return example(OutputPage)
 
-    async def cost(self, sandbox_id: str) -> Cost:
-        self._note("cost", sandbox_id)
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
+        self._note("cost", sandbox_id, created_at)
         return example(Cost)
+
+    async def account_cost(self, start: datetime, end: datetime) -> AccountCost:
+        self._note("account_cost", start, end)
+        return example(AccountCost)
 
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         self._note("files_link", sandbox_id, request)
@@ -438,12 +444,15 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
     ("snapshot_get", "GET", "/v1/snapshots/snap-9", None, "snapshot_get"),
     ("snapshot_delete", "DELETE", "/v1/snapshots/snap-9", None, "snapshot_delete"),
     ("snapshot_cost", "GET", "/v1/snapshots/snap-9/cost", None, "snapshot_cost"),
+    ("account_cost", "GET", "/v1/cost", None, "account_cost"),
 ]
 
 
 async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
     headers: dict[str, str] = {}
     query = ""
+    if path == "/v1/cost":
+        query = "start=2026-11-13T10:00:00Z&end=2026-11-13T11:00:00Z"
     if path.endswith(("/files", "/files/exists")) or (
         path.endswith("/directories") and method == "GET"
     ):
@@ -459,7 +468,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
 
 
 def test_the_route_table_covers_all_operations() -> None:
-    assert len({operation for operation, *_ in ROUTES}) == 31
+    assert len({operation for operation, *_ in ROUTES}) == 32
 
 
 @pytest.mark.parametrize(("operation", "method", "path", "body", "called"), ROUTES)
@@ -674,7 +683,7 @@ def test_a_directory_operation_that_the_provider_lacks_is_unsupported() -> None:
         async def process_output(
             self, sandbox_id: str, process_id: str, *, cursor: Any = None, wait_ms: int = 0
         ) -> Any: ...
-        async def cost(self, sandbox_id: str) -> Any: ...
+        async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Any: ...
 
     app = create_app(Bare)
     reply = asyncio.run(call(app, "GET", "/v1/sandboxes/s1/files/exists", query="path=/d"))

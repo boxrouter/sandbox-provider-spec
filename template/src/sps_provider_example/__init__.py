@@ -480,8 +480,9 @@ class ExampleProvider(Provider):
             exit_code=log["code"] if done else None,
         )
 
-    async def cost(self, sandbox_id: str) -> Cost:
-        # GET /machines/{id}/usage; the price list in discovery prices the record.
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
+        # GET /machines/{id}/usage; the price list in discovery prices the record. `created_at`
+        # is only a lookup hint, and Example Cloud's usage record states the start itself.
         usage = await self._json("GET", f"/machines/{sandbox_id}/usage")
         # `as_of` is when Example Cloud read its record, by its own clock; a running machine
         # counts up to it, and the line stays open (`end` null) until the machine ends.

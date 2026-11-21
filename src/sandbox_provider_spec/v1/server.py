@@ -43,7 +43,13 @@ from sandbox_provider_spec.v1.types import (
     Terminal,
     TerminalRequest,
 )
-from sandbox_provider_spec.v1.wire import WireError, error_to_json, from_json, to_json
+from sandbox_provider_spec.v1.wire import (
+    WireError,
+    error_to_json,
+    from_json,
+    parse_timestamp,
+    to_json,
+)
 
 Scope = MutableMapping[str, Any]
 Message = MutableMapping[str, Any]
@@ -422,9 +428,37 @@ async def _process_output(p: Provider, r: _Request) -> Reply:
     return 200, to_json(page)
 
 
+def _time_param(r: _Request, name: str, *, required: bool = False) -> datetime | None:
+    text = r.query_one(name, required=required)
+    if text is None:
+        return None
+    try:
+        return parse_timestamp(text)
+    except (WireError, ValueError):
+        raise SpsError(
+            "invalid_request", f"Query parameter {name!r} must be a UTC time ending in Z"
+        ) from None
+
+
 async def _cost(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    created_at = _time_param(r, "created_at")
     r.check_query_used()
-    return 200, to_json(await p.cost(_entity(r.path_params[0], "sandbox_id")))
+    # A provider written before the hint existed has no `created_at` parameter, so it is passed
+    # only when the caller sent it.
+    if created_at is None:
+        return 200, to_json(await p.cost(sandbox_id))
+    return 200, to_json(await p.cost(sandbox_id, created_at=created_at))
+
+
+async def _account_cost(p: Provider, r: _Request) -> Reply:
+    start = _time_param(r, "start", required=True)
+    end = _time_param(r, "end", required=True)
+    r.check_query_used()
+    assert start is not None and end is not None
+    if end <= start:
+        raise SpsError("invalid_request", "Query parameter 'end' must be after 'start'")
+    return 200, to_json(await p.account_cost(start, end))
 
 
 async def _files_write(p: Provider, r: _Request) -> Reply:
@@ -703,6 +737,7 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("POST", f"{_S}/processes", _process_start),
         ("GET", f"{_P}/output", _process_output),
         ("GET", f"{_S}/cost", _cost),
+        ("GET", "/v1/cost", _account_cost),
         ("POST", f"{_S}/file-links", _files_link),
         ("POST", f"{_S}/pause", _pause),
         ("POST", f"{_S}/resume", _resume),

@@ -9,6 +9,7 @@ import asyncio
 import json
 import traceback
 from collections.abc import AsyncIterator, Awaitable, Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
@@ -115,6 +116,16 @@ OPERATIONS: list[tuple[str, Callable[[HttpProvider], Awaitable[Any]], str, str, 
         200,
     ),
     ("cost", lambda p: p.cost("sbx-17"), "GET", "/v1/sandboxes/sbx-17/cost", "Cost", 200),
+    (
+        "account_cost",
+        lambda p: p.account_cost(
+            datetime(2026, 11, 13, 10, tzinfo=UTC), datetime(2026, 11, 13, 11, tzinfo=UTC)
+        ),
+        "GET",
+        "/v1/cost",
+        "AccountCost",
+        200,
+    ),
     (
         "files_link",
         lambda p: p.files_link("sbx-17", FileLinkRequest("/tmp/a", "read", 60)),
@@ -261,9 +272,9 @@ def test_is_a_provider() -> None:
     assert issubclass(HttpProvider, Provider)
 
 
-def test_files_read_is_the_twenty_ninth_operation() -> None:
-    # files_read returns a stream and has its own tests below; the other 28 are in OPERATIONS.
-    assert len(OPERATIONS) == 30
+def test_files_read_is_the_thirtieth_operation() -> None:
+    # files_read returns a stream and has its own tests below; the other 29 are in OPERATIONS.
+    assert len(OPERATIONS) == 31
 
 
 @pytest.mark.parametrize(("name", "run", "method", "path", "body", "status"), OPERATIONS)

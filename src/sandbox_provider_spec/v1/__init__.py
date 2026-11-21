@@ -7,6 +7,7 @@ from __future__ import annotations
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, PROVIDER_FAULT, ErrorCode, SpsError
 from sandbox_provider_spec.v1.provider import Provider, read_manifest
 from sandbox_provider_spec.v1.types import (
+    AccountCost,
     Cost,
     CostLine,
     CreateRequest,
@@ -43,6 +44,7 @@ from sandbox_provider_spec.v1.types import (
     Process,
     ProcessStartRequest,
     ProviderInfo,
+    ProviderTime,
     RegistryCredentials,
     RunRequest,
     RunResult,
@@ -50,6 +52,8 @@ from sandbox_provider_spec.v1.types import (
     SandboxClass,
     SandboxPage,
     SandboxState,
+    Secret,
+    SecretHeader,
     Size,
     Snapshot,
     SnapshotDeleteResult,
@@ -71,6 +75,7 @@ from sandbox_provider_spec.v1.wire import (
 __all__ = [
     "ERROR_TABLE",
     "PROVIDER_FAULT",
+    "AccountCost",
     "Cost",
     "CostLine",
     "CreateRequest",
@@ -110,12 +115,15 @@ __all__ = [
     "Provider",
     "ProviderInfo",
     "RegistryCredentials",
+    "ProviderTime",
     "RunRequest",
     "RunResult",
     "Sandbox",
     "SandboxClass",
     "SandboxPage",
     "SandboxState",
+    "Secret",
+    "SecretHeader",
     "Size",
     "Snapshot",
     "SnapshotDeleteResult",

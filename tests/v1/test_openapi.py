@@ -25,6 +25,7 @@ BASE = "https://spec.invalid/"
 HTTP_METHODS = {"get", "put", "post", "delete", "patch", "head", "options"}
 
 OPERATION_IDS = [
+    "account_cost",
     "cost",
     "create",
     "destroy",
@@ -354,6 +355,7 @@ def test_create_request_is_an_sps_request_plus_three_fields() -> None:
         "env",
         "labels",
         "snapshot",
+        "secrets",
     }
 
 

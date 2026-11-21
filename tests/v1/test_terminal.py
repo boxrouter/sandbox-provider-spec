@@ -127,7 +127,7 @@ class TerminalProvider(Provider, manifest=False):
     async def process_output(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError
 
-    async def cost(self, sandbox_id: str) -> Any:
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Any:
         raise NotImplementedError
 
     async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:

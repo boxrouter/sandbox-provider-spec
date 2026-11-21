@@ -519,12 +519,23 @@ paths:
         every state, including after the sandbox ends. While the sandbox exists the status is `accruing`. The cost reaches
         `final` within `limits.cost_final_within_seconds` after the sandbox ends and stays readable at least until it is
         `final`.
+      parameters:
+        - name: created_at
+          in: query
+          required: false
+          description: >-
+            A lookup hint: when the caller knows the sandbox was created (the `created_at` that `create` or `get` returned).
+            A provider whose usage records are kept by time may use it to bound where it looks for them, and **must not**
+            report a cost from before it. A provider that knows the time itself ignores it. A provider that needs the time
+            and gets none answers with its own error.
+          schema: {$ref: "#/components/schemas/Timestamp"}
       responses:
         "200":
           description: The cost so far, or the final cost.
           content:
             application/json:
               schema: {$ref: "#/components/schemas/Cost"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "404": {$ref: "#/components/responses/NotFound"}
@@ -1116,6 +1127,42 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/cost:
+    get:
+      operationId: account_cost
+      tags: [optional]
+      summary: The account's cost over a window
+      description: >-
+        What the whole account was charged for the window from `start` up to `end`, as the provider's own account records
+        state it. A billing true-up compares it with the sum of the sandbox costs. Offered when discovery states
+        `limits.account_cost_window_seconds`, the longest window that the provider answers; without it the answer is
+        `unsupported`. A window that is empty, reversed or longer than that limit is `invalid_request`. The cost needs no
+        sandbox: it covers every charge on the account in the window, including charges for sandboxes that are gone.
+      parameters:
+        - name: start
+          in: query
+          required: true
+          description: The start of the window, inclusive.
+          schema: {$ref: "#/components/schemas/Timestamp"}
+        - name: end
+          in: query
+          required: true
+          description: The end of the window, exclusive. It is after `start`.
+          schema: {$ref: "#/components/schemas/Timestamp"}
+      responses:
+        "200":
+          description: The account's cost for the window.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/AccountCost"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
   /v1/sandboxes/{sandbox_id}/terminals:
     parameters:
       - {$ref: "#/components/parameters/SandboxId"}
@@ -1517,8 +1564,9 @@ components:
     Limits:
       type: object
       description: >-
-        The provider's limits. Each value except `cost_final_within_seconds` is at least its floor, which every conforming
-        provider meets. `cost_final_within_seconds` is the provider's own statement, and stating it offers `cost`.
+        The provider's limits. Each value except `cost_final_within_seconds` and `account_cost_window_seconds` is at least its
+        floor, which every conforming provider meets. Those two are the provider's own statements, and stating one offers
+        `cost` or `account.cost`.
       required:
         - file_bytes
         - run_timeout_ms
@@ -1550,6 +1598,11 @@ components:
           description: >-
             Largest build context (the tar archive) that `image_prepare` accepts. Stated by a provider that lists the image
             operations; at least 512 MiB.
+        account_cost_window_seconds:
+          type: integer
+          minimum: 1
+          description: >-
+            Offers `account.cost`. The longest window, in seconds, that `account.cost` answers. The spec sets no ceiling.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -1707,13 +1760,78 @@ components:
           description: >-
             Restore: start the new sandbox from this snapshot (needs the `snapshots` section). `image` must be absent or null.
             The labels of the saved sandbox are not copied.
+        secrets:
+          type: array
+          minItems: 1
+          maxItems: 64
+          items: {$ref: "#/components/schemas/Secret"}
+          description: >-
+            Credentials that the provider adds to the sandbox's outgoing requests without code in the sandbox being able to
+            read them (needs the `hidden_secrets` section: `requirements` names it, or the request is `invalid_request`).
+            Write-only: no response, log line or error body carries a `value`, and a provider **must not** return one. Code in
+            the sandbox sees only each `placeholder`.
       allOf:
+        - if:
+            required: [secrets]
+          then:
+            required: [requirements]
+            properties:
+              requirements: {required: [hidden_secrets]}
         - if:
             required: [lifetime_seconds]
             properties:
               lifetime_seconds: {type: "null"}
           then:
             not: {required: [at_end]}
+    Secret:
+      type: object
+      additionalProperties: false
+      required: [placeholder, value, hosts]
+      properties:
+        placeholder:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: "The text that code in the sandbox sees and may put where the credential belongs."
+        value:
+          type: string
+          minLength: 1
+          description: "The credential. Write-only: it is never returned, logged or put in an error."
+        hosts:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: {type: string, minLength: 1, maxLength: 253}
+          description: >-
+            The host names whose requests receive the credential, in the syntax of the `inject_into` setting. The provider adds
+            the credential to requests for these hosts and no others.
+        headers:
+          type: array
+          minItems: 1
+          description: >-
+            The request headers that carry the credential (needs the `header_templates` knob; `hosts` are then exact host
+            names). Each is set to `prefix`, then the value, then `suffix`. Absent: the provider's default way of carrying it.
+          items:
+            type: object
+            additionalProperties: false
+            required: [name]
+            properties:
+              name: {type: string, pattern: "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$", description: "An HTTP header name."}
+              prefix: {type: string, default: "", description: "Text before the value."}
+              suffix: {type: string, default: "", description: "Text after the value."}
+      description: One write-only credential of a create.
+    ProviderTime:
+      type: object
+      additionalProperties: false
+      required: [kind, at, source]
+      properties:
+        kind:
+          enum:
+            [created, started, ready, paused, resumed, stopped, ended, deadline, billed_start, billed_end, requested, stop_requested, updated, checkpointed]
+          description: What the time is.
+        at: {$ref: "#/components/schemas/Timestamp"}
+        source: {type: string, minLength: 1, description: "The provider's own name for the field that held the time."}
+      description: One time that the provider reports about a sandbox, under its own field name.
     Sandbox:
       type: object
       required: [id, sandbox_class, state, size, region, image, labels, created_at, ends_at, at_end]
@@ -1737,6 +1855,13 @@ components:
         at_end:
           enum: [destroyed, paused, null]
           description: The state the timer ends it in; null with no lifetime.
+        times:
+          type: array
+          items: {$ref: "#/components/schemas/ProviderTime"}
+          description: >-
+            Times that the provider's own records state for the sandbox, each under the provider's own field name. A cost
+            read places the provider's bill against them. `get` returns them when the provider keeps any; `list` may omit
+            them. Absent means that the provider reports none.
       description: Returned by `create`, `get`, `list`, `pause`, `resume` and `lifetime.extend`.
     SandboxPage:
       type: object
@@ -1808,6 +1933,34 @@ components:
           description: >-
             The end of the period. Both `start` and `end` null: the line covers no period, as a fee does. `start` set and `end`
             null: an open period, allowed only while the status is `accruing`.
+    AccountCost:
+      type: object
+      required: [start, end, status, total_usd, source, lines, as_of]
+      properties:
+        start: {$ref: "#/components/schemas/Timestamp"}
+        end: {$ref: "#/components/schemas/Timestamp"}
+        status:
+          enum: [accruing, final]
+          description: >-
+            `final` means that the figures will not change. A window that reaches into the provider's open billing period is
+            `accruing`.
+        total_usd:
+          anyOf: [{$ref: "#/components/schemas/Decimal"}, {type: "null"}]
+          description: >-
+            The sum of the line amounts, in US dollars at the provider's published list price, before any plan, free tier,
+            trial, credit or discount. Null only while the status is `accruing` and nothing is metered yet.
+        source:
+          enum: [reported, calculated]
+          description: As for `Cost`.
+        lines:
+          type: array
+          items: {$ref: "#/components/schemas/CostLine"}
+        as_of:
+          $ref: "#/components/schemas/Timestamp"
+          description: The time up to which these figures count usage. It may be earlier than the time of the read.
+      description: >-
+        What the account was charged between `start` and `end`. It carries money only: each line has an `item` and an
+        `amount_usd`.
     DestroyResult:
       type: object
       required: [sandbox_id, state]

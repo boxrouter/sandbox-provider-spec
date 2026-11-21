@@ -9,15 +9,19 @@ equals `x` for every valid `x` that the OpenAPI file's examples show.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+import json
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, TypeVar, cast
 
+from jsonschema.exceptions import ValidationError
+
 from sandbox_provider_spec.v1._spec_files import validator
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, Outcome, SpsError
 from sandbox_provider_spec.v1.types import (
+    AccountCost,
     Cost,
     CostLine,
     CreateRequest,
@@ -47,12 +51,15 @@ from sandbox_provider_spec.v1.types import (
     Process,
     ProcessStartRequest,
     ProviderInfo,
+    ProviderTime,
     RegistryCredentials,
     RunRequest,
     RunResult,
     Sandbox,
     SandboxClass,
     SandboxPage,
+    Secret,
+    SecretHeader,
     Size,
     Snapshot,
     SnapshotDeleteResult,
@@ -93,6 +100,17 @@ def _stamp(value: datetime) -> str:
     return text + "Z"
 
 
+def timestamp(value: datetime) -> str:
+    """A time as the text of a `Timestamp` (RFC 3339 in UTC with a `Z`), for a query parameter."""
+    return _stamp(value)
+
+
+def parse_timestamp(text: str) -> datetime:
+    """The time of a `Timestamp` text. Raises `WireError` when it is not one."""
+    _check("Timestamp", text)
+    return _time(text)
+
+
 def _opt(value: Any, convert: Callable[[Any], Any]) -> Any:
     return None if value is None else convert(value)
 
@@ -116,8 +134,26 @@ def _enc_size(value: Size) -> Json:
     return out
 
 
+def _enc_provider_time(value: ProviderTime) -> Json:
+    return {"kind": value.kind, "at": _stamp(value.at), "source": value.source}
+
+
+def _enc_secret(value: Secret) -> Json:
+    out: Json = {
+        "placeholder": value.placeholder,
+        "value": value.value,
+        "hosts": list(value.hosts),
+    }
+    if value.headers:
+        out["headers"] = [
+            {"name": header.name, "prefix": header.prefix, "suffix": header.suffix}
+            for header in value.headers
+        ]
+    return out
+
+
 def _enc_sandbox(value: Sandbox) -> Json:
-    return {
+    out: Json = {
         "id": value.id,
         "sandbox_class": value.sandbox_class,
         "state": value.state,
@@ -133,6 +169,9 @@ def _enc_sandbox(value: Sandbox) -> Json:
         "ends_at": _opt(value.ends_at, _stamp),
         "at_end": value.at_end,
     }
+    if value.times:
+        out["times"] = [_enc_provider_time(item) for item in value.times]
+    return out
 
 
 def _enc_create_request(value: CreateRequest) -> Json:
@@ -149,6 +188,8 @@ def _enc_create_request(value: CreateRequest) -> Json:
     out["env"] = dict(value.env)
     out["labels"] = dict(value.labels)
     _put(out, "snapshot", value.snapshot)
+    if value.secrets:
+        out["secrets"] = [_enc_secret(item) for item in value.secrets]
     return out
 
 
@@ -278,6 +319,18 @@ def _enc_prepared_image(value: PreparedImage) -> Json:
     }
 
 
+def _enc_account_cost(value: AccountCost) -> Json:
+    return {
+        "start": _stamp(value.start),
+        "end": _stamp(value.end),
+        "status": value.status,
+        "total_usd": _opt(value.total_usd, _dec),
+        "source": value.source,
+        "lines": [_enc_cost_line(line) for line in value.lines],
+        "as_of": _stamp(value.as_of),
+    }
+
+
 def _enc_class(value: SandboxClass) -> Json:
     out: Json = {
         "id": value.id,
@@ -326,6 +379,7 @@ def _enc_limits(value: Limits) -> Json:
     }
     _put(out, "cost_final_within_seconds", value.cost_final_within_seconds)
     _put(out, "image_context_bytes", value.image_context_bytes)
+    _put(out, "account_cost_window_seconds", value.account_cost_window_seconds)
     return out
 
 
@@ -369,6 +423,22 @@ def _dec_size(data: Json) -> Size:
     return Size(cpu=data["cpu"], memory_mib=data["memory_mib"], disk_mib=data.get("disk_mib"))
 
 
+def _dec_provider_time(data: Json) -> ProviderTime:
+    return ProviderTime(kind=data["kind"], at=_time(data["at"]), source=data["source"])
+
+
+def _dec_secret(data: Json) -> Secret:
+    return Secret(
+        placeholder=data["placeholder"],
+        value=data["value"],
+        hosts=tuple(data["hosts"]),
+        headers=tuple(
+            SecretHeader(h["name"], h.get("prefix", ""), h.get("suffix", ""))
+            for h in data.get("headers", ())
+        ),
+    )
+
+
 def _dec_sandbox(data: Json) -> Sandbox:
     return Sandbox(
         id=data["id"],
@@ -381,6 +451,7 @@ def _dec_sandbox(data: Json) -> Sandbox:
         created_at=_time(data["created_at"]),
         ends_at=_opt(data["ends_at"], _time),
         at_end=data["at_end"],
+        times=tuple(_dec_provider_time(item) for item in data.get("times", ())),
     )
 
 
@@ -395,6 +466,7 @@ def _dec_create_request(data: Json) -> CreateRequest:
         env=dict(data.get("env", {})),
         labels=dict(data.get("labels", {})),
         snapshot=data.get("snapshot"),
+        secrets=tuple(_dec_secret(item) for item in data.get("secrets", ())),
     )
 
 
@@ -504,6 +576,18 @@ def _dec_prepared_image(data: Json) -> PreparedImage:
     )
 
 
+def _dec_account_cost(data: Json) -> AccountCost:
+    return AccountCost(
+        start=_time(data["start"]),
+        end=_time(data["end"]),
+        status=data["status"],
+        total_usd=_opt(data["total_usd"], _decimal),
+        source=data["source"],
+        lines=tuple(_dec_cost_line(line) for line in data["lines"]),
+        as_of=_time(data["as_of"]),
+    )
+
+
 def _dec_class(data: Json) -> SandboxClass:
     return SandboxClass(
         id=data["id"],
@@ -566,6 +650,9 @@ _CODECS: dict[type, _Codec] = {
     Price: _Codec("Price", _enc_price, _dec_price),
     CostLine: _Codec("CostLine", _enc_cost_line, _dec_cost_line),
     Cost: _Codec("Cost", _enc_cost, _dec_cost),
+    AccountCost: _Codec("AccountCost", _enc_account_cost, _dec_account_cost),
+    ProviderTime: _Codec("ProviderTime", _enc_provider_time, _dec_provider_time),
+    Secret: _Codec("Secret", _enc_secret, _dec_secret),
     DestroyResult: _Codec(
         "DestroyResult",
         lambda v: {"sandbox_id": v.sandbox_id, "state": v.state},
@@ -778,11 +865,39 @@ _CODECS: dict[type, _Codec] = {
 }
 
 
+def _secret_values(data: Any) -> list[str]:
+    """The `secrets[].value` strings of a create body (or of one secret), for redaction."""
+    items = data.get("secrets") if isinstance(data, dict) else None
+    if isinstance(items, list):
+        found = [item.get("value") for item in items if isinstance(item, dict)]
+    else:
+        found = [data.get("value")] if isinstance(data, dict) else []
+    return [value for value in found if isinstance(value, str) and value]
+
+
+def _error_text(schema: str, error: ValidationError, values: Sequence[str]) -> str:
+    """One validation error as text that carries no secret value.
+
+    A schema message may quote the offending instance, and a create's secret values must reach
+    no error body or log line. An error inside a secret says only which rule failed; any other
+    message has every secret value cut out of it, in plain, `repr` and JSON spelling.
+    """
+    path = list(error.path)
+    if schema == "Secret" or (schema == "CreateRequest" and path[:1] == ["secrets"]):
+        return f"does not satisfy {error.validator}"
+    text = error.message
+    for value in values:
+        for spelling in (value, repr(value)[1:-1], json.dumps(value)[1:-1]):
+            text = text.replace(spelling, "[redacted]")
+    return text[:200]
+
+
 def _check(schema: str, data: Any) -> None:
     errors = sorted(validator(schema).iter_errors(data), key=lambda error: list(error.path))
     if errors:
+        values = _secret_values(data) if schema in ("CreateRequest", "Secret") else []
         details = "; ".join(
-            f"{'/'.join(map(str, error.path)) or '(root)'}: {error.message[:200]}"
+            f"{'/'.join(map(str, error.path)) or '(root)'}: {_error_text(schema, error, values)}"
             for error in errors[:5]
         )
         raise WireError(f"not a valid {schema}: {details}")

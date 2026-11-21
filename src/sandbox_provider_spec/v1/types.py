@@ -54,6 +54,33 @@ class Size:
     disk_mib: int | None = None
 
 
+TimeKind = Literal[
+    "created",
+    "started",
+    "ready",
+    "paused",
+    "resumed",
+    "stopped",
+    "ended",
+    "deadline",
+    "billed_start",
+    "billed_end",
+    "requested",
+    "stop_requested",
+    "updated",
+    "checkpointed",
+]
+
+
+@dataclass(frozen=True)
+class ProviderTime:
+    """One time that the provider's own records state for a sandbox."""
+
+    kind: TimeKind
+    at: datetime
+    source: str  # the provider's own name for the field that held the time
+
+
 @dataclass(frozen=True)
 class Sandbox:
     id: str
@@ -66,12 +93,31 @@ class Sandbox:
     created_at: datetime
     ends_at: datetime | None
     at_end: EndState | None
+    times: Sequence[ProviderTime] = ()  # `get` returns them when the provider keeps any
 
 
 @dataclass(frozen=True)
 class SandboxPage:
     sandboxes: Sequence[Sandbox]
     next_cursor: str | None
+
+
+@dataclass(frozen=True)
+class SecretHeader:
+    name: str  # an HTTP header name
+    prefix: str = ""
+    suffix: str = ""
+
+
+@dataclass(frozen=True)
+class Secret:
+    """One write-only credential of a create (needs the `hidden_secrets` section). The value is
+    never returned, logged or put in an error, and is left out of `repr`."""
+
+    placeholder: str  # what code in the sandbox sees
+    value: str = field(repr=False)
+    hosts: Sequence[str]
+    headers: Sequence[SecretHeader] = ()
 
 
 @dataclass(frozen=True)
@@ -85,6 +131,7 @@ class CreateRequest:
     env: Mapping[str, str] = field(default_factory=dict)
     labels: Mapping[str, str] = field(default_factory=dict)
     snapshot: str | None = None  # restore from this snapshot (needs the `snapshots` section)
+    secrets: Sequence[Secret] = field(default=(), repr=False)  # write-only; see `Secret`
 
 
 @dataclass(frozen=True)
@@ -124,6 +171,19 @@ class Cost:
     lines: Sequence[CostLine]
     as_of: datetime  # when the provider stated the figures
     snapshot_id: str | None = None  # set by `snapshot_cost` only
+
+
+@dataclass(frozen=True)
+class AccountCost:
+    """What the account was charged between `start` and `end`; money only."""
+
+    start: datetime
+    end: datetime
+    status: Literal["accruing", "final"]
+    total_usd: Decimal | None  # null only while `accruing` and nothing is metered yet
+    source: Literal["reported", "calculated"]
+    lines: Sequence[CostLine]
+    as_of: datetime
 
 
 @dataclass(frozen=True)
@@ -427,6 +487,7 @@ class Limits:
     list_limit: int
     cost_final_within_seconds: int | None = None  # stating it offers `cost`
     image_context_bytes: int | None = None  # the largest build context `image_prepare` accepts
+    account_cost_window_seconds: int | None = None  # stating it offers `account.cost`
 
 
 @dataclass(frozen=True)

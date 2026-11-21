@@ -13,6 +13,7 @@ import sys
 import textwrap
 import typing
 from collections.abc import AsyncIterable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -74,6 +75,10 @@ OPTIONAL = {
     "image_list": ("image.list", ()),
     "image_delete": ("image.delete", ("n",)),
     "cost": ("cost", ("s",)),
+    "account_cost": (
+        "account.cost",
+        (datetime(2026, 11, 13, tzinfo=UTC), datetime(2026, 11, 14, tzinfo=UTC)),
+    ),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
 
@@ -94,7 +99,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 36
+    assert len(ids) == 37
 
 
 def test_error_table_is_the_openapi_table() -> None:

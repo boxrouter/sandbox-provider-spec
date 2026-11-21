@@ -7,6 +7,7 @@ from __future__ import annotations
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Mapping
+from datetime import datetime
 from importlib.resources import as_file, files
 from types import MappingProxyType
 from typing import Any, ClassVar
@@ -17,6 +18,7 @@ from sandbox_provider_spec.load import load
 from sandbox_provider_spec.v1._spec_files import document
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.types import (
+    AccountCost,
     Cost,
     CreateRequest,
     CredentialField,
@@ -196,14 +198,22 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     # Optional operations. Each default refuses with `unsupported`; a provider overrides the
     # ones whose section it claims and the tester passes. `cost` is one of them: a provider
-    # offers it by stating `limits.cost_final_within_seconds`.
+    # offers it by stating `limits.cost_final_within_seconds` (and `account.cost`, by stating
+    # `limits.account_cost_window_seconds`).
 
     def _unsupported(self, operation: str) -> SpsError:
         provider = getattr(type(self), "provider_id", type(self).__name__)
         return SpsError("unsupported", f"{provider} does not support {operation}")
 
-    async def cost(self, sandbox_id: str) -> Cost:
+    async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
+        """The sandbox's cost. `created_at` is a lookup hint only: use it to bound where to look
+        for records, never report a cost from before it, and ignore it when the time is known."""
         raise self._unsupported("cost")
+
+    async def account_cost(self, start: datetime, end: datetime) -> AccountCost:
+        """The account's cost for the window from `start` up to `end` (`account.cost`). A provider
+        offers it by stating `limits.account_cost_window_seconds`."""
+        raise self._unsupported("account.cost")
 
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         raise self._unsupported("files.link")
