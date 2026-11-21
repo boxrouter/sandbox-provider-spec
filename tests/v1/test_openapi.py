@@ -25,8 +25,10 @@ BASE = "https://spec.invalid/"
 HTTP_METHODS = {"get", "put", "post", "delete", "patch", "head", "options"}
 
 OPERATION_IDS = [
+    "account_capacity",
     "account_cost",
     "cost",
+    "cost_capture",
     "create",
     "destroy",
     "discovery",

@@ -518,7 +518,7 @@ paths:
         Offered when discovery states `limits.cost_final_within_seconds`; without it the answer is `unsupported`. Works in
         every state, including after the sandbox ends. While the sandbox exists the status is `accruing`. The cost reaches
         `final` within `limits.cost_final_within_seconds` after the sandbox ends and stays readable at least until it is
-        `final`.
+        `final`. A class that lists `cost.capture` is exempt from the readable-after-the-end rule.
       parameters:
         - name: created_at
           in: query
@@ -539,6 +539,59 @@ paths:
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "404": {$ref: "#/components/responses/NotFound"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/cost/capture:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    post:
+      operationId: cost_capture
+      tags: [optional]
+      summary: Fix the sandbox's cost before it is destroyed (idempotent)
+      description: >-
+        Offered when a class lists `cost.capture` in `operations`. For a provider whose usage records go with the sandbox:
+        the call fixes the figure while the records still exist and returns it as a `Cost`. After it, the only operations
+        that the sandbox allows are `get`, a repeated `cost_capture` and `destroy`; the others answer `conflict`. A repeat
+        with the same key, or any later capture, returns the same figures. A provider whose classes list it need not keep
+        the cost readable after the sandbox ends.
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      responses:
+        "200":
+          description: The captured cost.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Cost"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/account/capacity:
+    get:
+      operationId: account_capacity
+      tags: [optional]
+      summary: What the account may still start, run and spend
+      description: >-
+        Offered when a class lists `account.capacity` in `operations`. The account that the credential belongs to: how many
+        starts each window allows, whether it can start now, its concurrency and its prepaid balance. A null field means that
+        the provider does not know it.
+      responses:
+        "200":
+          description: The account's capacity as of the time stated.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/AccountCapacity"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
         "422": {$ref: "#/components/responses/Unsupported"}
         "429": {$ref: "#/components/responses/RateLimited"}
         "500": {$ref: "#/components/responses/ProviderError"}
@@ -1713,6 +1766,8 @@ components:
               - labels.update
               - image.prepare.oci_layout
               - image.cost
+              - cost.capture
+              - account.capacity
           allOf:
             - if: {contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}}
               then:
@@ -1735,7 +1790,7 @@ components:
             Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
             listed all four or none, and so are the image operations `image.prepare`, `image.get`, `image.list` and
             `image.delete` (the class also claims `custom_images` knob `prepared`). `run.base64` says that `run` accepts
-            `output: base64`, and `labels.update` stands alone (it is not part of either group). Two more need
+            `output: base64`, and `labels.update`, `cost.capture` and `account.capacity` each stand alone (they are not part of either group). Two more need
             `image.prepare`: `image.cost` (`GET /v1/images/{id}/cost`) and `image.prepare.oci_layout` (an OCI image arrives as
             an image-layout tar in the `context` part, and the provider states `limits.image_layout_bytes`). They turn on when
             the tester passes them.
@@ -2019,6 +2074,57 @@ components:
       description: >-
         The sandbox's cost. Quantities come from the provider's own records of the sandbox, never from a clock in the consumer
         or in an adapter. "The sandbox ends" is when `get` reports it `destroyed` or it is gone.
+    AccountCapacity:
+      type: object
+      required: [as_of, starts, can_start, paid_overage_enabled, concurrency, prepaid]
+      additionalProperties: false
+      properties:
+        as_of:
+          $ref: "#/components/schemas/Timestamp"
+          description: The time that these figures describe.
+        starts:
+          type: array
+          items: {$ref: "#/components/schemas/StartWindow"}
+          description: How many sandbox starts each limited window allows. Empty when the provider limits no starts.
+        can_start:
+          type: [boolean, "null"]
+          description: Whether the account may start a sandbox now. Null when unknown.
+        paid_overage_enabled:
+          type: [boolean, "null"]
+          description: Whether starts beyond a window's limit are allowed and charged. Null when unknown.
+        concurrency:
+          anyOf: [{$ref: "#/components/schemas/Concurrency"}, {type: "null"}]
+          description: The account's running sandboxes against its cap. Null when unknown.
+        prepaid:
+          anyOf: [{$ref: "#/components/schemas/Prepaid"}, {type: "null"}]
+          description: The account's prepaid balance. Null when unknown or when the account has none.
+      description: >-
+        What the account may still do, as one read. A null field means unknown; it is never a zero or a guess.
+    StartWindow:
+      type: object
+      required: [window_seconds, used, limit, remaining]
+      additionalProperties: false
+      properties:
+        window_seconds: {type: integer, minimum: 1, description: The length of the window, in seconds.}
+        used: {type: integer, minimum: 0, description: Starts counted in the window so far.}
+        limit: {type: integer, minimum: 0, description: Starts that the window allows.}
+        remaining: {type: integer, minimum: 0, description: Starts left in the window.}
+    Concurrency:
+      type: object
+      required: [active, limit]
+      additionalProperties: false
+      properties:
+        active: {type: integer, minimum: 0, description: Sandboxes that count against the cap now.}
+        limit: {type: integer, minimum: 0, description: The most sandboxes that may count at once.}
+    Prepaid:
+      type: object
+      required: [balance_usd, past_due]
+      additionalProperties: false
+      properties:
+        balance_usd:
+          $ref: "#/components/schemas/Decimal"
+          description: The prepaid balance, in US dollars.
+        past_due: {type: boolean, description: Whether the account owes a payment that the provider has not received.}
     CostLine:
       type: object
       required: [item, amount_usd]

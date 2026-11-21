@@ -25,6 +25,7 @@ import websockets.exceptions
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, ErrorCode, SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
+    AccountCapacity,
     AccountCost,
     Cost,
     CreateRequest,
@@ -604,6 +605,19 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
         return await self._json(AccountCost, "GET", "/v1/cost", params=params)
 
     # --- optional operations ----------------------------------------------------------------
+
+    async def cost_capture(self, sandbox_id: str, *, idempotency_key: str) -> Cost:
+        if not _IDEMPOTENCY_KEY.fullmatch(idempotency_key):
+            raise SpsError("invalid_request", "idempotency_key is not a valid key")
+        return await self._json(
+            Cost,
+            "POST",
+            self._sandbox_path(sandbox_id, "/cost/capture"),
+            headers={"Idempotency-Key": idempotency_key},
+        )
+
+    async def account_capacity(self) -> AccountCapacity:
+        return await self._json(AccountCapacity, "GET", "/v1/account/capacity")
 
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         return await self._json(

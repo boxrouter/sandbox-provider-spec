@@ -122,7 +122,7 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 
 `cost` is optional: state `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`, or leave it out and `cost` answers `unsupported`. If you offer it:
 
-1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. Take quantities from your own records, never from a clock in the consumer or an adapter.
+1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. If your usage records go with the sandbox, list `cost.capture` instead (below). Take quantities from your own records, never from a clock in the consumer or an adapter.
 2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee) or `usage` (what the line reports, with `amount_usd` null). `total_usd` is the sum of the lines, and null for `usage`. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
 3. `as_of` is the time up to which your figures count usage. It may be earlier than the time of the read, if your records lag.
 4. `final` means that the figures will not change. Make the cost `final` within `cost_final_within_seconds` after the sandbox ends, or after storage that outlives it ends (you choose the number; the tester waits at most 7 days). A `final` cost has no open line, and a `total_usd` unless its `source` is `usage`.
@@ -392,6 +392,14 @@ is needed to be a valid 1.0 provider.
   whose own command failed. Set it only then: a caller does not try another provider for a broken
   build. `field` names the request field at fault; on a `create`, `provider_error` with `field`
   `image` says that the prepared image never booted.
+
+### Cost capture and account capacity
+
+Two more operations are claimed in `classes[].operations`, each on its own, and they turn on when the tester passes them.
+
+`cost.capture` is for a provider whose usage records disappear when the sandbox does. `POST /v1/sandboxes/{sandbox_id}/cost/capture`, with an `Idempotency-Key`, fixes the cost while the records still exist and returns it as a `Cost`. After it the sandbox allows only `get`, another capture and `destroy` (every other call is `conflict`), and another capture returns the same figures. A class that lists it need not keep `cost` readable after the sandbox ends.
+
+`account.capacity` is `GET /v1/account/capacity`. It returns `as_of`, `starts` (a list of `{window_seconds, used, limit, remaining}`), `can_start`, `paid_overage_enabled`, `concurrency` (`{active, limit}`) and `prepaid` (`{balance_usd, past_due}`). Every field is present, and a value that you do not know is null, never a zero or a guess.
 
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,

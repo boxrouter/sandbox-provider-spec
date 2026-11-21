@@ -76,6 +76,15 @@ untested:
     The claim is checked where it is made: discovery's schema refuses a list of some but not all
     four operations (tests/v1/test_interface.py), and the tester runs the `directories.` tests
     only for a class that lists them. The equivalence with commands is what those tests check.
+  provider-api/cost-capture: >-
+    A capture fixes figures that only the provider's own records can confirm, and what the sandbox
+    allows afterwards is a state that the shared tests do not create. The reference server and the
+    client pass it through unchanged, and `HttpProvider` and the server are checked against the
+    OpenAPI file (tests/v1/test_cost_capture_capacity.py).
+  provider-api/account-capacity: >-
+    The limits and balance of an account are the provider's own figures, and no run can set them to
+    compare. The reference server and the client pass the object through unchanged, and its schema
+    refuses a missing field (tests/v1/test_cost_capture_capacity.py).
   provider-api/cost-offered: >-
     A provider offers cost by stating a value in discovery. The tester reads that value and leaves
     the cost tests out, and prints `operation cost unsupported`, when it is absent

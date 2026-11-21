@@ -21,7 +21,9 @@ from jsonschema.exceptions import ValidationError
 from sandbox_provider_spec.v1._spec_files import validator
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, Outcome, SpsError
 from sandbox_provider_spec.v1.types import (
+    AccountCapacity,
     AccountCost,
+    Concurrency,
     Cost,
     CostLine,
     CreateRequest,
@@ -44,6 +46,7 @@ from sandbox_provider_spec.v1.types import (
     OutputChunk,
     OutputPage,
     PathInfo,
+    Prepaid,
     PreparedImage,
     PreviewLink,
     Price,
@@ -65,6 +68,7 @@ from sandbox_provider_spec.v1.types import (
     SnapshotDeleteResult,
     SnapshotPage,
     SnapshotRequest,
+    StartWindow,
     TcpLink,
     TerminalLink,
     TerminalRequest,
@@ -345,6 +349,30 @@ def _enc_account_cost(value: AccountCost) -> Json:
     }
 
 
+def _enc_account_capacity(value: AccountCapacity) -> Json:
+    return {
+        "as_of": _stamp(value.as_of),
+        "starts": [
+            {
+                "window_seconds": item.window_seconds,
+                "used": item.used,
+                "limit": item.limit,
+                "remaining": item.remaining,
+            }
+            for item in value.starts
+        ],
+        "can_start": value.can_start,
+        "paid_overage_enabled": value.paid_overage_enabled,
+        "concurrency": _opt(
+            value.concurrency, lambda item: {"active": item.active, "limit": item.limit}
+        ),
+        "prepaid": _opt(
+            value.prepaid,
+            lambda item: {"balance_usd": _dec(item.balance_usd), "past_due": item.past_due},
+        ),
+    }
+
+
 def _enc_class(value: SandboxClass) -> Json:
     out: Json = {
         "id": value.id,
@@ -618,6 +646,20 @@ def _dec_account_cost(data: Json) -> AccountCost:
     )
 
 
+def _dec_account_capacity(data: Json) -> AccountCapacity:
+    return AccountCapacity(
+        as_of=_time(data["as_of"]),
+        starts=tuple(StartWindow(**item) for item in data["starts"]),
+        can_start=data["can_start"],
+        paid_overage_enabled=data["paid_overage_enabled"],
+        concurrency=_opt(data["concurrency"], lambda item: Concurrency(**item)),
+        prepaid=_opt(
+            data["prepaid"],
+            lambda item: Prepaid(_decimal(item["balance_usd"]), item["past_due"]),
+        ),
+    )
+
+
 def _dec_class(data: Json) -> SandboxClass:
     return SandboxClass(
         id=data["id"],
@@ -684,6 +726,7 @@ _CODECS: dict[type, _Codec] = {
     AccountCost: _Codec("AccountCost", _enc_account_cost, _dec_account_cost),
     ProviderTime: _Codec("ProviderTime", _enc_provider_time, _dec_provider_time),
     Secret: _Codec("Secret", _enc_secret, _dec_secret),
+    AccountCapacity: _Codec("AccountCapacity", _enc_account_capacity, _dec_account_capacity),
     DestroyResult: _Codec(
         "DestroyResult",
         lambda v: {"sandbox_id": v.sandbox_id, "state": v.state},

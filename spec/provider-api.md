@@ -232,6 +232,7 @@ true zero, never "not counted yet".
   ends. `final` means that the figures **MUST NOT** change afterwards. A `final` cost has no open
   line, and a `total_usd` unless its source is `usage`. The provider chooses the number and states it as it is.
 - A provider **MUST** keep the cost readable after the sandbox ends at least until it is `final`. <!-- rule: provider-api/cost-retained -->
+  A class that lists `cost.capture` (below) is exempt from this rule.
 
 While the sandbox exists, `cost` returns the cost so far with status `accruing`. SPS defines no
 correction after `final`: a consumer that finds a later difference reconciles it itself.
@@ -248,6 +249,16 @@ amounts and the sources of a sandbox cost but no quantities required. It needs n
 counts charges for sandboxes that are gone, and a billing true-up compares it with the sum of the
 sandbox costs. A window that is empty, reversed or longer than the stated limit is `invalid_request`.
 Without the limit `account.cost` answers `unsupported`.
+**Capturing the cost before the end.** Some providers delete their usage records with the sandbox,
+so `cost` cannot be read after the end. Such a provider lists `cost.capture` in `classes[].operations`
+of each class that has it. `POST /v1/sandboxes/{sandbox_id}/cost/capture`, with an `Idempotency-Key`
+header, fixes the figure while the records still exist and returns it as a `Cost`.
+
+- A provider that lists `cost.capture` **MUST**, on a capture, return the cost that it will state <!-- rule: provider-api/cost-capture -->
+  for that sandbox. After a capture the sandbox allows only `get`, a repeated capture and
+  `destroy`; every other operation on it is `conflict`. A repeated capture, with the same key or
+  another, **MUST** return the same figures. A consumer captures once, immediately before it
+  destroys, and keeps the figure. The provider need not keep `cost` readable after the sandbox ends.
 
 ## 11. Errors
 
@@ -651,3 +662,25 @@ tells a caller which side failed.
   (`context`, `source`, `image`). On a `create` that answers `provider_error`, `image` means that the
   prepared image it named never booted, and a caller retires that image.
 
+## 23. Account capacity
+
+`account.capacity` tells a consumer what the account that owns the credential may still start, run
+and spend, so that it can admit work without trying a start that the provider will refuse. A
+provider that has such limits lists `account.capacity` in `classes[].operations` of each class that
+it applies to; like the directory operations, it is no SPS gate, and it turns on when the tester
+passes it.
+
+`GET /v1/account/capacity` takes no parameters and returns one object:
+
+| Field | Meaning |
+| --- | --- |
+| `as_of` | The time that the figures describe. |
+| `starts` | A list of `{window_seconds, used, limit, remaining}`: how many starts each limited window allows. Empty when no starts are limited. |
+| `can_start` | Whether the account may start a sandbox now, or null. |
+| `paid_overage_enabled` | Whether starts beyond a window's limit are allowed and charged, or null. |
+| `concurrency` | `{active, limit}`, the running sandboxes against the cap, or null. |
+| `prepaid` | `{balance_usd, past_due}`, the prepaid balance in US dollars as a decimal string, or null. |
+
+- A provider that lists `account.capacity` **MUST** return every field, and a field whose value it <!-- rule: provider-api/account-capacity -->
+  does not know **MUST** be null, never a zero or a guess. `remaining` is the number of starts left
+  in the window.

@@ -80,6 +80,8 @@ OPTIONAL = {
         (datetime(2026, 11, 13, tzinfo=UTC), datetime(2026, 11, 14, tzinfo=UTC)),
     ),
     "image_cost": ("image.cost", ("i",)),
+    "cost_capture": ("cost.capture", ("s", {"idempotency_key": "idem-key-1"})),
+    "account_capacity": ("account.capacity", ()),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
 
@@ -100,7 +102,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 38
+    assert len(ids) == 40
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -139,6 +141,7 @@ def test_every_json_object_type_is_covered() -> None:
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
         "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest",
         "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
+        "StartWindow", "Concurrency", "Prepaid",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}
     assert set(example_names()) == every - plain

@@ -18,6 +18,7 @@ from sandbox_provider_spec.load import load
 from sandbox_provider_spec.v1._spec_files import document
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.types import (
+    AccountCapacity,
     AccountCost,
     Cost,
     CreateRequest,
@@ -214,6 +215,17 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         """The account's cost for the window from `start` up to `end` (`account.cost`). A provider
         offers it by stating `limits.account_cost_window_seconds`."""
         raise self._unsupported("account.cost")
+
+    async def cost_capture(self, sandbox_id: str, *, idempotency_key: str) -> Cost:
+        """Fix the sandbox's cost before it is destroyed (`cost.capture`). After it the sandbox
+        allows `get`, a repeated capture and `destroy` only, and the cost need not stay
+        readable once the sandbox ends."""
+        raise self._unsupported("cost.capture")
+
+    async def account_capacity(self) -> AccountCapacity:
+        """What the credential's account may still start, run and spend (`account.capacity`).
+        A field the provider does not know is `None`."""
+        raise self._unsupported("account.capacity")
 
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         raise self._unsupported("files.link")

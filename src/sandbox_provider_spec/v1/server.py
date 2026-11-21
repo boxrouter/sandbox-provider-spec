@@ -468,6 +468,20 @@ async def _image_cost(p: Provider, r: _Request) -> Reply:
     return 200, to_json(await p.image_cost(image_id, created_at=created_at))
 
 
+async def _cost_capture(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    key = r.headers.get("idempotency-key", "")
+    if not _IDEMPOTENCY_KEY.fullmatch(key):
+        raise SpsError("invalid_request", "Idempotency-Key must be 8 to 63 of a-z 0-9 -")
+    r.check_query_used()
+    return 200, to_json(await p.cost_capture(sandbox_id, idempotency_key=key))
+
+
+async def _account_capacity(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.account_capacity())
+
+
 async def _files_write(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     path = _file_path(r)
@@ -745,6 +759,8 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("GET", f"{_P}/output", _process_output),
         ("GET", f"{_S}/cost", _cost),
         ("GET", "/v1/cost", _account_cost),
+        ("POST", f"{_S}/cost/capture", _cost_capture),
+        ("GET", "/v1/account/capacity", _account_capacity),
         ("POST", f"{_S}/file-links", _files_link),
         ("POST", f"{_S}/pause", _pause),
         ("POST", f"{_S}/resume", _resume),

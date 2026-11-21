@@ -191,6 +191,38 @@ class AccountCost:
 
 
 @dataclass(frozen=True)
+class StartWindow:
+    window_seconds: int
+    used: int
+    limit: int
+    remaining: int
+
+
+@dataclass(frozen=True)
+class Concurrency:
+    active: int
+    limit: int
+
+
+@dataclass(frozen=True)
+class Prepaid:
+    balance_usd: Decimal
+    past_due: bool
+
+
+@dataclass(frozen=True)
+class AccountCapacity:
+    """What `account_capacity` returns. A `None` field is unknown, never a zero or a guess."""
+
+    as_of: datetime
+    starts: Sequence[StartWindow]
+    can_start: bool | None
+    paid_overage_enabled: bool | None
+    concurrency: Concurrency | None
+    prepaid: Prepaid | None
+
+
+@dataclass(frozen=True)
 class DestroyResult:
     sandbox_id: str
     state: Literal["destroying", "destroyed"]

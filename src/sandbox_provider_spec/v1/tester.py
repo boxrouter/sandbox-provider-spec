@@ -41,6 +41,10 @@ NOT_APPLICABLE = frozenset({"the Python form has no link"})
 # `cost` operation reports `unsupported`, when discovery states no `cost_final_within_seconds`.
 COST_TESTS = ("contract.cost", "snapshots.v1.cost")
 
+# `contract.cost_final` reads a destroyed sandbox's cost, which a class that lists `cost.capture` is
+# exempt from keeping (contract section 10), so a run leaves it out for such a provider.
+CAPTURE_EXEMPT = ("contract.cost_final",)
+
 # The required operations (contract section 1) and the steps of a test that exercise each.
 OPERATIONS = (
     "discovery",
@@ -278,6 +282,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
         if wanted and not options.tests and discovery is not None and not cost_offered(discovery):
             wanted = not test.id.startswith(COST_TESTS)
+        if wanted and not options.tests and discovery is not None:
+            if "cost.capture" in claimed_operations(discovery):
+                wanted = test.id not in CAPTURE_EXEMPT
         if wanted and not (options.quick and test.id in QUICK_SKIPS):
             chosen.append(test)
     if not chosen:
