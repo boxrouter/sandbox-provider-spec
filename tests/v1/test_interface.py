@@ -145,7 +145,7 @@ def test_every_json_object_type_is_covered() -> None:
         "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest", "NetworkUpdateRequest",
         "TerminalId",
         "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
-        "StartWindow", "Concurrency", "Prepaid",
+        "StartWindow", "Concurrency", "Prepaid", "StoredArtifacts",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}
     assert set(example_names()) == every - plain

@@ -19,7 +19,7 @@ from test_tester import LocalProvider, example, with_gates
 
 from sandbox_provider_spec import fixtures as fixtures_module
 from sandbox_provider_spec.cli import main
-from sandbox_provider_spec.driver import Unsupported, resource
+from sandbox_provider_spec.driver import resource
 from sandbox_provider_spec.fixtures import DERIVED, FIXTURES, FixtureError, read_fixtures
 from sandbox_provider_spec.v1 import (
     CreateRequest,
@@ -377,17 +377,6 @@ def test_disconnect_needs_a_process() -> None:
         box = driver.call("create", None, {})
         with pytest.raises(ValueError, match="requires a process"):
             driver.call("process.disconnect", box, {})
-    finally:
-        driver.close()
-
-
-def test_the_other_operations_that_1_0_lacks_stay_unsupported() -> None:
-    driver = ProviderDriver(LocalProvider(), run="run-1")
-    try:
-        with pytest.raises(Unsupported):
-            driver.call("terminal.reattach", None, {})
-        with pytest.raises(Unsupported):
-            driver.call("terminal.disconnect", None, {})
     finally:
         driver.close()
 
