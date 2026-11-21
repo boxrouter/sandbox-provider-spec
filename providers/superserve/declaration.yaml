@@ -3,10 +3,10 @@ provider: superserve
 # Every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed adapter
 # report (see evidence.md).
 verified:
-  date: 2026-11-17
+  date: 2026-11-21
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
-  sdks: {"superserve": "0.12.0"}
+  sdks: {"superserve": "0.12.0", "sandbox-provider-spec": "0.5.58"}
 resources:
   kernel: dedicated
   # A sandbox inherits its shape from the template it starts from and cannot override it, so each
@@ -73,12 +73,6 @@ gates:
     - workdir
     - user
     runs_entrypoint: true
-  # Docker Engine in a second team template built on the standard image (`dockerd` is its `start_cmd`); a create
-  # naming `docker` starts from it, never from a caller's image.
-  docker:
-  - networking: host
-    conflicts:
-    - custom_images
   # Superserve's `pause` and `resume` keep processes and memory (`Pause.memory`, no cold restart). The adapter
   # swaps `auto_delete_seconds` 0 for the 30-day retention for the length of a caller's pause (lifecycle.py).
   pause_resume:
@@ -88,10 +82,9 @@ gates:
   idle_shutdown:
   - custom_idle_time: true
     on_idle: destroyed
-  # Preview URLs (previews.py). A public preview is proven; the private variants are not declared: the
-  # provider answers a link credential with a redirect (a cookie bootstrap) that the runner does not follow,
-  # and `previews.access.private` uses that form (evidence.md). `loopback` is not declared
-  # either (evidence.md).
+  # Preview URLs (previews.py): a public preview is the published port's URL; a private one adds a port-scoped
+  # token carried in the URL (`link`, a 302 cookie bootstrap) or in a header. A revoke unpublishes the port.
+  # `loopback` is not declared (evidence.md).
   previews:
   - access: public
     revocable: true
@@ -103,6 +96,34 @@ gates:
     reserved_ports: [49983]
     websocket: true
     survives_pause: true
+  - access: private
+    credential: link
+    revocable: true
+    max_ports:
+      at_least: 2
+    any_port: true
+    link_lifetime_seconds:
+      at_least: 120
+    reserved_ports: [49983]
+    websocket: true
+    survives_pause: true
+  - access: private
+    credential: header
+    revocable: true
+    max_ports:
+      at_least: 2
+    any_port: true
+    link_lifetime_seconds:
+      at_least: 120
+    reserved_ports: [49983]
+    websocket: true
+    survives_pause: true
+  # Superserve's exec takes a user; a file is staged by the file API (root) and copied by a command that runs as
+  # that user (guest.COPY).
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
   # A pty under the guest supervisor (terminals.py): closing an observer never ends the shell.
   terminal:
   - reattach: true
@@ -293,15 +314,91 @@ evidence:
     tests:
     - coverage.previews.survives_pause
     report: reports/prober-default-coverage.json
-  gates.docker.0.networking:
-    tests:
-    - coverage.docker.host
-    report: reports/prober-default-coverage.json
   gates.previews.0.reserved_ports:
     tests:
     - coverage.previews.reserved_ports
     report: reports/prober-default-coverage.json
-  gates.docker.0.conflicts:
-    source: providers/superserve/evidence.md
-    read: '2026-11-14'
-    quote: a create that names `docker` starts from it, never from a caller's image
+  gates.previews.1.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/prober-default-core.json
+  gates.previews.1.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/prober-default-core.json
+  gates.previews.1.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/prober-default-coverage.json
+  gates.previews.1.reserved_ports:
+    tests:
+    - coverage.previews.reserved_ports
+    report: reports/prober-default-coverage.json
+  gates.previews.1.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/prober-default-coverage.json
+  gates.previews.1.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/prober-default-coverage.json
+  gates.previews.2.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/prober-default-core.json
+  gates.previews.2.link_lifetime_seconds:
+    tests:
+    - previews.link_lifetime_seconds.public
+    report: reports/prober-default-core.json
+  gates.previews.2.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/prober-default-coverage.json
+  gates.previews.2.reserved_ports:
+    tests:
+    - coverage.previews.reserved_ports
+    report: reports/prober-default-coverage.json
+  gates.previews.2.websocket:
+    tests:
+    - coverage.previews.websocket
+    report: reports/prober-default-coverage.json
+  gates.previews.2.survives_pause:
+    tests:
+    - coverage.previews.survives_pause
+    report: reports/prober-default-coverage.json
+  gates.previews.1.access:
+    tests:
+    - previews.access.private
+    report: reports/tester-core-20261121.json
+  gates.previews.1.credential:
+    tests:
+    - previews.credential.link
+    report: reports/tester-core-20261121.json
+  gates.previews.1.revocable:
+    tests:
+    - previews.revocable.true
+    report: reports/tester-core-20261121.json
+  gates.previews.2.access:
+    tests:
+    - previews.access.private
+    report: reports/tester-core-20261121.json
+  gates.previews.2.credential:
+    tests:
+    - previews.credential.header
+    report: reports/tester-core-20261121.json
+  gates.previews.2.revocable:
+    tests:
+    - previews.revocable.true
+    report: reports/tester-core-20261121.json
+  gates.user_selection.0.commands:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/tester-user-20261121.json
+  gates.user_selection.0.files_write:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/tester-user-20261121.json
+  gates.user_selection.0.process_start:
+    tests:
+    - coverage.guest_user.selectable
+    report: reports/tester-user-20261121.json

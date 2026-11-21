@@ -805,9 +805,13 @@ def _source_suite_rules(suite_digest: Any) -> tuple[dict[str, Any] | None, list[
             else:
                 assert coverage_bytes is not None
                 coverage = cached_load(coverage_path, content=coverage_bytes)
-                source_tests = [
-                    test for test in core_tests if test["id"].startswith("baseline.")
-                ] + coverage["tests"]
+                # The shared suite the tester runs under this digest is `suite.yaml` and
+                # `coverage.yaml` together (`tester.shared_suite`), so a report may hold any of
+                # their tests; one that holds only baseline and coverage rows is a subset.
+                core_ids = {test["id"] for test in core_tests}
+                source_tests = core_tests + [
+                    test for test in coverage["tests"] if test["id"] not in core_ids
+                ]
             return {test["id"]: test.get("rules", []) for test in source_tests}, []
         except (KeyError, TypeError, ValueError, yaml.YAMLError) as error:
             return None, [f"package has an invalid conformance suite: {error}"]
