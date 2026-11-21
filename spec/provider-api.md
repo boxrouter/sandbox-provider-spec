@@ -597,6 +597,14 @@ provider's own domains.
   provider's images, not one class's: it is the same on every class that lists `image.prepare`,
   and a caller treats a provider as router-keeping when any class states it. The tester leaves
   out the assertions about labels read back and filtered, and checks all the rest.
+- A provider whose discovery states `image_delete_in_use: conflict` (default `accepted`) **MUST** <!-- rule: provider-api/image-delete-in-use -->
+  change nothing when it answers `image.delete` with `conflict` (the image stays `ready` and
+  every sandbox is untouched), and **MUST** accept the delete once no sandbox made from the
+  image is running or paused. It **MAY** answer `conflict` while one is, because it cannot
+  remove an image that a sandbox still runs from. The statement is the same on every class that
+  lists `image.prepare`, and a caller treats a provider as blocking when any class states it and
+  retries the delete later. The tester destroys the sandbox before it deletes the image and
+  checks all the rest.
 - A `create` from `provider_artifact` **MUST** start a sandbox only from a `ready` image: a <!-- rule: provider-api/image-create -->
   `preparing` or `failed` image is `conflict`, and a deleted image or an id that the provider has
   no record of is `not_found`. A sandbox of a different size than the image is bound to is

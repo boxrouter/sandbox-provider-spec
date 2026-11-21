@@ -22,6 +22,7 @@ EndState = Literal["destroyed", "paused"]
 LifetimeEnforcer = Literal["provider", "router"]
 LabelKeeper = Literal["provider", "router"]
 SnapshotCostMode = Literal["offered", "unavailable"]
+ImageDeleteInUse = Literal["accepted", "conflict"]
 PriceItem = Literal[
     "cpu",
     "memory",
@@ -586,6 +587,10 @@ class SandboxClass:
     # provider cannot report what a snapshot costs and answers `unsupported`
     # (`provider-api/snapshot-cost-unavailable`), while `cost` for sandboxes stays offered.
     snapshot_cost: SnapshotCostMode = "offered"
+    # Whether `image.delete` is accepted while a sandbox made from the image exists (the default,
+    # rule `provider-api/image-delete`) or answers `conflict` until those sandboxes end
+    # (`provider-api/image-delete-in-use`).
+    image_delete_in_use: ImageDeleteInUse = "accepted"
 
 
 @dataclass(frozen=True)

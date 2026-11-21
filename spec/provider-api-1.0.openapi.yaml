@@ -1855,6 +1855,14 @@ components:
             the rule `provider-api/snapshot-cost` applies. `unavailable` means the provider has no record from which to state a
             snapshot's cost, answers `snapshot.cost` with `unsupported`, and still offers `cost` for sandboxes. It means
             something only when the class claims `snapshots`.
+        image_delete_in_use:
+          enum: [accepted, conflict]
+          default: accepted
+          description: >-
+            Whether `image.delete` is accepted while a sandbox made from the image exists. `accepted` (the default) applies the
+            rule `provider-api/image-delete`. `conflict` means the provider cannot remove an image that a sandbox still runs
+            from: it answers `conflict` until those sandboxes have ended, and the delete is then accepted. It means something
+            only when `operations` lists `image.prepare`.
     Discovery:
       type: object
       required: [spec_version, provider, limits, classes]

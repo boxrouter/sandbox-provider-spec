@@ -311,6 +311,30 @@ def snapshot_cost_unavailable(discovery: Discovery | None) -> bool:
     )
 
 
+def image_delete_blocked(discovery: Discovery | None) -> bool:
+    """Whether some class states `image_delete_in_use: conflict`: a delete of an image waits for
+    the sandboxes made from it."""
+    return discovery is not None and any(
+        item.image_delete_in_use == "conflict" for item in discovery.classes
+    )
+
+
+def _destroy_before_image_delete(test: Test) -> Test:
+    """`test` with each sandbox that it created destroyed before its image is deleted: the
+    provider cannot delete an image that a sandbox still runs from (rule
+    `provider-api/image-delete-in-use`). A sandbox is destroyed once."""
+    steps: list[dict[str, Any]] = []
+    boxes: list[str] = []
+    for step in test.steps:
+        if step.get("op") == "create" and "as" in step:
+            boxes.append(str(step["as"]))
+        if step.get("op") == "image.delete":
+            steps.extend({"op": "destroy", "target": box} for box in boxes)
+            boxes = []
+        steps.append(step)
+    return dataclasses.replace(test, steps=tuple(steps))
+
+
 def cost_offered(discovery: Discovery | None) -> bool:
     """Whether discovery states `cost_final_within_seconds`, which is how a provider offers cost."""
     return discovery is not None and discovery.limits.cost_final_within_seconds is not None
@@ -513,6 +537,8 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             chosen.append(test)
     if not chosen:
         raise ValueError("no shared tests match the selection")
+    if image_delete_blocked(discovery):
+        chosen = [_destroy_before_image_delete(test) for test in chosen]
     kept = labels_kept(discovery)
     if not all(kept.values()):
         chosen = [_without_label_assertions(test, kept) for test in chosen]

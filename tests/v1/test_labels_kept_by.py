@@ -192,3 +192,35 @@ def test_a_class_that_cannot_report_a_snapshots_cost_has_that_test_left_out() ->
     assert wire["classes"][0]["snapshot_cost"] == "unavailable"
     assert from_json(Discovery, wire).classes[0].snapshot_cost == "unavailable"
     assert "snapshot_cost" not in to_json(example(Discovery))["classes"][0]
+
+
+@pytest.mark.rule("provider-api/image-delete-in-use")
+def test_a_blocking_class_has_its_sandboxes_destroyed_before_the_image_is_deleted() -> None:
+    suite = shared_suite()
+    plain = {
+        t.id: t
+        for t in select_tests(
+            suite,
+            stating(example(Discovery), operations=IMAGE_OPERATIONS),
+            TestOptions(tests=("images.v1.prepare_oci",)),
+        ).tests
+    }
+    blocking = {
+        t.id: t
+        for t in select_tests(
+            suite,
+            stating(
+                example(Discovery), operations=IMAGE_OPERATIONS, image_delete_in_use="conflict"
+            ),
+            TestOptions(tests=("images.v1.prepare_oci",)),
+        ).tests
+    }
+    ops = lambda test: [s["op"] for s in test.steps]  # noqa: E731
+    before = ops(plain["images.v1.prepare_oci"])
+    after = ops(blocking["images.v1.prepare_oci"])
+    assert "destroy" not in before
+    assert after.index("destroy") == after.index("image.delete") - 1
+    assert len(after) == len(before) + 1
+    wire = to_json(stating(example(Discovery), image_delete_in_use="conflict"))
+    assert wire["classes"][0]["image_delete_in_use"] == "conflict"
+    assert "image_delete_in_use" not in to_json(example(Discovery))["classes"][0]
