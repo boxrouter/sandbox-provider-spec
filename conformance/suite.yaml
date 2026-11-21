@@ -4806,13 +4806,12 @@ tests:
   - provider-api/process-eof-not-exit
   proves: []
 - id: contract.discovery_valid
-  title: Discovery is a valid 1.0 document, prices every class and states a 1 GiB file limit.
+  title: Discovery is a valid 1.0 document and states a 1 GiB file limit.
   steps:
   - op: discovery
     expect:
       equals:
         valid: true
-        priced: true
         file_limit_floor: true
   rules:
   - provider-api/files-limit-floor

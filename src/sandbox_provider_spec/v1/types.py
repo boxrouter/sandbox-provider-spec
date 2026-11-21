@@ -183,13 +183,14 @@ class Cost:
 
 @dataclass(frozen=True)
 class AccountCost:
-    """What the account was charged between `start` and `end`; money only."""
+    """What the account was charged, or used, between `start` and `end`."""
 
     start: datetime
     end: datetime
     status: Literal["accruing", "final"]
-    total_usd: Decimal | None  # null only while `accruing` and nothing is metered yet
-    source: Literal["reported", "calculated"]
+    # null while `accruing` with nothing metered yet, and always when `source` is `usage`
+    total_usd: Decimal | None
+    source: Literal["reported", "calculated", "usage"]
     lines: Sequence[CostLine]
     as_of: datetime
 

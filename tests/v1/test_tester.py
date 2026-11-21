@@ -1248,6 +1248,19 @@ def test_a_provider_may_stop_answering_once_the_cost_is_final() -> None:
     }
 
 
+def test_a_provider_that_states_no_prices_passes_discovery_valid() -> None:
+    class NoPrices(ContractProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            found = await super().discovery()
+            return dataclasses.replace(
+                found, classes=tuple(dataclasses.replace(c, prices=()) for c in found.classes)
+            )
+
+    report = run_tests(NoPrices(), TestOptions(tests=("contract.discovery_valid",)))
+    assert "contract.discovery_valid passed" in report.lines
+    assert report.all_passed
+
+
 def test_a_provider_that_states_no_final_window_does_not_offer_cost() -> None:
     class NoCost(ContractProvider, manifest=False):
         async def discovery(self) -> Discovery:

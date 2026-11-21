@@ -336,6 +336,25 @@ def test_account_cost_round_trips_and_is_claimed_by_its_window() -> None:
         from_json(Limits, {**example("Limits"), "account_cost_window_seconds": 0})
 
 
+def test_a_usage_account_cost_states_quantities_and_no_amount_and_round_trips() -> None:
+    document = {
+        **example("AccountCost"),
+        "source": "usage",
+        "total_usd": None,
+        "lines": [
+            {**line, "amount_usd": None, "start": None, "end": None}
+            for line in (
+                {"item": "cpu", "quantity": "2.5", "unit": "vcpu_hour"},
+                {"item": "memory", "quantity": "9", "unit": "gib_hour"},
+            )
+        ],
+    }
+    cost = from_json(AccountCost, document)
+    assert cost.source == "usage" and cost.total_usd is None
+    assert all(line.amount_usd is None and line.quantity is not None for line in cost.lines)
+    assert to_json(cost) == document
+
+
 def test_account_cost_reaches_the_provider_with_typed_times() -> None:
     reply = send(
         "GET", "/v1/cost", params={"start": "2026-11-13T10:00:00Z", "end": "2026-11-13T11:00:00Z"}

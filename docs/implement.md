@@ -103,8 +103,9 @@ of sandbox, such as a container or a microVM; the main class has the id `default
 [optional sections](#optional-sections) that you claim. `ready: false` means that the class takes no
 new sandboxes now, while existing sandboxes keep working.
 
-**Prices.** You can write your price list in minutes by copying your own price page. Each item has
-four required fields:
+**Prices.** Stating prices is optional. You can write your price list in minutes by copying your own
+price page, or leave `prices` empty and return `usage` costs, whose quantities the consumer prices.
+Each item has four required fields:
 
 - `item` is what is charged: `cpu`, `memory`, `disk`, `gpu`, `machine` (a whole fixed-size machine),
   `create` (each sandbox), `egress`, `snapshot`, `volume`, `start` (each start or resume), `request`,

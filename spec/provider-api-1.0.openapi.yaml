@@ -1933,7 +1933,9 @@ components:
         prices:
           type: array
           items: {$ref: "#/components/schemas/Price"}
-          description: What this class costs.
+          description: >-
+            The list prices of this class. A provider may state none: an empty list states no prices, which is not a price of
+            zero and is not an error.
         image_binds:
           type: array
           uniqueItems: true
@@ -2336,9 +2338,10 @@ components:
           anyOf: [{$ref: "#/components/schemas/Decimal"}, {type: "null"}]
           description: >-
             The sum of the line amounts, in US dollars at the provider's published list price, before any plan, free tier,
-            trial, credit or discount. Null only while the status is `accruing` and nothing is metered yet.
+            trial, credit or discount. Null while the status is `accruing` and nothing is metered yet, and always null when
+            the `source` is `usage`.
         source:
-          enum: [reported, calculated]
+          enum: [reported, calculated, usage]
           description: As for `Cost`.
         lines:
           type: array
@@ -2347,8 +2350,9 @@ components:
           $ref: "#/components/schemas/Timestamp"
           description: The time up to which these figures count usage. It may be earlier than the time of the read.
       description: >-
-        What the account was charged between `start` and `end`. It carries money only: each line has an `item` and an
-        `amount_usd`.
+        What the account was charged between `start` and `end`. Each line has an `item` and an `amount_usd`, and a
+        `quantity` and `unit` when the `source` is `calculated` or `usage`. A `usage` account cost states quantities from the
+        provider's own records and no amounts, as a `usage` sandbox `Cost` does.
     DestroyResult:
       type: object
       required: [sandbox_id, state]

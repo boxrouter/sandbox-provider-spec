@@ -264,6 +264,19 @@ def test_a_usage_cost_states_quantities_and_no_amount() -> None:
     assert _errors("Cost", {**usage, "source": "guessed"})
 
 
+def test_a_usage_account_cost_states_quantities_and_no_amount() -> None:
+    line = {"item": "cpu", "quantity": "2.5", "unit": "vcpu_hour", "amount_usd": None}
+    usage = {**_example("AccountCost"), "source": "usage", "total_usd": None, "lines": [line]}
+    assert _errors("AccountCost", usage) == []
+    assert _errors("AccountCost", {**usage, "source": "guessed"})
+
+
+def test_a_class_may_state_no_prices() -> None:
+    example = _example("Discovery")
+    classes = [{**item, "prices": []} for item in example["classes"]]
+    assert _errors("Discovery", {**example, "classes": classes}) == []
+
+
 def test_a_cost_line_needs_only_an_item_and_an_amount() -> None:
     line = {"item": "cpu", "amount_usd": "1"}
     assert _errors("CostLine", line) == []

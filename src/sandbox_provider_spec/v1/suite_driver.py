@@ -330,7 +330,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
     # Discovery and cost
 
     def discovery(self, target: object, inputs: Inputs) -> Observation:
-        """Judge the discovery document: valid 1.0, a price per class, file limit >= 1 GiB (8)."""
+        """Judge the discovery document: valid 1.0, file limit >= 1 GiB (8). Prices are optional."""
         del target, inputs
         found = self.wait(self.api.discovery())
         try:
@@ -340,7 +340,6 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             valid = False
         return {
             "valid": valid,
-            "priced": bool(found.classes) and all(item.prices for item in found.classes),
             "file_limit_floor": found.limits.file_bytes >= _ONE_GIB,
         }
 

@@ -225,7 +225,9 @@ true zero, never "not counted yet".
   from a clock in the consumer or in an adapter.
 - Amounts **MUST** be the provider's published list price when the usage happened, in US dollars <!-- rule: provider-api/cost-list-price -->
   as decimal strings, before any plan, free tier, trial, credit or discount. The prices in discovery
-  are list prices too: a plan or discount on an account never changes them. A `reported` cost
+  are list prices too: a plan or discount on an account never changes them. A provider may state
+  none: an empty `prices` list states no prices, and a consumer that prices a `usage` cost takes the
+  price from elsewhere. A `reported` cost
   states those list amounts in the provider's records. A source that states amounts net of a
   discount is turned into list amounts from its quantities, and the cost is then `calculated`.
 - `as_of` **MUST** be the time up to which the figures count usage. It may be earlier than the <!-- rule: provider-api/cost-stated-at -->
@@ -257,9 +259,10 @@ time itself. A provider that needs the time and gets none answers with an error 
 A provider that states `limits.account_cost_window_seconds` offers `account.cost`
 (`GET /v1/cost?start=&end=`), which returns what the whole account was charged between `start`
 (inclusive) and `end` (exclusive): `status`, `total_usd`, `source`, `lines` and `as_of`, with the
-amounts and the sources of a sandbox cost but no quantities required. It needs no sandbox, so it
+amounts and the sources of a sandbox cost (`reported`, `calculated` or `usage`, whose lines state
+quantities, no amounts and a null `total_usd`, as for a sandbox cost). It needs no sandbox, so it
 counts charges for sandboxes that are gone, and a billing true-up compares it with the sum of the
-sandbox costs. A window that is empty, reversed or longer than the stated limit is `invalid_request`.
+sandbox costs (the consumer prices a `usage` account cost as it prices a `usage` sandbox cost). A window that is empty, reversed or longer than the stated limit is `invalid_request`.
 Without the limit `account.cost` answers `unsupported`.
 **Capturing the cost before the end.** Some providers delete their usage records with the sandbox,
 so `cost` cannot be read after the end. Such a provider lists `cost.capture` in `classes[].operations`
