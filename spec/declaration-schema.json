@@ -78,6 +78,7 @@
         "default_size": {"$ref": "#/$defs/default_size"},
         "disk_mib": {"$ref": "#/$defs/number_or_unknown"},
         "regions": {"$ref": "#/$defs/string_list_or_unknown"},
+        "default_region": {"type": "string", "minLength": 1},
         "located_in": {"$ref": "#/$defs/string_list_or_unknown"},
         "gpus": {"$ref": "#/$defs/string_list_or_unknown"},
         "max_gpus": {"$ref": "#/$defs/number_or_unknown"},

@@ -1794,3 +1794,28 @@ def test_reports_dir_names_one_class_and_one_selection(tmp_path: Path) -> None:
         == 1
     )
     assert not out.exists()
+
+
+def test_a_coverage_row_for_a_knob_value_not_claimed_stays_out_of_an_explicit_selection() -> None:
+    """`coverage.<section>.` rows belong to their section: `runs_entrypoint.false` is not run
+    for a class whose variants all claim `runs_entrypoint: true`."""
+    claimed = with_gates(
+        {"custom_images": {"source": "oci", "prepared": True, "runs_entrypoint": True}}
+    )
+    chosen = {
+        test.id
+        for test in select_tests(
+            shared_suite(),
+            claimed,
+            TestOptions(
+                tests=[
+                    "coverage.custom_images.runs_entrypoint",
+                    "coverage.custom_images.prepare.size",
+                ]
+            ),
+        ).tests
+    }
+    assert chosen == {
+        "coverage.custom_images.runs_entrypoint.true",
+        "coverage.custom_images.prepare.size",
+    }

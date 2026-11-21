@@ -119,3 +119,43 @@ def test_report_subject_binds_a_report_to_the_package_and_its_discovery() -> Non
     assert discovery_digest(renamed) != discovery_digest(
         dataclasses.replace(base, classes=[base.classes[0]])
     )
+
+
+@pytest.mark.rule("provider-api/discovery-within-static")
+def test_within_judges_each_default_against_its_own_discovery_not_the_static_one() -> None:
+    base = with_resources(
+        example(),
+        regions=["us-east", "eu-west"],
+        default_region="us-east",
+        sizes=[{"cpu": 2, "memory_mib": 2048}, {"cpu": [4, 8], "memory_mib": 8192}],
+        default_size={"cpu": 2, "memory_mib": 2048},
+        default_user="sandbox",
+        default_cwd="/workspace",
+    )
+    name = base.classes[0].id
+    other = with_resources(
+        base,
+        regions=["us-east", "eu-west"],
+        default_region="eu-west",  # this account's home region differs from the static one
+        sizes=[{"cpu": 2, "memory_mib": 2048}, {"cpu": [4, 8], "memory_mib": 8192}],
+        default_size={"cpu": 6, "memory_mib": 8192},  # inside the listed range
+        default_user="root",
+        default_cwd="/root",
+    )
+    assert within(other, base) == []
+    bare = {k: v for k, v in base.classes[0].resources.items() if not k.startswith("default_")}
+    lacking = dataclasses.replace(
+        base, classes=[dataclasses.replace(base.classes[0], resources=bare), *base.classes[1:]]
+    )
+    assert within(other, lacking) == []  # a ceiling without the defaults is not "+default_region"
+    lost = with_resources(
+        other,
+        regions=["us-east", "eu-west"],
+        default_region="ap-south",
+        default_size={"cpu": 3, "memory_mib": 2048},
+    )
+    assert within(lost, base) == [
+        f"classes.{name}.resources.default_region: 'ap-south' is not one of its regions",
+        f"classes.{name}.resources.default_size: {{'cpu': 3, 'memory_mib': 2048}} "
+        "is not one of its sizes",
+    ]

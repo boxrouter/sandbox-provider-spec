@@ -516,3 +516,12 @@ def test_path_info_pairs_exists_with_type(body: dict[str, Any], refused: bool) -
             from_json(v1_types.PathInfo, body)
     else:
         assert to_json(from_json(v1_types.PathInfo, body)) == body
+
+
+def test_invalid_request_keeps_its_unknown_outcome_over_the_wire() -> None:
+    """A streamed upload whose size differs from the declared one may have written bytes."""
+    body = error_to_json(SpsError("invalid_request", "size differs", outcome="unknown"))
+    assert error_from_json(body).outcome == "unknown"
+    plain = error_to_json(SpsError("invalid_request", "bad field"))
+    assert error_from_json(plain).outcome == "failed"
+    assert error_from_json(error_to_json(SpsError("not_found", "gone"))).outcome == "failed"

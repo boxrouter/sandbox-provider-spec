@@ -523,6 +523,19 @@ def shared_suite() -> Suite:
     return Suite(coverage.digest, core.tests + extra, coverage.baseline_ids)
 
 
+def _section(test: Test) -> str:
+    """The section a test belongs to: `coverage.<section>.<name>` rows belong to their section, so a
+    row for a knob value that the class does not claim stays out of an explicit selection."""
+    head, _, rest = test.id.partition(".")
+    return rest.partition(".")[0] if head == "coverage" else head
+
+
+def _claimed_section(test: Test, gates: Mapping[str, object]) -> bool:
+    """Whether the class claims the section of `test` or a gate that it proves, so that an explicit
+    selection leaves the test out when the claim lacks a knob value that it proves."""
+    return _section(test) in gates or any(proof.get("gate") in gates for proof in test.proves)
+
+
 def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions) -> Suite:
     """The baseline tests, every `contract.` test, and the tests of each claimed section."""
     gates = claimed_gates(discovery) if discovery is not None else {}
@@ -533,7 +546,7 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         head = test.id.split(".", 1)[0]
         if options.tests:
             wanted = any(test.id.startswith(prefix) for prefix in options.tests) and (
-                head not in gates or _consistent(test, gates, options.fixtures)
+                not _claimed_section(test, gates) or _consistent(test, gates, options.fixtures)
             )
         elif test.id in OPERATION_CLAIMS:
             # A test named for an operation that a claim turns on runs only when it is claimed.

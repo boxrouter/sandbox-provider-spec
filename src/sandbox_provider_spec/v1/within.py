@@ -16,6 +16,10 @@ from sandbox_provider_spec.v1.wire import to_json
 _LARGER_IS_NARROWER = frozenset({"cost_final_within_seconds", "min_seconds"})
 # A class lists its unavailable regions; naming more of them narrows what it offers.
 _FREE_KEYS = frozenset({"unavailable_regions"})
+# What a create gets when it names nothing can differ per account (a different plan, a different
+# home region), so it is not compared with the static value: each is judged against its own
+# discovery's offering instead (`_defaults`).
+_DEFAULTS = frozenset({"default_region", "default_size", "default_user", "default_cwd"})
 
 
 def within(discovery: Discovery, ceiling: Discovery) -> list[str]:
@@ -37,7 +41,35 @@ def within(discovery: Discovery, ceiling: Discovery) -> list[str]:
             found.append(f"{path}: +class")
         else:
             _mapping(path, item, match, found)
+        _defaults(f"{path}.resources", item.get("resources"), found)
     return found
+
+
+def _defaults(path: str, resources: object, found: list[str]) -> None:
+    """The defaults a class states must be ones it offers: `default_region` one of its `regions`
+    and `default_size` one of its `sizes`, in the same discovery, never compared with the static
+    discovery's default. `default_user` and `default_cwd` have no list to be one of."""
+    if not isinstance(resources, Mapping):
+        return
+    region, regions = resources.get("default_region"), resources.get("regions")
+    if isinstance(region, str) and isinstance(regions, Sequence) and region not in regions:
+        found.append(f"{path}.default_region: {region!r} is not one of its regions")
+    size, sizes = resources.get("default_size"), resources.get("sizes")
+    if isinstance(size, Mapping) and isinstance(sizes, Sequence) and not isinstance(sizes, str):
+        if not any(isinstance(entry, Mapping) and _covers(entry, size) for entry in sizes):
+            found.append(f"{path}.default_size: {dict(size)!r} is not one of its sizes")
+
+
+def _covers(entry: Mapping[str, object], size: Mapping[str, object]) -> bool:
+    """Whether a listed size (a number or a `[low, high]` range per field) holds the default."""
+    for name, wanted in size.items():
+        have = entry.get(name)
+        if isinstance(have, Sequence) and not isinstance(have, str) and len(have) == 2:
+            if not (isinstance(wanted, (int, float)) and have[0] <= wanted <= have[1]):
+                return False
+        elif have != wanted:
+            return False
+    return True
 
 
 def _mapping(path: str, live: object, ceiling: object, found: list[str]) -> None:
@@ -45,7 +77,7 @@ def _mapping(path: str, live: object, ceiling: object, found: list[str]) -> None
         found.append(f"{path}: {live!r} (ceiling {ceiling!r})")
         return
     for key, value in live.items():
-        if key in _FREE_KEYS or value is None:
+        if key in _FREE_KEYS or key in _DEFAULTS or value is None:
             continue
         where = f"{path}.{key}"
         if key not in ceiling or ceiling[key] is None:

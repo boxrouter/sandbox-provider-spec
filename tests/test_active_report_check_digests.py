@@ -73,6 +73,12 @@ def _used_proof_ids(report: dict[str, Any], support: dict[str, Any]) -> set[str]
 QUARANTINED_ADAPTERS = frozenset(
     {"adapter-boxd", "adapter-e2b", "adapter-modal", "adapter-superserve"}
 )
+# oi-s-n 2026-11-21: `custom_images.oci` also names `sh_script` beside `bash_script` for each
+# command (a 1.0 driver runs it with `sh`, so a base image without bash passes), which moved its
+# check digest and changed no result: a native driver still runs `bash_script`. These adapters are
+# replaced by the swarm, and the spec-provider packages' reports carry the new digest. Lift with
+# each adapter's deletion.
+CUSTOM_OCI_QUARANTINED = frozenset({"adapter-agent37", "adapter-blaxel", "adapter-superserve"})
 
 
 def test_active_reports_keep_current_check_digests() -> None:
@@ -98,7 +104,8 @@ def test_active_reports_keep_current_check_digests() -> None:
         # recorder already read "not reached". These four reports are of adapters that the swarm
         # replaces; the spec-provider packages' reports carry the new digests. Lift with each
         # adapter's deletion.
-        quarantined = report_path.parent.parent.parent.parent.name in QUARANTINED_ADAPTERS
+        adapter = report_path.parent.parent.parent.parent.name
+        quarantined = adapter in QUARANTINED_ADAPTERS
         report = json.loads(report_path.read_text(encoding="utf-8"))
         recorded = report.get("check_digests")
         if not isinstance(recorded, dict):
@@ -110,6 +117,8 @@ def test_active_reports_keep_current_check_digests() -> None:
             if test_id not in current:
                 continue
             if quarantined and test_id.startswith("network_lockdown."):
+                continue
+            if test_id == "custom_images.oci" and adapter in CUSTOM_OCI_QUARANTINED:
                 continue
             if test_id not in recorded:
                 mismatches.append(

@@ -681,6 +681,12 @@ def _check_resource_declarations(
                         errors.append(f"needs names no declared resource value: {dependent}")
         elif key == "unmet_limits":
             _check_unmet_limits(value, resources.get("needs"), errors)
+        elif key == "default_region":
+            regions = resources.get("regions")
+            if not isinstance(value, str) or not value:
+                errors.append(f"{UNKNOWN_WORD}: resources.default_region")
+            elif isinstance(regions, list) and value not in regions:
+                errors.append(f"{UNKNOWN_WORD}: resources.default_region must be one of regions")
         elif key == "kernel":
             if not isinstance(value, str) or value not in [*spec["values"], "unknown"]:
                 errors.append(f"{UNKNOWN_WORD}: resources.kernel")

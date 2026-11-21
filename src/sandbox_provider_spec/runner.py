@@ -80,10 +80,63 @@ def https_fixture(value: object) -> str:
     return value
 
 
+# The prepared-image tests (`images.v1.*`) use the run's `oci_image` and `image_marker` when it
+# gives them (a provider whose images must be Ubuntu, say) and otherwise this Alpine image.
+ALPINE_IMAGE = (
+    "docker.io/library/alpine@sha256:"
+    "d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc"
+)
+PREPARED_OCI = {"prepared_oci_image": "oci_image", "prepared_oci_marker": "image_marker"}
+
+
+def prepared_oci(field: str, fixtures: Mapping[str, object]) -> object:
+    """`$runner.prepared_oci_image` or `$runner.prepared_oci_marker`. An `oci_image` given
+    without its `image_marker` cannot be checked, so the Alpine marker is never used for it."""
+    given = fixtures.get("oci_image")
+    if given is None:
+        return ALPINE_IMAGE if field == "prepared_oci_image" else "Alpine Linux"
+    if PREPARED_OCI[field] not in fixtures:
+        raise NotRun("fixture_missing")
+    return fixtures[PREPARED_OCI[field]]
+
+
+SIZE_NAMES = {"cpu_min": "cpu", "memory_min_mib": "memory_mib", "disk_min_mib": "disk_mib"}
+
+
+def public_size(fixtures: Mapping[str, object]) -> dict[str, object]:
+    """`$runner.larger_size_value`: `larger_size` with the public names that a prepared image's
+    `resources` carry (`cpu`, `memory_mib`, `disk_mib`) in place of the request names."""
+    size = fixtures.get("larger_size")
+    if size is None:
+        raise NotRun("fixture_missing")
+    if not isinstance(size, Mapping) or any(key not in SIZE_NAMES for key in size):
+        raise NotRun("proof_fixture_invalid")
+    return {SIZE_NAMES[key]: value for key, value in size.items()}
+
+
+LIFETIME_ENDS = ("lifetime_ends_seconds", "lifetime_ends_wait_ms")
+LIFETIME_ENDS_DEFAULT_SECONDS = 60
+
+
+def lifetime_ends(field: str, fixtures: Mapping[str, object]) -> int:
+    """`$runner.lifetime_ends_seconds` (the run's value, else 60) or `$runner.lifetime_ends_wait_ms`
+    (the same time in milliseconds), for a provider whose shortest lifetime is above 60 seconds."""
+    seconds = fixtures.get("lifetime_ends_seconds", LIFETIME_ENDS_DEFAULT_SECONDS)
+    if not isinstance(seconds, int) or isinstance(seconds, bool) or seconds < 1:
+        raise NotRun("proof_fixture_invalid")
+    return seconds if field == "lifetime_ends_seconds" else seconds * 1000
+
+
 def resolve(value: Any, bindings: Mapping[str, object], fixtures: Mapping[str, object]) -> Any:
     if isinstance(value, str) and value.startswith("$"):
         name, _, field = value[1:].partition(".")
         if name == "runner":
+            if field in PREPARED_OCI:
+                return prepared_oci(field, fixtures)
+            if field in LIFETIME_ENDS:
+                return lifetime_ends(field, fixtures)
+            if field == "larger_size_value":
+                return public_size(fixtures)
             if field not in fixtures:
                 raise NotRun("fixture_missing")
             found = fixtures[field]

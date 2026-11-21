@@ -994,6 +994,9 @@
       "registry": "countries",
       "unknown_identifier": "no_match"
     },
+    "default_region": {
+      "kind": "string"
+    },
     "gpus": {
       "registry": "gpus",
       "unknown_identifier": "no_match"
@@ -1127,6 +1130,7 @@
     "on_memory_exhausted": "What the provider ends when a process allocates more memory than the sandbox has: the process (process_killed) or the sandbox (sandbox_ended).",
     "regions": "The regions a request can pin, and the countries a sandbox may run in when none is pinned.",
     "located_in": "The regions a request can pin, and the countries a sandbox may run in when none is pinned.",
+    "default_region": "The region a create that pins none lands in. It is one of the declared regions. It can differ per account: the account's own discovery states its own, a static declaration states a new account's. A caller checks only that it is one of that discovery's regions, never that it equals the static one, and a placement the caller configured for its route wins when set. Informative: a request is matched on regions and located_in, never on this.",
     "gpus": "The GPU models offered, and how many one sandbox may have.",
     "max_gpus": "The GPU models offered, and how many one sandbox may have.",
     "extendable_lifetime": "The lifetime of a running sandbox can be lengthened.",

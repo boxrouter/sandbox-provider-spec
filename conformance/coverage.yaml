@@ -2408,7 +2408,7 @@ tests:
     expect:
       equals:
         resources:
-          one_of: [null, $runner.larger_size]
+          one_of: [null, $runner.larger_size_value]
   - op: create
     in:
       image: $image

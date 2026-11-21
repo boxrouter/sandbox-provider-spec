@@ -1045,7 +1045,13 @@ def _enc_error_body(error: SpsError) -> Json:
 def _dec_error_body(body: Mapping[str, Any]) -> SpsError:
     code = body["code"]
     assert code in ERROR_TABLE
-    outcome: Outcome = body["outcome"] if ERROR_TABLE[code][1] == "provider" else "failed"
+    # A provider fault carries its outcome; so does `invalid_request`, the one caller fault that
+    # may be `unknown` (a streamed upload whose size differs from the declared one).
+    outcome: Outcome = (
+        body["outcome"]
+        if ERROR_TABLE[code][1] == "provider" or code == "invalid_request"
+        else "failed"
+    )
     return SpsError(
         code,
         body["message"],

@@ -144,6 +144,10 @@ FIXTURES: Mapping[str, str] = {
     "link_lifetime_wait_seconds": (
         "The preview or file link's observation window in seconds (300 proves a 300-second bound)."
     ),
+    "lifetime_ends_seconds": (
+        "The short lifetime, in seconds, that `contract.lifetime_ends` asks for (default 60); "
+        "give the provider's shortest lifetime when it is above 60."
+    ),
     "max_allow_entries": (
         "One to 32 distinct controlled host names, to prove the allowlist entry limit."
     ),
@@ -224,8 +228,12 @@ FIXTURES: Mapping[str, str] = {
 # Names that the runner derives from a fixture above, each with its source. A value given for
 # one is overwritten by the derived one, so a run refuses it.
 DERIVED: Mapping[str, str] = {
+    "prepared_oci_image": "oci_image",
+    "prepared_oci_marker": "image_marker",
     "gpu_model": "test_gpu",
     "gpu_name_pattern": "test_gpu",
+    "larger_size_value": "larger_size",
+    "lifetime_ends_wait_ms": "lifetime_ends_seconds",
     "link_lifetime_wait_ms": "link_lifetime_wait_seconds",
     "max_allow_count": "max_allow_entries",
     "max_deny_count": "max_deny_entries",

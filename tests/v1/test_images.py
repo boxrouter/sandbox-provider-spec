@@ -18,9 +18,10 @@ from typing import Any
 import httpx
 import pytest
 from test_openapi import validator
-from test_tester import LocalProvider, example, with_operations
+from test_tester import LocalProvider, example, with_gates, with_operations
 
 from sandbox_provider_spec.driver import NotRun
+from sandbox_provider_spec.runner import ALPINE_IMAGE
 from sandbox_provider_spec.v1 import (
     CreateRequest,
     Discovery,
@@ -295,7 +296,8 @@ class ImageProvider(LocalProvider, manifest=False):
                         assert member is not None
                         files[destination] = member.read()
         else:
-            files["/etc/os-release"] = b'NAME="Alpine Linux"\n'
+            ubuntu = "ubuntu@" in getattr(request.source, "oci", "")
+            files["/etc/os-release"] = b'NAME="Ubuntu"\n' if ubuntu else b'NAME="Alpine Linux"\n'
         image = PreparedImage(
             id=f"img-{len(self.images) + 1}",
             state="preparing" if self.polls_until_ready else "ready",
@@ -616,6 +618,7 @@ def test_the_four_operations_claim_the_images_section_and_nothing_else() -> None
         t.id for t in select_tests(suite, with_operations(IMAGE_OPERATIONS), TestOptions()).tests
     }
     images = {t.id for t in suite.tests if t.id.startswith("images.") and t.id not in CLAIMED_TESTS}
+    images -= {"images.v1.prepare_dockerfile_context"}  # it also needs a dockerfile source claim
     assert images and images <= claimed
     assert not any(
         t.id.startswith("directories.")
@@ -736,3 +739,75 @@ def test_an_oci_reference_without_a_digest_is_not_run(provider: ImageProvider) -
             driver.image_prepare(None, {"source": "oci", "image": "alpine:3.20"})
     finally:
         driver.close()
+
+
+UBUNTU = "docker.io/library/ubuntu@sha256:" + "ab" * 32
+IMAGE_TESTS = (
+    "images.v1.prepare_oci",
+    "images.v1.idempotent_prepare",
+    "images.v1.get_and_list",
+    "images.v1.cost",
+)
+
+
+def test_the_prepared_image_tests_use_the_runs_oci_image_and_marker(
+    provider: ImageProvider,
+) -> None:
+    ImageProvider.polls_until_ready = 0
+    options = TestOptions(
+        tests=IMAGE_TESTS, fixtures={"oci_image": UBUNTU, "image_marker": "Ubuntu"}
+    )
+    tests = outcome(run_tests(provider, options))
+    assert set(tests.values()) <= {"passed", "unsupported"} and "passed" in tests.values(), tests
+    prepared = {getattr(item["request"].source, "oci", None) for item in ImageProvider.seen}
+    assert prepared == {UBUNTU}
+
+
+def test_the_prepared_image_tests_use_pinned_alpine_without_the_fixture(
+    provider: ImageProvider,
+) -> None:
+    ImageProvider.polls_until_ready = 0
+    tests = outcome(run_tests(provider, TestOptions(tests=IMAGE_TESTS)))
+    assert "passed" in tests.values(), tests
+    prepared = {getattr(item["request"].source, "oci", None) for item in ImageProvider.seen}
+    assert prepared == {ALPINE_IMAGE}
+
+
+def test_an_oci_image_without_its_marker_leaves_the_prepare_test_not_run(
+    provider: ImageProvider,
+) -> None:
+    ImageProvider.polls_until_ready = 0
+    options = TestOptions(tests=("images.v1.prepare_oci",), fixtures={"oci_image": UBUNTU})
+    report = run_tests(provider, options)
+    (row,) = report["tests"]
+    assert (row["result"], row["reason"]) == ("not_run", "fixture_missing")
+
+
+def test_the_dockerfile_test_builds_on_the_runs_image(provider: ImageProvider) -> None:
+    ImageProvider.polls_until_ready = 0
+    options = TestOptions(
+        tests=("images.v1.prepare_dockerfile_context",),
+        fixtures={"oci_image": UBUNTU, "image_marker": "Ubuntu"},
+    )
+    assert set(outcome(run_tests(provider, options)).values()) == {"passed"}
+    (item,) = ImageProvider.seen
+    assert item["request"].source.dockerfile.splitlines()[0] == f"FROM {UBUNTU}"
+    ImageProvider.seen.clear()
+    run_tests(provider, TestOptions(tests=("images.v1.prepare_dockerfile_context",)))
+    assert ImageProvider.seen[0]["request"].source.dockerfile.startswith(f"FROM {ALPINE_IMAGE}\n")
+
+
+def test_the_dockerfile_test_runs_only_for_a_class_that_claims_a_dockerfile_source() -> None:
+    suite = shared_suite()
+
+    def discovery(sources: list[str]) -> Any:
+        found = with_gates({"custom_images": {"source": sources, "prepared": True}})
+        first = dataclasses.replace(found.classes[0], operations=IMAGE_OPERATIONS)
+        return dataclasses.replace(found, classes=[first, *found.classes[1:]])
+
+    for options in (TestOptions(), TestOptions(tests=["images.v1."])):
+        chosen = {t.id for t in select_tests(suite, discovery(["oci"]), options).tests}
+        assert "images.v1.prepare_oci" in chosen
+        assert "images.v1.prepare_dockerfile_context" not in chosen
+        both = {t.id for t in select_tests(suite, discovery(["oci", "dockerfile"]), options).tests}
+        assert "images.v1.prepare_dockerfile_context" in both

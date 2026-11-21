@@ -234,7 +234,7 @@ Common fixture names are below. Supplementary denylist tests also need the
 | `max_allow_entries`, `wildcard_domains` | Allowlist domain lists for limit and wildcard tests; the allowed endpoint must match and the denied endpoint must remain outside them. `max_allow_entries` must be a list of 1 through 32 distinct strings, compared case-sensitively, with one matching URL per entry in `max_allow_urls`. |
 | `max_inject_into_hosts`, `max_inject_into_urls` | A nonempty list of distinct host names and same-length HTTPS URLs, with each URL's hostname exactly matching the host at the same position. The controlled endpoints record only whether that run's generated secret arrived; no secret value is returned or written to a report. |
 | `hidden_secret_wildcard_host`, `hidden_secret_wildcard_urls` | One `*.` wildcard hostname for a controlled receiver domain and two HTTPS URLs resolving to the controlled receiver: one direct child and one deeper subdomain under the wildcard. The receiver records only whether that run's generated secret arrived at each host. |
-| `oci_image`, `provider_artifact_image`, `image_marker` | An OCI reference or existing provider-native artifact, and expected controlled text in its `/etc/os-release`. Existing artifacts are borrowed and never deleted. |
+| `oci_image`, `provider_artifact_image`, `image_marker` | An OCI reference or existing provider-native artifact, and expected controlled text in its `/etc/os-release`. Existing artifacts are borrowed and never deleted. The `images.v1.*` tests prepare `oci_image` and look for `image_marker` when both are given, and otherwise prepare a pinned Alpine image (`prepared_oci_image`, `prepared_oci_marker`); `conformance/fixtures/runner-images.yaml` is one pinned Ubuntu image for every run (for a provider whose machines are Ubuntu-only). |
 | `standard_base_dockerfile` | A Dockerfile whose single `FROM` is the provider's own standard image, written the way the provider accepts it, followed by exactly these four lines: `COPY copied.txt /opt/sps-copy`, `COPY binary.bin /opt/sps-binary`, `ADD added.txt /opt/sps-added` and `ADD bundle.bin /opt/sps-bundle/`. `coverage.custom_images.prepare.dockerfile_standard_base_context` prepares it with its own build context. A provider that accepts a Dockerfile only on its standard image supplies it; for any other provider the test is not run. |
 | `private_oci_image`, `private_oci_username`, `private_oci_password`, `private_oci_marker` | A fresh, unique-per-run image in an isolated private registry that rejects anonymous pulls and cannot be read with provider-managed credentials; username and password are its only valid pull credentials. The image holds `/etc/sps-private-oci-marker` containing the run-unique `private_oci_marker` text, and needs whatever else the provider's evidence says an image must contain. The test supplies the credentials with `image.prepare` and verifies the sandbox started from that image, without prescribing whether the driver resolves the image then or at sandbox creation. Credentials are never recorded in reports. |
 | `original_size`, `restored_size` | JSON resource-request mappings for resize using request-vocabulary keys such as `cpu_min`, `memory_min_mib` and `disk_min_mib`, not declaration size fields or provider-native option names. Each driver supports only a subset of resource keys. Both mappings must be present and must differ; each observed allocation must use the same keys and values as its corresponding mapping exactly. Live-resize tests require exactly `cpu_min` and `memory_min_mib`, with no other keys: `original_size` is smaller and `restored_size` is larger in both. |
@@ -435,6 +435,7 @@ and its digest) cannot be given on the command line.
 | `image_marker` | Controlled text that the image's `/etc/os-release` holds, proving its own files are there. |
 | `larger_size` | A resource request with `cpu_min` and `memory_min_mib`, larger than the default size. |
 | `link_lifetime_wait_seconds` | The preview or file link's observation window in seconds (300 proves a 300-second bound). |
+| `lifetime_ends_seconds` | The short lifetime, in seconds, that `contract.lifetime_ends` asks for (default 60); give the provider's shortest lifetime when it is above 60. |
 | `max_allow_entries` | One to 32 distinct controlled host names, to prove the allowlist entry limit. |
 | `max_allow_urls` | Reachable URLs, one per `max_allow_entries` item in the same order. |
 | `max_deny_entries` | Distinct controlled names or IPv4 ranges, to prove the denylist entry limit. |
@@ -476,11 +477,15 @@ The run derives these from the fixtures above, so a run refuses a value for them
 | --- | --- |
 | `gpu_model` | `test_gpu` |
 | `gpu_name_pattern` | `test_gpu` |
+| `larger_size_value` | `larger_size` |
+| `lifetime_ends_wait_ms` | `lifetime_ends_seconds` |
 | `link_lifetime_wait_ms` | `link_lifetime_wait_seconds` |
 | `max_allow_count` | `max_allow_entries` |
 | `max_deny_count` | `max_deny_entries` |
 | `max_inject_into_count` | `max_inject_into_hosts` |
 | `max_lifetime_observed_seconds` | `max_lifetime_wait_ms` |
+| `prepared_oci_image` | `oci_image` |
+| `prepared_oci_marker` | `image_marker` |
 | `preview_link_lifetime_seconds` | `link_lifetime_wait_seconds` |
 | `preview_process_timeout_ms` | `link_lifetime_wait_seconds` |
 | `preview_sandbox_lifetime_seconds` | `link_lifetime_wait_seconds` |

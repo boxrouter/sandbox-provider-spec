@@ -279,6 +279,7 @@ DECLARATION_RESOURCES: Final = frozenset(
         "on_memory_exhausted",
         "regions",
         "located_in",
+        "default_region",
         "gpus",
         "max_gpus",
         "extendable_lifetime",

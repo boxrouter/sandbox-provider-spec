@@ -1,9 +1,9 @@
 # Runner fixture inventory
 
-`suite.yaml` and `coverage.yaml` currently reference 78 distinct `$runner.*` names. The
-40 endpoint-supplied values below are the keys a deployment of this endpoint service
+`suite.yaml` and `coverage.yaml` currently reference 81 distinct `$runner.*` names. The
+30 endpoint-supplied values below are the keys a deployment of this endpoint service
 supplies through the run's fixture file.
-The other 38 values are run inputs or values the runner derives, as described below; they are
+The other 40 values are run inputs or values the runner derives, as described below; they are
 not values served by this endpoint service.
 
 The `Dockerfile` and `fly.toml` beside this file build and configure one controlled
@@ -11,7 +11,7 @@ deployment. Wildcard fixtures use one-level names under the controlled DNS
 zone configured at deployment; the zone's DNS record and wildcard certificate are part of
 that deployment setup. Address fixtures use two distinct dedicated IPv4 addresses in one CIDR.
 
-## Endpoint-supplied values (40)
+## Endpoint-supplied values (30)
 
 | `$runner` key | What it must serve |
 | --- | --- |
@@ -25,10 +25,6 @@ that deployment setup. Address fixtures use two distinct dedicated IPv4 addresse
 | `connection_harness` | HTTPS `/stream` URL, a private test token, and optional CA bundle; stream emits `sps-connection-proof` lines at short intervals. |
 | `connection_harness_domains` | The stream hostname used in the initial sandbox network policy. |
 | `denied_url` | A second reachable controlled receiver URL outside the positive allowlist. |
-| `deny_wins_allow_entry` | A wildcard host entry covering both deny-wins receiver names. |
-| `deny_wins_allowed_url` | Reachable HTTPS receiver under the wildcard, on a host different from the denied host. |
-| `deny_wins_denied_url` | Reachable HTTPS receiver whose exact hostname is also in the deny entry. |
-| `deny_wins_deny_entry` | The exact hostname of `deny_wins_denied_url`. |
 | `denylist_addresses_entries` | IPv4 address or CIDR entries denied by address-based tests. |
 | `denylist_addresses_urls` | One HTTP/HTTPS pair per address entry, both URLs using literal IPs inside that entry. |
 | `denylist_mixed_entries` | A nonempty list containing controlled host names and IPv4 address or CIDR entries. |
@@ -36,15 +32,9 @@ that deployment setup. Address fixtures use two distinct dedicated IPv4 addresse
 | `denylist_allowed_urls` | Reachable, unlisted HTTP/HTTPS controls for denylist and entry-count tests. |
 | `denylist_names_entries` | Controlled hostname entries denied by name-based tests. |
 | `denylist_names_urls` | One HTTP/HTTPS pair for each name entry, both using that exact controlled hostname. |
-| `egress_harness` | One host and private token for `/probe` on HTTP 80 and HTTPS 443, TLS on 8443, and TCP/UDP proof exchanges. TCP and UDP use 7000 and 7001. |
-| `egress_harness_domains` | Hostname list resolving to the egress harness for domain-traffic checks. |
 | `egress_proxy_protocol` | Proxy protocol selected for egress-proxy tests: `http` or `socks5`; this service supports both. |
 | `hidden_secret_wildcard_host` | One wildcard receiver hostname for hidden-secret injection. |
 | `hidden_secret_wildcard_urls` | Two HTTPS request URLs: one for a direct child of the hidden-secret wildcard domain and one for a deeper subdomain. |
-| `http_rules_allowed_url` | HTTPS `/allowed/x` URL on the controlled host used by HTTP-rule tests. |
-| `http_rules_host` | Exact hostname of all three HTTP-rule URLs. |
-| `http_rules_outside_path_url` | HTTPS `/other` URL on the HTTP-rule host. |
-| `http_rules_wrong_method_url` | HTTPS `/allowed/x` URL on the HTTP-rule host; the test sends POST to it. |
 | `max_allow_entries` | One through 32 distinct controlled hostnames used to prove allowlist entry limits. |
 | `max_allow_urls` | Same-length reachable URLs whose hostnames match `max_allow_entries` in order. |
 | `max_deny_entries` | Distinct controlled names or IPv4 ranges used to prove denylist entry limits. |
@@ -64,7 +54,13 @@ for unauthenticated TLS tunnels, the receiver associates the connection with the
 the first request. Proxy destinations are restricted to the app hostname, configured
 wildcard suffix, and fixture ports 80, 443, 8443, 7000 and 7001.
 
-## Other runner inputs and derived values (38)
+The same deployment also serves the hosts of the coverage rows that take their receivers in the
+request instead of as `$runner.*` names: `deny_wins_*` (a wildcard entry, the exact denied host
+and two receiver URLs), `http_rules_*` (one host with `/allowed/x` and `/other`) and the
+`egress_harness`. `fixtures.py` does not list them, `--fixtures` refuses them, and the shared
+suite and `coverage.yaml` never read them; keep them out of a fixtures file.
+
+## Other runner inputs and derived values (40)
 
 | `$runner` key | Purpose |
 | --- | --- |
@@ -76,7 +72,7 @@ wildcard suffix, and fixture ports 80, 443, 8443, 7000 and 7001.
 | `idle_before_wait_ms` | Runner observation delay shorter than the native idle interval. |
 | `idle_lifetime_seconds` | Sandbox lifetime long enough to cover both idle observations. |
 | `idle_process_timeout_ms` | Process deadline longer than the complete idle observation. |
-| `image_marker` | Expected controlled marker text in an image's `/etc/os-release`. |
+| `image_marker` | Expected controlled marker text in an image's `/etc/os-release` (`Ubuntu` for `runner-images.yaml`). |
 | `entrypoint_image` | `image.prepare` input for an image whose ENTRYPOINT or CMD creates a known marker. When Dockerfile preparation is supported, use `FROM python:3.11-slim` with `ENTRYPOINT ["/sps-entrypoint"]`, where `/sps-entrypoint` writes `/tmp/sps-entrypoint` then sleeps. Otherwise use the pinned public `docker.io/library/nginx:1.27` OCI image (or its prepared provider reference); its `/docker-entrypoint.sh` launches nginx, which writes `/run/nginx.pid`. |
 | `entrypoint_marker` | `/tmp/sps-entrypoint` for the Dockerfile fixture or `/run/nginx.pid` for the nginx OCI fixture. The marker must be absent from the image layers and created only by startup. |
 | `larger_size` | Resource request with `cpu_min` and `memory_min_mib` above the provider's default size. |
@@ -89,8 +85,10 @@ wildcard suffix, and fixture ports 80, 443, 8443, 7000 and 7001.
 | `max_lifetime_seconds` | Requested lifetime for the active-sandbox observation. |
 | `max_lifetime_wait_ms` | Runner wait for the maximum-lifetime observation. |
 | `max_mounts` | Positive mount count for volume coverage. |
-| `oci_image` | Public OCI image used by image preparation and container tests. |
+| `oci_image` | Public OCI image used by image preparation and container tests. `fixtures/runner-images.yaml` pins one Ubuntu-based image for every run; with it, `images.v1.*` and `custom_images.oci` use it too (without it `images.v1.*` use a pinned Alpine image and `custom_images.oci` is `not_run`). |
 | `original_size` | Smaller provider resource request used by resize coverage. |
+| `prepared_oci_image` | Derived: `oci_image`, else the pinned Alpine image, for `images.v1.*`. |
+| `prepared_oci_marker` | Derived: `image_marker` with `oci_image`, else `Alpine Linux`. |
 | `preview_link_lifetime_seconds` | Derived native preview-link lifetime with setup margin. |
 | `preview_process_timeout_ms` | Derived process timeout with setup margin. |
 | `preview_sandbox_lifetime_seconds` | Derived sandbox lifetime with setup margin. |

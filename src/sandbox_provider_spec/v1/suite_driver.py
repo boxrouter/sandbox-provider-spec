@@ -50,6 +50,8 @@ from sandbox_provider_spec.v1.types import (
     ProcessStartRequest,
     RunRequest,
     Sandbox,
+    Secret,
+    SecretHeader,
     Snapshot,
     SnapshotRequest,
     Terminal,
@@ -77,8 +79,12 @@ CREATE_INPUTS = frozenset(
         "image",
         "labels",
         "idempotency_key",
+        "secret",
     }
 )
+
+SECRET_PLACEHOLDER_ENV = "SPS_SECRET_PLACEHOLDER"
+"""The environment variable through which the tests read a sandbox's secret placeholder."""
 
 # An id that no provider has issued: it fits the id syntax (contract section 3) and names nothing.
 UNKNOWN_SANDBOX_ID = "sps-test-no-such-sandbox"
@@ -100,6 +106,17 @@ class SandboxHandle:
     """What a sandbox resource keeps in memory."""
 
     id: str
+
+
+@dataclass
+class SecretHandle:
+    """A credential made by `secret.create`, held until a `create` binds it. SPS 1.0 has no secret
+    object: the value reaches the provider only in the `secrets` of a create, so there is nothing
+    to delete. The value stays out of `repr`."""
+
+    value: str = field(repr=False)
+    hosts: tuple[str, ...] = ()
+    headers: tuple[SecretHeader, ...] = ()
 
 
 @dataclass
@@ -132,6 +149,22 @@ class TerminalHandle:
     pump: Future[None] | None = None
     id: str | None = None
     """The name the terminal was opened under, when its class claims `terminal.reattach`."""
+
+
+def _default_region_listed(resources: Mapping[str, object]) -> bool:
+    """A class that states `default_region` lists it among its `regions` (a list of regions)."""
+    default = resources.get("default_region")
+    regions = resources.get("regions")
+    return default is None or not isinstance(regions, (list, tuple)) or default in regions
+
+
+def _secret_headers(items: object) -> tuple[SecretHeader, ...]:
+    if not isinstance(items, (list, tuple)):
+        raise ValueError("headers must be a list")
+    return tuple(
+        SecretHeader(str(item["name"]), str(item.get("prefix", "")), str(item.get("suffix", "")))
+        for item in items
+    )
 
 
 def _iso(moment: datetime | None) -> str | None:
@@ -249,13 +282,17 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         image = image_reference(inputs.get("image")) or inputs.get("image")
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
+        env = strings(inputs, "environment")
+        requirements = cast(Mapping[str, object], inputs.get("requirements", {}))
+        secrets = self._secrets(inputs, requirements, env)
         request = CreateRequest(
             sandbox_class=self.sandbox_class if snapshot is None else snapshot.sandbox_class,
             resources=cast(Mapping[str, object], inputs.get("resources", {})),
-            requirements=cast(Mapping[str, object], inputs.get("requirements", {})),
+            requirements=requirements,
             image=cast("str | Mapping[str, str] | None", image),
             at_end=cast(Any, inputs.get("at_end", "destroyed")),
-            env=strings(inputs, "environment"),
+            env=env,
+            secrets=secrets,
             labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id},
             lifetime_seconds=cast("int | None", inputs.get("lifetime_seconds", 300)),
             snapshot=None if snapshot is None else snapshot.id,
@@ -264,6 +301,40 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         handle = SandboxHandle(created.id)
         owned = self.own("sandbox", handle, lambda: self._destroy(handle.id))
         return {"resource": owned, "identity": created.id}
+
+    def secret_create(self, target: object, inputs: Inputs) -> Observation:
+        """Make a credential for a later `create` to bind (`create` with `secret`)."""
+        del target
+        value = text(inputs, "value")
+        hosts = inputs.get("hosts") or ()
+        headers = inputs.get("headers") or ()
+        if not isinstance(hosts, (list, tuple)) or not all(isinstance(h, str) for h in hosts):
+            raise ValueError("hosts must be a list of text")
+        if not isinstance(headers, (list, tuple)):
+            raise ValueError("headers must be a list")
+        handle = SecretHandle(value, tuple(hosts), _secret_headers(headers))
+        return {"resource": self.own("secret", handle, lambda: {"result": "already_released"})}
+
+    @staticmethod
+    def _secrets(
+        inputs: Inputs, requirements: Mapping[str, object], env: dict[str, str]
+    ) -> tuple[Secret, ...]:
+        """The `secrets` of a create that binds a `secret`: its hosts and header templates are
+        the ones the request's `hidden_secrets` names, else the ones the secret was made with.
+        The placeholder goes into `env` so that code in the sandbox can use it."""
+        if "secret" not in inputs:
+            return ()
+        handle = resource(inputs["secret"]).native
+        if not isinstance(handle, SecretHandle):
+            raise ValueError("secret must be a secret resource")
+        asked = requirements.get("hidden_secrets")
+        asked = asked if isinstance(asked, Mapping) else {}
+        hosts = asked.get("inject_into") or handle.hosts
+        if not isinstance(hosts, (list, tuple)) or not hosts:
+            raise ValueError("a secret needs the hosts to inject into")
+        headers = _secret_headers(asked.get("headers") or ()) or handle.headers
+        placeholder = env.setdefault(SECRET_PLACEHOLDER_ENV, f"sps-placeholder-{uuid4().hex}")
+        return (Secret(placeholder, handle.value, tuple(hosts), headers),)
 
     def _key(self, inputs: Inputs) -> str:
         """A create's idempotency key: fresh, or shared by one test's creates in one run only."""
@@ -335,7 +406,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         found = self.wait(self.api.discovery())
         try:
             to_json(found)
-            valid = True
+            valid = all(_default_region_listed(item.resources) for item in found.classes)
         except WireError:
             valid = False
         return {

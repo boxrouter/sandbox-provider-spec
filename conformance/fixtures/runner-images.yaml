@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
+#
+# The shared image fixture: one public, digest-pinned, Ubuntu-based OCI image for every
+# provider's run, so that all runs prepare the same one (a provider whose machines are
+# Ubuntu-only cannot prove prepared images on Alpine).
+# Use it with `sandbox-provider-spec test --fixtures conformance/fixtures/runner-images.yaml`.
+# It supplies `oci_image` and `image_marker`: the `custom_images.oci` test, the `images.v1.*`
+# tests and the `custom_images` coverage rows then use this image instead of their defaults.
+# The digest is of the multi-platform index of `docker.io/library/ubuntu:24.04`. Change it only
+# with a new digest read from the registry, and update the marker with it.
+oci_image: docker.io/library/ubuntu@sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289
+image_marker: Ubuntu
