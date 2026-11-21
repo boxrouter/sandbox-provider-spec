@@ -21,6 +21,7 @@ class Ticket:
     token: str
     sandbox_id: str
     request: TerminalRequest
+    reattach: str | None = None  # the id of a terminal to connect to, in place of starting one
 
 
 class Tickets:
@@ -36,7 +37,13 @@ class Tickets:
         for name in [name for name, item in self._items.items() if item.expires <= now]:
             del self._items[name]
 
-    def issue(self, token: str, sandbox_id: str, request: TerminalRequest) -> str:
+    def issue(
+        self,
+        token: str,
+        sandbox_id: str,
+        request: TerminalRequest,
+        reattach: str | None = None,
+    ) -> str:
         self._sweep()
         if len(self._items) >= MAX_TERMINAL_TICKETS:
             raise SpsError(
@@ -44,7 +51,7 @@ class Tickets:
             )
         name = secrets.token_urlsafe(24)
         self._items[name] = Ticket(
-            self._clock() + TERMINAL_TICKET_SECONDS, token, sandbox_id, request
+            self._clock() + TERMINAL_TICKET_SECONDS, token, sandbox_id, request, reattach
         )
         return name
 

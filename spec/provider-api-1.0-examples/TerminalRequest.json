@@ -4,5 +4,6 @@
   "env": {},
   "columns": 80,
   "rows": 24,
-  "term": "xterm-256color"
+  "term": "xterm-256color",
+  "id": null
 }

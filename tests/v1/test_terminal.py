@@ -20,7 +20,7 @@ import pytest
 import websockets.asyncio.client
 import websockets.exceptions
 
-from sandbox_provider_spec.driver import NotRun
+from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported
 from sandbox_provider_spec.v1 import (
     CredentialField,
     Provider,
@@ -84,7 +84,8 @@ class Shell(Terminal):
 
     async def close(self) -> None:
         self.closed = True
-        self._queue.put_nowait(None)
+        if self.request.id is None:  # a named terminal only detaches
+            self._queue.put_nowait(None)
 
 
 class TerminalProvider(Provider, manifest=False):
@@ -136,6 +137,32 @@ class TerminalProvider(Provider, manifest=False):
         shell = Shell(request)
         type(self).opened.append(shell)
         return shell
+
+
+class ReattachProvider(TerminalProvider, manifest=False):
+    """Keeps the terminals that were opened under an id until they end."""
+
+    named: ClassVar[dict[str, Shell]] = {}
+    ended: ClassVar[list[str]] = []
+
+    async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
+        shell = await super().terminal_open(sandbox_id, request)
+        assert isinstance(shell, Shell)
+        if request.id is not None:
+            type(self).named[request.id] = shell
+        return shell
+
+    async def terminal_reattach(self, sandbox_id: str, terminal_id: str) -> Terminal:
+        if terminal_id not in type(self).named:
+            raise SpsError("not_found", "No such terminal")
+        return type(self).named[terminal_id]
+
+    async def terminal_end(self, sandbox_id: str, terminal_id: str) -> None:
+        type(self).ended.append(terminal_id)
+        shell = type(self).named.pop(terminal_id, None)
+        if shell is not None:
+            shell.exit_code = 130
+            shell._queue.put_nowait(None)  # noqa: SLF001 - the test provider's own object
 
 
 class NoTerminalProvider(TerminalProvider, manifest=False):
@@ -268,6 +295,98 @@ def test_an_adapter_without_a_terminal_is_unsupported() -> None:
             headers={"Authorization": f"Bearer {TOKEN}"},
         )
         assert (response.status_code, response.json()["error"]["code"]) == (422, "unsupported")
+
+
+# --- reattach ----------------------------------------------------------------------------------
+
+
+def test_a_named_terminal_outlives_its_connection_and_is_reached_by_its_id() -> None:
+    ReattachProvider.state = "running"
+    ReattachProvider.opened, ReattachProvider.named, ReattachProvider.ended = [], {}, []
+    for served in serve(ReattachProvider):
+
+        async def main() -> None:
+            provider = client(served)
+            try:
+                first = await provider.terminal_open(
+                    "sbx-17", TerminalRequest(id="terminal-0123abcd")
+                )
+                await first.write(b"export X=1")
+                assert await collect(first, 10) == b"export X=1"
+                await first.close()  # detaches: the program keeps running
+                shell = ReattachProvider.named["terminal-0123abcd"]
+                assert shell.closed and shell.exit_code is None
+                again = await provider.terminal_reattach("sbx-17", "terminal-0123abcd")
+                await again.write(b"echo $X")
+                assert await collect(again, 7) == b"echo $X"
+                await again.write(b"exit 3")
+                assert [chunk async for chunk in again.output()] == []
+                assert again.exit_code == 3
+                await again.close()
+                missing = await provider.terminal_reattach("sbx-17", "terminal-ffffffff")
+                with pytest.raises(SpsError) as refused:  # reported when the link is connected
+                    await collect(missing, 1)
+                assert refused.value.code == "not_found"
+                await provider.terminal_end("sbx-17", "terminal-0123abcd")
+                assert ReattachProvider.ended == ["terminal-0123abcd"]
+            finally:
+                await provider.aclose()
+
+        run(main())
+
+
+def test_the_driver_disconnects_reattaches_and_ends_a_named_terminal() -> None:
+    ReattachProvider.state = "running"
+    ReattachProvider.opened, ReattachProvider.named, ReattachProvider.ended = [], {}, []
+    for served in serve(ReattachProvider):
+        driver = ProviderDriver(HttpProvider(served.url, TOKEN))
+        try:
+            box = driver_box(driver)
+            tty = driver.call("terminal.open", box, {"reattachable": True})
+            driver.call("terminal.write", tty, {"data": "aGk="})
+            driver.call("terminal.disconnect", tty, {})
+            attached = driver.call("terminal.reattach", tty, {})
+            driver.call("terminal.write", attached, {"data": "eW8="})
+            output = driver.call("terminal.output", attached, {"until_contains": "yo"})
+            assert b"yo" in output["terminal"]
+            driver.call("terminal.end", tty, {})
+            gone = driver.call("terminal.reattach", tty, {})
+            with pytest.raises(NativeFailure) as refused:
+                driver.call("terminal.output", gone, {"first_chunk": True, "timeout_ms": 10000})
+            assert refused.value.code == "not_found"
+        finally:
+            driver.close()
+
+
+def test_an_unnamed_terminal_cannot_be_disconnected_from() -> None:
+    TerminalProvider.state = "running"
+    TerminalProvider.opened = []
+    for served in serve(TerminalProvider):
+        driver = ProviderDriver(HttpProvider(served.url, TOKEN))
+        try:
+            box = driver_box(driver)
+            tty = driver.call("terminal.open", box, {})
+            with pytest.raises(Unsupported):
+                driver.call("terminal.disconnect", tty, {})
+        finally:
+            driver.close()
+
+
+def test_a_server_refuses_an_id_when_the_provider_cannot_reattach(served: Served) -> None:
+    response = httpx.post(
+        f"{served.url}/v1/sandboxes/sbx-17/terminals",
+        json={"id": "terminal-0123abcd"},
+        headers={"Authorization": f"Bearer {TOKEN}"},
+    )
+    assert (response.status_code, response.json()["error"]["code"]) == (422, "unsupported")
+    for path, method in (
+        ("/v1/sandboxes/sbx-17/terminals/terminal-0123abcd/link", "POST"),
+        ("/v1/sandboxes/sbx-17/terminals/terminal-0123abcd", "DELETE"),
+    ):
+        answer = httpx.request(
+            method, served.url + path, headers={"Authorization": f"Bearer {TOKEN}"}
+        )
+        assert (answer.status_code, answer.json()["error"]["code"]) == (422, "unsupported")
 
 
 # --- the link ----------------------------------------------------------------------------------
@@ -638,9 +757,6 @@ def test_terminal_operations_are_unsupported_when_discovery_does_not_claim_the_s
     from sandbox_provider_spec.v1.tester import OPERATION_CLAIMS  # noqa: PLC0415
 
     assert OPERATION_CLAIMS["terminal.open"] == ("gate", "terminal")
-    driver = ProviderDriver(TerminalProvider({"token": "x"}), provider_id="shell")
-    try:
-        assert "terminal.reattach" in driver.unsupported
-        assert "terminal.disconnect" in driver.unsupported
-    finally:
-        driver.close()
+    for operation in ("terminal.disconnect", "terminal.reattach", "terminal.end"):
+        assert OPERATION_CLAIMS[operation] == ("knob", ("terminal", "reattach"))
+    assert OPERATION_CLAIMS["network.update"][0] == "knobs"

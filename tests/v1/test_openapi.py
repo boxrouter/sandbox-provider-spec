@@ -48,6 +48,7 @@ OPERATION_IDS = [
     "labels_update",
     "lifetime_extend",
     "list",
+    "network_update",
     "pause",
     "preview_link",
     "preview_revoke",
@@ -64,7 +65,9 @@ OPERATION_IDS = [
     "snapshot_get",
     "snapshot_list",
     "tcp_link",
+    "terminal_end",
     "terminal_open",
+    "terminal_reattach",
 ]
 ERROR_CODES = {
     "invalid_request": (400, "caller"),
@@ -325,6 +328,7 @@ def test_request_schemas_are_found() -> None:
         "LabelsUpdateRequest",
         "LifetimeExtendRequest",
         "MkdirRequest",
+        "NetworkUpdateRequest",
         "PreviewRequest",
         "ProcessStartRequest",
         "RunRequest",

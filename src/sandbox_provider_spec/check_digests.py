@@ -61,7 +61,7 @@ SHARED_OPERATIONS = frozenset(
         "snapshot.delete", "snapshot.delete_again", "snapshot.restore",
         "snapshot.restore_begin", "snapshot.restore_wait", "snapshot.retention",
         "snapshot.take", "tcp.link", "terminal.disconnect", "terminal.open",
-        "terminal.output", "terminal.reattach", "terminal.write", "terminal.resize",
+        "terminal.output", "terminal.reattach", "terminal.write", "terminal.resize", "terminal.end",
         "terminal.wait", "terminal.close", "terminal.link_reuse", "volume.create",
         "volume.create_many", "volume.observe_kind", "volume.observe_mounts",
     }

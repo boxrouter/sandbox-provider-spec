@@ -640,6 +640,7 @@ def test_shipped_base64_commands_run_verbatim_on_a_host_root(tmp_path: Path) -> 
 
 
 GUEST_USER_ROW = "coverage.guest_user.selectable"
+TERMINAL_END_ROW = "coverage.terminal.end"
 IMAGE_DEFAULTS_ROWS = (
     "coverage.custom_images.defaults.dockerfile",
     "coverage.custom_images.defaults.distro_dockerfile",
@@ -663,6 +664,7 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
         DISTRO_CONTEXT_ROW,
         STANDARD_BASE_ROW,
         GUEST_USER_ROW,
+        TERMINAL_END_ROW,
         *IMAGE_DEFAULTS_ROWS,
     }
     for identifier in set(live) & set(preserved):

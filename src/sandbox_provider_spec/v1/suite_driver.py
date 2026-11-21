@@ -64,10 +64,7 @@ RUN_LABEL = "sps.test.run"
 """Every sandbox that a test run creates carries this label, with the run id as its value."""
 
 # Operations that 1.0 has no counterpart for: a test needing one is `unsupported`.
-NOT_IN_1_0 = {
-    "terminal.disconnect": "SPS 1.0 has no operation to disconnect from a terminal",
-    "terminal.reattach": "SPS 1.0 has no operation to reattach to a terminal",
-}
+NOT_IN_1_0: dict[str, str] = {}
 
 # Create inputs that SPS 1.0 maps to a field of `CreateRequest`.
 CREATE_INPUTS = frozenset(
@@ -133,6 +130,8 @@ class TerminalHandle:
     """What ended the terminal or refused its start, raised by the next output or wait."""
     ended: bool = False
     pump: Future[None] | None = None
+    id: str | None = None
+    """The name the terminal was opened under, when its class claims `terminal.reattach`."""
 
 
 def _iso(moment: datetime | None) -> str | None:
@@ -669,6 +668,18 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             del labels[RUN_LABEL]
         return {"labels": labels}
 
+    def network_update(self, target: object, inputs: Inputs) -> Observation:
+        """Replace the running sandbox's network policy; `inputs` is the new policy and entries."""
+        self.wait(
+            self.api.network_update(
+                self._sandbox(target),
+                text(inputs, "policy"),
+                allow=cast("list[str]", inputs.get("allow") or ()),
+                deny=cast("list[str]", inputs.get("deny") or ()),
+            )
+        )
+        return {}
+
     def tcp_link(self, target: object, inputs: Inputs) -> Observation:
         link = self.wait(self.api.tcp_link(self._sandbox(target), number(inputs, "port", 0)))
         return {"host": link.host, "port": link.port}
@@ -835,17 +846,55 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             columns=number(inputs, "columns", 80),
             rows=number(inputs, "rows", 24),
             term=cast(str, inputs.get("term", "xterm-256color")),
+            # A test that disconnects and reattaches asks for a named terminal (`reattachable`).
+            id=f"sps-test-{uuid4().hex}" if inputs.get("reattachable") is True else None,
         )
-        handle = TerminalHandle(sandbox_id, None)
+        handle = TerminalHandle(sandbox_id, None, id=request.id)
+        self._attach(handle, self.api.terminal_open(sandbox_id, request))
+        owned = self.own("terminal", handle, lambda: self._close_terminal(handle))
+        return {"resource": owned}
+
+    def _attach(self, handle: TerminalHandle, opening: Awaitable[Terminal]) -> None:
         try:
-            handle.terminal = self.wait(self.api.terminal_open(sandbox_id, request))
+            handle.terminal = self.wait(opening)
         except NativeFailure as error:
             handle.error, handle.ended = SpsError(cast(Any, error.code), "refused"), True
         else:
             handle.pump = asyncio.run_coroutine_threadsafe(self._pump(handle), self._loop)
             self._terminals.append(handle)
+
+    def terminal_disconnect(self, target: object, inputs: Inputs) -> Observation:
+        """Close the connection of a terminal that has an id: its program keeps running."""
+        del inputs
+        handle = self._terminal(target)
+        if handle.id is None or handle.terminal is None:
+            raise Unsupported("the terminal has no id, so closing it ends it")
+        self.wait(handle.terminal.close())
+        if handle.pump is not None:
+            with contextlib.suppress(Exception):
+                handle.pump.result(timeout=10)
+        return {}
+
+    def terminal_reattach(self, target: object, inputs: Inputs) -> Observation:
+        """Connect to the terminal again. The result is a new terminal resource on the same id. A
+        terminal that is no longer running is reported by the first output read or wait, as a
+        refused start is."""
+        del inputs
+        old = self._terminal(target)
+        if old.id is None:
+            raise Unsupported("the terminal has no id")
+        handle = TerminalHandle(old.sandbox_id, None, id=old.id)
+        self._attach(handle, self.api.terminal_reattach(old.sandbox_id, old.id))
         owned = self.own("terminal", handle, lambda: self._close_terminal(handle))
         return {"resource": owned}
+
+    def terminal_end(self, target: object, inputs: Inputs) -> Observation:
+        del inputs
+        handle = self._terminal(target)
+        if handle.id is None:
+            raise Unsupported("the terminal has no id")
+        self.wait(self.api.terminal_end(handle.sandbox_id, handle.id))
+        return {}
 
     async def _pump(self, handle: TerminalHandle) -> None:
         """Collect a terminal's output until it ends, so that nothing waits on the reader."""
@@ -864,6 +913,9 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             if handle.pump is not None:
                 with contextlib.suppress(Exception):
                     handle.pump.result(timeout=10)  # the pump ends once the terminal is closed
+        if handle.id is not None:  # closing only detached it
+            with contextlib.suppress(NativeFailure, Unsupported):
+                self.wait(self.api.terminal_end(handle.sandbox_id, handle.id))
         return {"result": "deleted"}
 
     def terminal_write(self, target: object, inputs: Inputs) -> Observation:

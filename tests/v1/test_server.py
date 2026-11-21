@@ -199,6 +199,14 @@ class Recorder(Provider, manifest=False):
         self._note("labels_update", sandbox_id, dict(labels))
         return example(Sandbox)
 
+    async def network_update(
+        self, sandbox_id: str, policy: str, *, allow: Any = (), deny: Any = ()
+    ) -> None:
+        self._note("network_update", sandbox_id, policy, list(allow), list(deny))
+
+    async def terminal_end(self, sandbox_id: str, terminal_id: str) -> None:
+        self._note("terminal_end", sandbox_id, terminal_id)
+
     async def tcp_link(self, sandbox_id: str, port: int) -> TcpLink:
         self._note("tcp_link", sandbox_id, port)
         return example(TcpLink)
@@ -420,6 +428,14 @@ ROUTES: list[tuple[str, str, str, Any, str]] = [
     ),
     ("preview_revoke", "DELETE", "/v1/sandboxes/sbx-1/previews/prv-1", None, "preview_revoke"),
     (
+        "network_update",
+        "PUT",
+        "/v1/sandboxes/sbx-1/network",
+        request_json("NetworkUpdateRequest"),
+        "network_update",
+    ),
+    ("terminal_end", "DELETE", "/v1/sandboxes/sbx-1/terminals/term-0001", None, "terminal_end"),
+    (
         "labels_update",
         "PATCH",
         "/v1/sandboxes/sbx-1/labels",
@@ -468,7 +484,7 @@ async def drive(app: Any, method: str, path: str, body: Any) -> Reply:
 
 
 def test_the_route_table_covers_all_operations() -> None:
-    assert len({operation for operation, *_ in ROUTES}) == 32
+    assert len({operation for operation, *_ in ROUTES}) == 34
 
 
 @pytest.mark.parametrize(("operation", "method", "path", "body", "called"), ROUTES)
@@ -527,6 +543,28 @@ def test_a_provider_with_the_short_preview_signature_still_serves_a_plain_reques
 def test_a_preview_request_with_a_bad_access_or_lifetime_is_refused(body: dict[str, Any]) -> None:
     app = create_app(Recorder)
     reply = asyncio.run(call(app, "POST", "/v1/sandboxes/sbx-1/previews", body=j(body)))
+    assert reply.status == 400 and Recorder.calls == []
+
+
+def test_network_update_passes_the_policy_and_entries_and_refuses_bad_ones() -> None:
+    app = create_app(Recorder)
+    path = "/v1/sandboxes/sbx-1/network"
+    body = {"policy": "allowlist", "allow": ["a.example.com", "10.0.0.0/24"]}
+    assert asyncio.run(call(app, "PUT", path, body=j(body))).status == 200
+    assert asyncio.run(call(app, "PUT", path, body=j({"policy": "deny_all"}))).status == 200
+    assert Recorder.calls == [
+        ("network_update", ("sbx-1", "allowlist", ["a.example.com", "10.0.0.0/24"], [])),
+        ("network_update", ("sbx-1", "deny_all", [], [])),
+    ]
+    Recorder.calls.clear()
+    for bad in ({}, {"policy": "nope"}, {"policy": "allowlist", "allow": "a"}, {"allow": ["a"]}):
+        assert asyncio.run(call(app, "PUT", path, body=j(bad))).status == 400
+    assert Recorder.calls == []
+
+
+def test_a_terminal_end_of_a_bad_id_is_refused() -> None:
+    app = create_app(Recorder)
+    reply = asyncio.run(call(app, "DELETE", "/v1/sandboxes/sbx-1/terminals/a%20b"))
     assert reply.status == 400 and Recorder.calls == []
 
 

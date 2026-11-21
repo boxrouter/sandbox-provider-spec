@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterable, Mapping
+from collections.abc import AsyncIterable, Mapping, Sequence
 from datetime import datetime
 from importlib.metadata import entry_points
 from importlib.resources import as_file, files
@@ -357,7 +357,34 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         raise self._unsupported("image.cost")
 
     async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
+        """Start the program and return its terminal. With `request.id`, closing the terminal only
+        detaches it (a class that claims `terminal` with `reattach: true`); without, it ends."""
         raise self._unsupported("terminal.open")
+
+    async def terminal_reattach(self, sandbox_id: str, terminal_id: str) -> Terminal:
+        """Connect to the terminal that `terminal_open` started under this `id` and that is still
+        running; `not_found` when it is not. An earlier connection to it is closed."""
+        raise self._unsupported("terminal.reattach")
+
+    async def terminal_end(self, sandbox_id: str, terminal_id: str) -> None:
+        """End the terminal that was opened under this `id`, as a closed connection ends a
+        terminal that has none. An id that is already gone succeeds."""
+        raise self._unsupported("terminal.end")
+
+    async def network_update(
+        self,
+        sandbox_id: str,
+        policy: str,
+        *,
+        allow: Sequence[str | Mapping[str, object]] = (),
+        deny: Sequence[str | Mapping[str, object]] = (),
+    ) -> None:
+        """Replace the running sandbox's network policy (`deny_all`, `allowlist`, `denylist` or
+        `open`) and its `allow` or `deny` entries; the sandbox keeps its processes and files.
+        The new policy holds when the call returns. A policy or entries that the sandbox's
+        `network_lockdown` variant does not allow (`switches_to`, `changeable`) are refused with
+        `unsupported`."""
+        raise self._unsupported("network.update")
 
     async def aclose(self) -> None:
         """Release HTTP clients; the host calls it once when it is done with the adapter."""

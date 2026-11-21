@@ -944,6 +944,7 @@ _CODECS: dict[type, _Codec] = {
             "columns": v.columns,
             "rows": v.rows,
             "term": v.term,
+            "id": v.id,
         },
         lambda d: TerminalRequest(
             argv=None if d.get("argv") is None else tuple(d["argv"]),
@@ -952,6 +953,7 @@ _CODECS: dict[type, _Codec] = {
             columns=d.get("columns", 80),
             rows=d.get("rows", 24),
             term=d.get("term", "xterm-256color"),
+            id=d.get("id"),
         ),
     ),
     Limits: _Codec("Limits", _enc_limits, lambda d: Limits(**d)),

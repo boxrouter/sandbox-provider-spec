@@ -832,6 +832,35 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
             body=to_json(request),
         )
 
+    async def terminal_reattach_link(self, sandbox_id: str, terminal_id: str) -> TerminalLink:
+        """Call `terminal.reattach` and return the link, without connecting to it."""
+        path = self._sandbox_path(sandbox_id, f"/terminals/{_id(terminal_id, 'terminal_id')}/link")
+        return await self._json(TerminalLink, "POST", path, body={})
+
+    async def terminal_reattach(self, sandbox_id: str, terminal_id: str) -> Terminal:
+        return await self.terminal_connect(
+            await self.terminal_reattach_link(sandbox_id, terminal_id)
+        )
+
+    async def terminal_end(self, sandbox_id: str, terminal_id: str) -> None:
+        path = self._sandbox_path(sandbox_id, f"/terminals/{_id(terminal_id, 'terminal_id')}")
+        await self._ack("DELETE", path)
+
+    async def network_update(
+        self,
+        sandbox_id: str,
+        policy: str,
+        *,
+        allow: Sequence[str | Mapping[str, object]] = (),
+        deny: Sequence[str | Mapping[str, object]] = (),
+    ) -> None:
+        body: dict[str, Any] = {"policy": policy}
+        if allow:
+            body["allow"] = list(allow)
+        if deny:
+            body["deny"] = list(deny)
+        await self._ack("PUT", self._sandbox_path(sandbox_id, "/network"), body=body)
+
     async def terminal_connect(self, link: TerminalLink) -> Terminal:
         """Connect to a terminal link, sending only its URL and `headers`: never this provider's
         `Authorization` header, so that a link works for a client with no account token.

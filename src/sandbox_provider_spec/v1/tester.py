@@ -92,6 +92,11 @@ OPERATION_CLAIMS = {
     "preview.revoke": ("knob", ("previews", "revocable")),
     "tcp.link": ("gate", "tcp_ports"),
     "terminal.open": ("gate", "terminal"),
+    "terminal.disconnect": ("knob", ("terminal", "reattach")),
+    "terminal.reattach": ("knob", ("terminal", "reattach")),
+    "terminal.end": ("knob", ("terminal", "reattach")),
+    # Either knob claims it: a variant that can switch or change its policy.
+    "network.update": ("knobs", ("network_lockdown", ("switchable", "changeable"))),
     "lifetime.extend": ("fact", "extendable_lifetime"),
     "process.write_stdin": ("knob", ("processes", "input")),
     "process.close_stdin": ("knob", ("processes", "input")),
@@ -237,6 +242,11 @@ def unsupported_operations(discovery: Discovery) -> dict[str, str]:
             claimed = key in facts
         elif kind == "operations":
             claimed = key in listed
+        elif kind == "knobs":
+            gate, knobs = cast("tuple[str, tuple[str, ...]]", key)
+            claimed = any(
+                variant.get(knob) is True for variant in gates.get(gate, []) for knob in knobs
+            )
         else:
             gate, knob = cast("tuple[str, str]", key)
             claimed = any(variant.get(knob) is True for variant in gates.get(gate, []))

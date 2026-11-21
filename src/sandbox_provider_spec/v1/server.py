@@ -713,16 +713,12 @@ def _link_base(r: _Request) -> str:
     return f"{scheme}://{host}{scope.get('root_path', '')}"
 
 
-async def _terminal_open(p: Provider, r: _Request) -> Reply:
-    sandbox_id = _entity(r.path_params[0], "sandbox_id")
-    request: TerminalRequest = await r.typed_body(TerminalRequest)
-    if type(p).terminal_open is Provider.terminal_open:
-        raise SpsError("unsupported", "The provider does not support terminal.open")
-    sandbox = await p.get(sandbox_id)
-    if sandbox.state != "running":
-        raise SpsError("conflict", f"The sandbox is {sandbox.state}, not running")
+async def _terminal_link(
+    r: _Request, sandbox_id: str, request: TerminalRequest, reattach: str | None = None
+) -> Reply:
+    """The single-use link for a terminal that the next connection starts or reattaches to."""
     assert r.tickets is not None
-    ticket = r.tickets.issue(r.token, sandbox_id, request)
+    ticket = r.tickets.issue(r.token, sandbox_id, request, reattach)
     expires = datetime.now(UTC).replace(microsecond=0) + timedelta(seconds=TERMINAL_TICKET_SECONDS)
     body = {
         "url": f"{_link_base(r)}{TERMINAL_LINK_PATH}{ticket}",
@@ -731,6 +727,48 @@ async def _terminal_open(p: Provider, r: _Request) -> Reply:
     }
     _check("TerminalLink", body, "The link")
     return 200, body
+
+
+async def _terminal_open(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    request: TerminalRequest = await r.typed_body(TerminalRequest)
+    if type(p).terminal_open is Provider.terminal_open:
+        raise SpsError("unsupported", "The provider does not support terminal.open")
+    if request.id is not None and type(p).terminal_reattach is Provider.terminal_reattach:
+        raise SpsError("unsupported", "The provider does not support terminal.reattach")
+    sandbox = await p.get(sandbox_id)
+    if sandbox.state != "running":
+        raise SpsError("conflict", f"The sandbox is {sandbox.state}, not running")
+    return await _terminal_link(r, sandbox_id, request)
+
+
+async def _terminal_reattach(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    terminal_id = _entity(r.path_params[1], "terminal_id")
+    await r.json_body("EmptyObject", empty_ok=True)
+    if type(p).terminal_reattach is Provider.terminal_reattach:
+        raise SpsError("unsupported", "The provider does not support terminal.reattach")
+    sandbox = await p.get(sandbox_id)
+    if sandbox.state != "running":
+        raise SpsError("conflict", f"The sandbox is {sandbox.state}, not running")
+    return await _terminal_link(r, sandbox_id, TerminalRequest(), terminal_id)
+
+
+async def _terminal_end(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    terminal_id = _entity(r.path_params[1], "terminal_id")
+    r.check_query_used()
+    await p.terminal_end(sandbox_id, terminal_id)
+    return 200, {}
+
+
+async def _network_update(p: Provider, r: _Request) -> Reply:
+    sandbox_id = _entity(r.path_params[0], "sandbox_id")
+    body = await r.json_body("NetworkUpdateRequest")
+    await p.network_update(
+        sandbox_id, body["policy"], allow=body.get("allow", ()), deny=body.get("deny", ())
+    )
+    return 200, {}
 
 
 _Handler = Callable[[Provider, _Request], Awaitable[Reply]]
@@ -783,6 +821,9 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("DELETE", _I, _image_delete),
         ("GET", f"{_I}/cost", _image_cost),
         ("POST", f"{_S}/terminals", _terminal_open),
+        ("POST", f"{_S}/terminals/{_ID}/link", _terminal_reattach),
+        ("DELETE", f"{_S}/terminals/{_ID}", _terminal_end),
+        ("PUT", f"{_S}/network", _network_update),
     ]
 ]
 
@@ -917,7 +958,10 @@ async def _serve_terminal(provider: Provider, ticket: Ticket, receive: Receive, 
     await receive()  # websocket.connect
     await send({"type": "websocket.accept"})
     try:
-        terminal = await provider.terminal_open(ticket.sandbox_id, ticket.request)
+        if ticket.reattach is not None:
+            terminal = await provider.terminal_reattach(ticket.sandbox_id, ticket.reattach)
+        else:
+            terminal = await provider.terminal_open(ticket.sandbox_id, ticket.request)
     except SpsError as error:
         await _ws_error(send, error)
         return

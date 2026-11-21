@@ -83,6 +83,9 @@ OPTIONAL = {
     "cost_capture": ("cost.capture", ("s", {"idempotency_key": "idem-key-1"})),
     "account_capacity": ("account.capacity", ()),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
+    "terminal_reattach": ("terminal.reattach", ("s", "terminal-id-1")),
+    "terminal_end": ("terminal.end", ("s", "terminal-id-1")),
+    "network_update": ("network.update", ("s", "open")),
 }
 
 
@@ -102,7 +105,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 40
+    assert len(ids) == 43
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -139,7 +142,8 @@ def test_every_json_object_type_is_covered() -> None:
     plain = {
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
-        "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest",
+        "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest", "NetworkUpdateRequest",
+        "TerminalId",
         "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
         "StartWindow", "Concurrency", "Prepaid",
     }  # fmt: skip

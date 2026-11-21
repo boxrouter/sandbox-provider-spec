@@ -204,6 +204,41 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/network:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+    put:
+      operationId: network_update
+      tags: [optional]
+      summary: Replace a running sandbox's network policy
+      description: >-
+        Section `network_lockdown`: offered by a class whose variant states `switchable: true` (the sandbox can change to a
+        policy in `switches_to`) or `changeable: true` (the entries of its policy can change). The body has the same
+        `policy`, `allow` and `deny` as the `network_lockdown` requirement of `create`. Returns once the new policy holds:
+        connections opened after the call follow it, and the sandbox keeps its processes and files. A policy that the
+        sandbox's variant does not offer (not in its `switches_to`, or entries that its policy may not change), and a sandbox
+        created without `network_lockdown`, are refused with `unsupported`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/NetworkUpdateRequest"}
+      responses:
+        "200":
+          description: The new policy holds.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
   /v1/sandboxes/{sandbox_id}/run:
     parameters:
       - {$ref: "#/components/parameters/SandboxId"}
@@ -1279,6 +1314,67 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/terminals/{terminal_id}/link:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/TerminalId"}
+    post:
+      operationId: terminal_reattach
+      tags: [optional]
+      summary: A single-use WebSocket link to a terminal that was opened under an id
+      description: >-
+        Section `terminal` with the knob `reattach`. Starts nothing: connecting the returned link attaches to the running
+        terminal that `terminal_open` started under this `id`, and any earlier connection to it is closed. The link rules and
+        messages are those of `terminal_open` (`provider-api.md` section 16). A terminal that is not running (it exited, was
+        ended, or never existed) is a `not_found` error message when the link is connected.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EmptyObject"}
+      responses:
+        "200":
+          description: The terminal link.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/TerminalLink"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/sandboxes/{sandbox_id}/terminals/{terminal_id}:
+    parameters:
+      - {$ref: "#/components/parameters/SandboxId"}
+      - {$ref: "#/components/parameters/TerminalId"}
+    delete:
+      operationId: terminal_end
+      tags: [optional]
+      summary: End a terminal that was opened under an id
+      description: >-
+        Section `terminal` with the knob `reattach`. Ends the terminal as a closed connection ends one that has no id
+        (`provider-api/terminal-close-ends`). An id that is already gone succeeds.
+      responses:
+        "200":
+          description: The terminal is ended.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/EmptyObject"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
 components:
   securitySchemes:
     bearerAuth:
@@ -1344,6 +1440,12 @@ components:
       required: true
       description: The preview id that `preview_link` returned.
       schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    TerminalId:
+      name: terminal_id
+      in: path
+      required: true
+      description: The `id` that `terminal_open` was given.
+      schema: {$ref: "#/components/schemas/TerminalId"}
     SnapshotId:
       name: snapshot_id
       in: path
@@ -2728,10 +2830,38 @@ components:
       properties:
         host: {type: string, minLength: 1}
         port: {$ref: "#/components/schemas/Port"}
+    TerminalId:
+      type: string
+      pattern: "^[a-z0-9][a-z0-9-]{7,62}$"
+      description: A caller-chosen name for a terminal (8 to 63 characters of `a-z 0-9 -`, as for an idempotency key).
+    NetworkUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [policy]
+      properties:
+        policy: {enum: [deny_all, allowlist, denylist, open]}
+        allow:
+          type: array
+          maxItems: 4096
+          items: {anyOf: [{type: string, minLength: 1}, {type: object}]}
+          description: "The entries of an `allowlist`: host names, IPv4 addresses and ranges (`vocabulary.md`, `network_lockdown`). Required and nonempty for an `allowlist`."
+        deny:
+          type: array
+          maxItems: 4096
+          items: {anyOf: [{type: string, minLength: 1}, {type: object}]}
+          description: "The entries of a `denylist`. Required and nonempty for a `denylist`."
     TerminalRequest:
       type: object
       additionalProperties: false
       properties:
+        id:
+          anyOf: [{$ref: "#/components/schemas/TerminalId"}, {type: "null"}]
+          default: null
+          description: >-
+            Names the terminal so that `terminal_reattach` and `terminal_end` can reach it. Only a class that claims
+            `terminal` with `reattach: true` accepts it (any other refuses it with `unsupported`). With an id, closing the
+            connection detaches the terminal and its program keeps running (see `provider-api.md` section 16). Null: no
+            reattach, and a closed connection ends the terminal.
         argv:
           anyOf:
             - type: array

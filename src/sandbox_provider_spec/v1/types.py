@@ -501,6 +501,7 @@ class TerminalRequest:
     columns: int = 80
     rows: int = 24
     term: str = "xterm-256color"
+    id: str | None = None  # names the terminal for `terminal_reattach` and `terminal_end`
 
 
 @dataclass(frozen=True)
@@ -513,8 +514,9 @@ class TerminalLink:
 
 
 class Terminal(ABC):
-    """An open terminal (contract section 10.1), returned by `terminal_open` with its program
-    started. The caller owns it and closes it; errors after the start are raised as SpsError."""
+    """An open terminal (contract section 10.1), returned by `terminal_open` or `terminal_reattach`
+    with its program started. The caller owns it and closes it; errors after the start are raised
+    as SpsError. Closing a terminal opened with a `TerminalRequest.id` only detaches it."""
 
     exit_code: int | None  # set once output() has ended because the program exited
 

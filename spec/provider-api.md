@@ -362,8 +362,8 @@ of whatever fronts the server.
 
 A terminal is a program, by default a login shell, on a pseudo-terminal in the sandbox, driven
 over one WebSocket that carries input, output, resizes and the exit status. It belongs to the SPS
-gate `terminal`. Version 1.0 covers the variant with `reattach: false`; a provider that claims
-`reattach: true` gets no reattach operation in 1.0. `terminal.open` is described in the
+gate `terminal`. A provider that claims `reattach: true` implements `terminal.reattach` and
+`terminal.end` as well (the end of this section). `terminal.open` is described in the
 [OpenAPI file](provider-api-1.0.openapi.yaml); this section holds the link rules and the messages
 that travel on the WebSocket.
 
@@ -411,11 +411,12 @@ most 65536 bytes.
 - A provider **MUST** send the `exit` message after the last output frame and then close the <!-- rule: provider-api/terminal-exit -->
   connection with code 1000.
 
-**End.** 1.0 has no operation to reconnect.
+**End.** A terminal opened without an `id` cannot be reached again.
 
 - When the connection closes for any reason other than the program's exit, a provider **MUST** end <!-- rule: provider-api/terminal-close-ends -->
-  the terminal: it sends `SIGHUP` to the terminal's process group, then `SIGKILL` to what remains
-  of the group 5 seconds later. A process that left the group (`setsid`) is not part of the terminal.
+  the terminal that was opened without an `id`: it sends `SIGHUP` to the terminal's process group,
+  then `SIGKILL` to what remains of the group 5 seconds later. A process that left the group
+  (`setsid`) is not part of the terminal.
 
 **Liveness.** A pause, stop or end of the sandbox ends its terminals: the provider closes each
 connection with code 1001.
@@ -425,6 +426,23 @@ connection with code 1001.
 
 **Capacity.** A provider serves at least 4 open terminals per sandbox at once. A connection beyond
 its limit gets an `error` message `quota_exceeded`.
+
+**Reattach.** A class whose `terminal` variant states `reattach: true` accepts an `id` in
+`terminal.open` (8 to 63 characters of `a-z 0-9 -`, chosen by the caller, as for an idempotency
+key) and serves two more operations. A class without the claim refuses an `id` with `unsupported`.
+
+- A terminal opened with an `id` **MUST** keep running after its connection closes, and a provider <!-- rule: provider-api/terminal-reattach -->
+  **MUST** serve `terminal.reattach` for it until the program exits, `terminal.end` is called, or
+  the sandbox is paused, stopped or ended. `terminal.reattach` (`POST .../terminals/{id}/link`)
+  returns a link as `terminal.open` does, under the same link rules; connecting it attaches to the
+  same program, with what was set in its shell, and carries its output from then on (a provider
+  may replay recent output first). A terminal that is not running is a `not_found` error, reported in an `error` message when the
+  link is connected, as a missing `cwd` is. A connection
+  that is already attached is closed (code 1000), so one connection serves a terminal at a time.
+  The `exit` message reaches the connection that is attached when the program exits.
+- A provider **MUST** end a terminal on `terminal.end` (`DELETE .../terminals/{id}`) as a closed <!-- rule: provider-api/terminal-end -->
+  connection ends one without an `id` (`provider-api/terminal-close-ends`). An id that is already
+  gone succeeds.
 
 ## 17. Snapshots
 
@@ -757,3 +775,25 @@ the path of every value of `discovery` that steps outside `ceiling`, one per lin
 `sandbox_provider_spec.v1.installed()` returns the installed packages' `Provider` classes by
 provider id, from the `sandbox_provider_spec.providers` entry-point group; an id named twice is
 refused.
+
+## 25. Updating the network policy
+
+A class whose `network_lockdown` variant states `switchable: true` or `changeable: true` implements
+`network.update` (`PUT /v1/sandboxes/{id}/network`). It is no separate claim: the knob is the claim,
+and the tester proves it with `network_lockdown.switchable.true` and
+`network_lockdown.changeable.true`. The body is `{policy, allow, deny}`, the settings of the
+`network_lockdown` requirement of `create`: `policy` is `deny_all`, `allowlist`, `denylist` or
+`open`, `allow` lists an allowlist's entries and `deny` a denylist's.
+
+- A provider **MUST** apply the policy before it returns, so that connections opened afterwards <!-- rule: provider-api/network-update -->
+  follow it, and the sandbox keeps its processes and files; the rules of `network_lockdown`
+  (`vocabulary.md`) hold for the new policy. It **MUST** refuse with `unsupported` a policy that
+  its variant does not offer (a `switchable` variant offers its `switches_to` and the starting
+  policy) and entries it may not change (`changeable`), and a sandbox that was created without
+  `network_lockdown`; it changes nothing then.
+
+An `allow` list of an update may be empty: an allowlist with no entries lets nothing through
+(unlike `create`, where an allowlist needs a nonempty `allow`), and the tester's
+`coverage.network_lockdown.changeable.true` sends one. An update is the same call to a provider
+whether it switches the policy or only changes its entries. The consumer decides which one it asks
+for from what discovery claims.

@@ -303,7 +303,8 @@ adapter, each optional method raises `unsupported` until you implement it.
 | `processes` with `cancel` | `process.cancel` | Ends a process and its children |
 | `previews` | `preview.link`, and with `revocable` `preview.revoke` | An HTTPS URL that reaches a port in the sandbox; `preview.link` may ask for `access` (`public` or `private`) and a `lifetime_seconds`, and returns the link's `id`, `access` and `credential`; `preview.revoke` stops one link |
 | `tcp_ports` | `tcp.link` | A host and port that reach a TCP port in the sandbox |
-| `terminal` | `terminal.open` | A terminal over one WebSocket: input, output, resize and the exit status |
+| `terminal` | `terminal.open`, and with `reattach: true` `terminal.reattach` and `terminal.end` | A terminal over one WebSocket: input, output, resize and the exit status; with `reattach` it may be opened under an `id`, outlives its connection, and is reached again by that id |
+| `network_lockdown` with `switchable` or `changeable` | `network.update` | Replaces a running sandbox's network policy (to one of its `switches_to`, or other entries) without losing its processes or files |
 | `snapshots` | `snapshot.create`, `snapshot.get`, `snapshot.list`, `snapshot.delete`, `snapshot.cost`, and `create` with `snapshot` | Save a sandbox and start new sandboxes from the save |
 
 ### Directory operations

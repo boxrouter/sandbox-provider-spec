@@ -1125,6 +1125,7 @@ tests:
   title: A native terminal reattachment retains an exported variable.
   rules:
   - terminal/reattach
+  - provider-api/terminal-reattach
   proves:
   - gate: terminal
     knob: reattach
@@ -1141,6 +1142,7 @@ tests:
     in:
       columns: 100
       rows: 24
+      reattachable: true
     as: terminal
   - op: terminal.write
     target: terminal
@@ -1163,6 +1165,61 @@ tests:
         terminal:
           utf8_contains: sps-terminal-retained
       eventually_ms: 10000
+- id: coverage.terminal.end
+  title: Ending a detached terminal makes it unreachable, and its program stops.
+  rules:
+  - provider-api/terminal-end
+  proves:
+  - gate: terminal
+    knob: reattach
+    value: true
+  steps:
+  - op: create
+    as: box
+    in:
+      requirements:
+        terminal:
+          reattach: true
+  - op: terminal.open
+    target: box
+    in:
+      reattachable: true
+    as: terminal
+  - op: terminal.write
+    target: terminal
+    in:
+      data: ZWNobyAkJCA+L3RtcC9zcHMtdHR5LXBpZA0=
+  - op: files.exists
+    target: box
+    in:
+      path: /tmp/sps-tty-pid
+    expect:
+      equals:
+        exists: true
+      eventually_ms: 20000
+  - op: terminal.disconnect
+    target: terminal
+  - op: terminal.end
+    target: terminal
+  - op: run
+    target: box
+    in:
+      bash_script: sleep 7; test -d /proc/$(cat /tmp/sps-tty-pid) && echo alive || echo gone
+      timeout_ms: 60000
+    expect:
+      equals:
+        stdout:
+          utf8_contains: gone
+  - op: terminal.reattach
+    target: terminal
+    as: gone
+  - op: terminal.output
+    target: gone
+    in:
+      first_chunk: true
+      timeout_ms: 60000
+    expect:
+      error: not_found
 - id: coverage.custom_images.runs_entrypoint.true
   title: Observe whether a prepared image's ENTRYPOINT or CMD runs.
   rules:
@@ -1362,6 +1419,7 @@ tests:
   title: Observe native running-policy replacement without losing files or a heartbeat.
   rules:
   - network_lockdown/changeable
+  - provider-api/network-update
   proves:
   - gate: network_lockdown
     knob: changeable
@@ -1420,6 +1478,7 @@ tests:
   title: Observe switching a running sandbox to another locked policy without losing files or a heartbeat.
   rules:
   - network_lockdown/switchable
+  - provider-api/network-update
   proves:
   - gate: network_lockdown
     knob: switchable
