@@ -471,3 +471,50 @@ passes them. Where they are off, a consumer runs the commands instead.
   `path`, with the type as `files.list` gives it, and `{"exists": false, "type": null}` when none
   does, including when its parent is missing. It **MUST NOT** follow a final symbolic link: a
   dangling link exists, with type `symlink`.
+
+## 19. Prepared images
+
+A provider that lists `image.prepare`, `image.get`, `image.list` and `image.delete` in
+`classes[].operations` (all four or none, as section 18 says of the directory operations) offers
+prepared images, and claims `custom_images` knob `prepared: true` on the same class. A prepared
+image is made ahead of creation, from an OCI image, a private OCI image or a Dockerfile, and a
+`create` with `image: {"provider_artifact": "<id>"}` starts a sandbox from it. They turn on when the
+tester passes them. A provider that states them also states `limits.image_context_bytes`, at least
+512 MiB.
+
+`image.prepare` is one `multipart/form-data` request with an `Idempotency-Key`, as `create` has.
+The part `request` comes first and is JSON: the `source`, the `resources` that a sandbox from the
+image must start with (or null for any size) and `labels` (section 5). A Dockerfile source may be
+followed by the part `context`, a tar archive of the build context. In the Python form the adapter
+receives the context as a stream of bytes, and the size when the caller gave one. A source
+carries `digest` and `config` (`env`, `workdir`, `user`, `entrypoint`, `cmd`) that the caller
+resolved: the provider reaches no registry for them, because the egress proxy allows only the
+provider's own domains.
+
+- `image.prepare` **MUST** return a prepared image in state `preparing`, `ready` or `failed`, and <!-- rule: provider-api/image-prepare -->
+  a consumer reads `image.get` until the state is `ready`. A `failed` image carries `error`, a body
+  as an error response has. The provider **MUST** apply the `config` of an OCI source as the
+  defaults of every sandbox made from the image, and **MUST NOT** read a registry to find them.
+  A `private_oci` source's `credentials` **MUST NOT** be returned, logged or stored beyond the
+  preparation.
+- A build context **MUST** travel only in the part `context` and **MUST NOT** be held whole in <!-- rule: provider-api/image-context -->
+  memory: a server reads it as a stream. A context over `limits.image_context_bytes` is
+  `too_large`, a context with a source that is not a Dockerfile is `invalid_request`, and a part
+  that follows `context` or a part named otherwise is `invalid_request`. A body cut short is
+  `invalid_request` with outcome `unknown`.
+- Within 24 hours, a repeated `image.prepare` with the same key and the same request **MUST NOT** <!-- rule: provider-api/image-idempotent -->
+  make a second image: it returns the first one with status 201. The same key with a different
+  request is `conflict`.
+- `image.list` **MUST** return the account's images that are not deleted, in any state, and only <!-- rule: provider-api/image-list -->
+  those that have every `label` filter with exactly that value. `image.get` **MUST** return the
+  labels exactly as given to `image.prepare`, and an id that the provider has no record of is
+  `not_found`. The order is unspecified, the cursor is opaque, and `limit` is 1 to
+  `limits.list_limit`, 100 by default.
+- A `create` from `provider_artifact` **MUST** start a sandbox only from a `ready` image: a <!-- rule: provider-api/image-create -->
+  `preparing` or `failed` image is `conflict`, and a deleted image or an id that the provider has
+  no record of is `not_found`. A sandbox of a different size than the image is bound to is
+  `unsupported`.
+- `image.delete` **MUST** return once the provider has accepted it, and afterwards `image.get` and <!-- rule: provider-api/image-delete -->
+  a `create` from the image **MUST** answer `not_found`. A repeated delete **MUST** succeed with
+  state `deleted`, and an id that the provider has no record of is `not_found`. Deleting an image
+  never affects a sandbox that was made from it.

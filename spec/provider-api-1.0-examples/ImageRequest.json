@@ -1,0 +1,26 @@
+{
+  "source": {
+    "oci": "docker.io/library/python:3.12-slim",
+    "digest": "sha256:abababababababababababababababababababababababababababababababab",
+    "config": {
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin"
+      },
+      "workdir": "/app",
+      "user": "1000",
+      "entrypoint": null,
+      "cmd": [
+        "python",
+        "-m",
+        "http.server"
+      ]
+    }
+  },
+  "resources": {
+    "cpu": 2,
+    "memory_mib": 4096
+  },
+  "labels": {
+    "job": "build-42"
+  }
+}

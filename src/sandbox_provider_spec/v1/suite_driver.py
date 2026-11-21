@@ -39,6 +39,7 @@ from sandbox_provider_spec.driver import (
 )
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
+from sandbox_provider_spec.v1.suite_driver_images import ImageSteps, image_reference
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
     FileLinkRequest,
@@ -145,7 +146,7 @@ def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
 
-class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
+class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """A `Driver` whose operations call a `Provider`: `SpsError("unsupported")` becomes
     `Unsupported`, any other `SpsError` `NativeFailure(code)`. The provider is async, so the
     driver runs its own event loop in a background thread and waits for each call."""
@@ -174,6 +175,8 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         # claimed until the tester has read discovery, so it starts with all of them.
         self.command_fallback: set[str] = {"files.exists"}
         self._snapshots: dict[str, Resource] = {}
+        self._images: dict[str, Resource] = {}
+        self._image_keys: dict[str, tuple[str, Resource]] = {}
         self._terminals: builtins.list[TerminalHandle] = []
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
@@ -238,7 +241,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
         extra = sorted(set(inputs) - CREATE_INPUTS)
         if extra:
             raise Unsupported("a create input that SPS 1.0 does not define")
-        image = inputs.get("image")
+        image = image_reference(inputs.get("image")) or inputs.get("image")
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
         request = CreateRequest(
@@ -974,7 +977,7 @@ class ProviderDriver(Driver):  # pylint: disable=too-many-public-methods,too-man
                 results.append(
                     {"kind": "snapshot", "result": "error", "reason": type(error).__name__}
                 )
-        return results
+        return results + self.sweep_images()
 
 
 def _size(size: Any) -> dict[str, object]:

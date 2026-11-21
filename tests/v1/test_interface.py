@@ -61,6 +61,16 @@ OPTIONAL = {
     "snapshot_list": ("snapshot.list", ()),
     "snapshot_delete": ("snapshot.delete", ("n",)),
     "snapshot_cost": ("snapshot.cost", ("n",)),
+    "image_prepare": (
+        "image.prepare",
+        (
+            v1_types.ImageRequest(v1_types.DockerfileSource("FROM x\n")),
+            {"idempotency_key": "idem-key-1"},
+        ),
+    ),
+    "image_get": ("image.get", ("n",)),
+    "image_list": ("image.list", ()),
+    "image_delete": ("image.delete", ("n",)),
     "cost": ("cost", ("s",)),
     "terminal_open": ("terminal.open", ("s", v1_types.TerminalRequest())),
 }
@@ -82,7 +92,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 30
+    assert len(ids) == 34
 
 
 def test_error_table_is_the_openapi_table() -> None:
@@ -120,7 +130,7 @@ def test_every_json_object_type_is_covered() -> None:
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
         "PreviewRequest", "TcpLinkRequest",
-        "MkdirRequest", "EntryType", "UserName",
+        "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
     }  # fmt: skip
     every = {path.stem for path in EXAMPLES.glob("*.json")}
     assert set(example_names()) == every - plain

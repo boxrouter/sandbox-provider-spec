@@ -1,0 +1,14 @@
+{
+  "id": "img-4",
+  "state": "ready",
+  "error": null,
+  "resources": {
+    "cpu": 2,
+    "memory_mib": 4096
+  },
+  "stored_bytes": 734003200,
+  "labels": {
+    "job": "build-42"
+  },
+  "created_at": "2026-11-20T10:02:00Z"
+}

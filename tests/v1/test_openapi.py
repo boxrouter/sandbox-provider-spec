@@ -37,6 +37,10 @@ OPERATION_IDS = [
     "files_remove",
     "files_write",
     "get",
+    "image_delete",
+    "image_get",
+    "image_list",
+    "image_prepare",
     "lifetime_extend",
     "list",
     "pause",
@@ -303,6 +307,7 @@ def test_request_schemas_are_found() -> None:
         "CreateRequest",
         "EmptyObject",
         "FileLinkRequest",
+        "ImageRequest",
         "LifetimeExtendRequest",
         "MkdirRequest",
         "PreviewRequest",
@@ -317,7 +322,12 @@ def test_request_schemas_are_found() -> None:
         for _, _, item in operations()
         if "requestBody" in item and "application/json" in item["requestBody"]["content"]
     }
-    assert bodies == set(REQUEST_SCHEMAS)
+    # `ImageRequest` is the JSON part `request` of a multipart body.
+    assert bodies | {"ImageRequest"} == set(REQUEST_SCHEMAS)
+    multipart = DOCUMENT["paths"]["/v1/images"]["post"]["requestBody"]["content"]
+    assert multipart["multipart/form-data"]["schema"]["properties"]["request"] == {
+        "$ref": "#/components/schemas/ImageRequest"
+    }
 
 
 @pytest.mark.parametrize("name", REQUEST_SCHEMAS)

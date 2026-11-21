@@ -11,6 +11,7 @@ import asyncio
 import ipaddress
 import json
 import re
+import secrets
 from collections.abc import AsyncIterable, AsyncIterator, Mapping, Sequence
 from types import MappingProxyType
 from typing import Any, TypeVar
@@ -32,8 +33,12 @@ from sandbox_provider_spec.v1.types import (
     FileLink,
     FileLinkRequest,
     FileStream,
+    ImageDeleteResult,
+    ImagePage,
+    ImageRequest,
     OutputPage,
     PathInfo,
+    PreparedImage,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -62,7 +67,54 @@ _IDEMPOTENCY_KEY = re.compile(r"^[a-z0-9][a-z0-9-]{7,62}$")
 _TOKEN = re.compile(r"^[\x21-\x7e]+$")  # printable ASCII with no space, so it fits a header
 _CONNECT_SECONDS = 10.0
 _DEFAULT_READ_SECONDS = 60.0
+_IMAGE_PREPARE_READ_SECONDS = 600.0  # a prepare may build before it answers
 _SLACK_SECONDS = 30.0  # added to a timeout that the operation itself carries
+
+
+def _form_part(boundary: str, name: str, data: bytes, media: str) -> bytes:
+    return (
+        (
+            f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n'
+            f"Content-Type: {media}\r\n\r\n"
+        ).encode()
+        + data
+        + b"\r\n"
+    )
+
+
+def _multipart_body(
+    boundary: str, head: bytes, context: AsyncIterable[bytes] | None, size: int | None
+) -> tuple[AsyncIterator[bytes], int | None]:
+    """The request body of `image_prepare` as a stream, and its length when that is known."""
+    tail = f"\r\n--{boundary}--\r\n".encode()
+    part = b""
+    if context is not None:
+        length = "" if size is None else f"Content-Length: {size}\r\n"
+        part = (
+            f'--{boundary}\r\nContent-Disposition: form-data; name="context"; '
+            f'filename="context.tar"\r\nContent-Type: application/x-tar\r\n{length}\r\n'
+        ).encode()
+    else:
+        tail = f"--{boundary}--\r\n".encode()
+    framing = len(head) + len(part) + len(tail)
+    total = framing if context is None else (None if size is None else framing + size)
+
+    async def stream() -> AsyncIterator[bytes]:
+        yield head + part
+        if context is not None:
+            sent = 0
+            async for piece in context:
+                for start in range(0, len(piece), CHUNK_BYTES):
+                    chunk = piece[start : start + CHUNK_BYTES]
+                    sent += len(chunk)
+                    if size is not None and sent > size:
+                        raise SpsError("invalid_request", "The context is longer than context_size")
+                    yield chunk
+            if size is not None and sent != size:
+                raise SpsError("invalid_request", "The context is shorter than context_size")
+        yield tail
+
+    return stream(), total
 
 
 def _is_loopback(host: str) -> bool:
@@ -656,6 +708,62 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
 
     async def snapshot_cost(self, snapshot_id: str) -> Cost:
         return await self._json(Cost, "GET", self._snapshot_path(snapshot_id, "/cost"))
+
+    @staticmethod
+    def _image_path(image_id: str) -> str:
+        return f"/v1/images/{_id(image_id, 'image_id')}"
+
+    async def image_prepare(
+        self,
+        request: ImageRequest,
+        *,
+        context: AsyncIterable[bytes] | None = None,
+        context_size: int | None = None,
+        idempotency_key: str,
+    ) -> PreparedImage:
+        if not _IDEMPOTENCY_KEY.fullmatch(idempotency_key):
+            raise SpsError("invalid_request", "idempotency_key is not a valid key")
+        if context_size is not None and context_size < 0:
+            raise SpsError("invalid_request", "context_size cannot be negative")
+        boundary = secrets.token_hex(24)
+        head = _form_part(
+            boundary, "request", json.dumps(to_json(request)).encode(), "application/json"
+        )
+        content, length = _multipart_body(boundary, head, context, context_size)
+        headers = {
+            "Idempotency-Key": idempotency_key,
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+        }
+        if length is not None:
+            headers["Content-Length"] = str(length)
+        return await self._json(
+            PreparedImage,
+            "POST",
+            "/v1/images",
+            content=content,
+            headers=headers,
+            expect=(200, 201),
+            read_seconds=_IMAGE_PREPARE_READ_SECONDS,
+        )
+
+    async def image_get(self, image_id: str) -> PreparedImage:
+        return await self._json(PreparedImage, "GET", self._image_path(image_id))
+
+    async def image_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> ImagePage:
+        params = [("label", f"{key}={value}") for key, value in (labels or {}).items()]
+        if cursor is not None:
+            params.append(("cursor", cursor))
+        params.append(("limit", str(limit)))
+        return await self._json(ImagePage, "GET", "/v1/images", params=params)
+
+    async def image_delete(self, image_id: str) -> ImageDeleteResult:
+        return await self._json(ImageDeleteResult, "DELETE", self._image_path(image_id))
 
     async def terminal_link(self, sandbox_id: str, request: TerminalRequest) -> TerminalLink:
         """Call `terminal.open` and return the link, without connecting to it."""

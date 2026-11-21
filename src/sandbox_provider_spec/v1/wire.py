@@ -25,19 +25,29 @@ from sandbox_provider_spec.v1.types import (
     DirectoryEntry,
     DirectoryPage,
     Discovery,
+    DockerfileSource,
     FileInfo,
     FileLink,
     FileLinkRequest,
     Image,
+    ImageConfig,
+    ImageDeleteResult,
+    ImagePage,
+    ImageRequest,
+    ImageResources,
     Limits,
+    OciSource,
     OutputChunk,
     OutputPage,
     PathInfo,
+    PreparedImage,
     PreviewLink,
     Price,
+    PrivateOciSource,
     Process,
     ProcessStartRequest,
     ProviderInfo,
+    RegistryCredentials,
     RunRequest,
     RunResult,
     Sandbox,
@@ -210,6 +220,64 @@ def _enc_cost(value: Cost) -> Json:
     return out
 
 
+def _enc_image_resources(value: ImageResources) -> Json:
+    out: Json = {}
+    _put(out, "cpu", _opt(value.cpu, _number))
+    _put(out, "memory_mib", value.memory_mib)
+    _put(out, "disk_mib", value.disk_mib)
+    return out
+
+
+def _enc_image_config(value: ImageConfig) -> Json:
+    return {
+        "env": dict(value.env),
+        "workdir": value.workdir,
+        "user": value.user,
+        "entrypoint": _opt(value.entrypoint, list),
+        "cmd": _opt(value.cmd, list),
+    }
+
+
+def _enc_image_request(value: ImageRequest) -> Json:
+    source = value.source
+    body: Json
+    if isinstance(source, OciSource):
+        body = {
+            "oci": source.oci,
+            "digest": source.digest,
+            "config": _enc_image_config(source.config),
+        }
+    elif isinstance(source, PrivateOciSource):
+        body = {
+            "private_oci": source.private_oci,
+            "digest": source.digest,
+            "config": _enc_image_config(source.config),
+            "credentials": {
+                "username": source.credentials.username,
+                "password": source.credentials.password,
+            },
+        }
+    else:
+        body = {"dockerfile": source.dockerfile}
+    return {
+        "source": body,
+        "resources": _opt(value.resources, _enc_image_resources),
+        "labels": dict(value.labels),
+    }
+
+
+def _enc_prepared_image(value: PreparedImage) -> Json:
+    return {
+        "id": value.id,
+        "state": value.state,
+        "error": _opt(value.error, _enc_error_body),
+        "resources": _opt(value.resources, _enc_image_resources),
+        "stored_bytes": value.stored_bytes,
+        "labels": dict(value.labels),
+        "created_at": _stamp(value.created_at),
+    }
+
+
 def _enc_class(value: SandboxClass) -> Json:
     out: Json = {
         "id": value.id,
@@ -257,6 +325,7 @@ def _enc_limits(value: Limits) -> Json:
         "list_limit": value.list_limit,
     }
     _put(out, "cost_final_within_seconds", value.cost_final_within_seconds)
+    _put(out, "image_context_bytes", value.image_context_bytes)
     return out
 
 
@@ -386,6 +455,55 @@ def _dec_cost(data: Json) -> Cost:
     )
 
 
+def _dec_image_resources(data: Json) -> ImageResources:
+    return ImageResources(
+        cpu=data.get("cpu"), memory_mib=data.get("memory_mib"), disk_mib=data.get("disk_mib")
+    )
+
+
+def _dec_image_config(data: Json) -> ImageConfig:
+    return ImageConfig(
+        env=dict(data.get("env", {})),
+        workdir=data.get("workdir"),
+        user=data.get("user"),
+        entrypoint=_opt(data.get("entrypoint"), tuple),
+        cmd=_opt(data.get("cmd"), tuple),
+    )
+
+
+def _dec_image_request(data: Json) -> ImageRequest:
+    raw = data["source"]
+    source: OciSource | PrivateOciSource | DockerfileSource
+    if "oci" in raw:
+        source = OciSource(raw["oci"], raw["digest"], _dec_image_config(raw["config"]))
+    elif "private_oci" in raw:
+        credentials = RegistryCredentials(
+            raw["credentials"]["username"], raw["credentials"]["password"]
+        )
+        source = PrivateOciSource(
+            raw["private_oci"], raw["digest"], _dec_image_config(raw["config"]), credentials
+        )
+    else:
+        source = DockerfileSource(raw["dockerfile"])
+    return ImageRequest(
+        source=source,
+        resources=_opt(data.get("resources"), _dec_image_resources),
+        labels=dict(data.get("labels", {})),
+    )
+
+
+def _dec_prepared_image(data: Json) -> PreparedImage:
+    return PreparedImage(
+        id=data["id"],
+        state=data["state"],
+        error=_opt(data["error"], _dec_error_body),
+        resources=_opt(data["resources"], _dec_image_resources),
+        stored_bytes=data["stored_bytes"],
+        labels=dict(data["labels"]),
+        created_at=_time(data["created_at"]),
+    )
+
+
 def _dec_class(data: Json) -> SandboxClass:
     return SandboxClass(
         id=data["id"],
@@ -471,6 +589,21 @@ _CODECS: dict[type, _Codec] = {
         "SnapshotDeleteResult",
         lambda v: {"snapshot_id": v.snapshot_id, "state": v.state},
         lambda d: SnapshotDeleteResult(d["snapshot_id"], d["state"]),
+    ),
+    ImageRequest: _Codec("ImageRequest", _enc_image_request, _dec_image_request),
+    PreparedImage: _Codec("PreparedImage", _enc_prepared_image, _dec_prepared_image),
+    ImagePage: _Codec(
+        "ImagePage",
+        lambda v: {
+            "images": [_enc_prepared_image(item) for item in v.images],
+            "next_cursor": v.next_cursor,
+        },
+        lambda d: ImagePage(tuple(_dec_prepared_image(i) for i in d["images"]), d["next_cursor"]),
+    ),
+    ImageDeleteResult: _Codec(
+        "ImageDeleteResult",
+        lambda v: {"id": v.id, "state": v.state},
+        lambda d: ImageDeleteResult(d["id"], d["state"]),
     ),
     RunRequest: _Codec(
         "RunRequest",
@@ -669,14 +802,30 @@ def from_json(cls: type[T], data: object) -> T:
 # --- errors ------------------------------------------------------------------------------
 
 
-def error_to_json(error: SpsError) -> Json:
-    """The body of an error response."""
-    body: Json = {
+def _enc_error_body(error: SpsError) -> Json:
+    return {
         "code": error.code,
         "message": error.message[:1024],
         "outcome": error.outcome,
         "retry_after_seconds": error.retry_after_seconds,
     }
+
+
+def _dec_error_body(body: Mapping[str, Any]) -> SpsError:
+    code = body["code"]
+    assert code in ERROR_TABLE
+    outcome: Outcome = body["outcome"] if ERROR_TABLE[code][1] == "provider" else "failed"
+    return SpsError(
+        code,
+        body["message"],
+        outcome=outcome,
+        retry_after_seconds=body.get("retry_after_seconds"),
+    )
+
+
+def error_to_json(error: SpsError) -> Json:
+    """The body of an error response."""
+    body = _enc_error_body(error)
     _check("ErrorResponse", {"error": body})
     return {"error": body}
 
@@ -692,13 +841,4 @@ def error_from_json(data: object) -> SpsError:
             "provider_error", "The response was not a valid error response", outcome="unknown"
         )
     assert isinstance(data, dict)
-    body = cast(Mapping[str, Any], data["error"])
-    code = body["code"]
-    assert code in ERROR_TABLE
-    outcome: Outcome = body["outcome"] if ERROR_TABLE[code][1] == "provider" else "failed"
-    return SpsError(
-        code,
-        body["message"],
-        outcome=outcome,
-        retry_after_seconds=body.get("retry_after_seconds"),
-    )
+    return _dec_error_body(cast(Mapping[str, Any], data["error"]))

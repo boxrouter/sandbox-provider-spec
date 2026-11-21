@@ -2044,6 +2044,157 @@ tests:
         snapshot_matches: true
         sandbox_matches: true
         only_snapshot_lines: true
+- id: images.v1.prepare_oci
+  title: A prepared OCI image boots a sandbox with its own files, and after delete it is gone.
+  rules:
+  - provider-api/image-prepare
+  - provider-api/image-create
+  - provider-api/image-delete
+  proves: []
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      config:
+        env:
+          PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        cmd: [/bin/sh]
+    as: image
+  - op: image.state
+    target: image
+    expect:
+      equals:
+        state: ready
+  - op: create
+    in:
+      image: $image
+    as: box
+  - op: run
+    target: box
+    in:
+      bash_script: cat /etc/os-release
+    expect:
+      equals:
+        exit_code: 0
+        stdout:
+          utf8_contains: Alpine Linux
+  - op: image.delete
+    target: image
+  - op: image.state
+    target: image
+    expect:
+      equals:
+        state: absent
+  - op: create
+    in:
+      image: $image
+    expect:
+      error: not_found
+  - op: image.delete_again
+    target: image
+    expect:
+      equals:
+        state: deleted
+- id: images.v1.prepare_dockerfile_context
+  title: A prepared Dockerfile image copies a file of its build context, which a sandbox then reads.
+  rules:
+  - provider-api/image-context
+  - provider-api/image-prepare
+  proves: []
+  steps:
+  - op: image.prepare
+    in:
+      source: dockerfile
+      dockerfile: |
+        FROM docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+        COPY copied.txt /opt/sps-copy
+      context:
+        copied.txt: sps-image-context
+    as: image
+  - op: create
+    in:
+      image: $image
+    as: box
+  - op: files.read_bytes
+    target: box
+    in:
+      path: /opt/sps-copy
+    expect:
+      equals:
+        data:
+          utf8: sps-image-context
+  - op: image.delete
+    target: image
+- id: images.v1.idempotent_prepare
+  title: A repeated prepare with one key returns one image, and another request with that key is a conflict.
+  rules:
+  - provider-api/image-idempotent
+  proves: []
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      idempotency_key: image-same
+    as: first
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      idempotency_key: image-same
+    as: second
+  - op: bindings.compare
+    in:
+      left: $first.identity
+      right: $second.identity
+    expect:
+      equals:
+        equal: true
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      idempotency_key: image-same
+      labels:
+        sps.test.case: image-idempotent-other
+    expect:
+      error: conflict
+- id: images.v1.get_and_list
+  title: A prepared image is read back with its labels and is listed by label, and an unknown id is not found.
+  rules:
+  - provider-api/image-list
+  proves: []
+  steps:
+  - op: image.prepare
+    in:
+      source: oci
+      image: docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+      labels:
+        sps.test.case: image-get-and-list
+    as: image
+  - op: image.state
+    target: image
+    expect:
+      equals:
+        state: ready
+        labels:
+          sps.test.case: image-get-and-list
+  - op: image.list
+    in:
+      labels:
+        sps.test.case: image-get-and-list
+    expect:
+      equals:
+        count: 1
+  - op: image.state
+    in:
+      unknown: true
+    expect:
+      equals:
+        state: absent
+  - op: image.delete
+    target: image
 - id: network_lockdown.deny_all
   title: Native deny all returns no destination data from outbound connections.
   rules:

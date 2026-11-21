@@ -11,6 +11,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
+from sandbox_provider_spec.v1.errors import SpsError
+
 # These types mirror the objects of the OpenAPI file field for field, so their size is set by
 # the contract.
 # pylint: disable=too-many-instance-attributes
@@ -160,6 +162,89 @@ class SnapshotPage:
 @dataclass(frozen=True)
 class SnapshotDeleteResult:
     snapshot_id: str
+    state: Literal["deleting", "deleted"]
+
+
+@dataclass(frozen=True)
+class ImageConfig:
+    """The image's own settings, resolved by the caller. The provider reaches no registry."""
+
+    env: Mapping[str, str] = field(default_factory=dict)
+    workdir: str | None = None
+    user: str | None = None
+    entrypoint: Sequence[str] | None = None
+    cmd: Sequence[str] | None = None
+
+
+@dataclass(frozen=True)
+class RegistryCredentials:
+    """Registry credentials: write-only, never returned, logged or shown in a repr."""
+
+    username: str = field(repr=False)
+    password: str = field(repr=False)
+
+
+@dataclass(frozen=True)
+class OciSource:
+    oci: str
+    digest: str  # `sha256:` and 64 lowercase hex digits
+    config: ImageConfig
+
+
+@dataclass(frozen=True)
+class PrivateOciSource:
+    private_oci: str
+    digest: str
+    config: ImageConfig
+    credentials: RegistryCredentials
+
+
+@dataclass(frozen=True)
+class DockerfileSource:
+    dockerfile: str  # the text; the build context is `image_prepare`'s `context`
+
+
+ImageSource = OciSource | PrivateOciSource | DockerfileSource
+
+
+@dataclass(frozen=True)
+class ImageResources:
+    """A size. A field that is `None` is not bound."""
+
+    cpu: float | None = None
+    memory_mib: int | None = None
+    disk_mib: int | None = None
+
+
+@dataclass(frozen=True)
+class ImageRequest:
+    source: ImageSource
+    resources: ImageResources | None = None  # the size a sandbox from the image must start with
+    labels: Mapping[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class PreparedImage:
+    """A prepared image (not to be confused with `Image`, a ready-made image in discovery)."""
+
+    id: str
+    state: Literal["preparing", "ready", "failed"]
+    error: SpsError | None  # why it failed; set only when `state` is `failed`
+    resources: ImageResources | None  # the size it is bound to; None: any size
+    stored_bytes: int | None
+    labels: Mapping[str, str]
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class ImagePage:
+    images: Sequence[PreparedImage]
+    next_cursor: str | None
+
+
+@dataclass(frozen=True)
+class ImageDeleteResult:
+    id: str
     state: Literal["deleting", "deleted"]
 
 
@@ -336,6 +421,7 @@ class Limits:
     process_retention_seconds: int
     list_limit: int
     cost_final_within_seconds: int | None = None  # stating it offers `cost`
+    image_context_bytes: int | None = None  # the largest build context `image_prepare` accepts
 
 
 @dataclass(frozen=True)

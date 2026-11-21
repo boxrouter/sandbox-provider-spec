@@ -319,6 +319,27 @@ same moment, would give: `files.list` returns the immediate entries sorted by th
 names and never follows a symbolic link, `files.remove` removes a link and never its target, and
 `files.exists` reports a dangling link as existing.
 
+### Prepared images
+
+Four operations prepare an image ahead of creation: `image.prepare`, `image.get`, `image.list` and
+`image.delete`. A provider that can build an image from an OCI image, a private OCI image or a
+Dockerfile lists all four, or none, in `classes[].operations`, claims `custom_images` knob
+`prepared`, and states `limits.image_context_bytes` (at least 512 MiB). They turn on when the tester
+passes its `images.` tests.
+
+- **The request.** `image.prepare` is one `multipart/form-data` request with an `Idempotency-Key`.
+  The part `request` comes first and holds the `source`, optional `resources` and `labels`. A
+  Dockerfile that copies files is followed by the part `context`, a tar archive. In Python you get
+  `context` as an async stream of bytes (and `context_size` when the caller knows it): read it once,
+  and never hold it whole.
+- **No registry.** `digest` and `config` (environment, working directory, user, entrypoint, command)
+  come from the caller, who resolved them. Apply `config` as the defaults of every sandbox made from
+  the image, and reach no registry. Registry credentials are write-only: never return or log them.
+- **The result.** A `PreparedImage` in state `preparing`, `ready` or `failed` (with an `error` body).
+  A consumer reads `image.get` until `ready`, then creates with
+  `image: {"provider_artifact": "<id>"}`. `image.delete` returns on acceptance, and afterwards the
+  id is `not_found`; a sandbox already made from the image is not affected.
+
 ### Run as a named user, exact output bytes
 
 Two optional additions change `run`, `process.start` and `files.write`; a provider that skips them

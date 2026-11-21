@@ -1,0 +1,13 @@
+{
+  "env": {
+    "PATH": "/usr/local/bin:/usr/bin"
+  },
+  "workdir": "/app",
+  "user": "1000",
+  "entrypoint": null,
+  "cmd": [
+    "python",
+    "-m",
+    "http.server"
+  ]
+}

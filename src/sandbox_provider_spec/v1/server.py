@@ -27,6 +27,7 @@ from urllib.parse import parse_qsl
 from sandbox_provider_spec.v1 import tokens
 from sandbox_provider_spec.v1._spec_files import validator
 from sandbox_provider_spec.v1.errors import SpsError
+from sandbox_provider_spec.v1.image_upload import prepare_image
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.terminal_tickets import (
     TERMINAL_TICKET_SECONDS,
@@ -281,24 +282,30 @@ class _Request:  # pylint: disable=too-many-instance-attributes
         except (ValueError, TypeError, KeyError):
             raise SpsError("invalid_request", "The body does not fit its schema") from None
 
-    async def upload(self, size: int) -> AsyncIterator[bytes]:
-        """The body as chunks of at most 1 MiB. A body that is not exactly `size` bytes sets
-        `stream_error` and ends the stream with that error."""
-        seen = 0
+    async def body_stream(self) -> AsyncIterator[bytes]:
+        """The body as it arrives, never held whole. A dropped connection sets `stream_error`."""
         while True:
             message = await self._receive()
             if message["type"] == "http.disconnect":
                 self._fail("The connection ended before the whole body arrived")
             chunk: bytes = message.get("body", b"")
+            if chunk:
+                yield chunk
+            if not message.get("more_body", False):
+                return
+
+    async def upload(self, size: int) -> AsyncIterator[bytes]:
+        """The body as chunks of at most 1 MiB. A body that is not exactly `size` bytes sets
+        `stream_error` and ends the stream with that error."""
+        seen = 0
+        async for chunk in self.body_stream():
             seen += len(chunk)
             if seen > size:
                 self._fail("The body is longer than Content-Length")
             for start in range(0, len(chunk), CHUNK_BYTES):
                 yield chunk[start : start + CHUNK_BYTES]
-            if not message.get("more_body", False):
-                if seen != size:
-                    self._fail("The body is shorter than Content-Length")
-                return
+        if seen != size:
+            self._fail("The body is shorter than Content-Length")
 
     def _fail(self, message: str) -> None:
         self.stream_error = SpsError("invalid_request", message, outcome="unknown")
@@ -365,12 +372,17 @@ def _label_filter(r: _Request) -> dict[str, str]:
     return labels
 
 
-async def _list(p: Provider, r: _Request) -> Reply:
-    labels = _label_filter(r)
+def _page_query(r: _Request) -> tuple[str | None, int]:
+    """The `cursor` and `limit` query parameters of a list operation."""
     cursor = r.query_one("cursor")
     if cursor == "":
         raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
-    limit = r.query_int("limit", 100, 1)
+    return cursor, r.query_int("limit", 100, 1)
+
+
+async def _list(p: Provider, r: _Request) -> Reply:
+    labels = _label_filter(r)
+    cursor, limit = _page_query(r)
     r.check_query_used()
     page = await p.list(labels=labels or None, cursor=cursor, limit=limit)
     return 200, to_json(page)
@@ -460,10 +472,7 @@ def _flag(r: _Request, name: str) -> bool:
 async def _files_list(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     path = _file_path(r)
-    cursor = r.query_one("cursor")
-    if cursor == "":
-        raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
-    limit = r.query_int("limit", 100, 1)
+    cursor, limit = _page_query(r)
     r.check_query_used()
     return 200, to_json(await p.files_list(sandbox_id, path, cursor=cursor, limit=limit))
 
@@ -569,10 +578,7 @@ async def _snapshot_list(p: Provider, r: _Request) -> Reply:
     sandbox_id = r.query_one("sandbox_id")
     if sandbox_id is not None:
         _entity(sandbox_id, "sandbox_id")
-    cursor = r.query_one("cursor")
-    if cursor == "":
-        raise SpsError("invalid_request", "Query parameter 'cursor' cannot be empty")
-    limit = r.query_int("limit", 100, 1)
+    cursor, limit = _page_query(r)
     r.check_query_used()
     page = await p.snapshot_list(
         labels=labels or None, sandbox_id=sandbox_id, cursor=cursor, limit=limit
@@ -593,6 +599,33 @@ async def _snapshot_delete(p: Provider, r: _Request) -> Reply:
 async def _snapshot_cost(p: Provider, r: _Request) -> Reply:
     r.check_query_used()
     return 200, to_json(await p.snapshot_cost(_entity(r.path_params[0], "snapshot_id")))
+
+
+async def _image_prepare(p: Provider, r: _Request) -> Reply:
+    key = r.headers.get("idempotency-key", "")
+    if not _IDEMPOTENCY_KEY.fullmatch(key):
+        raise SpsError("invalid_request", "Idempotency-Key must be 8 to 63 of a-z 0-9 -")
+    image = await prepare_image(
+        p, key=key, headers=r.headers, body=r.body_stream(), stream_error=lambda: r.stream_error
+    )
+    return 201, to_json(image)  # as for `create`, every success is 201
+
+
+async def _image_list(p: Provider, r: _Request) -> Reply:
+    labels = _label_filter(r)
+    cursor, limit = _page_query(r)
+    r.check_query_used()
+    return 200, to_json(await p.image_list(labels=labels or None, cursor=cursor, limit=limit))
+
+
+async def _image_get(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.image_get(_entity(r.path_params[0], "image_id")))
+
+
+async def _image_delete(p: Provider, r: _Request) -> Reply:
+    r.check_query_used()
+    return 200, to_json(await p.image_delete(_entity(r.path_params[0], "image_id")))
 
 
 def _link_base(r: _Request) -> str:
@@ -631,6 +664,7 @@ _Handler = Callable[[Provider, _Request], Awaitable[Reply]]
 _S = rf"/v1/sandboxes/{_ID}"
 _P = rf"{_S}/processes/{_ID}"
 _N = rf"/v1/snapshots/{_ID}"
+_I = rf"/v1/images/{_ID}"
 # (method, path pattern, handler); `files.read` is the one route that does not reply with JSON.
 _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
     (m, re.compile(f"^{pattern}$"), handler)
@@ -664,6 +698,10 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("GET", _N, _snapshot_get),
         ("DELETE", _N, _snapshot_delete),
         ("GET", f"{_N}/cost", _snapshot_cost),
+        ("POST", "/v1/images", _image_prepare),
+        ("GET", "/v1/images", _image_list),
+        ("GET", _I, _image_get),
+        ("DELETE", _I, _image_delete),
         ("POST", f"{_S}/terminals", _terminal_open),
     ]
 ]

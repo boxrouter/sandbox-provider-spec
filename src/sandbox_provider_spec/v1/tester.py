@@ -88,6 +88,10 @@ OPERATION_CLAIMS = {
     "files.write.user": ("knob", ("user_selection", "files_write")),
     "process.start.user": ("knob", ("user_selection", "process_start")),
     "run.base64": ("operations", "run.base64"),
+    "image.prepare": ("operations", "image.prepare"),
+    "image.get": ("operations", "image.get"),
+    "image.list": ("operations", "image.list"),
+    "image.delete": ("operations", "image.delete"),
     "snapshot.create": ("gate", "snapshots"),
     "snapshot.get": ("gate", "snapshots"),
     "snapshot.list": ("gate", "snapshots"),
@@ -99,9 +103,13 @@ OPERATION_CLAIMS = {
 # not marked unsupported; the driver falls back to the command.
 COMMAND_FALLBACK = frozenset({"files.exists"})
 
-# The section of tests that discovery's `classes[].operations` turns on, in place of a gate.
+# The sections of tests that discovery's `classes[].operations` turns on, in place of a gate: a
+# section runs when some class lists every operation of its group.
 DIRECTORIES = "directories"
 DIRECTORY_OPERATIONS = ("files.list", "files.mkdir", "files.remove", "files.exists")
+IMAGES = "images"
+IMAGE_OPERATIONS = ("image.prepare", "image.get", "image.list", "image.delete")
+OPERATION_GROUPS = {DIRECTORIES: DIRECTORY_OPERATIONS, IMAGES: IMAGE_OPERATIONS}
 
 
 # What a run says when discovery cannot be read for one of these reasons: nothing else could run.
@@ -164,13 +172,13 @@ def claimed_operations(discovery: Discovery) -> set[str]:
 
 
 def claimed_sections(discovery: Discovery | None) -> list[str]:
-    """The sections whose tests a run includes: the claimed gates, and `directories` when some
-    class lists the four directory operations."""
+    """The sections whose tests a run includes: the claimed gates, and `directories` and `images`
+    when some class lists all the operations of that group."""
     if discovery is None:
         return []
     found = list(claimed_gates(discovery))
-    if set(DIRECTORY_OPERATIONS) <= claimed_operations(discovery):
-        found.append(DIRECTORIES)
+    listed = claimed_operations(discovery)
+    found += [section for section, names in OPERATION_GROUPS.items() if set(names) <= listed]
     return found
 
 

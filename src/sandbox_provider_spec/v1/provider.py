@@ -27,8 +27,12 @@ from sandbox_provider_spec.v1.types import (
     FileLink,
     FileLinkRequest,
     FileStream,
+    ImageDeleteResult,
+    ImagePage,
+    ImageRequest,
     OutputPage,
     PathInfo,
+    PreparedImage,
     PreviewLink,
     Process,
     ProcessStartRequest,
@@ -264,6 +268,33 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     async def snapshot_cost(self, snapshot_id: str) -> Cost:
         raise self._unsupported("snapshot.cost")
+
+    async def image_prepare(
+        self,
+        request: ImageRequest,
+        *,
+        context: AsyncIterable[bytes] | None = None,
+        context_size: int | None = None,
+        idempotency_key: str,
+    ) -> PreparedImage:
+        """Prepare an image ahead of creation. `context` is the build context (a tar archive) as
+        a stream that the adapter reads once; `context_size` is its size when the caller says it."""
+        raise self._unsupported("image.prepare")
+
+    async def image_get(self, image_id: str) -> PreparedImage:
+        raise self._unsupported("image.get")
+
+    async def image_list(
+        self,
+        *,
+        labels: Mapping[str, str] | None = None,
+        cursor: str | None = None,
+        limit: int = 100,
+    ) -> ImagePage:
+        raise self._unsupported("image.list")
+
+    async def image_delete(self, image_id: str) -> ImageDeleteResult:
+        raise self._unsupported("image.delete")
 
     async def terminal_open(self, sandbox_id: str, request: TerminalRequest) -> Terminal:
         raise self._unsupported("terminal.open")

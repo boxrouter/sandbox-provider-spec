@@ -915,6 +915,146 @@ paths:
         "500": {$ref: "#/components/responses/ProviderError"}
         "503": {$ref: "#/components/responses/Unavailable"}
         "504": {$ref: "#/components/responses/Timeout"}
+  /v1/images:
+    post:
+      operationId: image_prepare
+      tags: [optional]
+      summary: Prepare an image ahead of creation (idempotent)
+      description: >-
+        Section `images` (`classes[].operations`; the class also claims `custom_images` knob `prepared`). The body is
+        `multipart/form-data`: the part `request` (JSON, first) and, for a Dockerfile that copies files, the part `context`
+        (a tar archive of the build context). The context never travels inside JSON and a server reads it as a stream. The
+        provider reaches no registry: `config` and `digest` are the caller's. Returns once the provider has accepted the
+        work, with state `preparing`, `ready` or `failed`; read `image_get` until `ready`. A repeat with the same key and
+        the same request returns the first image with status 201.
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [request]
+              properties:
+                request: {$ref: "#/components/schemas/ImageRequest"}
+                context:
+                  type: string
+                  format: binary
+                  description: >-
+                    A tar archive of the Dockerfile's build context, at most `limits.image_context_bytes`. The part may carry
+                    a `Content-Length` header; when it does, the provider receives it as `context_size`. It follows `request`.
+            encoding:
+              request: {contentType: application/json}
+              context: {contentType: application/x-tar}
+      responses:
+        "201":
+          description: The image started by this call or found by its idempotency key.
+          headers:
+            Request-Id: {$ref: "#/components/headers/RequestId"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PreparedImage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "402": {$ref: "#/components/responses/QuotaExceeded"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/TooLarge"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    get:
+      operationId: image_list
+      tags: [optional]
+      summary: List prepared images, filtered by labels
+      description: >-
+        Section `images`. Returns the images that are not deleted, in any state. The order is unspecified and the cursor is
+        opaque.
+      parameters:
+        - name: label
+          in: query
+          required: false
+          description: >-
+            `<key>=<value>`; may repeat. An image matches when it has every given label with exactly that value. The first
+            `=` separates the key from the value.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items: {type: string, pattern: "^[^=]+=.*$"}
+        - name: cursor
+          in: query
+          required: false
+          description: The `next_cursor` of the previous page.
+          schema: {type: string, minLength: 1}
+        - name: limit
+          in: query
+          required: false
+          description: Page size, 1 to `limits.list_limit` of discovery.
+          schema: {type: integer, minimum: 1, default: 100}
+      responses:
+        "200":
+          description: One page of images.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ImagePage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+  /v1/images/{image_id}:
+    parameters:
+      - {$ref: "#/components/parameters/ImageId"}
+    get:
+      operationId: image_get
+      tags: [optional]
+      summary: Read one prepared image
+      description: Section `images`. It observes only.
+      responses:
+        "200":
+          description: The image.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PreparedImage"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
+    delete:
+      operationId: image_delete
+      tags: [optional]
+      summary: Delete a prepared image
+      description: >-
+        Section `images`. Returns once the provider has accepted it; afterwards `image_get` and a create from the image are
+        `not_found`. A repeated delete succeeds with state `deleted`. A sandbox already created from it is not affected.
+      responses:
+        "200":
+          description: The delete was accepted.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ImageDeleteResult"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
   /v1/sandboxes/{sandbox_id}/terminals:
     parameters:
       - {$ref: "#/components/parameters/SandboxId"}
@@ -1010,6 +1150,12 @@ components:
       in: path
       required: true
       description: The snapshot id that the provider chose.
+      schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+    ImageId:
+      name: image_id
+      in: path
+      required: true
+      description: The prepared image id that the provider chose.
       schema: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
     ProcessId:
       name: process_id
@@ -1331,6 +1477,12 @@ components:
           description: >-
             Offers `cost`. The provider makes a sandbox's `cost` `final` within this many seconds after the sandbox ends. The
             spec sets no ceiling.
+        image_context_bytes:
+          type: integer
+          minimum: 536870912
+          description: >-
+            Largest build context (the tar archive) that `image_prepare` accepts. Stated by a provider that lists the image
+            operations; at least 512 MiB.
     ProviderInfo:
       type: object
       required: [id, name]
@@ -1371,20 +1523,38 @@ components:
         operations:
           type: array
           uniqueItems: true
-          items: {enum: [files.list, files.mkdir, files.remove, files.exists, run.base64]}
-          if:
-            contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}
-          then:
-            allOf:
-              - {contains: {const: files.list}}
-              - {contains: {const: files.mkdir}}
-              - {contains: {const: files.remove}}
-              - {contains: {const: files.exists}}
+          items:
+            enum:
+              - files.list
+              - files.mkdir
+              - files.remove
+              - files.exists
+              - run.base64
+              - image.prepare
+              - image.get
+              - image.list
+              - image.delete
+          allOf:
+            - if: {contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}}
+              then:
+                allOf:
+                  - {contains: {const: files.list}}
+                  - {contains: {const: files.mkdir}}
+                  - {contains: {const: files.remove}}
+                  - {contains: {const: files.exists}}
+            - if: {contains: {enum: [image.prepare, image.get, image.list, image.delete]}}
+              then:
+                allOf:
+                  - {contains: {const: image.prepare}}
+                  - {contains: {const: image.get}}
+                  - {contains: {const: image.list}}
+                  - {contains: {const: image.delete}}
           default: []
           description: >-
             Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
-            listed all four or none. `run.base64` says that `run` accepts `output: base64`. They turn on when the tester
-            passes them.
+            listed all four or none, and so are the image operations `image.prepare`, `image.get`, `image.list` and
+            `image.delete` (the class also claims `custom_images` knob `prepared`). `run.base64` says that `run` accepts
+            `output: base64`. They turn on when the tester passes them.
         images:
           type: array
           minItems: 1
@@ -1634,6 +1804,122 @@ components:
       required: [snapshot_id, state]
       properties:
         snapshot_id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+        state: {enum: [deleting, deleted]}
+    ImageConfig:
+      type: object
+      additionalProperties: false
+      description: >-
+        The image's own settings, resolved by the caller from the registry. The provider applies them as the defaults of a
+        sandbox made from the image, and reaches no registry.
+      properties:
+        env: {$ref: "#/components/schemas/Env"}
+        workdir:
+          anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
+          default: null
+        user: {type: [string, "null"], default: null, description: "A user name or numeric id."}
+        entrypoint:
+          anyOf: [{type: array, items: {type: string}, maxItems: 1024}, {type: "null"}]
+          default: null
+        cmd:
+          anyOf: [{type: array, items: {type: string}, maxItems: 1024}, {type: "null"}]
+          default: null
+    ImageRequest:
+      type: object
+      additionalProperties: false
+      required: [source]
+      description: The part `request` of `image_prepare`.
+      properties:
+        source:
+          description: >-
+            Exactly one of: a public OCI image, a private OCI image (the credentials are write-only: never returned, never
+            logged), or a Dockerfile (its text; the build context is the part `context`).
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [oci, digest, config]
+              properties:
+                oci: {type: string, minLength: 1, maxLength: 1024, description: "The image reference."}
+                digest: {$ref: "#/components/schemas/ImageDigest"}
+                config: {$ref: "#/components/schemas/ImageConfig"}
+            - type: object
+              additionalProperties: false
+              required: [private_oci, digest, config, credentials]
+              properties:
+                private_oci: {type: string, minLength: 1, maxLength: 1024, description: "The image reference."}
+                digest: {$ref: "#/components/schemas/ImageDigest"}
+                config: {$ref: "#/components/schemas/ImageConfig"}
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required: [username, password]
+                  properties:
+                    username: {type: string}
+                    password: {type: string}
+                  description: Registry credentials. Write-only.
+            - type: object
+              additionalProperties: false
+              required: [dockerfile]
+              properties:
+                dockerfile: {type: string, minLength: 1, maxLength: 1048576, description: "The Dockerfile text."}
+        resources:
+          anyOf: [{$ref: "#/components/schemas/ImageResources"}, {type: "null"}]
+          default: null
+          description: The size that a sandbox made from the image must start with; null means any size.
+        labels:
+          $ref: "#/components/schemas/Labels"
+          description: The image's labels.
+    ImageDigest:
+      type: string
+      pattern: "^sha256:[0-9a-f]{64}$"
+      description: The image's content digest, resolved by the caller.
+    ImageResources:
+      type: object
+      additionalProperties: false
+      properties:
+        cpu: {type: number, exclusiveMinimum: 0}
+        memory_mib: {type: integer, minimum: 1}
+        disk_mib: {type: integer, minimum: 1}
+      description: A size. A field that is absent is not bound.
+    PreparedImage:
+      type: object
+      required: [id, state, error, resources, stored_bytes, labels, created_at]
+      description: Returned by `image_prepare`, `image_get` and `image_list`.
+      properties:
+        id:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{1,128}$"
+          description: >-
+            The image id, chosen by the provider and never reused. `create` takes it as `image: {provider_artifact: <id>}`.
+        state:
+          enum: [preparing, ready, failed]
+          description: "`ready`: a sandbox can start from it. `preparing`: not yet. `failed`: never will be."
+        error:
+          anyOf: [{$ref: "#/components/schemas/Error"}, {type: "null"}]
+          description: Why it failed, when the state is `failed`; null otherwise.
+        resources:
+          anyOf: [{$ref: "#/components/schemas/ImageResources"}, {type: "null"}]
+          description: The size that the image is bound to, or null when a sandbox of any size can start from it.
+        stored_bytes:
+          type: [integer, "null"]
+          minimum: 0
+          description: The bytes the provider stores for it, when the provider knows.
+        labels: {$ref: "#/components/schemas/Labels"}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+    ImagePage:
+      type: object
+      required: [images, next_cursor]
+      properties:
+        images:
+          type: array
+          items: {$ref: "#/components/schemas/PreparedImage"}
+        next_cursor:
+          type: [string, "null"]
+          description: Opaque. Null means that this page is the last one.
+    ImageDeleteResult:
+      type: object
+      required: [id, state]
+      properties:
+        id: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
         state: {enum: [deleting, deleted]}
     RunRequest:
       type: object
