@@ -237,6 +237,10 @@
           "type": "integer",
           "minimum": 0
         },
+        "class": {
+          "type": "string",
+          "description": "The sandbox class that ran the test (the 1.0 tester runs each test on a class that claims what it proves)."
+        },
         "rules": {
           "type": "array",
           "uniqueItems": true,

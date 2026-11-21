@@ -357,7 +357,11 @@ class ImageProvider(LocalProvider, manifest=False):
 
     async def run(self, sandbox_id: str, request: RunRequest) -> RunResult:
         files = self.box_files.get(sandbox_id)
-        if files and request.argv[:2] == ["bash", "-c"] and request.argv[2].startswith("cat "):
+        if (
+            files
+            and request.argv[:2] in (["bash", "-c"], ["sh", "-c"])
+            and request.argv[2].startswith("cat ")
+        ):
             return RunResult(0, files[request.argv[2][4:]].decode(), "")
         return await super().run(sandbox_id, request)
 

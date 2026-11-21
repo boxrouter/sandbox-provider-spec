@@ -556,8 +556,8 @@ def test_driver_runs_a_background_process_to_its_exit(driver: ProviderDriver) ->
     assert driver.call("process.wait", started, {"timeout_ms": 10000}) == {"exit_code": 5}
     assert driver.call("process.status", started, {}) == {"state": "exited", "exit_code": 5}
     assert driver.call("process.output", started, {}) == {"stdout": b"hi", "stderr": b""}
-    with pytest.raises(Unsupported):  # SPS 1.0 has no reattach
-        driver.call("process.reattach", started, {})
+    again = driver.call("process.reattach", made, {"identity": started["identity"]})
+    assert again["identity"] == started["identity"]  # reattach reads the same process anew
 
 
 def test_unsupported_operations_follow_the_claims() -> None:

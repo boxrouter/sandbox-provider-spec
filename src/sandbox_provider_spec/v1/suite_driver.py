@@ -15,7 +15,7 @@ import builtins
 import contextlib
 import threading
 import time
-from collections.abc import AsyncIterator, Awaitable, Iterator, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
 from concurrent.futures import Future
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -40,6 +40,7 @@ from sandbox_provider_spec.driver import (
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver_images import ImageSteps, image_reference
+from sandbox_provider_spec.v1.suite_driver_processes import ProcessHandle, ProcessSteps
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
     FileLinkRequest,
@@ -60,8 +61,6 @@ RUN_LABEL = "sps.test.run"
 
 # Operations that 1.0 has no counterpart for: a test needing one is `unsupported`.
 NOT_IN_1_0 = {
-    "process.reattach": "SPS 1.0 has no operation to reattach to a process",
-    "process.disconnect": "SPS 1.0 has no operation to disconnect from a process",
     "terminal.disconnect": "SPS 1.0 has no operation to disconnect from a terminal",
     "terminal.reattach": "SPS 1.0 has no operation to reattach to a terminal",
 }
@@ -88,10 +87,8 @@ _SNAPSHOT_WAIT_SECONDS = 900  # how long a snapshot may stay in `saving`
 
 _ONE_GIB = 1 << 30
 
-_OUTPUT_WAIT_MS = 1000
 _TERMINAL_OUTPUT_MS = 15_000  # how long terminal.output waits when a test names no limit
 _TERMINAL_WAIT_MS = 60_000  # how long terminal.wait waits for the exit when a test names no limit
-_WAIT_MS = 60_000  # how long process.wait waits for an exit when a test names no limit
 
 # Provider-fault codes that a retry can outlast.
 RETRYABLE = frozenset({"provider_error", "unavailable", "timeout", "rate_limited"})
@@ -102,21 +99,6 @@ class SandboxHandle:
     """What a sandbox resource keeps in memory."""
 
     id: str
-
-
-@dataclass
-class ProcessHandle:  # pylint: disable=too-many-instance-attributes
-    """A background process and the output read from it so far."""
-
-    sandbox_id: str
-    process_id: str
-    cursor: str | None = None
-    stdout: bytearray = field(default_factory=bytearray)
-    stderr: bytearray = field(default_factory=bytearray)
-    stdout_closed: bool = False
-    stderr_closed: bool = False
-    state: str = "running"
-    exit_code: int | None = None
 
 
 @dataclass
@@ -153,7 +135,7 @@ def _iso(moment: datetime | None) -> str | None:
     return None if moment is None else moment.isoformat().replace("+00:00", "Z")
 
 
-class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
+class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """A `Driver` whose operations call a `Provider`: `SpsError("unsupported")` becomes
     `Unsupported`, any other `SpsError` `NativeFailure(code)`. The provider is async, so the
     driver runs its own event loop in a background thread and waits for each call."""
@@ -171,9 +153,14 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         provider_id: str | None = None,
         run: str | None = None,
         unsupported: Mapping[str, str] | None = None,
+        new_client: Callable[[], Provider] | None = None,
     ) -> None:
         super().__init__()
         self.api = provider
+        self._new_client = new_client
+        self.sandbox_class = "default"
+        """The class that `create` asks for; the tester sets it to the class that runs a test."""
+        self._clients: builtins.list[Provider] = []
         self.provider = provider_id or str(getattr(type(provider), "provider_id", "unknown"))
         self.run_id = run or uuid4().hex
         self.sdk_versions = {"sandbox-provider-spec": version("sandbox-provider-spec")}
@@ -214,6 +201,9 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
             for handle in self._terminals:
                 with contextlib.suppress(Exception):
                     self._close_terminal(handle)
+            for client in self._clients:
+                with contextlib.suppress(Exception):
+                    self.wait(client.aclose())
             self.wait(self.api.aclose())
         finally:
             self._loop.call_soon_threadsafe(self._loop.stop)
@@ -254,7 +244,7 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
         request = CreateRequest(
-            sandbox_class="default" if snapshot is None else snapshot.sandbox_class,
+            sandbox_class=self.sandbox_class if snapshot is None else snapshot.sandbox_class,
             resources=cast(Mapping[str, object], inputs.get("resources", {})),
             requirements=cast(Mapping[str, object], inputs.get("requirements", {})),
             image=cast("str | Mapping[str, str] | None", image),
@@ -366,8 +356,15 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         base64_output = inputs.get("output") == "base64"
         if base64_output and "run.base64" in self.unsupported:
             raise Unsupported(self.unsupported["run.base64"])
+        # A test names `bash_script` (bash is in a provider's default image) or, for an image
+        # that a plain OCI base supplies, `sh_script` (POSIX `sh` is in every OCI base).
+        argv = (
+            ["sh", "-c", text(inputs, "sh_script")]
+            if "sh_script" in inputs
+            else ["bash", "-c", text(inputs, "bash_script")]
+        )
         request = RunRequest(
-            argv=["bash", "-c", text(inputs, "bash_script")],
+            argv=argv,
             cwd=cast("str | None", inputs.get("cwd")),
             env=strings(inputs, "environment"),
             timeout_ms=number(inputs, "timeout_ms", 60_000),
@@ -566,66 +563,6 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
         owned = self.own("process", handle, lambda: {"result": "already_released"})
         return {"resource": owned, "identity": started.id}
 
-    def _read(self, handle: ProcessHandle, wait_ms: int) -> None:
-        page = self.wait(
-            self.api.process_output(
-                handle.sandbox_id, handle.process_id, cursor=handle.cursor, wait_ms=wait_ms
-            )
-        )
-        handle.cursor = page.next_cursor
-        for chunk in page.chunks:
-            (handle.stdout if chunk.stream == "stdout" else handle.stderr).extend(
-                chunk.data.encode()
-            )
-        handle.stdout_closed = handle.stdout_closed or page.stdout_closed
-        handle.stderr_closed = handle.stderr_closed or page.stderr_closed
-        handle.state, handle.exit_code = page.state, page.exit_code
-
-    def process_output(self, target: object, inputs: Inputs) -> Observation:
-        handle = self._process(target)
-        deadline = time.monotonic() + number(inputs, "timeout_ms", 15000) / 1000
-        first_chunk = inputs.get("first_chunk") is True
-        while True:
-            self._read(handle, _OUTPUT_WAIT_MS)
-            heard = bool(handle.stdout or handle.stderr)
-            finished = handle.state == "exited" or (handle.stdout_closed and handle.stderr_closed)
-            if finished or (first_chunk and heard) or time.monotonic() >= deadline:
-                return {"stdout": bytes(handle.stdout), "stderr": bytes(handle.stderr)}
-
-    def process_status(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
-        handle = self._process(target)
-        self._read(handle, 0)
-        return {"state": handle.state, "exit_code": handle.exit_code}
-
-    def process_wait(self, target: object, inputs: Inputs) -> Observation:
-        handle = self._process(target)
-        deadline = time.monotonic() + number(inputs, "timeout_ms", _WAIT_MS) / 1000
-        while True:
-            self._read(handle, _OUTPUT_WAIT_MS)
-            if handle.state == "exited":
-                return {"exit_code": handle.exit_code}
-            if time.monotonic() >= deadline:
-                raise NotRun("native_process_still_running")
-
-    def process_write_stdin(self, target: object, inputs: Inputs) -> Observation:
-        handle = self._process(target)
-        data = base64.b64decode(text(inputs, "data"), validate=True)
-        self.wait(self.api.process_write_stdin(handle.sandbox_id, handle.process_id, data))
-        return {}
-
-    def process_close_stdin(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
-        handle = self._process(target)
-        self.wait(self.api.process_close_stdin(handle.sandbox_id, handle.process_id))
-        return {}
-
-    def process_cancel(self, target: object, inputs: Inputs) -> Observation:
-        del inputs
-        handle = self._process(target)
-        self.wait(self.api.process_cancel(handle.sandbox_id, handle.process_id))
-        return {}
-
     # Optional sections
 
     def pause(self, target: object, inputs: Inputs) -> Observation:
@@ -636,7 +573,13 @@ class ProviderDriver(Driver, ImageSteps):  # pylint: disable=too-many-public-met
     def resume(self, target: object, inputs: Inputs) -> Observation:
         del inputs
         sandbox = self.wait(self.api.resume(self._sandbox(target)))
-        return {"state": "active" if sandbox.state == "running" else sandbox.state}
+        # The resumed sandbox is the same one, so a step can bind it (`as:`) and name it as the
+        # target of the steps after, as `create` allows.
+        return {
+            "resource": resource(target),
+            "identity": sandbox.id,
+            "state": "active" if sandbox.state == "running" else sandbox.state,
+        }
 
     def lifetime_extend(self, target: object, inputs: Inputs) -> Observation:
         sandbox = self.wait(

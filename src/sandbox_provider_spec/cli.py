@@ -8,7 +8,7 @@ import argparse
 import json
 import os
 import sys
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from importlib.metadata import entry_points
 from pathlib import Path
@@ -16,7 +16,7 @@ from typing import Any
 
 import yaml
 
-from sandbox_provider_spec import conformance, provider_assets, starter
+from sandbox_provider_spec import conformance, fixtures, provider_assets, starter
 from sandbox_provider_spec.check import (
     check_catalog,
     check_path,
@@ -232,10 +232,19 @@ def _credentials(pairs: list[str]) -> dict[str, str] | None:
     return values
 
 
+def _on_class(row: dict[str, Any]) -> str:
+    return f" (class {row['class']})" if "class" in row else ""
+
+
 def _test(args: argparse.Namespace) -> int:
     """Run the shared tests against an installed provider or a base URL."""
     credentials = _credentials(args.credential)
     if credentials is None:
+        return 1
+    try:
+        given = fixtures.read_fixtures(args.fixture, args.fixtures)
+    except fixtures.FixtureError as error:
+        print(f"test: {error}", file=sys.stderr)
         return 1
     target: str = args.target
     try:
@@ -248,6 +257,9 @@ def _test(args: argparse.Namespace) -> int:
             from sandbox_provider_spec.v1.http_client import HttpProvider  # noqa: PLC0415
 
             provider: Provider = HttpProvider(target, credentials["token"])
+            new_client: Callable[[], Provider] = lambda: HttpProvider(  # noqa: E731
+                target, credentials["token"]
+            )
         else:
             provider_class = _load_provider_class(target, "test")
             if provider_class is None:
@@ -262,6 +274,7 @@ def _test(args: argparse.Namespace) -> int:
                 )
                 return 1
             provider = provider_class(credentials)
+            new_client = lambda: provider_class(credentials)  # noqa: E731
     except ModuleNotFoundError as error:
         if error.name != "httpx":
             raise
@@ -274,7 +287,12 @@ def _test(args: argparse.Namespace) -> int:
         print(f"test: {error}", file=sys.stderr)
         return 1
     options = tester.TestOptions(
-        reachable_url=args.reachable_url, tests=args.test, quick=args.quick
+        reachable_url=args.reachable_url,
+        tests=args.test,
+        quick=args.quick,
+        fixtures=given,
+        new_client=new_client,
+        sandbox_class=args.sandbox_class,
     )
     try:
         result = tester.run_tests(provider, options)
@@ -284,7 +302,10 @@ def _test(args: argparse.Namespace) -> int:
     print("\n".join(result.lines))
     for row in result["tests"]:
         if row["result"] not in {"passed", "unsupported"}:
-            print(f"{row['id']}: {row.get('reason', row['result'])}", file=sys.stderr)
+            print(
+                f"{row['id']}{_on_class(row)}: {row.get('reason', row['result'])}",
+                file=sys.stderr,
+            )
             for step in row["steps"]:
                 if "command" in step:
                     print(f"  command: {step['command']}", file=sys.stderr)
@@ -388,6 +409,8 @@ def main(argv: list[str] | None = None) -> int:
         "test",
         help="run the shared tests against an installed provider or a base URL "
         "(exit 0 pass, 3 pass under --quick, 1 otherwise)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=fixtures.help_text(),
     )
     test_cmd.add_argument("target", help="an installed provider id, or an http(s):// base URL")
     test_cmd.add_argument(
@@ -402,6 +425,31 @@ def main(argv: list[str] | None = None) -> int:
         "--reachable-url",
         default="https://example.com",
         help="an HTTPS URL that a sandbox can reach (default https://example.com)",
+    )
+    test_cmd.add_argument(
+        "--class",
+        dest="sandbox_class",
+        metavar="NAME",
+        help="run every test on this class and only what it claims (default: each test runs on "
+        "the first class, in discovery order, that claims what it proves; the baseline runs on "
+        "`default`)",
+    )
+    test_cmd.add_argument(
+        "--fixture",
+        action="append",
+        default=[],
+        metavar="NAME=VALUE",
+        help="a runner fixture a test needs (repeatable; names are listed below). VALUE is JSON "
+        "when it parses as JSON, else text; env:VAR reads the environment variable VAR, so a "
+        "secret is never printed. A test whose fixture is not supplied is not_run",
+    )
+    test_cmd.add_argument(
+        "--fixtures",
+        action="append",
+        default=[],
+        metavar="FILE",
+        help="a YAML or JSON map of fixture name to value (repeatable; --fixture wins); a string "
+        "env:VAR at any depth is read from the environment",
     )
     test_cmd.add_argument(
         "--test", action="append", default=[], help="test id or prefix; repeatable"

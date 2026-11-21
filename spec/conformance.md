@@ -363,6 +363,141 @@ unconfirmed. This rule does not release markerless artifact or other operations.
 original failed test remains failed; separate later reconciliation never rewrites a
 report's cleanup result.
 
+### Fixtures of `sandbox-provider-spec test`
+
+The 1.0 tester runs the same shared tests as `run`. A test that needs a value only the account
+can supply (an image a registry serves, a URL a sandbox may reach, a size to ask for) reads it
+from a **fixture**. A test whose fixture is missing is `not_run` with the reason
+`fixture_missing`, never failed; it can then not be claimed. `test` takes fixtures in two ways:
+
+```
+sandbox-provider-spec test <provider> --credential api_key=MY_KEY \
+  --fixture oci_image=docker.io/library/alpine@sha256:<digest> \
+  --fixture image_marker="Alpine Linux" \
+  --fixture private_oci_password=env:REGISTRY_PASSWORD \
+  --fixtures my-fixtures.yaml
+```
+
+- `--fixture NAME=VALUE` (repeatable). A value that parses as JSON (`3`, `true`, `["a.example"]`,
+  `{"cpu_min": 2}`) is that JSON value, anything else is text. `env:VAR` reads the environment
+  variable `VAR` as text, so a secret stays out of the command line and every message.
+- `--fixtures FILE` (repeatable): a YAML or JSON map of fixture name to value. A string `env:VAR`
+  at any depth is read from the environment. A `--fixture` wins over a file.
+
+An unknown name is refused before anything runs. `reachable_url` is `--reachable-url`;
+`run_nonce` is the run's own. Names that the run derives from another (below) are refused too.
+Values that are Python objects (`fuse_mount_controller` and its digest, the handover controller
+and its digest) cannot be given on the command line.
+
+| Fixture | What the test needs |
+| --- | --- |
+| `address_families` | A map `{ipv4_literal, ipv6_literal, port}` of one IPv4 and one IPv6 endpoint that an unrestricted sandbox can reach. |
+| `allowed_domains` | A list of domains or CIDRs that an allowlist for `allowed_url` holds. |
+| `allowed_ip_range` | One IPv4 range (`/0` to `/24`) that covers `allowed_ip_url` and `allowed_ip_range_url`. |
+| `allowed_ip_range_url` | A second literal-IPv4 HTTP URL, inside `allowed_ip_range`, on another address than `allowed_ip_url`. |
+| `allowed_ip_url` | A literal-IP HTTP URL that a sandbox can reach, for the address allowlist tests. |
+| `allowed_ips` | A list of IP addresses or CIDRs that an allowlist for `allowed_ip_url` holds. |
+| `allowed_mixed` | A list holding a host name that covers `allowed_url` and an address that covers `allowed_ip_url`. |
+| `allowed_url` | A controlled HTTP(S) receiver URL that the allowlist tests expect to reach. |
+| `connection_harness` | A map `{stream_url, token, ca_pem?}` of an HTTPS stream that shows whether an open connection survives. |
+| `connection_harness_domains` | A list holding the host name of `connection_harness`, used in the initial network policy. |
+| `denied_url` | A controlled receiver URL outside every allowlist, which a lockdown must block. |
+| `denylist_addresses_entries` | Denylist entries that are IPv4 addresses or CIDRs. |
+| `denylist_addresses_urls` | One HTTP and one HTTPS URL per address entry, each using a literal IP inside that entry. |
+| `denylist_allowed_urls` | Reachable URLs that no denylist entry names, which must stay reachable. |
+| `denylist_mixed_entries` | Denylist entries that are host names and addresses together. |
+| `denylist_mixed_urls` | One HTTP and one HTTPS URL per mixed entry, in entry order. |
+| `denylist_names_entries` | Denylist entries that are host names. |
+| `denylist_names_urls` | One HTTP and one HTTPS URL per name entry, using that exact host name. |
+| `egress_proxy` | A map `{addresses: {http|socks5: <address>}}` of the proxy a sandbox is routed through. |
+| `egress_proxy_protocol` | The proxy protocol (`http` or `socks5`) that the egress-proxy tests ask for. |
+| `entrypoint_image` | An `image.prepare` request for an image that has an entrypoint. |
+| `entrypoint_marker` | The path of the file that the entrypoint of `entrypoint_image` writes when it runs. |
+| `expiry_options` | A `create` request for a sandbox with a 60-second resumable ending. |
+| `file_stream_large` | `true` runs the streams of 1 GiB and more; the tester sets it, so give `false` to skip them. |
+| `file_transfer_lifetime_seconds` | Optional lifetime, in seconds, of a sandbox in the file-link and 1 GiB transfer tests. |
+| `files_write_executable_effect` | Whether a written file stays executable: `preserved`, `may_clear`, or `unverified` (default). |
+| `fuse_mount_access_mode` | The access mode of the mount that the provider-terminal handover tests make. |
+| `fuse_mount_controller` | Python only: an object with the mount lifecycle methods; no command-line form. |
+| `fuse_mount_controller_digest` | Python only: the digest of the source files of `fuse_mount_controller`. |
+| `fuse_mount_create` | A `create` request for a sandbox that can mount a FUSE volume. |
+| `fuse_mount_handover_controller` | Python only: an object that drives the provider-terminal handover; no command-line form. |
+| `fuse_mount_handover_controller_digest` | Python only: the digest of the source files of the handover controller. |
+| `fuse_mount_prerequisites` | What must hold before the mount tests run (the volume, its credentials and its kind). |
+| `guest_reserved_tcp_ports` | A map `{candidates, provider_executables}` naming the TCP ports the guest may reserve for itself. |
+| `hidden_secret_wildcard_host` | One `*.` wildcard host name of a controlled receiver, for a hidden secret's `inject_into`. |
+| `hidden_secret_wildcard_urls` | Two HTTPS URLs on that receiver: a direct child of the wildcard and a deeper subdomain. |
+| `idle_activity_settings` | The `idle_shutdown` setting for observing a long-running command across the idle interval. |
+| `idle_after_wait_ms` | Milliseconds to wait until after the effective idle interval, before reading state. |
+| `idle_before_wait_ms` | Milliseconds to wait, shorter than the idle interval, while the sandbox must still be active. |
+| `idle_lifetime_seconds` | The lifetime, in seconds, of a sandbox in the idle-shutdown tests. |
+| `idle_process_timeout_ms` | The timeout, in milliseconds, of the process the idle-shutdown tests keep running. |
+| `image_marker` | Controlled text that the image's `/etc/os-release` holds, proving its own files are there. |
+| `larger_size` | A resource request with `cpu_min` and `memory_min_mib`, larger than the default size. |
+| `link_lifetime_wait_seconds` | The preview or file link's observation window in seconds (300 proves a 300-second bound). |
+| `max_allow_entries` | One to 32 distinct controlled host names, to prove the allowlist entry limit. |
+| `max_allow_urls` | Reachable URLs, one per `max_allow_entries` item in the same order. |
+| `max_deny_entries` | Distinct controlled names or IPv4 ranges, to prove the denylist entry limit. |
+| `max_deny_urls` | One HTTP and one HTTPS URL for each `max_deny_entries` item. |
+| `max_inject_into_hosts` | Distinct receiver host names, for the `inject_into` limit. |
+| `max_inject_into_urls` | HTTPS URLs, one per host of `max_inject_into_hosts` in the same order. |
+| `max_lifetime_seconds` | The lifetime, in seconds, that the max-lifetime test asks `create` for. |
+| `max_lifetime_wait_ms` | Milliseconds, at least 1000, that the max-lifetime test waits and then observes. |
+| `max_live_sandboxes` | How many sandboxes the runner may hold at once (an integer, default 1). |
+| `max_mounts` | The count of volumes the max-mounts test mounts (at most 32). |
+| `oci_image` | A public OCI image reference, pinned by digest, for the prepared-image tests. |
+| `original_size` | The resource request that a sandbox is created with before a snapshot resizes it. |
+| `outbound_http_url` | A public plain-HTTP URL on port 80 that returns 2xx without a redirect. |
+| `outbound_tcp_echo` | A map `{host, port}` of a public TCP echo service (not port 80 or 443). |
+| `outbound_udp_echo` | A map `{host, port}` of a public UDP echo service. |
+| `private_oci_image` | A private OCI image reference, pinned by digest, that needs the username and password below. |
+| `private_oci_marker` | Controlled text that the private image's `/etc/os-release` holds. |
+| `private_oci_password` | The registry password for `private_oci_image` (give it as `env:VAR`). |
+| `private_oci_username` | The registry username for `private_oci_image`. |
+| `provider_artifact_image` | The id of a provider image that the account already has, which a sandbox starts from. |
+| `reachable_url` | Set by `--reachable-url`: an HTTPS URL that a sandbox can reach with a 2xx response. |
+| `reserved_ports` | A list of at most 64 distinct ports that the provider reserves (may be empty). |
+| `restored_size` | The resource request that a sandbox restored from a snapshot asks for. |
+| `standard_base_dockerfile` | A Dockerfile on the provider's standard image, with the four `COPY` and `ADD` lines the test names. |
+| `test_gpu` | A resource request `{gpu_model: [<registry model>]}` for the GPU sandbox. |
+| `test_size` | A resource request using `cpu_min`, `memory_min_mib` and optional `disk_min_mib`, for the size tests. |
+| `volume_kind` | The kind of volume the max-mounts test makes: `filesystem` or `object_store`. |
+| `wildcard_allowed_url` | A reachable HTTPS URL under `wildcard_domains`, which the wildcard allowlist must permit. |
+| `wildcard_denied_url` | A reachable HTTPS URL outside every wildcard, which must stay blocked. |
+| `wildcard_domains` | Wildcard host names (`*.example.com`) for an allowlist, covering `wildcard_allowed_url`. |
+| `workload_identity_receiver_health_url` | An HTTPS health URL of the receiver (default: `/health` on the receiver's host). |
+| `workload_identity_receiver_url` | An HTTPS URL of a receiver that records the identity tokens a sandbox presents. |
+| `workload_identity_records_url` | An HTTPS URL from which the tester reads what that receiver recorded. |
+
+The run derives these from the fixtures above, so a run refuses a value for them:
+
+| Derived name | From |
+| --- | --- |
+| `gpu_model` | `test_gpu` |
+| `gpu_name_pattern` | `test_gpu` |
+| `link_lifetime_wait_ms` | `link_lifetime_wait_seconds` |
+| `max_allow_count` | `max_allow_entries` |
+| `max_deny_count` | `max_deny_entries` |
+| `max_inject_into_count` | `max_inject_into_hosts` |
+| `max_lifetime_observed_seconds` | `max_lifetime_wait_ms` |
+| `preview_link_lifetime_seconds` | `link_lifetime_wait_seconds` |
+| `preview_process_timeout_ms` | `link_lifetime_wait_seconds` |
+| `preview_sandbox_lifetime_seconds` | `link_lifetime_wait_seconds` |
+| `test_gpu_models` | `test_gpu` |
+| `test_size_value` | `test_size` |
+
+Classes: the tester creates each test's sandboxes in a class that claims what the test proves (the
+first such class in discovery order), so a gate that only the `vm` class claims runs on `vm`; a
+test that claims nothing, such as the baseline, runs on `default`. `--class NAME` runs every test on
+that class and only what it claims. The report names the class of each test, and `test` prints
+`class <name> <status>` per class when more than one ran.
+
+Two tester notes. The prepared-image test `images.v1.prepare_oci` runs its check with `sh -c`
+(POSIX, in every OCI base), so a plain OCI image without `bash` passes it. The other `run`
+tests keep `bash`, which the baseline requires of a provider's default image. And
+`processes.reattach.true` has no disconnect in 1.0: the tester starts a process, then opens a
+fresh client to the same provider and reads `process.output` of that process from the start.
+
 ## Results and reports
 
 | Result | Meaning |

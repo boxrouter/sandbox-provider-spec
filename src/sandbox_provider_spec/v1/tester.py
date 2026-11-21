@@ -4,8 +4,9 @@
 
 from __future__ import annotations
 
+import dataclasses
 import subprocess
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
 from uuid import uuid4
@@ -17,7 +18,7 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
-from sandbox_provider_spec.v1.types import CreateRequest, Discovery
+from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
 # Worst first: a section or operation takes the worst status of its tests.
 SEVERITY = ("error", "differs", "not_run", "unsupported", "passed")
@@ -163,6 +164,11 @@ class TestOptions:
     tests: Sequence[str] = ()
     quick: bool = False
     fixtures: Mapping[str, object] = field(default_factory=dict)
+    new_client: Callable[[], Provider] | None = None
+    """Makes a fresh client of the same provider, which `processes.reattach` reads through."""
+    sandbox_class: str | None = None
+    """Pins every test to this class (and to what it claims); None runs each test on a class that
+    claims what the test proves."""
 
 
 class Report(dict[str, Any]):
@@ -268,6 +274,63 @@ def _consistent(test: Test, gates: Mapping[str, list[Mapping[str, object]]]) -> 
     return True
 
 
+def _alone(discovery: Discovery, item: SandboxClass) -> Discovery:
+    return dataclasses.replace(discovery, classes=[item])
+
+
+def _gates_needed(test: Test, discovery: Discovery) -> set[str]:
+    """The gates a test needs its class to claim: those it proves, and its own section's."""
+    head = test.id.split(".", 1)[0]
+    needed = {str(proof["gate"]) for proof in test.proves if "gate" in proof}
+    if head in claimed_gates(discovery):
+        needed.add(head)
+    return needed
+
+
+def _claims(discovery: Discovery, item: SandboxClass, test: Test) -> bool:
+    """Whether this one class claims what the test needs: its gates and knob values, the
+    operations (or group of operations) that turn its section on."""
+    own = _alone(discovery, item)
+    gates = claimed_gates(own)
+    if not _gates_needed(test, discovery) <= set(gates) or not _consistent(test, gates):
+        return False
+    group = OPERATION_GROUPS.get(test.id.split(".", 1)[0])
+    if group is not None and not set(group) <= set(item.operations):
+        return False
+    return test.id not in OPERATION_CLAIMS or test.id not in unsupported_operations(own)
+
+
+def _needs_a_claim(test: Test, discovery: Discovery) -> bool:
+    head = test.id.split(".", 1)[0]
+    return bool(
+        _gates_needed(test, discovery) or head in OPERATION_GROUPS or test.id in OPERATION_CLAIMS
+    )
+
+
+def default_class(discovery: Discovery) -> str:
+    """The class that the baseline runs on: `default`, else the first class."""
+    names = [item.id for item in discovery.classes]
+    return "default" if "default" in names else names[0]
+
+
+def class_for_test(test: Test, discovery: Discovery) -> str:
+    """The class that runs a test: the default class when the test claims nothing, else the first
+    class in discovery order that claims what it needs (the default class when none does alone)."""
+    if _needs_a_claim(test, discovery):
+        for item in discovery.classes:
+            if _claims(discovery, item, test):
+                return item.id
+    return default_class(discovery)
+
+
+def _pinned(discovery: Discovery, name: str) -> Discovery:
+    for item in discovery.classes:
+        if item.id == name:
+            return _alone(discovery, item)
+    known = ", ".join(item.id for item in discovery.classes)
+    raise CannotRun(f"the provider has no class {name!r} (its classes: {known})")
+
+
 def shared_suite() -> Suite:
     """Every shared test: `suite.yaml` and `coverage.yaml`, under the digest that covers both."""
     core = read_suite()
@@ -342,7 +405,10 @@ def _probe_cost(driver: ProviderDriver, discovery: Discovery | None) -> str:
     try:
         created = driver.wait(
             driver.api.create(
-                CreateRequest(labels={"sps.test.run": driver.run_id}), idempotency_key=str(uuid4())
+                CreateRequest(
+                    sandbox_class=driver.sandbox_class, labels={"sps.test.run": driver.run_id}
+                ),
+                idempotency_key=str(uuid4()),
             )
         )
         driver.wait(driver.api.cost(created.id))
@@ -383,11 +449,43 @@ def _summary(
     return lines
 
 
+def _class_line(name: str, results: Sequence[Mapping[str, Any]]) -> str:
+    own = [str(row["result"]) for row in results if row["class"] == name and _applies(row)]
+    return f"class {name} {_worst(own)}"
+
+
+def _run_by_class(
+    driver: ProviderDriver,
+    suite: Suite,
+    discovery: Discovery | None,
+    fixtures: dict[str, object],
+) -> tuple[list[dict[str, object]], list[str]]:
+    """Run each test on its class, one run of the runner per class, and label every result with
+    the class that ran it. Results come back in the suite's order, the classes in order of use."""
+    if discovery is None:
+        results = run_suite(driver, suite, fixtures)
+        for row in results:
+            row["class"] = driver.sandbox_class
+        return results, [driver.sandbox_class]
+    groups: dict[str, list[Test]] = {}
+    for test in suite.tests:
+        groups.setdefault(class_for_test(test, discovery), []).append(test)
+    by_id: dict[str, dict[str, object]] = {}
+    for name, tests in groups.items():
+        driver.sandbox_class = name
+        for row in run_suite(
+            driver, Suite(suite.digest, tuple(tests), suite.baseline_ids), fixtures
+        ):
+            row["class"] = name
+            by_id[str(row["id"])] = row
+    return [by_id[test.id] for test in suite.tests], list(groups)
+
+
 def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
     """Run the tests against `provider` and return the report. The sandboxes it creates are
     labelled `sps.test.run=<run id>`, and every one is deleted before this returns."""
     options = options or TestOptions()
-    driver = ProviderDriver(provider)
+    driver = ProviderDriver(provider, new_client=options.new_client)
     started = now()
     try:
         discovery: Discovery | None
@@ -400,8 +498,11 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             discovery, discovery_status = None, "error"
         except Exception:  # pylint: disable=broad-exception-caught
             discovery, discovery_status = None, "error"
+        if discovery is not None and options.sandbox_class is not None:
+            discovery = _pinned(discovery, options.sandbox_class)
         if discovery is not None:
             driver.provider = discovery.provider.id
+            driver.sandbox_class = default_class(discovery)
             missing = unsupported_operations(discovery)
             driver.unsupported = {
                 **driver.unsupported,
@@ -418,7 +519,9 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             **options.fixtures,
             "reachable_url": options.reachable_url,
         }
-        results = run_suite(driver, suite, fixtures)
+        results, used = _run_by_class(driver, suite, discovery, fixtures)
+        if discovery is not None:
+            driver.sandbox_class = default_class(discovery)
         cost_status = _probe_cost(driver, discovery)
         if cost_status == "passed" and not any(
             str(row["id"]).startswith("contract.cost") for row in results
@@ -432,6 +535,8 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         )
         sections: dict[str, list[str]] = {name: [] for name in claimed_sections(discovery)}
         document.lines = _summary(results, discovery_status, cost_status, sections)
+        if len(used) > 1 or options.sandbox_class is not None:
+            document.lines += [_class_line(name, results) for name in used]
         document.all_passed = (
             discovery_status == "passed"
             and cost_status in ("passed", "unsupported", "not_run")

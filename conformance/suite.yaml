@@ -2073,7 +2073,7 @@ tests:
   - op: run
     target: box
     in:
-      bash_script: cat /etc/os-release
+      sh_script: cat /etc/os-release
     expect:
       equals:
         exit_code: 0
