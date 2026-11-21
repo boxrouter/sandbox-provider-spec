@@ -1699,3 +1699,19 @@ def test_the_lifetime_enforcer_round_trips_on_the_wire_and_defaults_to_the_provi
     wire = to_json(routed)
     assert wire["classes"][0]["lifetime_enforced_by"] == "router"
     assert from_json(Discovery, wire).classes[0].lifetime_enforced_by == "router"
+
+
+def test_ordered_sessions_round_trips_and_defaults_to_nothing() -> None:
+    discovery = example(Discovery)
+    assert discovery.classes[0].ordered_sessions is False
+    assert "ordered_sessions" not in to_json(discovery)["classes"][0]
+    stated = dataclasses.replace(
+        discovery,
+        classes=[
+            dataclasses.replace(discovery.classes[0], ordered_sessions=True),
+            *discovery.classes[1:],
+        ],
+    )
+    wire = to_json(stated)
+    assert wire["classes"][0]["ordered_sessions"] is True
+    assert from_json(Discovery, wire).classes[0].ordered_sessions is True

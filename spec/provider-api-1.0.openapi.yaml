@@ -1753,6 +1753,14 @@ components:
             Who ends a sandbox in this class when its lifetime runs out. `provider` (the default) means the provider does, and
             the rule `provider-api/lifetime-enforced` applies. `router` means the caller, the router, ends it through its
             lease and sweeper; the provider still honours `destroy`, and the tester does not check the lifetime timer.
+        ordered_sessions:
+          type: boolean
+          default: false
+          description: >-
+            True means that a command (`run`, `process.start`) and a session transition (`pause`, `resume`, `stop`) on one
+            sandbox of this class must not overlap: the caller records a command's outcome before it sends the next
+            transition, and a transition's before the next command. False (the default) means the provider serves them
+            concurrently. The provider is not asked to refuse an overlap.
         gates:
           $ref: "declaration-schema.json#/properties/gates"
           description: The optional sections claimed, with their variants and knob values. A claim alone turns on nothing.

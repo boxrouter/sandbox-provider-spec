@@ -564,6 +564,10 @@ class SandboxClass:
     # Who ends a sandbox when its lifetime runs out: the provider (the default, rule
     # `provider-api/lifetime-enforced`) or the caller, the router, through its lease and sweeper.
     lifetime_enforced_by: LifetimeEnforcer = "provider"
+    # True: commands and `pause`, `resume` and `stop` on one sandbox must not overlap, so the
+    # caller orders them (a command's outcome is recorded before the next transition, and a
+    # transition's before the next command). False: the provider serves them concurrently.
+    ordered_sessions: bool = False
     # Optional operations that no SPS gate covers: all four of `files.list`, `files.mkdir`,
     # `files.remove` and `files.exists`, or none (contract section 10.3); and `labels.update`.
     operations: Sequence[str] = ()

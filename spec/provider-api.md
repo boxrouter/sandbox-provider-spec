@@ -72,6 +72,12 @@ creates with one key at the same time.
   tester does not run `contract.lifetime_ends` for it and reports it as `not_claimed` (in the
   JSON report a `not_run` whose reason begins `not_claimed:`), never as `passed`.
 
+A class whose discovery states `ordered_sessions: true` tells the caller that a command (`run`,
+`process.start`) and a session transition (`pause`, `resume`, `stop`) on one sandbox must not
+overlap: the caller records each one's outcome before it sends the next. A class that states nothing
+serves them concurrently. The provider is not asked to refuse an overlap, and the tester does not
+check the property, so a provider that states it cites its evidence in its README.
+
 A provider refuses a lifetime above the class's `max_lifetime_seconds` with `unsupported`. A
 provider that cannot run a sandbox without a lifetime refuses `lifetime_seconds: null` with
 `unsupported`. A request that no size, region, image, class or section can meet is refused with
