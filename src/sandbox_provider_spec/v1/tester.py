@@ -381,6 +381,24 @@ def _implied(test: Test, knob: str, allowed: tuple[str, ...]) -> str | None:
     return None
 
 
+def _floor(value: object) -> int | float | None:
+    """The number a count claim promises: itself, or the `at_least` of `{at_least: N}`."""
+    if isinstance(value, dict) and set(value) == {"at_least"}:
+        value = value["at_least"]
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return value
+
+
+def _reaches(claimed: object, wanted: object) -> bool:
+    """Whether a claimed count meets a test's `{at_least: N}`: a number or `{at_least: M}` with
+    M of N or more (a provider that claims four ports meets a test that needs two)."""
+    if not (isinstance(wanted, dict) and set(wanted) == {"at_least"}):
+        return False
+    have, need = _floor(claimed), _floor(wanted)
+    return have is not None and need is not None and have >= need
+
+
 def _consistent(
     test: Test,
     gates: Mapping[str, list[Mapping[str, object]]],
@@ -407,7 +425,11 @@ def _consistent(
         claimed = variant.get(knob)
         if value is _UNRESOLVED:
             return False
-        return claimed == value or (isinstance(claimed, list) and value in claimed)
+        return (
+            claimed == value
+            or (isinstance(claimed, list) and value in claimed)
+            or _reaches(claimed, value)
+        )
 
     def listed_or_open(variant: Mapping[str, object], knob: str, wanted: str | None) -> bool:
         listed = variant.get(knob)
@@ -536,12 +558,21 @@ def _claimed_section(test: Test, gates: Mapping[str, object]) -> bool:
     return _section(test) in gates or any(proof.get("gate") in gates for proof in test.proves)
 
 
+def _coverage_only(test: Test, sections: set[str], heads: set[str]) -> bool:
+    """Whether `test` is a `coverage.<section>.` row of a claimed section that no other test
+    covers: a gate with only coverage rows (`tcp_ports`, `desktop`, `docker`) would otherwise
+    report its section `not_run` with no test selected."""
+    section = _section(test)
+    return test.id.startswith("coverage.") and section in sections and section not in heads
+
+
 def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions) -> Suite:
     """The baseline tests, every `contract.` test, and the tests of each claimed section."""
     gates = claimed_gates(discovery) if discovery is not None else {}
     sections = set(claimed_sections(discovery))
     unsupported = unsupported_operations(discovery) if discovery is not None else {}
     chosen: list[Test] = []
+    heads = {test.id.split(".", 1)[0] for test in suite.tests}
     for test in suite.tests:
         head = test.id.split(".", 1)[0]
         if options.tests:
@@ -554,7 +585,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         elif head in {"baseline", "contract"}:
             wanted = True
         else:
-            wanted = head in sections and _consistent(test, gates, options.fixtures)
+            wanted = (head in sections or _coverage_only(test, sections, heads)) and _consistent(
+                test, gates, options.fixtures
+            )
         if wanted and test.id in CLAIMED_TESTS and discovery is not None:
             # Left out unless the class lists its operation; a test named by its whole id stays.
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests

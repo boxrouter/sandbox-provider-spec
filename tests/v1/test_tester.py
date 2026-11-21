@@ -1851,3 +1851,21 @@ def test_a_coverage_row_for_a_knob_value_not_claimed_stays_out_of_an_explicit_se
         "coverage.custom_images.runs_entrypoint.true",
         "coverage.custom_images.prepare.size",
     }
+
+
+def test_a_claimed_section_with_only_coverage_rows_runs_them_by_default() -> None:
+    """`tcp_ports` has no `suite.yaml` test: its coverage row runs for a class that claims at
+    least what it proves (two ports, TLS none), so the section is not `not_run` with no test."""
+
+    def chosen(gates: dict[str, object]) -> set[str]:
+        selected = select_tests(shared_suite(), with_gates(gates), TestOptions()).tests
+        return {test.id for test in selected if test.id.startswith("coverage.")}
+
+    ports = {"tls": "none", "max_tcp_ports": {"at_least": 4}}
+    assert chosen({"tcp_ports": ports}) == {"coverage.tcp_ports.none"}
+    assert chosen({"tcp_ports": {"tls": "none", "max_tcp_ports": 10}}) == {
+        "coverage.tcp_ports.none"
+    }
+    assert chosen({"tcp_ports": {"tls": "none", "max_tcp_ports": 1}}) == set()  # fewer than two
+    assert chosen({"tcp_ports": {"tls": "tls", "max_tcp_ports": 8}}) == set()  # not TLS none
+    assert chosen({"snapshots": {"keeps": "files_only"}}) == set()  # sections with tests unchanged
