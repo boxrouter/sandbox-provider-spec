@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.57: no spec change. `test_report_subject_binds_a_report_to_the_package_and_its_discovery` skips when no provider package is installed: in the standalone checkout that the private sync tests (the package alone, no workspace providers) it raised `StopIteration`, which stopped the 0.5.56 release.
 - 0.5.56: no spec change. The package's own `make check` passes again after the 0.5.48 to 0.5.55 additions: test providers are typed (mypy), `StoredArtifacts` is a nested example, the stale `NOT_IN_1_0` terminal test is gone (both operations are implemented), `runner-images.yaml` is a non-executed fixture, and the shared digests before 0.5.52 and 0.5.54 are registered in `historical-shared-digests.json`.
 - 0.5.55: no spec change. `tests/test_oi_s_j.py` builds its fake link credential from parts: the private SPS sync's candidate-tree secret scan (gitleaks `generic-api-key`) refused the whole literal, which stopped the 0.5.53 release.
 - 0.5.54: `custom_images.dockerfile` builds on the run's image too (the step input `dockerfile_from: $runner.prepared_oci_image`, which the runner turns into `FROM <image>` before every driver, native ones included), so a provider that builds only on its own system (Boat, Boxd: Ubuntu) runs it; it was `FROM python:3.12-slim`. Without `oci_image` the base is the pinned Alpine image. The outgoing suite digest is recorded in `historical-suite-rules.json`.

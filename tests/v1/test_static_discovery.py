@@ -99,7 +99,10 @@ def test_static_discovery_installed_lists_the_providers_by_id() -> None:
 
 
 def test_report_subject_binds_a_report_to_the_package_and_its_discovery() -> None:
-    cls = installed()["example"] if "example" in installed() else next(iter(installed().values()))
+    found = installed()
+    if not found:
+        pytest.skip("no provider package is installed in this environment (a standalone checkout)")
+    cls = found["example"] if "example" in found else next(iter(found.values()))
     subject = report_subject(cls, example())
     assert subject is not None
     assert subject["package_digest"] == package_digest(cls)
