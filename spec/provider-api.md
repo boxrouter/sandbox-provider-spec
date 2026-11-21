@@ -465,6 +465,17 @@ names its own.
   in any state, and only those that have every `label` filter with exactly that value and, when
   `sandbox_id` is given, were taken from that sandbox. `snapshot.get` **MUST** return the labels
   exactly as given to `snapshot.create`.
+- A provider whose discovery states `snapshot_labels_kept_by: router` (default `provider`) **MUST** <!-- rule: provider-api/snapshot-labels-router-kept -->
+  still accept `labels` on `snapshot.create` and treat them as part of the request for
+  `provider-api/snapshot-idempotent`, although it has nowhere to store them and the caller, the
+  router, keeps them itself. It **MAY** return `{}` as the `labels` of `snapshot.get` and
+  `snapshot.list`, **MAY** ignore the `label` filter of `snapshot.list`, and **MAY** answer
+  `snapshot.list` only when `sandbox_id` is given, otherwise with `invalid_request` and `field`
+  `sandbox_id`, because the router keeps the account-wide record. Every other rule of this
+  section still applies. As for images, the statement is the same on every class that claims
+  `snapshots`, and a caller treats a provider as router-keeping when any class states it. The
+  tester leaves out the assertions about labels read back and filtered, lists snapshots by
+  `sandbox_id`, and checks all the rest.
 - `snapshot.delete` **MUST** return once the provider has accepted it, and a restore after it <!-- rule: provider-api/snapshot-delete -->
   **MUST** answer `not_found`. A repeated delete **MUST** succeed with state `deleted`, and an id
   that the provider has no record of **MUST** be `not_found`. A variant with `deletable: false`
@@ -478,6 +489,13 @@ names its own.
   whose snapshots are free lists the `snapshot` price with `"price_usd": "0"` and
   `"included": true`, and returns one `snapshot` line with the amount `"0"`. A provider that does
   not offer `cost` (section 10) answers `unsupported` to `snapshot.cost`.
+- A provider whose discovery states `snapshot_cost: unavailable` (default `offered`) **MUST** <!-- rule: provider-api/snapshot-cost-unavailable -->
+  answer `unsupported` to `snapshot.cost`, because it has no record from which to state what a
+  snapshot costs (for example a snapshot that is gone, with its storage period, after the
+  delete). It **MUST** still offer `cost` for sandboxes when it states
+  `limits.cost_final_within_seconds`. The statement is the same on every class that claims
+  `snapshots`, and a caller treats a provider as unable to report a snapshot's cost when any
+  class states it. The tester leaves out `snapshots.v1.cost` and checks all the rest.
 
 After `snapshot.create` returns, the saved sandbox is in the state that the variant's
 `original_after` names. A snapshot of a paused sandbox is either taken or refused with `conflict`.
@@ -570,6 +588,15 @@ provider's own domains.
   labels exactly as given to `image.prepare`, and an id that the provider has no record of is
   `not_found`. The order is unspecified, the cursor is opaque, and `limit` is 1 to
   `limits.list_limit`, 100 by default.
+- A provider whose discovery states `image_labels_kept_by: router` (default `provider`) **MUST** <!-- rule: provider-api/image-labels-router-kept -->
+  still accept `labels` on `image.prepare` and treat them as part of the request for
+  `provider-api/image-idempotent` (the same key with other labels is `conflict`), although it
+  has nowhere to store them and the caller, the router, keeps them itself. It **MAY** return `{}`
+  as the `labels` of `image.get` and `image.list` and **MAY** ignore the `label` filter of
+  `image.list`. Every other rule of this section still applies. The statement is about the
+  provider's images, not one class's: it is the same on every class that lists `image.prepare`,
+  and a caller treats a provider as router-keeping when any class states it. The tester leaves
+  out the assertions about labels read back and filtered, and checks all the rest.
 - A `create` from `provider_artifact` **MUST** start a sandbox only from a `ready` image: a <!-- rule: provider-api/image-create -->
   `preparing` or `failed` image is `conflict`, and a deleted image or an id that the provider has
   no record of is `not_found`. A sandbox of a different size than the image is bound to is

@@ -152,6 +152,8 @@ class ImageSteps:
     # Whether some class lists `image.prepare.oci_layout`: the tester then reads each OCI image
     # from its registry, as the caller would, and sends it as the part `context`.
     oci_layout = False
+    # Whether the provider keeps the labels of its images (discovery's `image_labels_kept_by`).
+    image_labels_kept = True
 
     if TYPE_CHECKING:
         api: Provider
@@ -311,6 +313,8 @@ class ImageSteps:
     def sweep_images(self) -> builtins.list[Observation]:
         """Delete every image that still carries this run's label; none when the provider has no
         prepared images."""
+        if not self.image_labels_kept:
+            return []  # nothing marks the run's images; each one this driver made is released
         try:
             ids = cast("builtins.list[str]", self.image_list(None, {})["ids"])
         except Unsupported:
@@ -328,12 +332,15 @@ class ImageSteps:
     def image_list(self, target: object, inputs: Inputs) -> Observation:
         """The run's images that match the given labels."""
         del target
-        wanted = {**strings(inputs, "labels"), "sps.test.run": self.run_id}
+        # A provider that keeps no image labels is not asked for them: the run's images are the
+        # ones this driver made, found among what the provider lists.
+        kept = self.image_labels_kept
+        wanted = {**strings(inputs, "labels"), "sps.test.run": self.run_id} if kept else None
         ids: builtins.list[str] = []
         cursor: str | None = None
         while True:
             page = self.wait(self.api.image_list(labels=wanted, cursor=cursor))
-            ids.extend(item.id for item in page.images)
+            ids.extend(item.id for item in page.images if kept or item.id in self._images)
             cursor = page.next_cursor
             if cursor is None:
                 return {"count": len(ids), "ids": ids}

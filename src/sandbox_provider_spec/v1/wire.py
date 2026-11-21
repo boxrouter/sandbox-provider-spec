@@ -390,6 +390,12 @@ def _enc_class(value: SandboxClass) -> Json:
     if value.operations:
         out["operations"] = list(value.operations)
     _put(out, "image_binds", _opt(value.image_binds, list))
+    if value.image_labels_kept_by != "provider":
+        out["image_labels_kept_by"] = value.image_labels_kept_by
+    if value.snapshot_labels_kept_by != "provider":
+        out["snapshot_labels_kept_by"] = value.snapshot_labels_kept_by
+    if value.snapshot_cost != "offered":
+        out["snapshot_cost"] = value.snapshot_cost
     out["images"] = [_enc_image(image) for image in value.images]
     out["prices"] = [_enc_price(price) for price in value.prices]
     return out
@@ -679,6 +685,9 @@ def _dec_class(data: Json) -> SandboxClass:
         ordered_sessions=data.get("ordered_sessions", False),
         operations=tuple(data.get("operations", ())),
         image_binds=_opt(data.get("image_binds"), tuple),
+        image_labels_kept_by=data.get("image_labels_kept_by", "provider"),
+        snapshot_labels_kept_by=data.get("snapshot_labels_kept_by", "provider"),
+        snapshot_cost=data.get("snapshot_cost", "offered"),
     )
 
 

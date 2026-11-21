@@ -1833,6 +1833,28 @@ components:
             What a prepared image of this class is tied to: a size (`cpu_min`, `memory_min_mib`, `disk_min_mib`), a `region` or
             a `kernel`. Present only when `operations` lists `image.prepare`; absent or empty means that the image fits any
             size. A `PreparedImage.resources` object holds exactly these fields and no other.
+        image_labels_kept_by:
+          enum: [provider, router]
+          default: provider
+          description: >-
+            Who keeps the labels of a prepared image. `provider` (the default) means the provider does, and the rules
+            `provider-api/image-prepare` and `provider-api/image-list` apply. `router` means the provider has nowhere to store
+            them: it accepts `labels` on `image.prepare`, returns `{}` from `image.get` and `image.list`, ignores a `label`
+            filter, and the caller, the router, keeps the labels itself. It means something only when `operations` lists `image.prepare`.
+        snapshot_labels_kept_by:
+          enum: [provider, router]
+          default: provider
+          description: >-
+            Who keeps the labels of a snapshot, as `image_labels_kept_by` does for images. With `router` the provider also
+            answers `snapshot.list` only for a given `sandbox_id`. It means something only when the class claims `snapshots`.
+        snapshot_cost:
+          enum: [offered, unavailable]
+          default: offered
+          description: >-
+            Whether the class's provider reports what a snapshot costs. `offered` (the default) means `snapshot.cost` answers and
+            the rule `provider-api/snapshot-cost` applies. `unavailable` means the provider has no record from which to state a
+            snapshot's cost, answers `snapshot.cost` with `unsupported`, and still offers `cost` for sandboxes. It means
+            something only when the class claims `snapshots`.
     Discovery:
       type: object
       required: [spec_version, provider, limits, classes]

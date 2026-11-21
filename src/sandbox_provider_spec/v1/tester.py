@@ -49,7 +49,8 @@ NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED}
 
 # The tests that need an offered `cost` (contract section 10): a run leaves them out, and the
 # `cost` operation reports `unsupported`, when discovery states no `cost_final_within_seconds`.
-COST_TESTS = ("contract.cost", "snapshots.v1.cost")
+SNAPSHOT_COST_TEST = "snapshots.v1.cost"
+COST_TESTS = ("contract.cost", SNAPSHOT_COST_TEST)
 
 # `contract.cost_final` reads a destroyed sandbox's cost, which a class that lists `cost.capture` is
 # exempt from keeping (contract section 10), so a run leaves it out for such a provider.
@@ -241,6 +242,8 @@ def unsupported_operations(discovery: Discovery) -> dict[str, str]:
             claimed = any(variant.get(knob) is True for variant in gates.get(gate, []))
         if not claimed:
             missing[operation] = "discovery does not claim the section that needs this operation"
+    if snapshot_cost_unavailable(discovery):
+        missing["snapshot.cost"] = "the class states snapshot_cost unavailable"
     return missing
 
 
@@ -255,6 +258,57 @@ def not_claimed_tests(discovery: Discovery | None, class_name: str | None = None
     if chosen is not None and chosen.lifetime_enforced_by == "router":
         return {LIFETIME_TEST: LIFETIME_NOT_CLAIMED}
     return {}
+
+
+# The steps that read a label back, by the kind of record whose labels they read. A provider whose
+# class states `*_labels_kept_by: router` keeps no labels on that kind (rules
+# `provider-api/image-labels-router-kept` and `provider-api/snapshot-labels-router-kept`), so the
+# tester leaves out the label assertions and checks everything else.
+LABEL_READS = {"image.state": "image", "snapshot.get": "snapshot"}
+LABEL_LISTS = {"snapshot.list": "snapshot"}
+
+
+def labels_kept(discovery: Discovery | None) -> dict[str, bool]:
+    """Whether the provider keeps the labels of `image`s and `snapshot`s: false when any class
+    states `router` for the kind (the field means the same for every class of a provider)."""
+    classes = discovery.classes if discovery is not None else ()
+    return {
+        "image": not any(item.image_labels_kept_by == "router" for item in classes),
+        "snapshot": not any(item.snapshot_labels_kept_by == "router" for item in classes),
+    }
+
+
+def _without_label_assertions(test: Test, kept: Mapping[str, bool]) -> Test:
+    """`test` without what it asserts about labels of a kind the provider does not keep: the
+    `labels` that a read expects back, and a snapshot list by labels alone (a list by
+    `sandbox_id` stays, as does an image list, which the driver makes without the filter)."""
+    steps: list[dict[str, Any]] = []
+    for step in test.steps:
+        operation = str(step.get("op"))
+        kind = LABEL_READS.get(operation)
+        if kind is not None and not kept[kind]:
+            equals = dict(step.get("expect", {}).get("equals", {}))
+            if "labels" in equals:
+                del equals["labels"]
+                expect = {**step["expect"], "equals": equals}
+                if not equals:
+                    del expect["equals"]
+                step = {**step, "expect": expect}
+        kind = LABEL_LISTS.get(operation)
+        if kind is not None and not kept[kind]:
+            given = step.get("in", {})
+            if "labels" in given and "sandbox_id" not in given:
+                continue
+        steps.append(step)
+    return dataclasses.replace(test, steps=tuple(steps))
+
+
+def snapshot_cost_unavailable(discovery: Discovery | None) -> bool:
+    """Whether some class states `snapshot_cost: unavailable`: the provider cannot report what a
+    snapshot costs, so `snapshot.cost` answers `unsupported` and its test is left out."""
+    return discovery is not None and any(
+        item.snapshot_cost == "unavailable" for item in discovery.classes
+    )
 
 
 def cost_offered(discovery: Discovery | None) -> bool:
@@ -450,6 +504,8 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
         if wanted and not options.tests and discovery is not None and not cost_offered(discovery):
             wanted = not test.id.startswith(COST_TESTS)
+        if wanted and not options.tests and snapshot_cost_unavailable(discovery):
+            wanted = test.id != SNAPSHOT_COST_TEST
         if wanted and not options.tests and discovery is not None:
             if "cost.capture" in claimed_operations(discovery):
                 wanted = test.id not in CAPTURE_EXEMPT
@@ -457,6 +513,9 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             chosen.append(test)
     if not chosen:
         raise ValueError("no shared tests match the selection")
+    kept = labels_kept(discovery)
+    if not all(kept.values()):
+        chosen = [_without_label_assertions(test, kept) for test in chosen]
     return Suite(suite.digest, tuple(chosen), suite.baseline_ids)
 
 
@@ -599,6 +658,9 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             driver.command_fallback = set(COMMAND_FALLBACK) & set(missing)
             driver.oci_layout = OCI_LAYOUT in claimed_operations(discovery)
             driver.not_claimed = not_claimed_tests(discovery)
+            kept = labels_kept(discovery)
+            driver.image_labels_kept = kept["image"]
+            driver.snapshot_labels_kept = kept["snapshot"]
         suite = select_tests(shared_suite(), discovery, options)
         # The 1 GiB transfer of `contract.files_1gib_roundtrip` is a requirement of the contract,
         # so a run allows it unless the caller says otherwise.

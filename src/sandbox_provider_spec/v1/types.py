@@ -20,6 +20,8 @@ from sandbox_provider_spec.v1.errors import SpsError
 SandboxState = Literal["running", "paused", "stopped", "destroyed"]
 EndState = Literal["destroyed", "paused"]
 LifetimeEnforcer = Literal["provider", "router"]
+LabelKeeper = Literal["provider", "router"]
+SnapshotCostMode = Literal["offered", "unavailable"]
 PriceItem = Literal[
     "cpu",
     "memory",
@@ -574,6 +576,16 @@ class SandboxClass:
     # What a prepared image of this class is tied to; null unless the class lists `image.prepare`.
     # An empty list means that the image fits any size (S15).
     image_binds: Sequence[ImageBind] | None = None
+    # Who keeps the labels of a prepared image / a snapshot: the provider (the default, rules
+    # `provider-api/image-list` and `provider-api/snapshot-list`) or the caller, the router, which
+    # keeps them itself because the provider has nowhere to store them. Both are states of the
+    # class's image and snapshot sections; they apply to every class of the provider alike.
+    image_labels_kept_by: LabelKeeper = "provider"
+    snapshot_labels_kept_by: LabelKeeper = "provider"
+    # Whether `snapshot.cost` answers (the default, rule `provider-api/snapshot-cost`) or the
+    # provider cannot report what a snapshot costs and answers `unsupported`
+    # (`provider-api/snapshot-cost-unavailable`), while `cost` for sandboxes stays offered.
+    snapshot_cost: SnapshotCostMode = "offered"
 
 
 @dataclass(frozen=True)

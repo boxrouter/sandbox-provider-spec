@@ -168,6 +168,9 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
         self.unsupported = {**NOT_IN_1_0, **(unsupported or {})}
         # Tests that discovery leaves out of the claim, by id; the runner reports each `not_run`.
         self.not_claimed: Mapping[str, str] = {}
+        # Whether the provider keeps the labels of its snapshots (`ImageSteps.image_labels_kept` is
+        # the same for images). The tester sets both from discovery's `*_labels_kept_by`.
+        self.snapshot_labels_kept = True
         # Operations that have a command to run when discovery does not claim them. Nothing is
         # claimed until the tester has read discovery, so it starts with all of them.
         self.command_fallback: set[str] = {"files.exists"}
@@ -748,7 +751,10 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
     def snapshot_list(self, target: object, inputs: Inputs) -> Observation:
         """The run's snapshots that match the given labels and source sandbox."""
         del target
-        wanted = {**strings(inputs, "labels"), RUN_LABEL: self.run_id}
+        # A provider that keeps no snapshot labels is not asked for them: the run's snapshots
+        # are the ones this driver made, found among what the provider lists for the sandbox.
+        kept = self.snapshot_labels_kept
+        wanted = {**strings(inputs, "labels"), RUN_LABEL: self.run_id} if kept else None
         sandbox_id = inputs.get("sandbox_id")
         if sandbox_id is not None and not isinstance(sandbox_id, str):
             raise ValueError("sandbox_id must be text")
@@ -758,7 +764,7 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
             page = self.wait(
                 self.api.snapshot_list(labels=wanted, sandbox_id=sandbox_id, cursor=cursor)
             )
-            ids.extend(item.id for item in page.snapshots)
+            ids.extend(item.id for item in page.snapshots if kept or item.id in self._snapshots)
             cursor = page.next_cursor
             if cursor is None:
                 break
@@ -954,6 +960,8 @@ class ProviderDriver(Driver, ImageSteps, ProcessSteps):  # pylint: disable=too-m
     def snapshot_leftovers(self) -> builtins.list[str]:
         """Ids of this run's snapshots that the provider still lists; none when it has no
         snapshots section."""
+        if not self.snapshot_labels_kept:
+            return []  # nothing marks the run's snapshots; each one this driver made is released
         try:
             return cast("builtins.list[str]", self.snapshot_list(None, {})["ids"])
         except Unsupported:
