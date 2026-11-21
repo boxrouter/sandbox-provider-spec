@@ -112,12 +112,7 @@ def _digest(reference: str) -> str:
 def _source(inputs: Inputs) -> ImageSource:
     kind = inputs.get("source")
     if kind == "dockerfile":
-        dockerfile = text(inputs, "dockerfile")
-        if "dockerfile_from" in inputs:
-            # The base is the run's image (`$runner.prepared_oci_image`), so a provider whose
-            # machines are Ubuntu-only builds on Ubuntu; the test names only what follows `FROM`.
-            dockerfile = f"FROM {text(inputs, 'dockerfile_from')}\n{dockerfile}"
-        return DockerfileSource(dockerfile)
+        return DockerfileSource(text(inputs, "dockerfile"))
     reference = text(inputs, "image")
     if kind == "oci":
         return OciSource(reference, _digest(reference), _config(inputs))

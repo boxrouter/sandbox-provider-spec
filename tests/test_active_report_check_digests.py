@@ -79,6 +79,10 @@ QUARANTINED_ADAPTERS = frozenset(
 # replaced by the swarm, and the spec-provider packages' reports carry the new digest. Lift with
 # each adapter's deletion.
 CUSTOM_OCI_QUARANTINED = frozenset({"adapter-agent37", "adapter-blaxel", "adapter-superserve"})
+# oi-s-n 2026-11-21: `custom_images.dockerfile` now builds `FROM` the run's image
+# (`dockerfile_from`), which moved its check digest; a native driver still builds a plain
+# Dockerfile. Same lifetime as above.
+CUSTOM_DOCKERFILE_QUARANTINED = frozenset({"adapter-blaxel"})
 
 
 def test_active_reports_keep_current_check_digests() -> None:
@@ -119,6 +123,8 @@ def test_active_reports_keep_current_check_digests() -> None:
             if quarantined and test_id.startswith("network_lockdown."):
                 continue
             if test_id == "custom_images.oci" and adapter in CUSTOM_OCI_QUARANTINED:
+                continue
+            if test_id == "custom_images.dockerfile" and adapter in CUSTOM_DOCKERFILE_QUARANTINED:
                 continue
             if test_id not in recorded:
                 mismatches.append(

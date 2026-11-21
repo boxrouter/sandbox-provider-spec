@@ -127,6 +127,18 @@ def lifetime_ends(field: str, fixtures: Mapping[str, object]) -> int:
     return seconds if field == "lifetime_ends_seconds" else seconds * 1000
 
 
+def with_dockerfile_base(inputs: Any) -> Any:
+    """A step that names `dockerfile_from` builds on that image: its `dockerfile` gets
+    `FROM <image>` first and the key is dropped. Every driver then sees an ordinary Dockerfile,
+    and the base is the run's image (`$runner.prepared_oci_image`), which the provider can build
+    on."""
+    if not isinstance(inputs, Mapping) or "dockerfile_from" not in inputs:
+        return inputs
+    rest = {key: value for key, value in inputs.items() if key != "dockerfile_from"}
+    rest["dockerfile"] = f"FROM {inputs['dockerfile_from']}\n{inputs.get('dockerfile', '')}"
+    return rest
+
+
 def resolve(value: Any, bindings: Mapping[str, object], fixtures: Mapping[str, object]) -> Any:
     if isinstance(value, str) and value.startswith("$"):
         name, _, field = value[1:].partition(".")
@@ -738,7 +750,7 @@ class Runner:
 
     def _step(self, step: dict[str, Any], bindings: dict[str, object]) -> dict[str, object]:
         operation = step["op"]
-        inputs = resolve(step.get("in", {}), bindings, self.fixtures)
+        inputs = with_dockerfile_base(resolve(step.get("in", {}), bindings, self.fixtures))
         target = bindings.get(step.get("target", ""))
         expected = resolve(step.get("expect", {}), bindings, self.fixtures)
         deadline = time.monotonic() + expected.get("eventually_ms", 0) / 1000

@@ -3598,9 +3598,8 @@ tests:
   - op: image.prepare
     in:
       source: dockerfile
-      dockerfile: 'FROM python:3.12-slim
-
-        RUN printf heredoc >/opt/sps-image-marker
+      dockerfile_from: $runner.prepared_oci_image
+      dockerfile: 'RUN printf heredoc >/opt/sps-image-marker
 
         '
     as: image

@@ -12,7 +12,7 @@ import pytest
 
 from sandbox_provider_spec.driver import NotRun
 from sandbox_provider_spec.fixtures import DERIVED, FIXTURES, RESERVED, read_fixtures
-from sandbox_provider_spec.runner import resolve
+from sandbox_provider_spec.runner import resolve, with_dockerfile_base
 from sandbox_provider_spec.suite import read_suite
 
 CONFORMANCE = Path(__file__).resolve().parents[1] / "conformance"
@@ -58,3 +58,18 @@ def test_a_prepared_image_is_compared_with_the_larger_size_in_its_own_names() ->
         resolve("$runner.larger_size_value", {}, {})
     with pytest.raises(NotRun, match="proof_fixture_invalid"):
         resolve("$runner.larger_size_value", {}, {"larger_size": {"gpu": 1}})
+
+
+def test_a_dockerfile_step_builds_on_the_runs_image_for_every_driver() -> None:
+    step = {"source": "dockerfile", "dockerfile_from": "img@sha256:1", "dockerfile": "RUN true\n"}
+    assert with_dockerfile_base(step) == {
+        "source": "dockerfile",
+        "dockerfile": "FROM img@sha256:1\nRUN true\n",
+    }
+    plain = {"source": "dockerfile", "dockerfile": "FROM x\n"}
+    assert with_dockerfile_base(plain) == plain
+    tests = {test.id: test for test in read_suite(CONFORMANCE / "suite.yaml").tests}
+    for name in ("custom_images.dockerfile", "images.v1.prepare_dockerfile_context"):
+        prepare = next(s for s in tests[name].steps if s.get("op") == "image.prepare")
+        assert prepare["in"]["dockerfile_from"] == "$runner.prepared_oci_image"
+        assert "FROM" not in prepare["in"]["dockerfile"]
