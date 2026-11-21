@@ -19,6 +19,7 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
+from sandbox_provider_spec.v1.two_instances import two_instances
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
 # Worst first: a section or operation takes the worst status of its tests.
@@ -180,6 +181,10 @@ class TestOptions:
     fixtures: Mapping[str, object] = field(default_factory=dict)
     new_client: Callable[[], Provider] | None = None
     """Makes a fresh client of the same provider, which `processes.reattach` reads through."""
+    two_instances: bool = False
+    """Answer the run's calls from two provider objects in turn (needs `new_client`), so an adapter
+    that keeps per-sandbox state in its object fails: a later call lands on another object in
+    production."""
     sandbox_class: str | None = None
     """Pins every test to this class (and to what it claims); None runs each test on a class that
     claims what the test proves."""
@@ -736,6 +741,11 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
     """Run the tests against `provider` and return the report. The sandboxes it creates are
     labelled `sps.test.run=<run id>`, and every one is deleted before this returns."""
     options = options or TestOptions()
+    subject = provider
+    if options.two_instances:
+        if options.new_client is None:
+            raise CannotRun("two provider objects need a way to make a second one (new_client)")
+        provider = two_instances(provider, options.new_client())
     driver = ProviderDriver(provider, new_client=options.new_client)
     started = now()
     try:
@@ -791,7 +801,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
                 results,
                 spec_revision=_source_revision(),
                 started_at=started,
-                discovery=_subject_discovery(provider, discovery),
+                discovery=_subject_discovery(subject, discovery),
             )
         )
         sections: dict[str, list[str]] = {name: [] for name in claimed_sections(discovery)}

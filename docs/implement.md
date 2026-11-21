@@ -285,7 +285,7 @@ A full run also waits for a final cost, up to your `cost_final_within_seconds` a
 sandbox, and for a sandbox to end at the lifetime that it asked for (60 seconds, plus up to 30). `--quick`
 skips the 1 GiB round trip and those waits while you iterate, and prints `not_run` for what it did
 not test; a quick pass exits 3, never 0. If the tester cannot reach `https://example.com` from a
-sandbox, pass `--reachable-url` with an HTTPS URL that your sandboxes can reach. A consumer runs the same tester. To state that you conform, name the spec version,
+sandbox, pass `--reachable-url` with an HTTPS URL that your sandboxes can reach. Pass `--two-instances` to send the run's calls to two provider objects of one account in turn: a consumer runs several API tasks, so a later call can land on another object than the one that made the sandbox, and an adapter that keeps a per-sandbox fact in its object fails the run. A consumer runs the same tester. To state that you conform, name the spec version,
 the class, and the passing report ([GOVERNANCE.md](../GOVERNANCE.md#conformance-claims)).
 
 ## Optional Sections

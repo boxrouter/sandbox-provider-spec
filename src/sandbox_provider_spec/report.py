@@ -20,6 +20,7 @@ from sandbox_provider_spec.run_id import run_id
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import SPEC, Suite
 from sandbox_provider_spec.v1.digest import report_subject
+from sandbox_provider_spec.v1.two_instances import provider_class
 from sandbox_provider_spec.v1.types import Discovery
 
 __all__ = ["DEVELOPMENT_REVISION", "recorded_sdk_versions", "report", "revision", "write_report"]
@@ -117,7 +118,7 @@ def report(
     }
     if driver.execution_class is not None:
         document["class"] = driver.execution_class
-    subject = report_subject(type(getattr(driver, "api", driver)), discovery)
+    subject = report_subject(provider_class(getattr(driver, "api", driver)), discovery)
     if subject is not None:
         document["subject"] = subject
     return document

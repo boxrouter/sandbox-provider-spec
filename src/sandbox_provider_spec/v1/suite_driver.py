@@ -44,6 +44,7 @@ from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver_account import AccountSteps
 from sandbox_provider_spec.v1.suite_driver_images import ImageSteps, image_reference
 from sandbox_provider_spec.v1.suite_driver_processes import ProcessHandle, ProcessSteps
+from sandbox_provider_spec.v1.two_instances import provider_class
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
     FileLinkRequest,
@@ -419,7 +420,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         provider that does not state one (an HTTP form has no package to read it from)."""
         del target, inputs
         try:
-            ceiling = type(self.api).static_discovery()
+            ceiling = provider_class(self.api).static_discovery()
         except NotImplementedError:
             raise Unsupported("the provider states no static_discovery()") from None
         return {"outside": within(self.wait(self.api.discovery()), ceiling)}

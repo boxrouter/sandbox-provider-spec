@@ -321,6 +321,7 @@ def _test(args: argparse.Namespace) -> int:
         quick=args.quick,
         fixtures=given,
         new_client=new_client,
+        two_instances=args.two_instances,
         sandbox_class=args.sandbox_class,
     )
     try:
@@ -458,6 +459,13 @@ def main(argv: list[str] | None = None) -> int:
         "--reachable-url",
         default="https://example.com",
         help="an HTTPS URL that a sandbox can reach (default https://example.com)",
+    )
+    test_cmd.add_argument(
+        "--two-instances",
+        action="store_true",
+        help="answer the run's calls from two provider objects of the same account in turn, so "
+        "an adapter that keeps per-sandbox state in its object fails (a later call lands on "
+        "another object in production)",
     )
     test_cmd.add_argument(
         "--class",
