@@ -8,7 +8,7 @@ import dataclasses
 import json
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import pytest
 
@@ -64,8 +64,8 @@ class Regions(Provider, manifest=False):
         item = dataclasses.replace(found.classes[0], resources=dict(self.resources))
         return dataclasses.replace(found, classes=(item, *found.classes[1:]))
 
-    get = list = create = destroy = run = files_read = files_write = discovery
-    process_start = process_output = discovery
+    get = list = create = destroy = run = files_read = files_write = cast(Any, discovery)
+    process_start = process_output = cast(Any, discovery)
 
 
 @pytest.fixture(name="driver")
@@ -81,7 +81,7 @@ def valid(driver: ProviderDriver, resources: dict[str, object]) -> object:
 
 
 def test_the_tester_checks_that_discovery_lists_the_default_region(driver: ProviderDriver) -> None:
-    both = {"regions": ["us-east", "eu-west"]}
+    both: dict[str, object] = {"regions": ["us-east", "eu-west"]}
     assert valid(driver, {**both, "default_region": "eu-west"}) is True
     assert valid(driver, {**both, "default_region": "ap-south"}) is False
     assert valid(driver, both) is True

@@ -9,7 +9,7 @@ import dataclasses
 import json
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import pytest
 
@@ -42,8 +42,8 @@ class Keeper(Provider, manifest=False):
     async def destroy(self, sandbox_id: str) -> Any:
         return None
 
-    discovery = get = list = run = files_read = files_write = process_start = process_output = (
-        create
+    discovery = get = list = run = files_read = files_write = process_start = process_output = cast(
+        Any, create
     )
 
 
@@ -55,7 +55,7 @@ def driver_fixture() -> Iterator[ProviderDriver]:
 
 
 def sent(driver: ProviderDriver) -> CreateRequest:
-    return driver.api.requests[-1]  # type: ignore[attr-defined]
+    return cast(CreateRequest, driver.api.requests[-1])  # type: ignore[attr-defined]
 
 
 def test_a_secret_is_bound_by_the_create_that_names_it(driver: ProviderDriver) -> None:

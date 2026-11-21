@@ -36,7 +36,7 @@ from sandbox_provider_spec.v1.tester import (
 )
 
 
-def stating(discovery: Discovery, **fields: str) -> Discovery:
+def stating(discovery: Discovery, **fields: Any) -> Discovery:
     first = dataclasses.replace(discovery.classes[0], **fields)
     return dataclasses.replace(discovery, classes=[first, *discovery.classes[1:]])
 
@@ -215,7 +215,10 @@ def test_a_blocking_class_has_its_sandboxes_destroyed_before_the_image_is_delete
             TestOptions(tests=("images.v1.prepare_oci",)),
         ).tests
     }
-    ops = lambda test: [s["op"] for s in test.steps]  # noqa: E731
+
+    def ops(test: Any) -> list[Any]:
+        return [s["op"] for s in test.steps]
+
     before = ops(plain["images.v1.prepare_oci"])
     after = ops(blocking["images.v1.prepare_oci"])
     assert "destroy" not in before

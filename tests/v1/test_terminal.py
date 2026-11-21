@@ -13,7 +13,7 @@ import time
 from collections.abc import AsyncIterator, Iterator, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import httpx
 import pytest
@@ -348,7 +348,7 @@ def test_the_driver_disconnects_reattaches_and_ends_a_named_terminal() -> None:
             attached = driver.call("terminal.reattach", tty, {})
             driver.call("terminal.write", attached, {"data": "eW8="})
             output = driver.call("terminal.output", attached, {"until_contains": "yo"})
-            assert b"yo" in output["terminal"]
+            assert b"yo" in cast(bytes, output["terminal"])
             driver.call("terminal.end", tty, {})
             gone = driver.call("terminal.reattach", tty, {})
             with pytest.raises(NativeFailure) as refused:
