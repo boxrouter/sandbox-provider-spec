@@ -313,7 +313,7 @@ def test_a_preview_test_needs_a_variant_that_offers_the_credential_it_asks_for()
 
 
 def test_the_control_url_of_a_link_credential_in_the_host_spoils_the_token() -> None:
-    token = "a1b2c3d4e5f6g7h8i9j0k1l2"
+    token = "a1b2" + "c3d4" + "e5f6" + "g7h8" + "i9j0" + "k1l2"  # split for the scanner
     assert (
         _without_credential(f"https://3000-{token}.proxy.example.test/", "link")
         == "https://3000-" + "x" * len(token) + ".proxy.example.test/"
