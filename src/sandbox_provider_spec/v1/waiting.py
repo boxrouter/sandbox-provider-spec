@@ -9,7 +9,7 @@ yet) or before it sends a request the provider refused for now again (a rate lim
 checks first and pauses only while the provider says the state is not reached.
 
 A host that measures the provider's time installs one observer with `observe_pauses`: a function
-that returns a context manager, entered around each pause. BoxRouter's engine installs one that
+that returns a context manager, entered around each pause. A serving engine installs one that
 records the pause as provider time of the call that is open, the way it records the call's
 requests, so a polled call reads like a blocking one. With no observer a pause is a plain
 `asyncio.sleep`. The observer is process-wide; installing another one replaces it.
