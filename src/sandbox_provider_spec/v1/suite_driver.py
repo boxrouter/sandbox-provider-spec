@@ -69,6 +69,32 @@ RUN_LABEL = "sps.test.run"
 # Operations that 1.0 has no counterpart for: a test needing one is `unsupported`.
 NOT_IN_1_0: dict[str, str] = {}
 
+# Knobs that a test's `requirements` name for what it proves, which a 1.0 `CreateRequest` does not
+# carry (its `requirements` schema lists none of them): the request's `image` is the source, and
+# `network_lockdown.cuts_open_connections` is a fact of an update, not of a create. Sent as they
+# are, the request is invalid on the wire.
+PROOF_ONLY_REQUIREMENTS: Mapping[str, frozenset[str]] = {
+    "custom_images": frozenset({"source"}),
+    "network_lockdown": frozenset({"cuts_open_connections"}),
+}
+
+
+def _request_requirements(requirements: object) -> Mapping[str, object]:
+    """A test's `requirements` as a 1.0 `CreateRequest` carries them: without the knobs that
+    only say what the test proves. A section they leave empty stays, since naming it still asks
+    for the section."""
+    if not isinstance(requirements, Mapping):
+        raise ValueError("requirements must be a mapping")
+    kept: dict[str, object] = {}
+    for section, value in requirements.items():
+        drop = PROOF_ONLY_REQUIREMENTS.get(str(section))
+        if drop and isinstance(value, Mapping):
+            kept[str(section)] = {key: item for key, item in value.items() if key not in drop}
+        else:
+            kept[str(section)] = value
+    return kept
+
+
 # Create inputs that SPS 1.0 maps to a field of `CreateRequest`.
 CREATE_INPUTS = frozenset(
     {
@@ -284,7 +310,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
         env = strings(inputs, "environment")
-        requirements = cast(Mapping[str, object], inputs.get("requirements", {}))
+        requirements = _request_requirements(inputs.get("requirements", {}))
         secrets = self._secrets(inputs, requirements, env)
         request = CreateRequest(
             sandbox_class=self.sandbox_class if snapshot is None else snapshot.sandbox_class,
