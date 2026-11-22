@@ -251,13 +251,14 @@ class ImageProvider(LocalProvider, manifest=False):
     deleted: set[str] = set()
     seen: list[dict[str, Any]] = []
     box_files: dict[str, dict[str, bytes]] = {}
+    create_images: list[dict[str, str]] = []
     polls_until_ready = 0
     claim = True
 
     @classmethod
     def reset(cls) -> None:
         cls.images, cls.files, cls.keys, cls.deleted = {}, {}, {}, set()
-        cls.seen, cls.box_files = [], {}
+        cls.seen, cls.box_files, cls.create_images = [], {}, []
         cls.polls_until_ready, cls.claim = 0, True
 
     async def discovery(self) -> Discovery:
@@ -345,6 +346,7 @@ class ImageProvider(LocalProvider, manifest=False):
     async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
         files: dict[str, bytes] = {}
         if isinstance(request.image, Mapping):
+            ImageProvider.create_images.append(dict(request.image))
             image_id = request.image["provider_artifact"]
             if image_id not in self.images or image_id in self.deleted:
                 raise SpsError("not_found", "no such image")
@@ -361,7 +363,7 @@ class ImageProvider(LocalProvider, manifest=False):
         files = self.box_files.get(sandbox_id)
         if (
             files
-            and request.argv[:2] in (["bash", "-c"], ["sh", "-c"])
+            and list(request.argv[:2]) in (["bash", "-c"], ["sh", "-c"])
             and request.argv[2].startswith("cat ")
         ):
             return RunResult(0, files[request.argv[2][4:]].decode(), "")
@@ -644,6 +646,25 @@ def test_a_provider_that_prepares_images_passes_the_images_section(provider: Ima
     assert "section images passed" in report.lines
     assert all(image.id in ImageProvider.deleted for image in ImageProvider.images.values())
     assert all(box.state == "destroyed" for box in provider.boxes.values())
+
+
+def test_the_images_section_passes_over_http_with_the_created_image_naming_its_provider(
+    served: HttpProvider,
+) -> None:
+    """A create from a prepared image crosses the wire form: its `image` is checked against the
+    request schema, which requires `provider` beside `provider_artifact`. The tester sent the id
+    alone, so every create from a prepared image raised `WireError` over HTTP (the prober's
+    route) and passed in process."""
+    ImageProvider.polls_until_ready = 2
+    report = run_tests(served, TestOptions(tests=("images.",)))
+    tests = outcome(report)
+    assert tests and set(tests.values()) == {"passed"}, [
+        step for row in report["tests"] for step in row["steps"] if step["result"] != "passed"
+    ]
+    assert ImageProvider.create_images, "no create from a prepared image was sent"
+    assert all(
+        set(image) == {"provider_artifact", "provider"} for image in ImageProvider.create_images
+    ), ImageProvider.create_images
 
 
 def test_the_dockerfile_test_sends_a_tar_context_with_its_size(provider: ImageProvider) -> None:

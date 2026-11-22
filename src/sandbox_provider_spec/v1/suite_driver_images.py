@@ -63,13 +63,15 @@ class ImageHandle:
     borrowed: bool = False
 
 
-def image_reference(value: object) -> dict[str, str] | None:
+def image_reference(value: object, provider: str) -> dict[str, str] | None:
     """The `create` image of a prepared-image binding that a test passes as `image`, or None when
-    `value` is not such a binding."""
+    `value` is not such a binding. It names the provider, as the request schema requires (a
+    `provider_artifact` fits only the provider it names), so a request that crosses the HTTP
+    form is valid."""
     if isinstance(value, Mapping) and isinstance(value.get("resource"), Resource):
         native = cast(Resource, value["resource"]).native
         if isinstance(native, ImageHandle):
-            return {"provider_artifact": native.id}
+            return {"provider_artifact": native.id, "provider": provider}
     return None
 
 

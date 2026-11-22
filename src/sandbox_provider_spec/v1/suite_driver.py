@@ -280,7 +280,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         extra = sorted(set(inputs) - CREATE_INPUTS)
         if extra:
             raise Unsupported("a create input that SPS 1.0 does not define")
-        image = image_reference(inputs.get("image")) or inputs.get("image")
+        image = image_reference(inputs.get("image"), self.provider) or inputs.get("image")
         if image is not None and not isinstance(image, (str, Mapping)):
             raise Unsupported("an image that SPS 1.0 cannot name")
         env = strings(inputs, "environment")
