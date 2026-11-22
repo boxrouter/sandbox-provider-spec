@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: BoxRouter, Inc.
+# SPDX-License-Identifier: Apache-2.0
 """`v1.timing.lookup`: a flag that follows the task that entered it, nests and always resets."""
 
 import asyncio
