@@ -75,10 +75,14 @@ def test_an_idle_connection_outlives_the_httpx_default() -> None:
 def test_the_pool_limits_are_the_documented_ones() -> None:
     limits = connections.provider_limits()
     assert limits.keepalive_expiry == 300.0
-    assert limits.keepalive_expiry < 350.0
+    assert limits.keepalive_expiry is not None and limits.keepalive_expiry < 350.0
     assert limits.max_keepalive_connections == connections.MAX_KEEPALIVE_CONNECTIONS >= 200
     assert limits.max_connections == connections.MAX_CONNECTIONS
-    assert limits.max_connections >= limits.max_keepalive_connections
+    assert (
+        limits.max_connections is not None
+        and limits.max_keepalive_connections is not None
+        and limits.max_connections >= limits.max_keepalive_connections
+    )
 
 
 def test_the_packages_own_settings_pass_through() -> None:
