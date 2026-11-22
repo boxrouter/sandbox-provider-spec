@@ -11,11 +11,11 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator, Mapping
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
-from sandbox_provider_spec.suite import spec_dir
+from sandbox_provider_spec.check import spec_dir
 from sandbox_provider_spec.v1 import CreateRequest, to_json
 from sandbox_provider_spec.v1.suite_driver import (
     PROOF_ONLY_REQUIREMENTS,
@@ -26,7 +26,7 @@ from sandbox_provider_spec.v1.tester import shared_suite
 
 def _allowed() -> Mapping[str, Mapping[str, Any]]:
     schema = json.loads((spec_dir() / "request-schema.json").read_text("utf-8"))
-    return schema["$defs"]["requirements"]["properties"]
+    return cast(Mapping[str, Mapping[str, Any]], schema["$defs"]["requirements"]["properties"])
 
 
 def _create_requirements() -> Iterator[tuple[str, Mapping[str, Any]]]:
