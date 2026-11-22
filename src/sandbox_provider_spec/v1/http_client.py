@@ -22,6 +22,7 @@ import httpx
 import websockets.asyncio.client
 import websockets.exceptions
 
+from sandbox_provider_spec.v1.connections import provider_client
 from sandbox_provider_spec.v1.errors import ERROR_TABLE, ErrorCode, SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.types import (
@@ -333,7 +334,7 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
         self._plain_http_ok = allow_plain_http
         self.base_url = base_url.rstrip("/")
         self.credentials = MappingProxyType({})
-        self._client = httpx.AsyncClient(
+        self._client = provider_client(
             base_url=self.base_url,
             transport=transport,
             follow_redirects=False,
