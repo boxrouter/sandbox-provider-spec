@@ -39,6 +39,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
+from sandbox_provider_spec.v1 import idempotency
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver_account import AccountSteps
@@ -239,6 +240,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         self._snapshots: dict[str, Resource] = {}
         self._images: dict[str, Resource] = {}
         self._image_keys: dict[str, tuple[str, Resource]] = {}
+        self._sent_keys: set[str] = set()
         self._terminals: builtins.list[TerminalHandle] = []
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
@@ -324,7 +326,9 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             lifetime_seconds=cast("int | None", inputs.get("lifetime_seconds", 300)),
             snapshot=None if snapshot is None else snapshot.id,
         )
-        created = self.wait(self.api.create(request, idempotency_key=self._key(inputs)))
+        key = self._key(inputs)
+        with self._sending(key):
+            created = self.wait(self.api.create(request, idempotency_key=key))
         handle = SandboxHandle(created.id)
         owned = self.own("sandbox", handle, lambda: self._destroy(handle.id))
         return {"resource": owned, "identity": created.id}
@@ -362,6 +366,18 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         headers = _secret_headers(asked.get("headers") or ()) or handle.headers
         placeholder = env.setdefault(SECRET_PLACEHOLDER_ENV, f"sps-placeholder-{uuid4().hex}")
         return (Secret(placeholder, handle.value, tuple(hosts), headers),)
+
+    @contextlib.contextmanager
+    def _sending(self, key: str) -> Iterator[None]:
+        """Send `key` as a host would: its first use in this run is vouched as a first send
+        (`v1.idempotency`), and a later use is a repeat with no hint, so a provider that reads the
+        hint is tested on its fast first send and on its safe path for the repeat."""
+        if key in self._sent_keys:
+            yield
+            return
+        self._sent_keys.add(key)
+        with idempotency.fresh_key(key), idempotency.attempt(key, 1):
+            yield
 
     def _key(self, inputs: Inputs) -> str:
         """A create's idempotency key: fresh, or shared by one test's creates in one run only."""
@@ -822,9 +838,11 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         request = SnapshotRequest(
             keeps=cast(Any, keeps), labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id}
         )
-        created = self.wait(
-            self.api.snapshot_create(self._sandbox(target), request, idempotency_key=str(uuid4()))
-        )
+        key = str(uuid4())
+        with self._sending(key):
+            created = self.wait(
+                self.api.snapshot_create(self._sandbox(target), request, idempotency_key=key)
+            )
         owned = self._own_snapshot(created)  # owned before the wait, so a failed wait cleans up
         deadline = time.monotonic() + _SNAPSHOT_WAIT_SECONDS
         snapshot = created
@@ -897,11 +915,11 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         request = SnapshotRequest(
             keeps=cast(Any, keeps), labels={**strings(inputs, "labels"), RUN_LABEL: self.run_id}
         )
-        created = self.wait(
-            self.api.snapshot_create(
-                self._sandbox(target), request, idempotency_key=self._key(inputs)
+        key = self._key(inputs)
+        with self._sending(key):
+            created = self.wait(
+                self.api.snapshot_create(self._sandbox(target), request, idempotency_key=key)
             )
-        )
         self._own_snapshot(created)
         return {"id": created.id}
 
