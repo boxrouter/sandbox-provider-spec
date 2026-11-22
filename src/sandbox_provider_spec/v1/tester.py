@@ -804,6 +804,10 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
                 discovery=_subject_discovery(subject, discovery),
             )
         )
+        if options.sandbox_class is not None:
+            # A run pinned to one class says so, as a report of a native driver does: a declaration
+            # that names its class accepts only a report of that class as evidence.
+            document["class"] = options.sandbox_class
         sections: dict[str, list[str]] = {name: [] for name in claimed_sections(discovery)}
         document.lines = _summary(results, discovery_status, cost_status, sections)
         if len(used) > 1 or options.sandbox_class is not None:

@@ -84,6 +84,7 @@ def test_a_gate_that_only_a_non_default_class_claims_runs_on_that_class() -> Non
     assert provider.created_in.count("vm") == 1  # the claiming test, nothing else
     assert "class default passed" in report.lines
     assert any(line.startswith("class vm ") for line in report.lines)
+    assert "class" not in report  # a run that pinned no class names none
     jsonschema.validate(
         json.loads(json.dumps(report)),
         json.loads(
@@ -127,6 +128,7 @@ def test_a_pinned_class_runs_every_test_on_that_class() -> None:
     assert "pause_resume.files_only" in classes_of(report)
     assert set(provider.created_in) == {"vm"}
     assert any(line.startswith("class vm ") for line in report.lines)
+    assert report["class"] == "vm"  # a declaration of that class accepts the report as evidence
 
     other = ClassedProvider()
     report = run_tests(
@@ -134,6 +136,7 @@ def test_a_pinned_class_runs_every_test_on_that_class() -> None:
     )
     assert set(classes_of(report).values()) == {"default"}  # a pin overrides the claiming class
     assert set(other.created_in) == {"default"}
+    assert report["class"] == "default"
 
 
 def test_a_pinned_class_that_does_not_exist_is_refused_with_the_class_names() -> None:
