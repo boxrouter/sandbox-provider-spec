@@ -71,6 +71,7 @@ path = [
   "spec/vocabulary.md",
   "src/sandbox_provider_spec/data",
   "src/sandbox_provider_spec/py.typed",
+  "template/src/sps_provider_example/py.typed",
   "tests/fixtures/endpoints-worker/records-response.json",
   "tests/v1/test_openapi.py",
   "tests/matcher/README.md",
