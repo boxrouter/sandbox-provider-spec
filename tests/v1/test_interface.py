@@ -391,6 +391,21 @@ def test_subclass_loads_its_manifest(tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert "api_key" in raised.value.message
 
 
+def test_a_field_can_be_required_for_a_managed_deployment_only(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    wallet = {"name": "wallet", "secret": False, "required": False, "required_for_managed": True}
+    make_package(
+        tmp_path,
+        "wallet_provider",
+        {**GOOD_MANIFEST, "credential_fields": [*GOOD_MANIFEST["credential_fields"], wallet]},
+    )
+    impl = import_package(monkeypatch, tmp_path, "wallet_provider").Impl
+    assert [f.required_for_managed for f in impl.credential_fields] == [False, False, True]
+    # A consumer with its own account still gives only the key.
+    assert "wallet" not in impl({"api_key": "k"}).credentials
+
+
 def test_subclass_without_a_manifest_fails_when_defined(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

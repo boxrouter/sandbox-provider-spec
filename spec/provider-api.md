@@ -336,8 +336,10 @@ a new path (`/v2`), served beside `/v1` for a transition period.
 
 Each adapter's Python package holds `sps-provider.yaml`, with `provider_id` (`a-z 0-9 -`, 2 to 32
 characters, the entry point's name), `name`, `spec_version`, `credential_fields` (each with
-`name`, `secret`, `description` and, for a secret, an optional `public_prefix` such as `dtn_` that
-its values start with) and `api_domains`. Each `api_domains` entry is an exact host
+`name`, `secret`, `description`, an optional `required_for_managed` (a field that a consumer with
+its own account may leave out but that a deployment running the provider on its own account must
+supply) and, for a secret, an optional `public_prefix` such as `dtn_` that its values start
+with) and `api_domains`. Each `api_domains` entry is an exact host
 name or a suffix written with a leading dot (`.example.com`), which matches every host under it.
 The package validates the manifest against a schema when a `Provider` subclass is defined. Release
 tools, the tester and hosts read the file without importing the adapter.

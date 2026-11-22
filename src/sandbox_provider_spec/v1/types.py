@@ -49,6 +49,9 @@ class CredentialField:
     name: str  # for example "api_key"; a-z 0-9 _, 1 to 32 characters
     secret: bool = True
     required: bool = True
+    # A field that is not `required` but that a deployment running the provider on its own account
+    # must supply (a billing wallet, say); a consumer with its own account may leave it out.
+    required_for_managed: bool = False
     default: str | None = None  # only for a field that is not secret
     description: str = ""
     # How a secret's values start (`dtn_`, `ak-`): 2 to 8 lowercase letters or digits and `_` or
