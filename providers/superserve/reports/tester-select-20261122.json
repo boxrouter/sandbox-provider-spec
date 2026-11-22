@@ -1,50 +1,122 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "files.write.user": "sha256:0dc3f3d84e52f4403e4afb2816e4b21df7db4479669e0e31342191edb87a783a",
+    "coverage.guest_user.selectable": "sha256:0af8ff397666f00b61823fb27a638e8384abaac7f029d572ed4f2a75717c075c",
+    "coverage.network_lockdown.changeable.true": "sha256:3bbde8ab0cac5429931325082ff1aa094161bbafed90d6f43d9c9f59aa3134f3",
     "previews.access.private": "sha256:4c58c0c6c76675e85f5a626245b1ec3d3de5fabc3dd003523b9e7660b30265f8",
     "previews.credential.header": "sha256:5faac404108070cd61f806ca19f6586c35a259088a472ba42072d6799fc4facf",
     "previews.credential.link": "sha256:cbaa7bf56f1e1e6c98c7f1c3ae56990c21e325282d18388b96906ddf13423ede",
+    "previews.link_lifetime_seconds.public": "sha256:1565882a3810e32f4cbae067e901a677dda1bed9e9fbc885bc5104099225bc3c",
     "previews.listed_ports": "sha256:3e6d03670fdd9d85fdecad8dbbdac2397e73cc57b70986320a64b715b71c3da9",
     "previews.revocable.true": "sha256:4559a33d1aff3905f33d756a37031b3591b02cfabfd951ba57ed96a3b24a23eb",
     "previews.revocable.true.public": "sha256:673d0a354bbecf21c5ca55ee40c7e27ec71baf91032f68b0c619c397704c6dfc",
-    "process.start.user": "sha256:3e5fd3325df32fb72a7163ea35e330df60de29412e7a4cdeb3f3bd935fdd9c0c",
-    "run.user": "sha256:7c81584ed130f96a686697ed79d12d12496bbfe6641497c5ef7ccb6bb3c3c082"
+    "processes.reattach.true": "sha256:7a2074d73ce9cb49070a2e6ba9317bd51ac9655b5ab484eab1a13ee9ddb5f483"
   },
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.58"
+    "version": "0.5.63"
   },
-  "finished_at": "2026-11-21T09:43:09.043819+00:00",
+  "finished_at": "2026-11-22T04:08:49.749750+00:00",
   "provider": "superserve",
-  "revision": "65d72233f1700d872798f3a29e8a6c105a82f21d",
-  "run_id": "public-3686d57c427ea9e12261",
+  "revision": "eb7a0f88ae9195a1431a70dadec6ead6df4cf7a5",
+  "run_id": "public-5930aac9fa03de47670c",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.58",
+    "sandbox-provider-spec": "0.5.63",
     "superserve": "0.12.0"
   },
   "selected_tests": [
+    "processes.reattach.true",
     "previews.access.private",
     "previews.credential.link",
     "previews.credential.header",
     "previews.revocable.true",
     "previews.listed_ports",
     "previews.revocable.true.public",
-    "run.user",
-    "files.write.user",
-    "process.start.user"
+    "previews.link_lifetime_seconds.public",
+    "coverage.guest_user.selectable",
+    "coverage.network_lockdown.changeable.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-21T09:42:58.103589+00:00",
+  "started_at": "2026-11-22T04:06:27.031719+00:00",
   "subject": {
-    "discovery_digest": "sha256:9fc6199fa3f7bffbccbee7b770a92f61fd922f9ed959fc697e7eb759309f72b8",
+    "discovery_digest": "sha256:17d87c32fb77d754d81066bbd130bf7e0b116be2e58b01806249949229997d4c",
     "package": "sps-provider-superserve",
-    "package_digest": "sha256:6d03bc5f3b6827056dcf77d09e3361cc7b9b50dad1c0b823f283a8f73eb4651b",
+    "package_digest": "sha256:0d4217a22e4d3d888ae964b8eed97fa98ae27b5c843154412c54b5986d67bbc9",
     "version": "0.1.21"
   },
   "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
   "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 770,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 11,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
     {
       "class": "default",
       "cleanup": [
@@ -61,7 +133,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1387,
+      "duration_ms": 1132,
       "id": "previews.access.private",
       "proves": [
         {
@@ -140,7 +212,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1393,
+      "duration_ms": 1232,
       "id": "previews.credential.link",
       "proves": [
         {
@@ -219,7 +291,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1195,
+      "duration_ms": 1385,
       "id": "previews.credential.header",
       "proves": [
         {
@@ -306,7 +378,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2194,
+      "duration_ms": 1831,
       "id": "previews.revocable.true",
       "proves": [
         {
@@ -433,7 +505,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1103,
+      "duration_ms": 1140,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -544,7 +616,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1409,
+      "duration_ms": 1602,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -650,16 +722,119 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
           "kind": "sandbox",
           "result": "deleted"
         }
       ],
-      "duration_ms": 410,
-      "id": "run.user",
-      "proves": [],
+      "duration_ms": 121025,
+      "id": "previews.link_lifetime_seconds.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "link_lifetime_seconds",
+          "value": {
+            "at_least": 120
+          }
+        }
+      ],
       "result": "passed",
       "rules": [
-        "user-selection/commands"
+        "previews/link-lifetime"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 690,
+      "id": "coverage.guest_user.selectable",
+      "proves": [
+        {
+          "gate": "user_selection",
+          "knob": "commands",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "files_write",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "process_start",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start"
       ],
       "steps": [
         {
@@ -695,54 +870,6 @@
           "result": "passed"
         },
         {
-          "native_code": "not_found",
-          "operation": "run",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "exit_code": {
-              "actual": 0,
-              "matches": true
-            }
-          },
-          "operation": "run",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 540,
-      "id": "files.write.user",
-      "proves": [],
-      "result": "passed",
-      "rules": [
-        "user-selection/files-write"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "exit_code": {
-              "actual": 0,
-              "matches": true
-            }
-          },
-          "operation": "run",
-          "result": "passed"
-        },
-        {
           "observations": {},
           "operation": "files.write",
           "result": "passed"
@@ -765,7 +892,7 @@
             },
             "stdout": {
               "actual": {
-                "b64": "Y29uZm9ybWFuY2UK",
+                "b64": "cnVubmVyIDYwMAo=",
                 "truncated": false
               },
               "matches": true
@@ -773,38 +900,18 @@
           },
           "operation": "run",
           "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "process",
-          "result": "already_released"
-        },
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 433,
-      "id": "process.start.user",
-      "proves": [],
-      "result": "passed",
-      "rules": [
-        "user-selection/process-start"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
         },
         {
           "observations": {
             "exit_code": {
               "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "Y29uZm9ybWFuY2UK",
+                "truncated": false
+              },
               "matches": true
             }
           },
@@ -841,6 +948,48 @@
             }
           },
           "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11101,
+      "id": "coverage.network_lockdown.changeable.true",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/changeable",
+        "provider-api/network-update"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
           "result": "passed"
         }
       ]

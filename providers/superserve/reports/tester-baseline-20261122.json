@@ -23,14 +23,14 @@
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.58"
+    "version": "0.5.63"
   },
-  "finished_at": "2026-11-21T09:51:10.972439+00:00",
+  "finished_at": "2026-11-22T04:06:19.337373+00:00",
   "provider": "superserve",
-  "revision": "43ac3c01e1f13eb2ae7eb9971088702519762702",
-  "run_id": "public-82d261a3ffbe16ec3b04",
+  "revision": "eb7a0f88ae9195a1431a70dadec6ead6df4cf7a5",
+  "run_id": "public-c8c39509f54ffffab5cb",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.58",
+    "sandbox-provider-spec": "0.5.63",
     "superserve": "0.12.0"
   },
   "selected_tests": [
@@ -54,11 +54,11 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-21T09:50:45.269370+00:00",
+  "started_at": "2026-11-22T04:05:53.389437+00:00",
   "subject": {
-    "discovery_digest": "sha256:9fc6199fa3f7bffbccbee7b770a92f61fd922f9ed959fc697e7eb759309f72b8",
+    "discovery_digest": "sha256:17d87c32fb77d754d81066bbd130bf7e0b116be2e58b01806249949229997d4c",
     "package": "sps-provider-superserve",
-    "package_digest": "sha256:6d03bc5f3b6827056dcf77d09e3361cc7b9b50dad1c0b823f283a8f73eb4651b",
+    "package_digest": "sha256:0d4217a22e4d3d888ae964b8eed97fa98ae27b5c843154412c54b5986d67bbc9",
     "version": "0.1.21"
   },
   "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
@@ -71,7 +71,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 561,
+      "duration_ms": 580,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -107,7 +107,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 521,
+      "duration_ms": 377,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -143,7 +143,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 367,
+      "duration_ms": 322,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -175,7 +175,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 301,
+      "duration_ms": 261,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -216,7 +216,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 489,
+      "duration_ms": 363,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -252,7 +252,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 346,
+      "duration_ms": 296,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -285,7 +285,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 361,
+      "duration_ms": 320,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -328,7 +328,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 358,
+      "duration_ms": 369,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -364,7 +364,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 345,
+      "duration_ms": 356,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -400,7 +400,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 486,
+      "duration_ms": 458,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -451,7 +451,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 403,
+      "duration_ms": 342,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -501,7 +501,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15449,
+      "duration_ms": 15417,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -566,7 +566,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 388,
+      "duration_ms": 366,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -600,7 +600,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 391,
+      "duration_ms": 392,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -634,7 +634,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 630,
+      "duration_ms": 1054,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -680,7 +680,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 561,
+      "duration_ms": 585,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -720,7 +720,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2514,
+      "duration_ms": 2722,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -752,7 +752,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 390,
+      "duration_ms": 412,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",

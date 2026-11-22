@@ -3,10 +3,10 @@ provider: superserve
 # Every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed adapter
 # report (see evidence.md).
 verified:
-  date: 2026-11-21
+  date: 2026-11-22
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
-  sdks: {"superserve": "0.12.0", "sandbox-provider-spec": "0.5.58"}
+  sdks: {"superserve": "0.12.0", "sandbox-provider-spec": "0.5.63"}
 resources:
   kernel: dedicated
   # A sandbox inherits its shape from the template it starts from and cannot override it, so each
@@ -34,16 +34,16 @@ lifetime_timer:
   counts_paused_time: false
   at_end: [destroyed]
 gates:
-  # `commands.spawn` (a stdin write and its explicit EOF, a signal that ends the process); no reattach,
-  # because the service stops a command whose connection is gone.
+  # `commands.spawn` (a stdin write and its explicit EOF, a signal that ends the process); a process
+  # is read again by id from a cursor, because the guest supervisor keeps its output.
   processes:
   - input: true
     cancel: true
-    reattach: false
+    reattach: true
   # Superserve's `network` rules: `allow_out` takes addresses, CIDRs and domains with `*.` wildcards, and a
   # PATCH replaces both lists on an active sandbox. Not declared: deny_all (Superserve's refusal of an
-  # unlisted name over TLS reads as ambiguous, so `network_lockdown.deny_all` is not_run), a denylist and
-  # `changeable`.
+  # unlisted name over TLS reads as ambiguous, so `network_lockdown.deny_all` is not_run, as in the clean
+  # 2026-11-22 run) and a denylist.
   network_lockdown:
   - policy: allowlist
     entry_kinds: [names, addresses]
@@ -52,6 +52,7 @@ gates:
     entry_kinds: [names, addresses]
     allow_wildcards: true
     switchable: true
+    changeable: true
   # A public OCI image is built as a team template and a sandbox boots from it; an image's ENTRYPOINT and
   # CMD do not run in a template-booted sandbox, and no template option takes registry credentials, so a
   # private registry image is refused. A template the caller names is a provider artifact.
@@ -180,8 +181,8 @@ evidence:
     report: reports/prober-default-core.json
   gates.processes.0.reattach:
     tests:
-    - processes.reattach.false
-    report: reports/prober-default-core.json
+    - processes.reattach.true
+    report: reports/tester-select-20261122.json
   gates.network_lockdown.0.policy:
     tests:
     - network_lockdown.allowlist.names
@@ -218,6 +219,10 @@ evidence:
     tests:
     - coverage.network_lockdown.switchable.true
     report: reports/prober-default-coverage.json
+  gates.network_lockdown.1.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.true
+    report: reports/tester-select-20261122.json
   gates.custom_images.0.source:
     tests:
     - custom_images.oci
@@ -369,36 +374,36 @@ evidence:
   gates.previews.1.access:
     tests:
     - previews.access.private
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.previews.1.credential:
     tests:
     - previews.credential.link
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.previews.1.revocable:
     tests:
     - previews.revocable.true
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.previews.2.access:
     tests:
     - previews.access.private
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.previews.2.credential:
     tests:
     - previews.credential.header
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.previews.2.revocable:
     tests:
     - previews.revocable.true
-    report: reports/tester-core-20261121.json
+    report: reports/tester-select-20261122.json
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
-    report: reports/tester-user-20261121.json
+    report: reports/tester-select-20261122.json
   gates.user_selection.0.files_write:
     tests:
     - coverage.guest_user.selectable
-    report: reports/tester-user-20261121.json
+    report: reports/tester-select-20261122.json
   gates.user_selection.0.process_start:
     tests:
     - coverage.guest_user.selectable
-    report: reports/tester-user-20261121.json
+    report: reports/tester-select-20261122.json
