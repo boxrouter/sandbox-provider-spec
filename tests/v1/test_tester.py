@@ -511,6 +511,49 @@ def test_driver_creates_labelled_sandboxes_and_destroys_them(driver: ProviderDri
     driver.release(resource(made))  # already released: nothing is destroyed twice
 
 
+class _Pausing(LocalProvider, manifest=False):
+    """Pauses and resumes; `answers` says whether each returns the sandbox or nothing."""
+
+    answers = True
+
+    async def pause(self, sandbox_id: str) -> Sandbox | None:
+        box = dataclasses.replace(await self.get(sandbox_id), state="paused")
+        self.boxes[sandbox_id] = box
+        return box if self.answers else None
+
+    async def resume(self, sandbox_id: str) -> Sandbox | None:
+        box = dataclasses.replace(await self.get(sandbox_id), state="running")
+        self.boxes[sandbox_id] = box
+        return box if self.answers else None
+
+    async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox | None:
+        ends = datetime(2026, 11, 22, 12, tzinfo=UTC) + timedelta(seconds=seconds)
+        box = dataclasses.replace(await self.get(sandbox_id), ends_at=ends)
+        self.boxes[sandbox_id] = box
+        return box if self.answers else None
+
+
+@pytest.mark.parametrize("answers", [True, False])
+def test_pause_and_resume_may_return_nothing(answers: bool) -> None:
+    provider = _Pausing()
+    provider.answers = answers
+    driver = ProviderDriver(provider, run="run-1")
+    try:
+        made = driver.call("create", None, {})
+        paused = driver.call("pause", made, {})
+        again = driver.call("resume", made, {})
+        # Nothing returned observes no state; the resumed sandbox is still the one named.
+        assert paused == ({"state": "paused"} if answers else {})
+        assert again["identity"] == made["identity"]
+        assert again.get("state") == ("active" if answers else None)
+        assert driver.call("get", made, {})["state"] == "active"
+        # An extension that returns nothing is read back with `get`: the same deadline either way.
+        extended = driver.call("lifetime.extend", made, {"lifetime_seconds": 60})
+        assert extended == {"ends_at": "2026-11-22T12:01:00Z"}
+    finally:
+        driver.close()
+
+
 def test_driver_runs_a_bash_script_as_argv(driver: ProviderDriver) -> None:
     made = driver.call("create", None, {})
     result = driver.call("run", made, {"bash_script": "printf out; printf err >&2; exit 3"})

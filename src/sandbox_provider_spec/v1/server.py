@@ -568,19 +568,24 @@ async def _files_link(p: Provider, r: _Request) -> Reply:
 async def _pause(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     await r.json_body("EmptyObject", empty_ok=True)
-    return 200, to_json(await p.pause(sandbox_id))
+    paused = await p.pause(sandbox_id)
+    # The HTTP answer is the sandbox: a provider that returned none is read once (`get`) here, so
+    # only the binding pays for the record an in-process caller does not need.
+    return 200, to_json(paused if paused is not None else await p.get(sandbox_id))
 
 
 async def _resume(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     await r.json_body("EmptyObject", empty_ok=True)
-    return 200, to_json(await p.resume(sandbox_id))
+    resumed = await p.resume(sandbox_id)
+    return 200, to_json(resumed if resumed is not None else await p.get(sandbox_id))
 
 
 async def _lifetime_extend(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
     body = await r.json_body("LifetimeExtendRequest")
-    return 200, to_json(await p.lifetime_extend(sandbox_id, body["seconds"]))
+    extended = await p.lifetime_extend(sandbox_id, body["seconds"])
+    return 200, to_json(extended if extended is not None else await p.get(sandbox_id))
 
 
 async def _write_stdin(p: Provider, r: _Request) -> Reply:

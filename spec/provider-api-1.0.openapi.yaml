@@ -2163,7 +2163,9 @@ components:
         created_at: {$ref: "#/components/schemas/Timestamp"}
         ends_at:
           anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
-          description: When the lifetime timer will end it; null with no lifetime.
+          description: >-
+            When the lifetime timer will end it. null: not stated by this answer; read it with get. In get's own
+            answer, null means the sandbox has no lifetime.
         at_end:
           enum: [destroyed, paused, null]
           description: The state the timer ends it in; null with no lifetime.

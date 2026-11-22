@@ -48,6 +48,7 @@ from sandbox_provider_spec.v1 import (
     SpsError,
     TcpLink,
     from_json,
+    to_json,
 )
 from sandbox_provider_spec.v1.server import create_app
 from sandbox_provider_spec.v1.tokens import encode
@@ -160,15 +161,15 @@ class Recorder(Provider, manifest=False):
         self._note("files_link", sandbox_id, request)
         return example(FileLink)
 
-    async def pause(self, sandbox_id: str) -> Sandbox:
+    async def pause(self, sandbox_id: str) -> Sandbox | None:
         self._note("pause", sandbox_id)
         return example(Sandbox)
 
-    async def resume(self, sandbox_id: str) -> Sandbox:
+    async def resume(self, sandbox_id: str) -> Sandbox | None:
         self._note("resume", sandbox_id)
         return example(Sandbox)
 
-    async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox:
+    async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox | None:
         self._note("lifetime_extend", sandbox_id, seconds)
         return example(Sandbox)
 
@@ -531,6 +532,37 @@ def test_a_provider_with_the_short_preview_signature_still_serves_a_plain_reques
     reply = asyncio.run(call(app, "POST", "/v1/sandboxes/sbx-1/previews", body=j({"port": 3000})))
     assert reply.status == 200
     assert reply.json()["access"] == "public"
+
+
+@pytest.mark.parametrize(
+    ("operation", "path", "body", "args"),
+    [
+        ("pause", "pause", {}, ("sbx-1",)),
+        ("resume", "resume", {}, ("sbx-1",)),
+        ("lifetime_extend", "lifetime", {"seconds": 90}, ("sbx-1", 90)),
+    ],
+)
+def test_an_operation_that_returns_nothing_is_answered_with_one_get(
+    operation: str, path: str, body: dict[str, Any], args: tuple[Any, ...]
+) -> None:
+    class Quiet(Recorder, manifest=False):
+        async def pause(self, sandbox_id: str) -> Sandbox | None:
+            self._note("pause", sandbox_id)
+            return None
+
+        async def resume(self, sandbox_id: str) -> Sandbox | None:
+            self._note("resume", sandbox_id)
+            return None
+
+        async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox | None:
+            self._note("lifetime_extend", sandbox_id, seconds)
+            return None
+
+    app = create_app(Quiet)
+    reply = asyncio.run(call(app, "POST", f"/v1/sandboxes/sbx-1/{path}", body=j(body)))
+    assert reply.status == 200
+    assert reply.json() == to_json(example(Sandbox))  # the wire answer is still the sandbox
+    assert Recorder.calls == [(operation, args), ("get", ("sbx-1",))]
 
 
 @pytest.mark.parametrize(

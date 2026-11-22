@@ -808,3 +808,14 @@ An `allow` list of an update may be empty: an allowlist with no entries lets not
 `coverage.network_lockdown.changeable.true` sends one. An update is the same call to a provider
 whether it switches the policy or only changes its entries. The consumer decides which one it asks
 for from what discovery claims.
+
+## 26. Pausing, resuming and extending: the record is `get`'s
+
+`pause` and `resume` (section `pause_resume`) change the sandbox's state, and `lifetime.extend`
+its deadline. In process, each returns the sandbox or nothing (`None`). A provider returns nothing
+when it would read its record only to fill the result: the operation is then the provider's own
+call and nothing more. `lifetime.extend` still never shortens a lifetime, so a provider whose call
+would shorten one reads the deadline before the call, never after it. `get` is where a
+consumer reads the record (its state, size, lifetime and times), so a consumer never relies on a
+result being present. Over HTTP the answer stays the sandbox: the reference server answers a
+provider's `None` with one `get` of its own, so the wire answer of 1.0 is unchanged.

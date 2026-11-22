@@ -245,13 +245,19 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     async def files_link(self, sandbox_id: str, request: FileLinkRequest) -> FileLink:
         raise self._unsupported("files.link")
 
-    async def pause(self, sandbox_id: str) -> Sandbox:
+    async def pause(self, sandbox_id: str) -> Sandbox | None:
+        """Pause the sandbox. Returns the sandbox, or None when the provider would read its
+        record only to fill it: `get` is where a caller reads the record (Provider API section
+        26). The HTTP server answers a None with one `get`, so the wire answer is unchanged."""
         raise self._unsupported("pause")
 
-    async def resume(self, sandbox_id: str) -> Sandbox:
+    async def resume(self, sandbox_id: str) -> Sandbox | None:
+        """Resume the sandbox. Returns the sandbox or None, as `pause` does."""
         raise self._unsupported("resume")
 
-    async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox:
+    async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox | None:
+        """Keep the sandbox running at least `seconds` more; never shortens it. Returns the
+        sandbox or None, as `pause` does."""
         raise self._unsupported("lifetime.extend")
 
     async def process_write_stdin(self, sandbox_id: str, process_id: str, data: bytes) -> None:

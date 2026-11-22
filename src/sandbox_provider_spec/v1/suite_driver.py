@@ -697,23 +697,27 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
     def pause(self, target: object, inputs: Inputs) -> Observation:
         del inputs
         sandbox = self.wait(self.api.pause(self._sandbox(target)))
-        return {"state": sandbox.state}
+        # A provider may return nothing (it read no record): then no state is observed.
+        return {} if sandbox is None else {"state": sandbox.state}
 
     def resume(self, target: object, inputs: Inputs) -> Observation:
         del inputs
-        sandbox = self.wait(self.api.resume(self._sandbox(target)))
+        sandbox_id = self._sandbox(target)
+        sandbox = self.wait(self.api.resume(sandbox_id))
         # The resumed sandbox is the same one, so a step can bind it (`as:`) and name it as the
         # target of the steps after, as `create` allows.
-        return {
-            "resource": resource(target),
-            "identity": sandbox.id,
-            "state": "active" if sandbox.state == "running" else sandbox.state,
-        }
+        observed = {"resource": resource(target), "identity": sandbox_id}
+        if sandbox is None:
+            return observed
+        return {**observed, "state": "active" if sandbox.state == "running" else sandbox.state}
 
     def lifetime_extend(self, target: object, inputs: Inputs) -> Observation:
+        sandbox_id = self._sandbox(target)
         sandbox = self.wait(
-            self.api.lifetime_extend(self._sandbox(target), number(inputs, "lifetime_seconds", 0))
+            self.api.lifetime_extend(sandbox_id, number(inputs, "lifetime_seconds", 0))
         )
+        if sandbox is None:  # the provider read no record for its answer: the tester reads it
+            sandbox = self.wait(self.api.get(sandbox_id))
         return {"ends_at": _iso(sandbox.ends_at)}
 
     def preview_link(self, target: object, inputs: Inputs) -> Observation:
