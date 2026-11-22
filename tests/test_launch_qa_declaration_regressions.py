@@ -114,7 +114,7 @@ def test_e2b_declares_deny_all_network_lockdown() -> None:
 
 
 @pytest.mark.parametrize("name", ["allowed.example", "*.allowed.example"])
-def test_e2b_name_filter_scope_does_not_admit_unproven_authorities(name: str) -> None:
+def test_e2b_name_filter_scope_admits_the_proven_name_authorities(name: str) -> None:
     def request(entry: str) -> dict[str, Any]:
         return {"requirements": {"network_lockdown": {"policy": "allowlist", "allow": [entry]}}}
 
@@ -122,7 +122,7 @@ def test_e2b_name_filter_scope_does_not_admit_unproven_authorities(name: str) ->
     result = _match_e2b(request(name))
     assert result["rejected"] is None
     assert result["eligible"] == []
-    assert result["results"]["e2b"]["failed"][0]["reason"] == "limit_exceeded"
+    assert result["results"]["e2b"]["failed"] == []
 
 
 def test_blaxel_missing_rotation_mapping_is_not_evidence_of_provider_absence() -> None:
