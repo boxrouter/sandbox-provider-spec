@@ -70,21 +70,6 @@ def _used_proof_ids(report: dict[str, Any], support: dict[str, Any]) -> set[str]
     }
 
 
-QUARANTINED_ADAPTERS = frozenset(
-    {"adapter-boxd", "adapter-e2b", "adapter-modal", "adapter-superserve"}
-)
-# oi-s-n 2026-11-21: `custom_images.oci` also names `sh_script` beside `bash_script` for each
-# command (a 1.0 driver runs it with `sh`, so a base image without bash passes), which moved its
-# check digest and changed no result: a native driver still runs `bash_script`. These adapters are
-# replaced by the swarm, and the spec-provider packages' reports carry the new digest. Lift with
-# each adapter's deletion.
-CUSTOM_OCI_QUARANTINED = frozenset({"adapter-agent37", "adapter-blaxel", "adapter-superserve"})
-# oi-s-n 2026-11-21: `custom_images.dockerfile` now builds `FROM` the run's image
-# (`dockerfile_from`), which moved its check digest; a native driver still builds a plain
-# Dockerfile. Same lifetime as above.
-CUSTOM_DOCKERFILE_QUARANTINED = frozenset({"adapter-blaxel"})
-
-
 def test_active_reports_keep_current_check_digests() -> None:
     """A changed conformance/driver/runner check requires refreshed active reports."""
     if not (WORKSPACE_ROOT / "packages").is_dir():
@@ -96,20 +81,6 @@ def test_active_reports_keep_current_check_digests() -> None:
     mismatches: list[str] = []
 
     for report_path, support in _active_reports():
-        # keeper-quarantine 2026-11-19 f43336d9d5 #6482's probe retry moved the
-        # network_lockdown.deny_all check digest after boxd's deny-all report ran; the report is
-        # the founder's hosted probe and only he reruns it (aef62d5f6d exempted it). Lift when a
-        # fresh report lands.
-        if report_path.name == "network-lockdown-deny-all.json":
-            continue
-        # oi-s-j 2026-11-21: the guest probe's TLS classification moved the network_lockdown check
-        # digests (a handshake ended by the peer is a block, not "ambiguous"). It changes no result
-        # a report holds: in the recorder-backed checks an ended handshake sent no request, so the
-        # recorder already read "not reached". These four reports are of adapters that the swarm
-        # replaces; the spec-provider packages' reports carry the new digests. Lift with each
-        # adapter's deletion.
-        adapter = report_path.parent.parent.parent.parent.name
-        quarantined = adapter in QUARANTINED_ADAPTERS
         report = json.loads(report_path.read_text(encoding="utf-8"))
         recorded = report.get("check_digests")
         if not isinstance(recorded, dict):
@@ -119,12 +90,6 @@ def test_active_reports_keep_current_check_digests() -> None:
             continue
         for test_id in _used_proof_ids(report, support):
             if test_id not in current:
-                continue
-            if quarantined and test_id.startswith("network_lockdown."):
-                continue
-            if test_id == "custom_images.oci" and adapter in CUSTOM_OCI_QUARANTINED:
-                continue
-            if test_id == "custom_images.dockerfile" and adapter in CUSTOM_DOCKERFILE_QUARANTINED:
                 continue
             if test_id not in recorded:
                 mismatches.append(
