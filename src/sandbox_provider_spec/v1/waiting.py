@@ -25,19 +25,19 @@ __all__ = ["observe_pauses", "pause"]
 
 PauseObserver = Callable[[], AbstractContextManager[object]]
 
-_observer: PauseObserver | None = None
+_OBSERVER: PauseObserver | None = None
 
 
 def observe_pauses(observer: PauseObserver | None) -> None:
     """Enter `observer()` around every later `pause`; None removes the observer."""
-    global _observer  # pylint: disable=global-statement
-    _observer = observer
+    global _OBSERVER  # pylint: disable=global-statement
+    _OBSERVER = observer
 
 
 async def pause(seconds: float) -> None:
     """Wait `seconds` (none when it is zero or less) for the provider's state to change."""
     delay = max(0.0, seconds)
-    observer = _observer
+    observer = _OBSERVER
     if observer is None:
         await asyncio.sleep(delay)
         return
