@@ -22,9 +22,13 @@ def test_boxd_regional_offer_matches_registry_countries_and_snapshot_declaration
     assert registry["regions"]["boxd:us-nyc"]["countries"] == ["US"]
     assert declaration["resources"]["located_in"] == ["DE", "US"]
     assert declaration["gates"]["snapshots"] == [
-        {"keeps": "files_and_memory", "original_after": "unknown", "deletable": True}
+        {"keeps": "files_and_memory", "original_after": "briefly_paused", "deletable": True}
     ]
-    assert "custom_images" not in declaration["gates"]
+    assert declaration["gates"]["custom_images"] == [
+        {"source": "dockerfile"},
+        {"source": "oci"},
+        {"source": "provider_artifact"},
+    ]
 
 
 def test_boxd_size_resolution_fills_the_fixed_disk_for_a_request_that_names_none() -> None:
