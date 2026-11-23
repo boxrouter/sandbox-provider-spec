@@ -59,9 +59,11 @@ from sandbox_provider_spec.driver import (
 from sandbox_provider_spec.lifetime import DEFAULT_LIFETIME_SECONDS
 from sandbox_provider_spec.run_id import native_name, stale
 
+#: The provider's SDK, spelled once for the messages below.
+_SDK = "Vercel Sandbox SDK"
 #: How long a create waits for the team's concurrency limit (10 on the Hobby plan).
 CONCURRENCY_WAIT_SECONDS = 300
-#: Vercel's sandbox status, in the suite's state words; any other status is passed on as is.
+#: The provider's sandbox status, in the suite's state words; any other status is passed on as is.
 STATES = {"running": "active", "stopped": "stopped"}
 
 
@@ -97,15 +99,14 @@ def _policy(settings: Mapping[str, Any]) -> NetworkPolicy:
     if policy == "open":
         if "cuts_open_connections" in settings:
             raise Unsupported(
-                "Vercel Sandbox SDK does not specify whether network updates "
-                "close existing connections"
+                f"{_SDK} does not specify whether network updates close existing connections"
             )
         return NetworkPolicy.allow_all()
     if "domain_traffic" in settings:
-        raise Unsupported("Vercel Sandbox SDK has no network protocol selector for domain rules")
+        raise Unsupported(f"{_SDK} has no network protocol selector for domain rules")
     if "cuts_open_connections" in settings:
         raise Unsupported(
-            "Vercel Sandbox SDK does not specify whether network updates close existing connections"
+            f"{_SDK} does not specify whether network updates close existing connections"
         )
     if settings.get("http_rules"):
         raise Unsupported(
@@ -133,7 +134,7 @@ def _policy(settings: Mapping[str, Any]) -> NetworkPolicy:
             if not isinstance(entry, str):
                 raise Unsupported("Vercel network policy entries must be domains or IPv4 ranges")
             if ":" in entry:
-                raise Unsupported("Vercel Sandbox SDK network subnets accept IPv4 ranges only")
+                raise Unsupported(f"{_SDK} network subnets accept IPv4 ranges only")
             try:
                 addresses.append(str(ipaddress.IPv4Network(entry, strict=False)))
             except ValueError:
@@ -170,9 +171,7 @@ def _policy(settings: Mapping[str, Any]) -> NetworkPolicy:
         return NetworkPolicy.custom(
             allow={"*": ()}, subnets=NetworkPolicySubnets(deny=denied_addresses)
         )
-    raise Unsupported(
-        "Vercel Sandbox SDK supports allowlist, address denylist, open and deny-all policies"
-    )
+    raise Unsupported(f"{_SDK} supports allowlist, address denylist, open and deny-all policies")
 
 
 @dataclass
@@ -243,29 +242,28 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
     sdk_versions = {"vercel-sandbox": version("vercel-sandbox")}
     unsupported = {
         "resize": (
-            "Vercel Sandbox SDK does not document resource updates taking effect "
-            "in the current session"
+            f"{_SDK} does not document resource updates taking effect in the current session"
         ),
-        "ssh.access": "Vercel Sandbox SDK does not expose sandbox SSH access",
-        "process.write_stdin": "Vercel Sandbox SDK does not support process standard input",
-        "process.close_stdin": "Vercel Sandbox SDK does not support process standard input",
-        "terminal.open": "Vercel Sandbox SDK has no PTY operation",
-        "terminal.write": "Vercel Sandbox SDK has no PTY operation",
-        "terminal.output": "Vercel Sandbox SDK has no PTY operation",
+        "ssh.access": f"{_SDK} does not expose sandbox SSH access",
+        "process.write_stdin": f"{_SDK} does not support process standard input",
+        "process.close_stdin": f"{_SDK} does not support process standard input",
+        "terminal.open": f"{_SDK} has no PTY operation",
+        "terminal.write": f"{_SDK} has no PTY operation",
+        "terminal.output": f"{_SDK} has no PTY operation",
         "lifetime.observe_paused_countdown": (
-            "Vercel SDK exposes no remaining lifetime; each session gets its own time limit"
+            f"{_SDK} exposes no remaining lifetime; each session gets its own time limit"
         ),
-        "terminal.disconnect": "Vercel Sandbox SDK has no PTY operation",
-        "terminal.reattach": "Vercel Sandbox SDK has no PTY operation",
+        "terminal.disconnect": f"{_SDK} has no PTY operation",
+        "terminal.reattach": f"{_SDK} has no PTY operation",
         "tcp.link": "Vercel previews route HTTP only; the SDK has no raw TCP link",
-        "interpreter.context": "Vercel Sandbox SDK has no code interpreter",
-        "interpreter.run": "Vercel Sandbox SDK has no code interpreter",
-        "desktop.screenshot": "Vercel Sandbox SDK has no desktop operation",
-        "desktop.click": "Vercel Sandbox SDK has no desktop operation",
-        "desktop.type": "Vercel Sandbox SDK has no desktop operation",
-        "desktop.key": "Vercel Sandbox SDK has no desktop operation",
-        "desktop.start": "Vercel Sandbox SDK has no desktop operation",
-        "desktop.live_link": "Vercel Sandbox SDK has no desktop operation",
+        "interpreter.context": f"{_SDK} has no code interpreter",
+        "interpreter.run": f"{_SDK} has no code interpreter",
+        "desktop.screenshot": f"{_SDK} has no desktop operation",
+        "desktop.click": f"{_SDK} has no desktop operation",
+        "desktop.type": f"{_SDK} has no desktop operation",
+        "desktop.key": f"{_SDK} has no desktop operation",
+        "desktop.start": f"{_SDK} has no desktop operation",
+        "desktop.live_link": f"{_SDK} has no desktop operation",
     }
 
     def create(self, target: object, inputs: Inputs) -> Observation:
@@ -303,23 +301,20 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
         requirements = cast(Mapping[str, Mapping[str, Any]], inputs.get("requirements", {}))
         custom_images = requirements.get("custom_images", {})
         if inputs.get("build_context") or custom_images.get("build_context"):
-            raise Unsupported(
-                "Vercel Sandbox SDK does not build images from a Dockerfile or context"
-            )
+            raise Unsupported(f"{_SDK} does not build images from a Dockerfile or context")
         if "join" in inputs or "private_network" in requirements:
             raise Unsupported(
                 "Vercel Secure Compute network IDs do not provide sandbox-to-sandbox "
                 "private networking"
             )
         if "nested_virtualization" in inputs or "nested_virtualization" in requirements:
-            raise Unsupported("Vercel Sandbox SDK has no nested virtualization setting")
+            raise Unsupported(f"{_SDK} has no nested virtualization setting")
         if "live_resize" in requirements:
             raise Unsupported(
-                "Vercel Sandbox SDK does not document resource updates taking effect "
-                "in the current session"
+                f"{_SDK} does not document resource updates taking effect in the current session"
             )
         if "ssh" in requirements:
-            raise Unsupported("Vercel Sandbox SDK does not expose sandbox SSH access")
+            raise Unsupported(f"{_SDK} does not expose sandbox SSH access")
         # A persistent sandbox keeps its files when its session ends (`stopped`) and is the
         # only kind Vercel can stop and resume; a non-persistent one is removed.
         options: dict[str, Any] = {
@@ -362,7 +357,7 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
                 raise NotRun("gate_mapping_unavailable")
         resources = cast(Mapping[str, object], inputs.get("resources", {}))
         if "disk_min_mib" in resources:
-            raise Unsupported("Vercel Sandbox SDK has no disk size selector")
+            raise Unsupported(f"{_SDK} has no disk size selector")
         if set(resources) - {"cpu_min", "memory_min_mib", "long_running"}:
             raise NotRun("resource_mapping_unavailable")
         if "cpu_min" in resources or "memory_min_mib" in resources:
@@ -646,7 +641,7 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
 
     def preview_revoke(self, target: object, inputs: Inputs) -> Observation:
         del target, inputs
-        raise Unsupported("Vercel SDK cannot revoke one preview URL")
+        raise Unsupported(f"{_SDK} cannot revoke one preview URL")
 
     def lifetime_extend(self, target: object, inputs: Inputs) -> Observation:
         box(target).extend_execution_time_limit(number(inputs, "lifetime_seconds", 180))
@@ -670,18 +665,14 @@ class VercelDriver(Driver):  # pylint: disable=too-many-public-methods
     def image_prepare(self, target: object, inputs: Inputs) -> Observation:
         del target
         if inputs.get("source") == "dockerfile" or "context" in inputs:
-            raise Unsupported(
-                "Vercel Sandbox SDK does not build images from a Dockerfile or context"
-            )
+            raise Unsupported(f"{_SDK} does not build images from a Dockerfile or context")
         if inputs.get("source") == "private_oci":
             raise Unsupported(
-                "Vercel Sandbox SDK accepts image references but has no generic "
-                "private registry credentials"
+                f"{_SDK} accepts image references but has no generic private registry credentials"
             )
         if "username" in inputs or "password" in inputs:
             raise Unsupported(
-                "Vercel Sandbox SDK accepts image references but has no generic "
-                "private registry credentials"
+                f"{_SDK} accepts image references but has no generic private registry credentials"
             )
         # An existing reference is borrowed, never built or deleted by the test.
         return {"resource": Resource("image_reference", text(inputs, "image"), lambda: {}, True)}
