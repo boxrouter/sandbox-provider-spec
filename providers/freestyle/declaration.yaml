@@ -1,0 +1,77 @@
+spec: sandbox-provider-spec/0.1
+provider: freestyle
+# Every value is `unknown`, absent, a dated quote of Freestyle's documentation or API, or a committed
+# tester report (see evidence.md).
+verified:
+  date: 2026-11-23
+  # Freestyle's API is called over plain HTTP: the adapter uses httpx, no Freestyle SDK.
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.81"}
+resources:
+  kernel: dedicated
+  # The default base snapshot `freestyle/ubuntu`: 4 vCPU, 8 GiB memory, 32 GB disk (the largest the Free
+  # plan allows, so every plan can create it).
+  sizes:
+  - {cpu: 4, memory_mib: 8192, disk_mib: 32768}
+  default_size: {cpu: 4, memory_mib: 8192, disk_mib: 32768}
+  default_user: ubuntu
+  default_cwd: /home/ubuntu
+  root: [sudo]
+  # `ttlSeconds` is refused above 10 years (live, evidence/probe-shapes-*).
+  max_lifetime_seconds: 315360000
+  file_stream_max_bytes:
+    read: {at_least: 1073741824}
+    write: {at_least: 1073741824}
+  gpus: unknown
+  regions: unknown
+  located_in: unknown
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  long_running: unknown
+  extendable_lifetime: unknown
+# `lifetime_timer` is left out: Freestyle's `ttlSeconds` backstop is enforced by a sweep minutes late (evidence.md).
+gates:
+  # `POST /pause` keeps memory and processes (a file in /dev/shm and a running process survived a pause).
+  pause_resume:
+  - keeps: files_and_memory
+evidence:
+  resources.kernel:
+    source: https://www.freestyle.sh/docs/vms
+    read: 2026-11-23
+    quote: Freestyle VMs are full Linux virtual machines designed for long-running, complex tasks.
+  resources.sizes:
+    source: https://www.freestyle.sh/docs/vms/base-snapshots
+    read: 2026-11-23
+    quote: '| `freestyle/ubuntu` default | Ubuntu 24.04 LTS | 4 | 8 GiB | 32 GB |'
+  resources.default_size:
+    source: https://www.freestyle.sh/docs/vms/pricing-and-limits
+    read: 2026-11-23
+    quote: 'When you create a VM without requesting a specific size, it boots with: 4 vCPUs, 8 GiB memory, 32 GB disk'
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/tester-retry-20261123.json
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/tester-select-20261123.json
+  resources.root:
+    tests:
+    - coverage.facts.root.sudo
+    report: reports/tester-select-20261123.json
+  resources.max_lifetime_seconds:
+    source: https://api.freestyle.sh/v5/vms
+    read: 2026-11-23
+    quote: 'bad request: ttlSeconds cannot exceed 315360000 (10 years); got 99999999999'
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/tester-default-core.json
+  resources.file_stream_max_bytes.read:
+    tests:
+    - files.stream.v1.read.1gib
+    report: reports/tester-select-20261123.json
+  resources.file_stream_max_bytes.write:
+    tests:
+    - files.stream.v1.write.1gib
+    report: reports/tester-retry-20261123.json

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.83: adds the Freestyle provider folder (`providers/freestyle`: declaration, brand, notes, hidden publication, evidence and tester reports). No API, vocabulary or conformance-suite change.
 - 0.5.82: adds Beam's first declaration (`providers/beam/declaration.yaml`): it states no value (every fact `unknown`) so Cloud's go-live checks have a declaration to compare Beam's discovery with; no publication or conformance change.
 - 0.5.81: keeps the traces and sample logs behind the Blaxel pause finding (`providers/blaxel/pause-20261123/`) and says in the Blaxel evidence why `pause_resume` stays unclaimed. No declaration, vocabulary or conformance-suite change.
 - 0.5.80: `Provider.image_recipe_revision()`, an optional class method that returns the empty string by default: what a package adds to an image it prepares, as `[0-9a-f]{12}` derived from it, so a caller can carry it in the identity of a prepared copy (a copy made by an older recipe is another copy). A provider that does not state it behaves as before. No vocabulary or conformance-suite change.

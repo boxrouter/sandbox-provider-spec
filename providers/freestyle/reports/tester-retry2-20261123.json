@@ -1,0 +1,65 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "baseline.list": "sha256:207377f8c79c0f0f9bb6e484c160882578f866e3af512a2a602b52cec99a2e02"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.81"
+  },
+  "finished_at": "2026-11-23T12:41:11.535209+00:00",
+  "provider": "freestyle",
+  "revision": "4d2176782b2a7b0172fae0157abe79f71c1bf7dc",
+  "run_id": "public-7c2cbe516d23051503bc",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.81"
+  },
+  "selected_tests": [
+    "baseline.list"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T12:40:49.105684+00:00",
+  "subject": {
+    "discovery_digest": "sha256:f44228d63d9d4779dd40ad45cceb758f6787960b1b4265ab716ef559e09dd142",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:3dfc97a20204d7d8731c9d152ac0e7345823403512eba7dc58a48f3b587f0cbb",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10993,
+      "id": "baseline.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

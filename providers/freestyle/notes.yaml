@@ -1,0 +1,4 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.pause: Pausing a VM keeps its memory and processes; a paused VM bills disk only.
+fact.cost: Freestyle states no per-VM cost; the cost is the allocated vCPU, memory and disk against the
+  run seconds and age that the VM record states, and its record ends with the VM.

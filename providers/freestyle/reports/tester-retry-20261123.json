@@ -1,0 +1,220 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "baseline.destroy": "sha256:bf7709266fa96cd2d3265cd68e7ca5ea06c2b1357ca284d8c1b11896bc6f9784",
+    "baseline.list": "sha256:207377f8c79c0f0f9bb6e484c160882578f866e3af512a2a602b52cec99a2e02",
+    "contract.idempotent_create_other_body": "sha256:f28c55b546aaaa6f5f3697ee15793f7a3fcbacf8673d8af69fffb739d6a03c16",
+    "facts.default_user": "sha256:edcacbaaf78a80d689a5b337fc61527c126bfdb795daeea6373d28e590eb6f6a",
+    "files.stream.v1.write.1gib": "sha256:ac5b74a76be578c33812a6d852c2150d363578a9fa3e8d1fc88be4695299b943"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.81"
+  },
+  "finished_at": "2026-11-23T12:40:37.166501+00:00",
+  "provider": "freestyle",
+  "revision": "4d2176782b2a7b0172fae0157abe79f71c1bf7dc",
+  "run_id": "public-ba587e56d75ba2f78171",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.81"
+  },
+  "selected_tests": [
+    "baseline.list",
+    "baseline.destroy",
+    "facts.default_user",
+    "contract.idempotent_create_other_body",
+    "files.stream.v1.write.1gib"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T12:36:46.284686+00:00",
+  "subject": {
+    "discovery_digest": "sha256:f44228d63d9d4779dd40ad45cceb758f6787960b1b4265ab716ef559e09dd142",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:3dfc97a20204d7d8731c9d152ac0e7345823403512eba7dc58a48f3b587f0cbb",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 50739,
+      "id": "baseline.list",
+      "proves": [],
+      "reason": "timeout",
+      "result": "error",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "timeout",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 31258,
+      "id": "baseline.destroy",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 655,
+      "id": "facts.default_user",
+      "proves": [
+        {
+          "fact": "resources.default_user",
+          "value": "ubuntu"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_user": "ubuntu"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1092,
+      "id": "contract.idempotent_create_other_body",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/idempotent-create"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "count": {
+              "matches": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 135698,
+      "id": "files.stream.v1.write.1gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 1073741824
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

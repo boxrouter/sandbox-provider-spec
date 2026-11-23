@@ -1,0 +1,307 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.root.sudo": "sha256:824181107edc638a0fe2983936a0d065930aadbf89eeafc10140268848a50ce9",
+    "facts.default_cwd": "sha256:947352e79dd672e6f464e224bc0a716b1d256d3fea48f3e53ea2fa8874c5807c",
+    "facts.default_user": "sha256:edcacbaaf78a80d689a5b337fc61527c126bfdb795daeea6373d28e590eb6f6a",
+    "files.stream.v1.read.1gib": "sha256:1a054548d63c462ce820783f91d7148efa33061ae0de3772a2c077937b42874d",
+    "files.stream.v1.read.64mib": "sha256:1bdb41cda59ee5ea12157e31af923cbfdd031fce31f641273699df27f778b1b1",
+    "files.stream.v1.write.1gib": "sha256:ac5b74a76be578c33812a6d852c2150d363578a9fa3e8d1fc88be4695299b943",
+    "files.stream.v1.write.64mib": "sha256:1b6d2e72409bf18f3bb565aaa76763821d67cf8ee61bfa89d6e2e58239d50927"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.81"
+  },
+  "finished_at": "2026-11-23T12:36:30.262709+00:00",
+  "provider": "freestyle",
+  "revision": "4d2176782b2a7b0172fae0157abe79f71c1bf7dc",
+  "run_id": "public-8bd875d5afc9fa5836e7",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.81"
+  },
+  "selected_tests": [
+    "facts.default_user",
+    "facts.default_cwd",
+    "coverage.facts.root.sudo",
+    "files.stream.v1.write.64mib",
+    "files.stream.v1.write.1gib",
+    "files.stream.v1.read.64mib",
+    "files.stream.v1.read.1gib"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T12:31:55.803499+00:00",
+  "subject": {
+    "discovery_digest": "sha256:f44228d63d9d4779dd40ad45cceb758f6787960b1b4265ab716ef559e09dd142",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:3dfc97a20204d7d8731c9d152ac0e7345823403512eba7dc58a48f3b587f0cbb",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 50754,
+      "id": "facts.default_user",
+      "proves": [],
+      "reason": "timeout",
+      "result": "error",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "timeout",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11335,
+      "id": "facts.default_cwd",
+      "proves": [
+        {
+          "fact": "resources.default_cwd",
+          "value": "/home/ubuntu"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_cwd": "<HOME>"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11267,
+      "id": "coverage.facts.root.sudo",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "sudo"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11093,
+      "id": "files.stream.v1.write.64mib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 67108864
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 50627,
+      "id": "files.stream.v1.write.1gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "write": {
+              "at_least": 1073741824
+            }
+          }
+        }
+      ],
+      "reason": "timeout",
+      "result": "error",
+      "rules": [
+        "facts/file-stream-write"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "timeout",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 20891,
+      "id": "files.stream.v1.read.64mib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "read": {
+              "at_least": 67108864
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-read"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 117105,
+      "id": "files.stream.v1.read.1gib",
+      "proves": [
+        {
+          "fact": "resources.file_stream_max_bytes",
+          "value": {
+            "read": {
+              "at_least": 1073741824
+            }
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/file-stream-read"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

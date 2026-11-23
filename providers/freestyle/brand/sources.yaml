@@ -1,0 +1,26 @@
+retrieved_at: '2026-11-23'
+owner: Freestyle (freestyle.sh)
+source_page: https://www.freestyle.sh
+assets:
+  logo.svg:
+    source: https://www.freestyle.sh/logo.svg
+    role: Official Freestyle cloud symbol, the one file freestyle.sh serves as its logo (black stroke, no wordmark)
+    modifications: none; byte-identical to the served file (sha256 fd4e3bc0...90e72a9)
+  mark.svg:
+    source: https://www.freestyle.sh/logo.svg
+    role: Official one-colour Freestyle symbol, for use as a mask
+    modifications: >-
+      the stroke presentation attributes of the three paths (black, width 25, round caps, no fill) are
+      set once on the root <svg> element so the size test can measure the stroke; the paths are unchanged
+notes:
+  single_colour: >-
+    freestyle.sh publishes only this one-colour (black stroke) symbol, used in its page header and
+    structured data; it has no wordmark file, dark-background variant or colour version, so the logo
+    and the mark are the same drawing.
+  colour_choice: >-
+    #647AC3 is the blue accent in the site's stylesheet (the symbol itself is black); no brand page
+    names a colour.
+  no_brand_page: freestyle.sh/brand and /press return 404; no brand kit exists
+  terms: >-
+    no terms page was found on freestyle.sh (/terms, /legal and /terms-of-service return 404; only
+    /privacy exists), so no reuse terms or brand guidelines were found.
