@@ -1,0 +1,19 @@
+spec: sandbox-provider-spec/0.1
+provider: beam
+# A first declaration for the go-live wiring: it states no value, so every fact is `unknown` until a
+# clean tester run or a dated quote of Beam's documentation backs it (a later change adds them; the
+# package's discovery claims more than this file does, which `KNOWN_DRIFT` in cloud-hosted-adapters
+# records until then).
+verified:
+  date: 2026-11-23
+  # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
+  sdks: {"beta9": "0.1.300", "sandbox-provider-spec": "0.5.82"}
+resources:
+  kernel: unknown
+  sizes: unknown
+  gpus: unknown
+  regions: unknown
+  long_running: unknown
+  extendable_lifetime: unknown
+gates: {}
+evidence: {}
