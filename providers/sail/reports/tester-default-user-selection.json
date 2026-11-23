@@ -1,0 +1,237 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "files.write.user": "sha256:0dc3f3d84e52f4403e4afb2816e4b21df7db4479669e0e31342191edb87a783a",
+    "process.start.user": "sha256:3e5fd3325df32fb72a7163ea35e330df60de29412e7a4cdeb3f3bd935fdd9c0c",
+    "run.user": "sha256:7c81584ed130f96a686697ed79d12d12496bbfe6641497c5ef7ccb6bb3c3c082"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.84"
+  },
+  "finished_at": "2026-11-23T15:42:55.187891+00:00",
+  "provider": "sail",
+  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
+  "run_id": "public-d051af66882911a68dbc",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.84"
+  },
+  "selected_tests": [
+    "run.user",
+    "files.write.user",
+    "process.start.user"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T15:42:46.732061+00:00",
+  "subject": {
+    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "package": "sps-provider-sail",
+    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2239,
+      "id": "run.user",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "user-selection/commands"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1966,
+      "id": "files.write.user",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "user-selection/files-write"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "Y29uZm9ybWFuY2UK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1990,
+      "id": "process.start.user",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "user-selection/process-start"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

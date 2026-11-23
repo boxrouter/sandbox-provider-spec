@@ -1,0 +1,218 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "facts.default_cwd": "sha256:947352e79dd672e6f464e224bc0a716b1d256d3fea48f3e53ea2fa8874c5807c",
+    "facts.default_user": "sha256:edcacbaaf78a80d689a5b337fc61527c126bfdb795daeea6373d28e590eb6f6a",
+    "lifetime_timer.at_end.destroyed": "sha256:077f2abf65fcc28b85352bf9eb07f0726efe9da2442c992db4d900eb51fcfd4b",
+    "processes.cancel.false": "sha256:db12eaf12e81d8d697d03b21395d1e290b4af569f4bf97184a633a2b58451a33",
+    "processes.input.false": "sha256:5d8d167be0070fcc8cb8a355d821c0446641dd5c50dbee388877c19d281fdb49"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.84"
+  },
+  "finished_at": "2026-11-23T15:47:44.079701+00:00",
+  "provider": "sail",
+  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
+  "run_id": "public-f3e64eef9f5dd00a9a23",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.84"
+  },
+  "selected_tests": [
+    "processes.input.false",
+    "processes.cancel.false",
+    "facts.default_user",
+    "facts.default_cwd",
+    "lifetime_timer.at_end.destroyed"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T15:42:31.966059+00:00",
+  "subject": {
+    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "package": "sps-provider-sail",
+    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.input.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": true
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "processes.cancel.false",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "cancel",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/cancel"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "absent": {
+              "matches": true
+            }
+          },
+          "operation": "native.operation_absent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1713,
+      "id": "facts.default_user",
+      "proves": [
+        {
+          "fact": "resources.default_user",
+          "value": "root"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_user": "root"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1768,
+      "id": "facts.default_cwd",
+      "proves": [
+        {
+          "fact": "resources.default_cwd",
+          "value": "/"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_cwd": "/"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 306460,
+      "id": "lifetime_timer.at_end.destroyed",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "destroyed"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/lifetime-timer",
+        "provider-api/lifetime-enforced"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
