@@ -1973,3 +1973,12 @@ def test_a_claimed_section_with_only_coverage_rows_runs_them_by_default() -> Non
     assert chosen({"tcp_ports": {"tls": "none", "max_tcp_ports": 1}}) == set()  # fewer than two
     assert chosen({"tcp_ports": {"tls": "tls", "max_tcp_ports": 8}}) == set()  # not TLS none
     assert chosen({"snapshots": {"keeps": "files_only"}}) == set()  # sections with tests unchanged
+
+
+def test_driver_answers_unsupported_for_an_end_state_1_0_cannot_name(
+    driver: ProviderDriver,
+) -> None:
+    """`at_end: stopped` is not a 1.0 value (destroyed | paused): sent over HTTP it was a
+    `WireError`, so the driver says `unsupported` and sends nothing."""
+    with pytest.raises(Unsupported):
+        driver.call("create", None, {"at_end": "stopped"})

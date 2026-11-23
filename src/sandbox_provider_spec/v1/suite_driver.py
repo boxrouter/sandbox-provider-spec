@@ -319,6 +319,8 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             raise Unsupported("an image that SPS 1.0 cannot name")
         env = strings(inputs, "environment")
         requirements = _request_requirements(inputs.get("requirements", {}))
+        if inputs.get("at_end", "destroyed") not in ("destroyed", "paused"):
+            raise Unsupported("an at_end that SPS 1.0 cannot name")
         secrets = self._secrets(inputs, requirements, env)
         request = CreateRequest(
             sandbox_class=self.sandbox_class if snapshot is None else snapshot.sandbox_class,

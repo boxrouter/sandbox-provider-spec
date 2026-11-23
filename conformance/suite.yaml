@@ -933,8 +933,7 @@ tests:
     in:
       lifetime_seconds: 60
       requirements:
-        pause_resume:
-          keeps: any
+        pause_resume: {}
     as: box
   - op: pause
     target: box
@@ -957,8 +956,7 @@ tests:
     in:
       lifetime_seconds: 60
       requirements:
-        pause_resume:
-          keeps: any
+        pause_resume: {}
     as: box
   - op: pause
     target: box
@@ -2335,8 +2333,7 @@ tests:
       requirements:
         network_lockdown:
           policy: deny_all
-        pause_resume:
-          keeps: any
+        pause_resume: {}
   - op: pause
     target: box
   - op: resume
