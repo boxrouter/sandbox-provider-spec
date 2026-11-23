@@ -10,7 +10,7 @@ from collections.abc import AsyncIterator
 import httpx
 import pytest
 
-from sandbox_provider_spec.v1 import connections
+from sandbox_provider_spec.v1 import connections, timing
 
 # Longer than httpx's own keepalive_expiry (5 s), far shorter than the factory's 300 s.
 IDLE_GAP_SECONDS = 5.5
@@ -211,8 +211,8 @@ def _flaky(error: httpx.HTTPError) -> tuple[httpx.MockTransport, list[int]]:
     return httpx.MockTransport(handler), calls
 
 
-@pytest.mark.parametrize("error_type", [httpx.WriteError, httpx.ConnectError])
-def test_a_write_or_connect_that_failed_is_sent_again_for_any_method(
+@pytest.mark.parametrize("error_type", [httpx.WriteError])
+def test_a_write_that_failed_is_sent_again_for_any_method(
     error_type: type[httpx.HTTPError],
 ) -> None:
     async def run() -> int:
@@ -390,14 +390,12 @@ def test_an_observer_that_raises_changes_nothing() -> None:
 
 
 def test_only_the_second_send_is_marked_as_a_resend() -> None:
-    from sandbox_provider_spec.v1 import timing  # noqa: PLC0415
-
     marks: list[bool] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         marks.append(timing.in_resend())
         if len(marks) == 1:
-            raise httpx.ConnectError("refused")
+            raise httpx.WriteError("closed")
         return httpx.Response(200, json={})
 
     async def run() -> None:
@@ -407,3 +405,51 @@ def test_only_the_second_send_is_marked_as_a_resend() -> None:
 
     asyncio.run(run())
     assert marks == [False, True]
+
+
+def test_a_connect_error_from_a_supplied_transport_is_never_sent_again() -> None:
+    """A transport the caller supplies (an address-checking one) raises `ConnectError` for a
+    destination it refuses by policy: a second try would resolve the name again. One call, and
+    the failure is reported as not resent."""
+
+    class Refuses(httpx.AsyncBaseTransport):
+        def __init__(self) -> None:
+            self.calls = 0
+
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            self.calls += 1
+            raise httpx.ConnectError("public endpoint address refused", request=request)
+
+    heard: list[str] = []
+    connections.observe_failures(lambda facts: heard.append(str(facts["resent"])))
+    transport = Refuses()
+    try:
+
+        async def run() -> None:
+            async with connections.provider_client(transport=transport) as client:
+                with pytest.raises(httpx.ConnectError):
+                    await client.get("https://x.test/x")
+
+        asyncio.run(run())
+    finally:
+        connections.observe_failures(None)
+    assert transport.calls == 1
+    assert heard == ["no"]
+
+
+def test_a_refused_connect_on_the_libraries_own_transport_is_sent_again_once() -> None:
+    heard: list[str] = []
+    connections.observe_failures(lambda facts: heard.append(str(facts["resent"])))
+    try:
+
+        async def run() -> None:
+            async with _Server() as server:
+                port = server.port  # closed again when the block ends: nothing listens
+            async with connections.provider_client() as client:
+                with pytest.raises(httpx.ConnectError):
+                    await client.get(f"http://127.0.0.1:{port}/x")
+
+        asyncio.run(run())
+    finally:
+        connections.observe_failures(None)
+    assert heard == ["yes", "second"]

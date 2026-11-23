@@ -23,7 +23,9 @@ an answer) although nothing is wrong with the provider. The client `provider_cli
 such a call once more, on a fresh connection, only when that cannot repeat an effect, and whose body
 can be read again (a stream body cannot):
 
-- a connection that could not be made (`ConnectError`): nothing was sent;
+- a connection that could not be made (`ConnectError`) on the library's own transport: nothing
+  was sent (a transport the caller supplies may raise it for a destination it refuses, which is
+  never tried again);
 - a write that failed on HTTP/1.1 with a stated length: the peer closed before it took the whole
   request, and a server runs a request only once it has the whole of it;
 - on HTTP/2, a stream the peer reset with REFUSED_STREAM, which RFC 9113 says was not processed;
@@ -101,7 +103,9 @@ def observe_failures(observer: FailureObserver | None) -> None:
     _OBSERVER = observer
 
 
-def _resendable(request: httpx.Request, error: Exception, *, http2: bool) -> bool:
+def _resendable(
+    request: httpx.Request, error: Exception, *, http2: bool, own_transport: bool
+) -> bool:
     """Whether `request`, which failed with `error` before any answer, may be sent once more on a
     fresh connection without repeating an effect."""
     import httpx  # noqa: PLC0415  # pylint: disable=import-outside-toplevel,redefined-outer-name
@@ -110,13 +114,19 @@ def _resendable(request: httpx.Request, error: Exception, *, http2: bool) -> boo
     if not isinstance(request.stream, httpx.ByteStream):
         return False
     if isinstance(error, httpx.ConnectError):
-        return True  # nothing was sent
+        # Nothing was sent. Only on the library's own transport: a transport the caller supplies
+        # (an address-checking one, a mock) raises `ConnectError` for what it refuses by policy,
+        # and a refusal is never tried again: a second resolution of a name that just resolved
+        # to a forbidden address is what a rebinding attacker wants.
+        return own_transport
     if isinstance(error, httpx.WriteError):
         # HTTP/1.1 with a stated length (httpx states one for a body it holds): the peer closed
         # the connection before it took the whole request, and a server runs a request only once
         # it has the whole of it, so this one did not run. HTTP/2 is not argued here: a stream
         # may have been processed before its connection went away.
-        return not http2 and "content-length" in request.headers
+        # A request with no body states its end by having none.
+        framed = "content-length" in request.headers or not any(request.stream)
+        return not http2 and framed
     if http2 and _h2_fact(error)[1] == _H2_REFUSED_STREAM:
         # RFC 9113 section 8.7: a stream reset with REFUSED_STREAM was not processed, so it may
         # be sent again whatever the method. (A stream above the last stream id of a GOAWAY is the
@@ -163,6 +173,7 @@ def _client_class() -> type[httpx.AsyncClient]:
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             self._http2 = bool(kwargs.get("http2", False))
+            self._own_transport = kwargs.get("transport") is None
             super().__init__(*args, **kwargs)
 
         async def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
@@ -170,7 +181,9 @@ def _client_class() -> type[httpx.AsyncClient]:
             try:
                 return await super().send(request, **kwargs)
             except failures as error:
-                resend = _resendable(request, error, http2=self._http2)
+                resend = _resendable(
+                    request, error, http2=self._http2, own_transport=self._own_transport
+                )
                 self._report_failure(request, error, started, resent="yes" if resend else "no")
                 if not resend:
                     raise

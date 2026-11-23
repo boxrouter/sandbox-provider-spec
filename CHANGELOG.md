@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.92: `v1.connections.provider_client` no longer sends a `ConnectError` again when the caller supplied the transport: such a transport (an address-checking one) raises it for a destination it refuses by policy, and a refusal is never tried again (a second resolution of a name that resolved to a forbidden address is what a rebinding attacker wants). The library's own transport still sends a refused connect once more. A request with no body counts as framed for the HTTP/1.1 write-failure rule (its resend was missed for a GET). No vocabulary, declaration or conformance-suite change.
 - 0.5.91: the `resume.lifetime` suite row asks for `pause_resume: {}` in its create step, not `keeps: any`: `keeps` takes `files_only` or `files_and_memory` on the wire, so the row's create failed with a `WireError` before any provider call, on every package that lists `resume.lifetime` (found by the first prober run, 2026-11-23). No other change.
 
 - 0.5.90: the Sail declaration states `custom_images` (`provider_artifact` and a prepared `oci`), cited to a committed tester report from a clean checkout; no vocabulary or conformance-suite change.
