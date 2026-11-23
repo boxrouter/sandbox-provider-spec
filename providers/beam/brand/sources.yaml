@@ -1,0 +1,21 @@
+retrieved_at: '2026-11-23'
+owner: Beam (Smartshare, Inc.)
+source_page: https://www.beam.cloud
+assets:
+  mark.svg:
+    source: https://www.beam.cloud/favicon.svg
+    role: >-
+      Official Beam symbol, the white glyph of the site's own favicon drawn here in one colour
+      (black, so it follows the page's text colour); the logo and the mark are this one file
+    modifications: >-
+      The favicon's pixel-pattern background square and clip were removed and the glyph path was
+      taken as published (its translate and scale transform dropped; the viewBox is the path's own
+      coordinate extent, 0 0 81641 81642); fill changed from white to black. The path data is unchanged.
+notes:
+  chart_color: '#3B3C41 is the background colour of the same favicon; no brand colour page exists'
+  no_brand_page: beam.cloud/brand and /press return 404; no brand kit was found
+  no_wordmark: >-
+    beam.cloud/beam-logo-white.svg is the word "beam" in white for dark backgrounds, so no lockup
+    is shipped.
+  terms: >-
+    no reuse terms or brand guidelines were found; the mark is used to name Beam as a provider only.

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.79: adds the Beam brand (`providers/beam/brand.yaml` and `brand/`: one-colour mark from the site's own favicon glyph, chart colour `#3B3C41`); no declaration, publication or conformance change.
 - 0.5.77: the Blaxel declaration no longer claims `pause_resume`: the calls are in the sandbox's `sandbox-api` from 0.2.78 on and the images the adapter prepares carried 0.2.74. The evidence says why and when it returns. No API, vocabulary or conformance-suite change.
 - 0.5.76: publishes Boat (`providers/boat/publication.yaml`: the provider and its `default` class, `default_class: default`) under the founder records `founder-2026-11-23-boat-publish` and `founder-2026-11-23-boat-default-publish` ("also pls add boat now"), each with a content-bound receipt. No declaration, vocabulary, catalog or conformance-suite change.
 - 0.5.75: the Blaxel declaration claims `pause_resume` (`keeps: files_and_memory`) on the conformance report `reports/tester-pause-resume-20261123.json`, and its evidence says that Blaxel's sandbox API has the standby and resume calls. No API, vocabulary or conformance-suite change.
