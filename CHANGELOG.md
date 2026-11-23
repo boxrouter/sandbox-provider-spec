@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.86: the launch-state test lists Sail with the other unlaunched providers (Sail's brand, added in 0.5.85, has no `launched` until launch); the package's own test had been red since 0.5.85.
 - 0.5.85: adds the hidden Sail provider (`providers/sail/`: declaration for the `default` class, brand, notes, publication `state: hidden`, and its committed tester reports); no vocabulary or conformance-suite change.
 - 0.5.84: states Beam's declaration from its tester reports (`providers/beam`: processes, previews, network lockdown and the facts the reports prove). No API, vocabulary or conformance-suite change.
 - 0.5.83: adds the Freestyle provider folder (`providers/freestyle`: declaration, brand, notes, hidden publication, evidence and tester reports). No API, vocabulary or conformance-suite change.

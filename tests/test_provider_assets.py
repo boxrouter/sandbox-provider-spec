@@ -80,7 +80,7 @@ def test_launched_is_shipped_only_when_declared(tmp_path: Path) -> None:
 def test_shipped_launch_state_leaves_out_the_unlaunched_providers_until_launch() -> None:
     brands = provider_assets.build()["brand.json"]["providers"]
     launched = {name for name, declared in brands.items() if declared.get("launched")}
-    assert launched == set(brands) - {"agent37", "beam", "boat", "freestyle", "superserve"}
+    assert launched == set(brands) - {"agent37", "beam", "boat", "freestyle", "sail", "superserve"}
 
 
 def test_missing_files_mean_hidden_and_no_brand(tmp_path: Path) -> None:
