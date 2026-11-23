@@ -123,3 +123,12 @@ What a live run on the internal account showed (2026-11-23, `sps-provider-blaxel
 The claim rests on the conformance test `pause_resume.files_and_memory`
 ([`reports/tester-pause-resume-20261123.json`](reports/tester-pause-resume-20261123.json)): a process
 started before the pause carries on after the resume and writes the result that the test then reads.
+
+### Withdrawn the same day (2026-11-23)
+
+The claim is withdrawn. The two calls are served by the `sandbox-api` inside the sandbox, from
+version 0.2.78 on (the sandbox API's openapi at v0.2.74, v0.2.76 and v0.2.77 has neither; v0.2.78 to
+v0.2.81 have both). The run above was on Blaxel's own base image. The images that the adapter
+prepares, which every Cloud-created sandbox uses, carried version 0.2.74, and in production every
+`pause` of such a sandbox answered 404. The claim returns when the standard images are prepared with
+a `sandbox-api` that has the calls and the conformance row has passed on one of them, through Cloud.
