@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.84: states Beam's declaration from its tester reports (`providers/beam`: processes, previews, network lockdown and the facts the reports prove). No API, vocabulary or conformance-suite change.
 - 0.5.83: adds the Freestyle provider folder (`providers/freestyle`: declaration, brand, notes, hidden publication, evidence and tester reports). No API, vocabulary or conformance-suite change.
 - 0.5.82: adds Beam's first declaration (`providers/beam/declaration.yaml`): it states no value (every fact `unknown`) so Cloud's go-live checks have a declaration to compare Beam's discovery with; no publication or conformance change.
 - 0.5.81: keeps the traces and sample logs behind the Blaxel pause finding (`providers/blaxel/pause-20261123/`) and says in the Blaxel evidence why `pause_resume` stays unclaimed. No declaration, vocabulary or conformance-suite change.

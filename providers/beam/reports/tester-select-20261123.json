@@ -1,0 +1,324 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "edge.previews.public_under_lockdown": "sha256:6dadac501235bf056bb35dc8741a20349ed1f9f77369bd8466c8fbd9e6ca5589",
+    "facts.default_cwd": "sha256:947352e79dd672e6f464e224bc0a716b1d256d3fea48f3e53ea2fa8874c5807c",
+    "facts.default_user": "sha256:edcacbaaf78a80d689a5b337fc61527c126bfdb795daeea6373d28e590eb6f6a",
+    "facts.extendable_lifetime": "sha256:f3c35db46760e3bcec926ddbecb0fb4858168bad7d85e213b0a00ecc0f766070",
+    "lifetime_timer.at_end.destroyed": "sha256:077f2abf65fcc28b85352bf9eb07f0726efe9da2442c992db4d900eb51fcfd4b"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.84"
+  },
+  "finished_at": "2026-11-23T16:01:59.663419+00:00",
+  "provider": "beam",
+  "revision": "b0cfdaadffd544c3dfb8642fb4b61b6c96fd63bc",
+  "run_id": "public-d5a760fe8e4449afe8ae",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.84"
+  },
+  "selected_tests": [
+    "facts.default_user",
+    "facts.default_cwd",
+    "facts.extendable_lifetime",
+    "lifetime_timer.at_end.destroyed",
+    "edge.previews.public_under_lockdown"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T15:46:40.770997+00:00",
+  "subject": {
+    "discovery_digest": "sha256:db100eafaa66cb28685caf18768f93fd5091f83d376645fa3cfa4c324c67ec90",
+    "package": "sps-provider-beam",
+    "package_digest": "sha256:5bb84af6f0494ca32f79a3fdb5715d9aa308ef6bedfeb05713351fbfdf818425",
+    "version": "0.1.4"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 500,
+      "id": "facts.default_user",
+      "proves": [
+        {
+          "fact": "resources.default_user",
+          "value": "root"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_user": "root"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 439,
+      "id": "facts.default_cwd",
+      "proves": [
+        {
+          "fact": "resources.default_cwd",
+          "value": "/workspace"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/default-environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "default_cwd": "/workspace"
+          },
+          "operation": "environment.observe",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 611176,
+      "id": "facts.extendable_lifetime",
+      "proves": [
+        {
+          "fact": "resources.extendable_lifetime",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/extendable-lifetime"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "lifetime.extend",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "length": 6,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "length": 9,
+                "type": "str"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 305514,
+      "id": "lifetime_timer.at_end.destroyed",
+      "proves": [
+        {
+          "fact": "lifetime_timer.at_end",
+          "value": "destroyed"
+        },
+        {
+          "fact": "lifetime_timer.enforced_by",
+          "value": "provider"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/lifetime-timer",
+        "provider-api/lifetime-enforced"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 743,
+      "id": "edge.previews.public_under_lockdown",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "previews/public-serves-anyone"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": true,
+            "status": 200
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

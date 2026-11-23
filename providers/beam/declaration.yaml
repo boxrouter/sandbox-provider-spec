@@ -1,19 +1,219 @@
 spec: sandbox-provider-spec/0.1
 provider: beam
-# A first declaration for the go-live wiring: it states no value, so every fact is `unknown` until a
-# clean tester run or a dated quote of Beam's documentation backs it (a later change adds them; the
-# package's discovery claims more than this file does, which `KNOWN_DRIFT` in cloud-hosted-adapters
-# records until then).
+# Every value is `unknown`, absent or backed by a committed tester report (evidence.md says what each
+# rests on and what is left out).
 verified:
   date: 2026-11-23
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
-  sdks: {"beta9": "0.1.300", "sandbox-provider-spec": "0.5.82"}
+  sdks: {"sandbox-provider-spec": "0.5.84"}
 resources:
   kernel: unknown
   sizes: unknown
   gpus: unknown
   regions: unknown
   long_running: unknown
-  extendable_lifetime: unknown
-gates: {}
-evidence: {}
+  extendable_lifetime: true
+  default_user: root
+  default_cwd: /workspace
+  root: [by_default]
+  arch: [amd64]
+  libc: glibc
+  package_manager: apt
+  disk_in_memory: false
+  on_memory_exhausted: process_killed
+lifetime_timer:
+  enforced_by: provider
+  counts_paused_time: unknown
+  at_end: [destroyed]
+gates:
+  # A process is read again by its id from a cursor (`process_output`). No `input` and no `cancel`
+  # (Beam's exec takes no stdin here; nothing cancels a process): left out, not declared false.
+  processes:
+  - reattach: true
+  # Public links only (Beam's private link needs the account's own API token); no revoke.
+  previews:
+  - access: public
+    revocable: false
+    any_port: true
+    max_ports:
+      at_least: 2
+  # An allow list is enforced outside the sandbox; `deny_all` is an allow list of one unroutable address.
+  # No denylist.
+  network_lockdown:
+  - policy: [allowlist, deny_all, open]
+    entry_kinds: [names]
+    allow_wildcards: true
+    switchable: true
+    changeable: true
+    max_allow:
+      at_least: 32
+  - policy: [allowlist, deny_all, open]
+    entry_kinds: [addresses]
+    allow_wildcards: true
+    switchable: true
+    changeable: true
+    max_allow:
+      at_least: 32
+  - policy: [allowlist, deny_all, open]
+    entry_kinds: [names, addresses]
+    allow_wildcards: true
+    switchable: true
+    changeable: true
+    max_allow:
+      at_least: 32
+evidence:
+  resources.extendable_lifetime:
+    tests:
+    - facts.extendable_lifetime
+    report: reports/tester-select-20261123.json
+  resources.default_user:
+    tests:
+    - facts.default_user
+    report: reports/tester-select-20261123.json
+  resources.default_cwd:
+    tests:
+    - facts.default_cwd
+    report: reports/tester-select-20261123.json
+  resources.root:
+    tests:
+    - coverage.facts.root.by_default
+    report: reports/tester-default-coverage.json
+  resources.arch:
+    tests:
+    - coverage.facts.arch.amd64
+    report: reports/tester-default-coverage.json
+  resources.libc:
+    tests:
+    - coverage.facts.libc.glibc
+    report: reports/tester-default-coverage.json
+  resources.package_manager:
+    tests:
+    - coverage.facts.package_manager.apt
+    report: reports/tester-default-coverage.json
+  resources.disk_in_memory:
+    tests:
+    - coverage.facts.disk_in_memory.false
+    report: reports/tester-default-coverage.json
+  resources.on_memory_exhausted:
+    tests:
+    - coverage.facts.on_memory_exhausted.process_killed
+    report: reports/tester-default-coverage.json
+  lifetime_timer.enforced_by:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/tester-select-20261123.json
+  lifetime_timer.at_end:
+    tests:
+    - lifetime_timer.at_end.destroyed
+    report: reports/tester-select-20261123.json
+  gates.processes.0.reattach:
+    tests:
+    - processes.reattach.true
+    report: reports/tester-default-core.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/tester-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.false.public
+    report: reports/tester-default-core.json
+  gates.previews.0.max_ports:
+    tests:
+    - previews.listed_ports
+    report: reports/tester-default-core.json
+  gates.previews.0.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.0.policy:
+    reports:
+    - tests:
+      - network_lockdown.deny_all
+      - network_lockdown.allowlist.names
+      report: reports/tester-default-core.json
+    - tests:
+      - coverage.network_lockdown.open
+      report: reports/tester-default-coverage.json
+  gates.network_lockdown.0.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.switchable:
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.0.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.true
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.1.policy:
+    reports:
+    - tests:
+      - network_lockdown.deny_all
+      - network_lockdown.allowlist.addresses
+      report: reports/tester-default-core.json
+    - tests:
+      - coverage.network_lockdown.open
+      report: reports/tester-default-coverage.json
+  gates.network_lockdown.1.entry_kinds:
+    reports:
+    - tests:
+      - network_lockdown.allowlist.addresses
+      report: reports/tester-default-core.json
+    - tests:
+      - coverage.network_lockdown.allowlist.range
+      report: reports/tester-default-coverage.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.switchable:
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.1.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.true
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.policy:
+    reports:
+    - tests:
+      - network_lockdown.deny_all
+      report: reports/tester-default-core.json
+    - tests:
+      - coverage.network_lockdown.allowlist.mixed
+      - coverage.network_lockdown.open
+      report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.entry_kinds:
+    tests:
+    - coverage.network_lockdown.allowlist.mixed
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.2.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.2.switchable:
+    tests:
+    - coverage.network_lockdown.switchable.true
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.true
+    report: reports/tester-default-coverage.json
