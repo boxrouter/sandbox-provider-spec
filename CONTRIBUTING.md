@@ -61,6 +61,10 @@ stays `unknown`; never guess a value.
 
 ## Adding a provider
 
+A declaration and its adapter describe the provider's Linux sandboxes only. A provider that
+also offers macOS, Windows, Android or iOS machines leaves those classes out for now; open an
+issue before adding one (see [section 13](spec/spec.md#13-where-the-specification-stops)).
+
 1. **Choose a conformance path.** Use an installed adapter or HTTP consumer runner, or
    optionally add an independent native driver. A declaration may rely entirely on
    adapter-identity reports; adding a native module or CLI registration is not required.

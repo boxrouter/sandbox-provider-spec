@@ -14,6 +14,9 @@ It does not claim three additions that a provider with the means may add: runnin
 user (`user_selection`), exact output bytes (`run.base64`) and prepared images (`image.prepare`
 and its three companions); `docs/implement.md` says how.
 
+Every class an adapter lists is a Linux sandbox (`docs/implement.md` says why): leave out
+machines for other operating systems until the specification defines them.
+
 To ship a real provider, copy this directory and rename its Python package and distribution
 in `pyproject.toml`. Set the provider entry-point key there and `provider_id` in
 `src/<package>/sps-provider.yaml` to the same id, and set the display name in that manifest.

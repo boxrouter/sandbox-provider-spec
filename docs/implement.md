@@ -74,6 +74,12 @@ plans may see different classes, regions, and sizes. Prices are list prices: a p
 an account never changes them. A class is a wholesale different kind
 of sandbox, such as a container or a microVM; the main class has the id `default`.
 
+Every class describes a Linux sandbox: the required operations assume a POSIX system with `bash`
+and `python3`. A provider that also offers macOS, Windows, Android or iOS machines lists only its
+Linux classes. A class for another operating system would be matched to programs that need a
+shell, so the specification does not accept one until it defines how a class names its operating
+system ([section 13](../spec/spec.md#13-where-the-specification-stops)); open an issue first.
+
 ```json
 {
   "spec_version": "1.0",

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.96: the contributor documentation (`CONTRIBUTING.md`, `docs/implement.md`, the template README) now says what section 13 already did: a declaration or adapter lists only a provider's Linux sandboxes, and a class for macOS, Windows, Android or iOS waits for the specification to define how a class names its operating system. Documentation only: no vocabulary, declaration, schema or conformance-suite change.
 - 0.5.95: the boxd declaration states `snapshots.original_after: briefly_paused` and its three custom-image sources (dockerfile, oci, provider_artifact), as its discovery does and its committed clean tester reports prove. Its previews stay unstated: the committed coverage run answered `unsupported` on those rows. No vocabulary or conformance-suite change.
 
 - 0.5.94: the Agent37 default class's declaration states its one region (`agent37:us`), its reattaching terminal and its two custom-image sources (prepared oci, provider artifact), as its discovery does and its committed clean tester reports prove. The vm class declaration is unchanged: no committed report pinned to that class proves them yet. No vocabulary or conformance-suite change.
