@@ -169,6 +169,18 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         `NotImplementedError`."""
         raise NotImplementedError(f"{cls.__name__} states no static discovery")
 
+    @classmethod
+    def image_recipe_revision(cls) -> str:
+        """Optional. What this package adds to an image it prepares, as one short string: empty
+        when it adds nothing (the default), else `[0-9a-f]{12}`, derived from everything the
+        package writes into the image (never set by hand), so it changes when that does and only
+        then. A caller carries it in the identity of the prepared copy: a copy made by an older
+        recipe is a different copy, though the image it was made from is the same.
+
+        No I/O and no credentials, a constant of the installed package, so a caller reads it
+        from the class once."""
+        return ""
+
     @abstractmethod
     async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox: ...
 
