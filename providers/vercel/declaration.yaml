@@ -5,6 +5,7 @@ verified:
   sdks:
     vercel-sandbox: 0.9.0
 resources:
+  compliance: [soc2, soc2_type2, iso27001]
   kernel: dedicated
   max_lifetime_seconds: 86400
   long_running: unknown
@@ -127,6 +128,10 @@ gates:
     files_write: true
     process_start: true
 evidence:
+  resources.compliance:
+    source: https://vercel.com/docs/security/compliance
+    read: '2026-11-23'
+    quote: "Vercel has a SOC 2 Type 2 attestation for Security, Confidentiality, and Availability. ... Vercel is ISO 27001:2022 certified."
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true

@@ -6,6 +6,8 @@ verified:
   sdks:
     modal: 1.6.1
 resources:
+  compliance: [soc2, soc2_type2]
+  data_retention: retained
   kernel: dedicated
   disk_mib: 524288
   gpus: []
@@ -67,6 +69,14 @@ gates:
   terminal:
   - {}
 evidence:
+  resources.compliance:
+    source: https://modal.com/docs/guide/security
+    read: '2026-11-23'
+    quote: "For our latest SOC 2 Type II audit report, please visit our Trust Center to request access."
+  resources.data_retention:
+    source: https://modal.com/docs/guide/security
+    read: '2026-11-23'
+    quote: "App and container logs ... Functions, Sandboxes, Servers, Dedicated Endpoints ... Plan-dependent: 1 day on Starter, 30 days on Team, configurable on Enterprise ... While we store app logs and metadata as part of operating the platform, we access them only with your permission, to help troubleshoot an issue."
   resources.kernel:
     source: https://modal.com/docs/guide/sandboxes
     read: '2026-10-03'

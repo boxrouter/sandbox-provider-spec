@@ -6,6 +6,7 @@ verified:
     blaxel: 0.4.8
     sandbox-provider-spec: 0.5.75
 resources:
+  compliance: [soc2, soc2_type2, iso27001]
   kernel: dedicated
   disk_in_memory: true
   sizes:
@@ -64,6 +65,10 @@ gates:
   idle_shutdown:
   - on_idle: paused
 evidence:
+  resources.compliance:
+    source: https://blaxel.ai/blog/zero-data-retention-ai-sandboxes
+    read: '2026-11-23'
+    quote: "SOC 2 Type II, ISO 27001, and HIPAA BAA coverage extends across the full platform. That includes Sandboxes and Batch Jobs."
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true

@@ -13,6 +13,7 @@ verified:
   # report records the tester stack it ran with.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.84"}
 resources:
+  compliance: [soc2]
   kernel: dedicated
   arch: [amd64]
   libc: glibc
@@ -85,6 +86,10 @@ gates:
     switchable: true
     changeable: true
 evidence:
+  resources.compliance:
+    source: https://docs.sailresearch.com/security
+    read: '2026-11-23'
+    quote: "Sail is SOC 2 Type I compliant. You can request the independent auditor report through our Trust Center."
   resources.kernel:
     source: https://docs.sailresearch.com/sailboxes.md
     read: 2026-11-23

@@ -273,6 +273,7 @@ the request names it.
 | Hardware and isolation | `kernel`, `kernel_features`, `arch`, `gpus`, `max_gpus` |
 | Environment | `default_user`, `default_cwd`, `root`, `package_manager`, `libc`, `files_write_executable_effect` |
 | Files | `file_stream_max_bytes` |
+| Data handling | `data_retention`, `compliance` |
 
 What each fact means, how a request asks for it, when it fits and its rules are in the
 [vocabulary](vocabulary.md#facts-and-resources), with the region and GPU registries.
@@ -284,7 +285,7 @@ A request is a JSON or YAML object with these keys, all optional:
 | Key | Meaning |
 | --- | --- |
 | `requirements` | The gates the program relies on, each with the knobs it relies on and the settings for the sandbox. An extension key is `x-` followed by a provider name: lowercase letters or digits in non-empty segments separated by single hyphens, such as `x-acme-cloud`. Other `x-` forms are refused. |
-| `resources` | What the program asks of the facts: `cpu_min`, `memory_min_mib`, `on_memory_exhausted`, `disk_min_mib`, `size_is_ceiling`, `region`, `gpu_model`, `gpu_count`, `kernel`, `kernel_features`, `long_running`, `extendable_lifetime`, `paused_retention_seconds`, `root`, `arch`, `package_manager`, `libc`, `run_seconds`, `process_seconds`, `egress_ips`, `outbound_traffic` and `file_stream_bytes`. |
+| `resources` | What the program asks of the facts: `cpu_min`, `memory_min_mib`, `on_memory_exhausted`, `disk_min_mib`, `size_is_ceiling`, `region`, `gpu_model`, `gpu_count`, `kernel`, `kernel_features`, `long_running`, `extendable_lifetime`, `paused_retention_seconds`, `root`, `arch`, `package_manager`, `libc`, `run_seconds`, `process_seconds`, `egress_ips`, `outbound_traffic`, `data_retention`, `compliance` and `file_stream_bytes`. |
 | `lifetime_seconds` | How long the sandbox must be able to run continuously. `null` asks for a sandbox with no lifetime: it runs until the caller destroys it, so `at_end` must be left out, and only a provider that never ends a sandbox fits it ([matching](matching.md)). |
 | `at_end` | The state the sandbox ends in when its lifetime runs out: `destroyed` or `paused`. |
 | `image` | The environment the program brings. Left out, the sandbox starts from the provider's own default environment. A string is a public OCI image reference; `{"private_oci": "<reference>"}` names an OCI image in a registry requiring a username and password or token. The tool supplies those credentials separately at creation; they never appear in the request. `{"dockerfile": ...}` holds the Dockerfile's text to build, such as `{"dockerfile": "FROM alpine"}`; `{"provider_artifact": ..., "provider": ...}` names an image, template or snapshot that one provider holds. The Dockerfile's build context is supplied by the tool when it creates the image and is not part of the request. `requirements.custom_images.prepared: true` asks the provider to prepare the source before creation and boot the prepared artifact. |
@@ -436,7 +437,9 @@ built on an earlier candidate reads them as words its version does not define.
 - **A durable machine.** A long-lived agent computer is built from these capabilities (pause
   and resume, snapshots, volumes) and is not a primitive here.
 - **Security.** The specification is not a security certification. It states a few
-  isolation facts; each user owns their security model.
+  isolation facts, and it quotes what a provider says about keeping a sandbox's content
+  (`data_retention`) and the audits it holds (`compliance`) without verifying either. Each
+  user owns their security model.
 - **Linux.** A sandbox runs Linux: the baseline assumes a POSIX system with `bash` and
   `python3`. Providers that offer macOS or Windows machines declare only their Linux
   sandboxes. Runtimes that run only code compiled for them, such as WebAssembly components
@@ -541,7 +544,9 @@ built on an earlier candidate reads them as words its version does not define.
   or SSH logins; placeholders for hidden secrets replaced outside request headers or in request bodies;
   snapshots of one directory,
   restored into another sandbox; volumes attached to or detached from a running sandbox,
-  and snapshots of a volume; systemd running as the first process and starting services.
+  and snapshots of a volume; systemd running as the first process and starting services;
+  audits beyond `compliance`'s values, such as a SOC 1 report, a HIPAA business associate
+  agreement or ISO/IEC 27701, each of which enters `compliance` as a new value.
 
 - **Considered and left out.** Providers offer these, but a program can get each from what the
   specification already promises, so none is a word: a code interpreter that keeps state between

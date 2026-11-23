@@ -129,7 +129,7 @@ omitted class keep `class: null`, and proof lookup compares that raw value. An e
   `{at_least: N}`, when asking for more is `unknown`, or `unlimited`.
 - `unknown` **MUST NOT** appear inside a list. <!-- rule: declaration/unknown-not-in-a-list -->
 - **A fact that takes a list** (`sizes`, `regions`, `located_in`, `gpus`, `root`, `arch`,
-  `egress_ips`, `outbound_traffic`) may be `unknown` as a whole. An empty list means none,
+  `egress_ips`, `outbound_traffic`, `compliance`) may be `unknown` as a whole. An empty list means none,
   except that `arch` is never empty and `outbound_traffic`'s empty list means HTTPS only.
 - **Unknown scalar facts.** Leave `default_cwd` and `max_lifetime_seconds` out when
   unknown. A written `default_cwd` is an absolute sandbox path; a written lifetime
@@ -260,7 +260,7 @@ variant written `{}`, `gates.<gate>` for a gate declared `unsupported`, and
   of the provider's documentation, for what no test from inside a sandbox can reach: the
   kernel boundary, a plan's limits and a variant's `needs`, the sizes and disk a plan sells
   (a run creates one of them), where sandboxes run and where their outbound connections
-  come from, a time limit longer than a run can wait (such as `max_run_seconds: unlimited`,
+  come from, whether the provider keeps a sandbox's content and which audits it holds, a time limit longer than a run can wait (such as `max_run_seconds: unlimited`,
   or whether paused time counts towards the lifetime), a snapshot's `retention_seconds`, `max_gpus`, a gate
   declared `unsupported`, a variant's `conflicts`, and extension keys. The catalog's
   `evidence.quotable_paths` lists exactly which paths a quote may support.

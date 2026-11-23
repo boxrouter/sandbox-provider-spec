@@ -7,6 +7,8 @@ verified:
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
   sdks: {"sandbox-provider-spec": "0.5.84"}
 resources:
+  compliance: [soc2, soc2_type2]
+  data_retention: retained
   kernel: unknown
   sizes: unknown
   gpus: unknown
@@ -62,6 +64,14 @@ gates:
     max_allow:
       at_least: 32
 evidence:
+  resources.compliance:
+    source: https://docs.beam.cloud/v2/security/security
+    read: '2026-11-23'
+    quote: "Beam’s controls are audited under SOC 2 Type II by Advantage Partners."
+  resources.data_retention:
+    source: https://docs.beam.cloud/v2/security/privacy-policy
+    read: '2026-11-23'
+    quote: "Logs emitted by your workloads are Customer Data. They are retained for 30 days on the Developer and Team plans and for 1 year on the Growth plan, or as set out in your Order Form, and are governed by the Terms of Service and DPA."
   resources.extendable_lifetime:
     tests:
     - facts.extendable_lifetime

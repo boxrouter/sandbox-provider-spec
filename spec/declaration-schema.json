@@ -95,6 +95,8 @@
         "max_process_seconds": {"$ref": "#/$defs/number_or_unknown"},
         "disk_in_memory": {"$ref": "#/$defs/boolean_or_unknown"},
         "egress_ips": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["published_ranges", "dedicated"]}}]},
+        "data_retention": {"enum": ["none", "safety", "retained", "unknown"]},
+        "compliance": {"oneOf": [{"const": "unknown"}, {"type": "array", "uniqueItems": true, "items": {"enum": ["soc2", "soc2_type2", "iso27001"]}}]},
         "needs": {"$ref": "#/$defs/needs"},
         "unmet_limits": {"$ref": "#/$defs/unmet_limits"}
       }

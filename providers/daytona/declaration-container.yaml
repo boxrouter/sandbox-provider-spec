@@ -6,6 +6,7 @@ verified:
   sdks:
     daytona: 0.226.1
 resources:
+  compliance: [soc2, soc2_type2]
   kernel: shared
   default_size:
     cpu: 1
@@ -83,6 +84,10 @@ gates:
   idle_shutdown:
   - custom_idle_time: true
 evidence:
+  resources.compliance:
+    source: https://trust.daytona.io/
+    read: '2026-11-23'
+    quote: "Daytona's SOC 2 Type II examination is complete. Insight Assurance issued the report on July 28, 2026 with an unqualified opinion covering the period December 16, 2025 through March 15, 2026"
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true

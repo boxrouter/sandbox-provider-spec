@@ -662,6 +662,8 @@ map in [catalog.yaml](catalog.yaml).
 | `guest_reserved_tcp_ports` | A non-empty subset of TCP ports whose provider-owned listener was observed and blocked the exact tested guest bind tuple. Omitted ports, other families, scopes and times are not established; an empty table does not mean no ports are reserved. Omitted resource means unknown. |  | not compared |
 | `files_write_executable_effect` | What a regular-file write may do to executable bits: preserved keeps execute access on a 0755 overwrite, may_clear may drop it, unverified has no packaged claim. Writing a file does not guarantee it remains executable. Check or explicitly set executable permission before running it as a program. Omitted resource means unverified. The field is informative and never compared. |  | not compared |
 | `file_stream_max_bytes` | The largest file one streamed transfer through the provider's own API moves intact, for read (out of the sandbox) and write (into it): a number of bytes or {at_least: N}, each proven by a transfer of that size. Never unlimited; a direction left out is unknown. | `file_stream_bytes`: `{read: N, write: N}`, naming either or both | the declared value for each named direction is at least N |
+| `data_retention` | Whether the provider routinely keeps a sandbox's content once the sandbox is destroyed: none (zero data retention: no routine storage, apart from what the caller asked it to keep), safety (kept only to detect, investigate and prevent abuse or security incidents, never for training) or retained (also for other purposes, such as debugging, support, product improvement or training). Content is everything a program puts into or gets out of a sandbox; account and operation metadata is not content. | `data_retention` (one or a list) | it is one of them |
+| `compliance` | Independent audits of the provider's service that its own documentation states it currently holds, with a scope that covers this class: a SOC 2 report of either type (soc2), a SOC 2 Type 2 report (soc2_type2) or an ISO/IEC 27001 certificate (iso27001). A Type 2 report is listed as soc2 too. An audit in progress is not listed; [] means none is stated. | `compliance`, every audit it needs | it lists all of them |
 | `unmet_limits` | The ceiling that holds while a condition named under needs is not met: for a limited fact (max_lifetime_seconds or disk_mib) and one of its conditions, a positive integer in the fact's own unit, or unknown. It narrows what an account can be offered and never proves a request is supported. |  | not compared |
 | `default_region` | The region a create that pins none lands in. It is one of the declared regions. It can differ per account: the account's own discovery states its own, a static declaration states a new account's. A caller checks only that it is one of that discovery's regions, never that it equals the static one, and a placement the caller configured for its route wins when set. Informative: a request is matched on regions and located_in, never on this. |  | not compared |
 
@@ -698,6 +700,42 @@ kernel does not imply any of them.
 a request that brings an image decides them itself and does not ask for them. Where a gate's
 variant needs an environment the provider supplies, such as a Docker or desktop image, the
 variant's `conflicts` names each of those facts that differs there ([matching](matching.md)).
+
+`data_retention` and `compliance` say what a provider promises about the data its sandboxes
+hold, and who has audited it. Neither can be observed from inside a sandbox: each rests on a
+dated quote of the provider's own documentation, and the specification verifies neither the
+promise nor the audit.
+
+A sandbox's content is everything a program puts into it or gets out of it: its files and
+memory, command lines, environment variables and secrets, the input and output of its commands
+and processes, the files it transfers, and the traffic through its previews, ports and
+terminals. Content is not what the caller asked the provider to keep (snapshots, volumes,
+images, and the sandbox itself until it is destroyed), nor the account and operation metadata
+the provider needs to run and bill the service, such as ids, labels, sizes, regions, times and
+costs; a program keeps content out of labels. Holding content only to run a sandbox while it
+exists, in memory or on disk, is not retention, and neither is the time the provider's own
+deletion takes once the sandbox is destroyed. Under every value, a provider may keep particular
+content where the law requires it.
+
+`data_retention: none` is zero data retention: no routine storage of content after the sandbox
+is destroyed. `safety` allows routine storage from any sandbox, flagged or not, but only to
+detect, investigate and prevent abuse or security incidents, and never for training or to
+improve a product. `retained` is everything else: content may be kept for debugging, support,
+product improvement or training. A request lists the values it accepts, `data_retention: none`
+for zero data retention only or `[none, safety]` to accept safety retention too. A provider
+whose documentation does not say how it treats content is `unknown`, which no such request
+accepts. Where a value holds only under a plan, an agreement or an account setting, such as an
+enterprise contract or a zero-data-retention switch on the account, the declaration names that
+condition under `resources.needs.data_retention`, and an account that does not meet it is not
+offered the value ([matching](matching.md)).
+
+`compliance` lists the independent audits that the provider's documentation states it holds,
+with a scope that covers the class: `soc2` for a SOC 2 report of either type, `soc2_type2` for
+a Type 2 report, which also tests that the controls operated over a period, and `iso27001` for
+an ISO/IEC 27001 certificate. A Type 2 report is listed as `soc2` as well, so a request for any
+SOC 2 report fits it. An audit that the provider says is in progress or planned is not listed.
+The reports themselves stay with the provider, usually under a non-disclosure agreement. A
+request lists every audit it needs, such as `compliance: [soc2_type2]`.
 
 - A sandbox created with a declared size **MUST** receive that allocation. <!-- rule: facts/sizes -->
 - With `size_is_ceiling: true`, a sandbox created with a declared size **MUST NOT** use more CPU time per second than the size's `cpu`, or more memory than its `memory_mib`. <!-- rule: facts/size-is-ceiling -->
@@ -741,6 +779,12 @@ variant's `conflicts` names each of those facts that differs there ([matching](m
 - `ipv4_destination_reach: native` **MUST** have a successful native IPv4 handshake; <!-- rule: facts/outbound-ip-families -->
   `nat64` **MUST** have a successful IPv6 handshake to an explicitly translated IPv4 literal and
   definite native IPv4 absence. This fact never asserts `none` from a failed probe.
+- A provider declared with a `data_retention` value **MUST** keep a destroyed sandbox's content <!-- rule: facts/data-retention -->
+  no more than that value allows, and a value that holds only under a plan or agreement
+  **MUST** name it under `resources.needs.data_retention`.
+- Each audit `compliance` lists **MUST** be one the provider's own documentation states it <!-- rule: facts/compliance -->
+  currently holds, with a scope that covers the declared class.
+- A `compliance` list that names `soc2_type2` **MUST** also name `soc2`. <!-- rule: facts/compliance-type-2-is-soc2 -->
 - Each `guest_reserved_tcp_ports` member **MUST** be blocked by an established provider-owned <!-- rule: facts/guest-reserved-tcp-ports -->
   listener for the exact tested guest bind tuple and the bound class/image/runtime scope; omitted
   ports remain unknown.

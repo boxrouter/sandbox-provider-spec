@@ -267,6 +267,13 @@
             {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["published_ranges", "dedicated"]}}
           ]
         },
+        "data_retention": {
+          "oneOf": [
+            {"enum": ["none", "safety", "retained"]},
+            {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["none", "safety", "retained"]}}
+          ]
+        },
+        "compliance": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["soc2", "soc2_type2", "iso27001"]}},
         "file_stream_bytes": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"read": {"type": "integer", "minimum": 1}, "write": {"type": "integer", "minimum": 1}}}
       }
     },

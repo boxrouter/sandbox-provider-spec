@@ -207,10 +207,16 @@ RESOURCE_ASKS: Final = (
     "outbound_traffic",
     "outbound_ip_families",
     "file_stream_bytes",
+    "data_retention",
+    "compliance",
 )
 SIZE_ASKS: Final = {"cpu_min": "cpu", "memory_min_mib": "memory_mib", "disk_min_mib": "disk_mib"}
 KERNELS: Final = ("shared", "filtered", "dedicated")
 KERNEL_FEATURES: Final = ("fuse", "ebpf", "nested_cgroups", "netfilter")
+#: How long a provider keeps a sandbox's content after it is destroyed, least first.
+DATA_RETENTION: Final = ("none", "safety", "retained")
+#: Independent audits a provider holds; a Type 2 report also lists its general value.
+COMPLIANCE: Final = ("soc2", "soc2_type2", "iso27001")
 #: The ways a command gets root, which a declaration lists and a request picks from.
 ROOT_WAYS: Final = ("by_default", "sudo", "per_command")
 #: Resources a request may not name together with an image, which decides them itself.
@@ -224,6 +230,7 @@ PICK_RESOURCES: Final = {
     "libc": ("glibc", "musl"),
     "on_memory_exhausted": ("process_killed", "sandbox_ended"),
     "egress_ips": ("published_ranges", "dedicated"),
+    "data_retention": DATA_RETENTION,
 }
 OUTBOUND_TRAFFIC: Final = ("http", "any_tcp", "udp")
 OUTBOUND_IP_FAMILIES: Final = ("ipv4", "ipv6")
@@ -231,6 +238,7 @@ ALL_OF_RESOURCES: Final = {
     "kernel_features": KERNEL_FEATURES,
     "outbound_traffic": OUTBOUND_TRAFFIC,
     "outbound_ip_families": OUTBOUND_IP_FAMILIES,
+    "compliance": COMPLIANCE,
 }
 #: Resources a request can only ask for as `true`.
 YES_RESOURCES: Final = frozenset({"extendable_lifetime", "long_running", "size_is_ceiling"})
@@ -299,6 +307,8 @@ DECLARATION_RESOURCES: Final = frozenset(
         "guest_reserved_tcp_ports",
         "files_write_executable_effect",
         "file_stream_max_bytes",
+        "data_retention",
+        "compliance",
         "ipv4_destination_reach",
         "needs",
         "unmet_limits",

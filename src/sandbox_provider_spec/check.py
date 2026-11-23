@@ -694,6 +694,14 @@ def _check_resource_declarations(
             _check_declared_knob(
                 "resources", key, value, {"kind": "pick", "values": spec["values"]}, errors
             )
+        elif key == "compliance":
+            if value != "unknown":
+                _check_declared_list(value, spec, "resources.compliance", errors)
+                if isinstance(value, list) and "soc2_type2" in value and "soc2" not in value:
+                    errors.append(
+                        "resources.compliance names soc2_type2 without soc2: "
+                        "a Type 2 report is a SOC 2 report too"
+                    )
         elif spec.get("kind") == "list":
             if value != "unknown":
                 _check_declared_list(value, spec, f"resources.{key}", errors)
