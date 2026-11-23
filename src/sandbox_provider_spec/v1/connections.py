@@ -165,9 +165,7 @@ def _client_class() -> type[httpx.AsyncClient]:
             self._http2 = bool(kwargs.get("http2", False))
             super().__init__(*args, **kwargs)
 
-        async def send(  # type: ignore[override]
-            self, request: httpx.Request, **kwargs: Any
-        ) -> httpx.Response:
+        async def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
             started = time.monotonic()
             try:
                 return await super().send(request, **kwargs)
