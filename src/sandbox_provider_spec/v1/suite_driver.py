@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: BoxRouter, Inc.
 # SPDX-License-Identifier: Apache-2.0
+# pylint: disable=too-many-lines
 """Run the shared conformance tests against a 1.0 `Provider`.
 
 The suite's runner is synchronous and speaks the `Driver` contract: one method per operation,
