@@ -1,0 +1,580 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.delete": "sha256:b092ad2f2aed384b26d78e13cf263f71ecee62068044e4c5ff1f7ab269257f1e",
+    "coverage.custom_images.prepare.idempotent": "sha256:831214e228c00e2e714947b1b8aca78a88580ac98bb4abb90fb2487415813775",
+    "coverage.custom_images.prepare.registry": "sha256:0318d6ca2e84860ea4417047417a1f8f191f9c307c3657884f3382596ce9446e",
+    "coverage.custom_images.prepare.size": "sha256:007b4ce79b247ee58f6f6f7032fc6de0b3c3907dee86db4068694a57c0e870cb",
+    "coverage.custom_images.prepared_size_without_request": "sha256:38d3117730f743f0feab04749d73eae1a0d71e4c54f794d697488415706999a4",
+    "custom_images.oci": "sha256:424e746dca5c0ac0e4bbaa7375bac10f6de3f89d7171bbd86625eb9cda61d2fa",
+    "custom_images.provider_artifact": "sha256:a4a48f1490a42fa7f4af02c66c85f0cf46c8153b343567697092a00e77b1e5e7",
+    "images.v1.get_and_list": "sha256:8fb43264ff6fe0153d6971776010ed8c9bfdd1c6204d2264946356e5d2945c21",
+    "images.v1.idempotent_prepare": "sha256:ff1f632d5024cac8fb5976565aea1f5327f5e35a35cba76657e797c8f5ba1539",
+    "images.v1.prepare_oci": "sha256:0e64eaa38b355699f6b21d71da871d08350b7b7e5438b546b9139438f7f26cf7"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.84"
+  },
+  "finished_at": "2026-11-23T20:19:56.212518+00:00",
+  "provider": "sail",
+  "revision": "5adb2b0f9d5f4fb1f5abece95e572d583f9be89a",
+  "run_id": "public-5373cfabb07e4d7561a9",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.84"
+  },
+  "selected_tests": [
+    "images.v1.prepare_oci",
+    "images.v1.idempotent_prepare",
+    "images.v1.get_and_list",
+    "custom_images.oci",
+    "custom_images.provider_artifact",
+    "coverage.custom_images.prepare.registry",
+    "coverage.custom_images.prepare.size",
+    "coverage.custom_images.prepared_size_without_request",
+    "coverage.custom_images.prepare.idempotent",
+    "coverage.custom_images.prepare.delete"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-23T20:19:42.254313+00:00",
+  "subject": {
+    "discovery_digest": "sha256:d5f6445be9f2a0b84aaa49e9ea48de64c5e41ec8e95ff989cd6d190fb7dc6f88",
+    "package": "sps-provider-sail",
+    "package_digest": "sha256:aa943af7c87427ce2bd7a47ee9baba58cce5ed549358108945e733f8629c990a",
+    "version": "0.1.0"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 3273,
+      "id": "images.v1.prepare_oci",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-prepare",
+        "provider-api/image-create",
+        "provider-api/image-delete"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "length": 400,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "deleted"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.delete_again",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 527,
+      "id": "images.v1.idempotent_prepare",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-idempotent"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "image.prepare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 591,
+      "id": "images.v1.get_and_list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-list"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "count": {
+              "matches": true
+            }
+          },
+          "operation": "image.list",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2328,
+      "id": "custom_images.oci",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/oci"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 400,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1976,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 400,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2277,
+      "id": "coverage.custom_images.prepare.registry",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.size",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepared_size_without_request",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 453,
+      "id": "coverage.custom_images.prepare.idempotent",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 380,
+      "id": "coverage.custom_images.prepare.delete",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

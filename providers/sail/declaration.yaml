@@ -4,8 +4,8 @@ class: default
 # Every value is `unknown`, absent, a dated quote of Sail's documentation or a committed
 # tester report (the `sps-provider-sail` adapter over Sail's HTTP API). The adapter serves
 # the baseline surface (create, get, list, destroy, run, files, native processes by reattach
-# and cost) and states four gates in discovery (user selection, pause and resume, previews and
-# network lockdown), each proven by a tester run from a clean checkout. Every other gate stays
+# and cost) and states five gates in discovery (user selection, pause and resume, previews,
+# network lockdown and custom images), each proven by a tester run from a clean checkout. Every other gate stays
 # unknown until a run report proves it.
 verified:
   date: 2026-11-23
@@ -42,13 +42,20 @@ lifetime_timer:
   counts_paused_time: true
   at_end: [destroyed]
 # Gates the adapter offers in discovery, each proven by a tester run from a clean checkout
-# (reports/tester-default-{pause-resume,user-selection,previews,network-lockdown}.json).
+# (reports/tester-default-{pause-resume,user-selection,previews,network-lockdown,custom-images}.json).
+# Custom images: Sail builds a registry image (Debian- or Ubuntu-based only) ahead of creation and a
+# sandbox starts from it; the labels of a prepared image are kept by the router. `image_config`,
+# `image_defaults` and Dockerfile sources are not declared (the tester's Alpine image cannot be built).
 # Sail's native listeners are public and revocable; a preview link's lifetime is the requested
 # bound the tester observes. Network lockdown: Sail enforces an egress policy per Sailbox
 # (`egress_policy`): an allowlist of names (with `*.` wildcards) and addresses, `deny_all` and
 # `open`, replaceable on a running Sailbox. A denylist is not declared: Sail blocks a name only
 # under an allowlist. Process input and cancel stay unclaimed (no native operation).
 gates:
+  custom_images:
+  - source: provider_artifact
+  - source: oci
+    prepared: true
   user_selection:
   - commands: true
     files_write: true
@@ -215,3 +222,15 @@ evidence:
     tests:
     - coverage.network_lockdown.changeable.true
     report: reports/tester-default-network-lockdown.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/tester-default-custom-images.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.oci
+    report: reports/tester-default-custom-images.json
+  gates.custom_images.1.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/tester-default-custom-images.json
