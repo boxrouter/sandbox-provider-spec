@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.97: states how another operating system (macOS, Windows, Android, iOS or any other machine) can be added later without changing any file written today: section 13 gains rules `scope/linux-is-the-default` (a class, declaration or request that names none means Linux) and `scope/other-systems-are-additive` (a later version adds it as an optional word whose absence means Linux), and Provider API section 13 says a class for another operating system is never `default` and is reached only by naming its id, so a consumer written before it never meets one unasked. Both rules are listed in `untested.yaml`: nothing names an operating system yet. No vocabulary, schema, declaration or conformance-suite change.
 - 0.5.96: the contributor documentation (`CONTRIBUTING.md`, `docs/implement.md`, the template README) now says what section 13 already did: a declaration or adapter lists only a provider's Linux sandboxes, and a class for macOS, Windows, Android or iOS waits for the specification to define how a class names its operating system. Documentation only: no vocabulary, declaration, schema or conformance-suite change.
 - 0.5.95: the boxd declaration states `snapshots.original_after: briefly_paused` and its three custom-image sources (dockerfile, oci, provider_artifact), as its discovery does and its committed clean tester reports prove. Its previews stay unstated: the committed coverage run answered `unsupported` on those rows. No vocabulary or conformance-suite change.
 

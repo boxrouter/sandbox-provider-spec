@@ -4,6 +4,12 @@
 # never both.
 spec: sandbox-provider-spec/0.1
 untested:
+  scope/linux-is-the-default: >-
+    No class, declaration or request names an operating system yet, so there is nothing to
+    test. The rule constrains what a later version may add.
+  scope/other-systems-are-additive: >-
+    Describes how a later version of this specification is written. Nothing in this
+    repository adds another operating system to test it against.
   request/names-what-is-relied-on: >-
     Advice to people writing requests. Nothing a provider, checker or matcher does
     depends on it.

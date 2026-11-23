@@ -332,6 +332,12 @@ all of 1.x. Nothing that a 1.0 provider does becomes wrong in a later 1.x. A con
 unknown request fields (section 2), a requirement is never dropped without notice. A 2.0 would be
 a new path (`/v2`), served beside `/v1` for a transition period.
 
+Every class in 1.0 is a Linux sandbox, and a class that names no operating system is one. A later
+1.x may let a class be another operating system without breaking a consumer written before it: that
+class is never `default`, a request that names no class gets `default`, and `create` reaches any
+other class only by naming its id. A consumer that does not know the field naming the operating
+system therefore never meets such a class unless it asks for it.
+
 ## 14. The adapter manifest and author rules
 
 Each adapter's Python package holds `sps-provider.yaml`, with `provider_id` (`a-z 0-9 -`, 2 to 32

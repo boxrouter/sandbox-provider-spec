@@ -445,6 +445,14 @@ built on an earlier candidate reads them as words its version does not define.
   harness applies to processes on its own host. If classes for other operating systems are
   added, a declaration that names none describes a Linux sandbox, so existing declarations
   keep their meaning.
+
+  Whatever a later version adds for macOS, Windows, Android, iOS or another kind of machine,
+  these two rules already hold, so that it can only add:
+
+  - A class, declaration or request that names no operating system means Linux. <!-- rule: scope/linux-is-the-default -->
+  - A version that lets a sandbox be another operating system **MUST** add that as an optional <!-- rule: scope/other-systems-are-additive -->
+    word whose absence means Linux, and **MUST NOT** change what a class, declaration or
+    request that names none means.
 - **Account quotas.** How many sandboxes an account may run at once, and how fast it may
   create them, belong to the account and change on request. Whoever holds the account knows
   its own.
