@@ -81,8 +81,9 @@ of a sandbox with an interactive terminal.” The conformance report `reports/ad
 
 Blaxel's [sandbox overview](https://docs.blaxel.ai/Sandboxes/Overview) says a sandbox without an
 active connection "automatically transitions to a warm standby mode", "in approximately 15
-seconds", keeping its memory, processes and filesystem, and that reconnecting wakes it. There is no
-call to enter or leave standby ([standby control](https://docs.blaxel.ai/Sandboxes/Standby-control)).
+seconds", keeping its memory, processes and filesystem, and that reconnecting wakes it. The SDKs have no
+call to enter or leave standby ([standby control](https://docs.blaxel.ai/Sandboxes/Standby-control)),
+but the sandbox API does (see [Pause and resume](#pause-and-resume-pause_resume-keeps-files_and_memory--2026-11-23)).
 That is the spec's `idle_shutdown` with `on_idle: paused`, with no caller-chosen idle time.
 
 The claim was declared until 2026-10-21 and withdrawn then for lack of current evidence, not because
@@ -95,3 +96,30 @@ sandbox was deleted. Separately, benchmark trials of 2026-11-18 showed the guest
 
 `auto_wake` and `custom_idle_time` stay unclaimed. The adapter reports a sleeping sandbox as
 `active` (it wakes on the next request), so the claim rests on the native report.
+
+## Pause and resume: `pause_resume` with `keeps: files_and_memory` — 2026-11-23
+
+Blaxel's sandbox API has both calls: [`POST /standby`](https://docs.blaxel.ai/api-reference/system/put-the-sandbox-in-standby)
+("asks the host to put the sandbox in standby right away instead of waiting for it to be idle";
+`force=true` puts it there although a keep-alive process holds it awake) and
+[`POST /resume`](https://docs.blaxel.ai/api-reference/system/resume-the-sandbox) ("wakes a sandbox in
+standby"), both on the sandbox's own host. The earlier statement that there is no call to enter or
+leave standby was about the SDKs and was wrong for the API.
+
+What a live run on the internal account showed (2026-11-23, `sps-provider-blaxel` 0.3.4):
+
+- `POST /standby?force=true` answers 202 before the standby. The record's `state` (not `status`,
+  which stays `DEPLOYED`) said `STANDBY` 2.8 to 5.5 s later. The host ignores a request in the first
+  seconds of a sandbox's life (2 of 4 sandboxes, asked at 1, 4, 8 and 11 s of age); such a sandbox
+  went to standby on its own about 15 s after its last request, 18 to 22 s after the call.
+- `POST /resume` answers 200 in 0.1 s and the next command runs 0.1 s later. The record's `state`
+  still said `STANDBY` for 2.7 to 5.4 s after it.
+- The guest is frozen, not restarted: the same PID of a running process, the files with the same
+  bytes (`/root`, `/tmp`), the guest's uptime stopped across 30 s of wall time, and the clock caught
+  up on resume (the probe of 2026-11-22, cloud#9597; two cycles in a row on 2026-11-23).
+- The lifetime keeps counting in standby (`counts_paused_time: true`): `expiresIn` fell while the
+  sandbox was in `STANDBY`.
+
+The claim rests on the conformance test `pause_resume.files_and_memory`
+([`reports/tester-pause-resume-20261123.json`](reports/tester-pause-resume-20261123.json)): a process
+started before the pause carries on after the resume and writes the result that the test then reads.

@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.75: the Blaxel declaration claims `pause_resume` (`keeps: files_and_memory`) on the conformance report `reports/tester-pause-resume-20261123.json`, and its evidence says that Blaxel's sandbox API has the standby and resume calls. No API, vocabulary or conformance-suite change.
 - 0.5.74: `v1.waiting` renames its pause-observer module global to upper-case, keeping module-scope naming consistent. No API, vocabulary, declaration or conformance-suite change.
 - 0.5.73: `v1.suite_driver` carries a module-level `too-many-lines` exemption so the single-file conformance driver keeps its one pass. No API, vocabulary, declaration or conformance-suite change.
 - 0.5.72: `Provider.pause`, `Provider.resume` and `Provider.lifetime_extend` may return `None` instead of the sandbox (Provider API section 26). A provider returns nothing when it would read its record only to fill the result, so the operation costs its own call and nothing more; `get` is where a consumer reads the record. The HTTP server answers a `None` with one `get`, so the wire answer (a `Sandbox`) and the OpenAPI schema are unchanged, and a provider that returns the sandbox is unchanged. The OpenAPI description of `Sandbox.ends_at` now reads: null is not stated by this answer, read it with `get`; in `get`'s own answer null still means no lifetime. The tester observes no state from a `None`, binds a resumed sandbox by the id it named, and reads an extended deadline with `get`. No vocabulary, declaration or conformance-suite change.

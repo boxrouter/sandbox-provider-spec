@@ -1,9 +1,10 @@
 spec: sandbox-provider-spec/0.1
 provider: blaxel
 verified:
-  date: '2026-11-20'
+  date: '2026-11-23'
   sdks:
     blaxel: 0.4.8
+    sandbox-provider-spec: 0.5.75
 resources:
   kernel: dedicated
   disk_in_memory: true
@@ -62,6 +63,8 @@ gates:
   - {}
   idle_shutdown:
   - on_idle: paused
+  pause_resume:
+  - keeps: files_and_memory
 evidence:
   resources.size_is_ceiling:
     tests:
@@ -213,6 +216,10 @@ evidence:
     tests:
     - idle_shutdown.on_idle.paused
     report: reports/native-idle-standby-20261120.json
+  gates.pause_resume.0.keeps:
+    tests:
+    - pause_resume.files_and_memory
+    report: reports/tester-pause-resume-20261123.json
 lifetime_timer:
   enforced_by: provider
   counts_paused_time: true
