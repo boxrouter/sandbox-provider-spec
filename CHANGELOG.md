@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.76: publishes Boat (`providers/boat/publication.yaml`: the provider and its `default` class, `default_class: default`) under the founder records `founder-2026-11-23-boat-publish` and `founder-2026-11-23-boat-default-publish` ("also pls add boat now"), each with a content-bound receipt. No declaration, vocabulary, catalog or conformance-suite change.
 - 0.5.75: the Blaxel declaration claims `pause_resume` (`keeps: files_and_memory`) on the conformance report `reports/tester-pause-resume-20261123.json`, and its evidence says that Blaxel's sandbox API has the standby and resume calls. No API, vocabulary or conformance-suite change.
 - 0.5.74: `v1.waiting` renames its pause-observer module global to upper-case, keeping module-scope naming consistent. No API, vocabulary, declaration or conformance-suite change.
 - 0.5.73: `v1.suite_driver` carries a module-level `too-many-lines` exemption so the single-file conformance driver keeps its one pass. No API, vocabulary, declaration or conformance-suite change.
