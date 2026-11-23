@@ -5659,8 +5659,7 @@ tests:
     in:
       lifetime_seconds: 300
       requirements:
-        pause_resume:
-          keeps: any
+        pause_resume: {}
     as: box
   - op: pause
     target: box
