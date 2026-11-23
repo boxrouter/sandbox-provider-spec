@@ -1,0 +1,62 @@
+{"step": "created", "group": 0, "sid": "01a20838-59b2-8001-97fc-1c813d5b6f3d", "took": 0.56, "t": 1795434240.444}
+{"step": "pause", "group": 0, "cycle": 0, "code": 200, "took": 13.37, "t_start": 1795434240.679, "resume_code": 200, "resume_took": 0.44, "t": 1795434254.487}
+{"step": "pause", "group": 0, "cycle": 1, "code": 200, "took": 14.17, "t_start": 1795434254.594, "resume_code": 200, "resume_took": 0.14, "t": 1795434268.896}
+{"step": "pause", "group": 0, "cycle": 2, "code": 200, "took": 3.75, "t_start": 1795434269.011, "resume_code": 200, "resume_took": 0.14, "t": 1795434272.898}
+{"step": "pause", "group": 0, "cycle": 3, "code": 200, "took": 14.16, "t_start": 1795434272.999, "resume_code": 200, "resume_took": 0.14, "t": 1795434287.3}
+{"step": "pause", "group": 0, "cycle": 4, "code": 200, "took": 14.22, "t_start": 1795434287.4, "resume_code": 200, "resume_took": 0.33, "t": 1795434301.95}
+{"step": "destroyed", "group": 0, "code": 202, "t": 1795434302.16}
+{"step": "created", "group": 1, "sid": "01a20839-4c90-8001-94ba-5370082a9b30", "took": 0.46, "t": 1795434302.624}
+{"step": "pause", "group": 1, "cycle": 0, "code": 200, "took": 14.2, "t_start": 1795434302.972, "resume_code": 200, "resume_took": 0.47, "t": 1795434317.638}
+{"step": "pause", "group": 1, "cycle": 1, "code": 200, "took": 4.77, "t_start": 1795434317.735, "resume_code": 200, "resume_took": 6.95, "t": 1795434329.458}
+{"step": "pause", "group": 1, "cycle": 2, "code": 200, "took": 5.84, "t_start": 1795434329.58, "resume_code": 200, "resume_took": 1.8, "t": 1795434337.227}
+{"step": "pause", "group": 1, "cycle": 3, "code": 200, "took": 4.78, "t_start": 1795434337.371, "resume_code": 200, "resume_took": 0.16, "t": 1795434342.311}
+{"step": "pause", "group": 1, "cycle": 4, "code": 200, "took": 11.11, "t_start": 1795434342.428, "resume_code": 200, "resume_took": 0.18, "t": 1795434353.72}
+{"step": "destroyed", "group": 1, "code": 202, "t": 1795434353.799}
+{"step": "created", "group": 2, "sid": "01a2083a-17ba-8001-b944-b38dd879283a", "took": 0.83, "t": 1795434354.63}
+{"step": "pause", "group": 2, "cycle": 0, "code": 200, "took": 13.24, "t_start": 1795434354.969, "resume_code": 200, "resume_took": 0.46, "t": 1795434368.673}
+{"step": "pause", "group": 2, "cycle": 1, "code": 200, "took": 15.21, "t_start": 1795434368.766, "resume_code": 200, "resume_took": 0.16, "t": 1795434384.133}
+{"step": "pause", "group": 2, "cycle": 2, "code": 200, "took": 3.73, "t_start": 1795434384.248, "resume_code": 200, "resume_took": 0.16, "t": 1795434388.132}
+{"step": "pause", "group": 2, "cycle": 3, "code": 200, "took": 14.18, "t_start": 1795434388.249, "resume_code": 200, "resume_took": 0.15, "t": 1795434402.588}
+{"step": "pause", "group": 2, "cycle": 4, "code": 200, "took": 4.78, "t_start": 1795434402.692, "resume_code": 200, "resume_took": 0.17, "t": 1795434407.635}
+{"step": "destroyed", "group": 2, "code": 202, "t": 1795434407.749}
+{"step": "created", "group": 3, "sid": "01a2083a-ea72-8001-ac73-81ae588857c9", "took": 0.82, "t": 1795434408.571}
+{"step": "pause", "group": 3, "cycle": 0, "code": 200, "took": 15.25, "t_start": 1795434408.904, "resume_code": 200, "resume_took": 0.47, "t": 1795434424.629}
+{"step": "pause", "group": 3, "cycle": 1, "code": 504, "took": 59.6, "t_start": 1795434424.736, "body": "{\"error\":{\"code\":\"timeout\",\"fix\":\"Do not send this again: read operation 01a2083b-29ab-70d0-a38c-ee30f7f3963e until its outcome is completed or not_started.\",\"message\":\"The provider response timed out; execution may have occurred.\",\"request_id\":\"01a2083b-29a0-7c78-8d9f-ee87f5be183d\",\"outcome\":\"unknown\",\"retry\":\"check_outcome\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-co", "t": 1795434484.34}
+{"step": "after_unknown", "group": 3, "cycle": 1, "since": 0.0, "state": "running", "t": 1795434484.379}
+{"step": "pause_again", "group": 3, "cycle": 1, "code": 409, "body": "{\"error\":{\"code\":\"conflict\",\"fix\":\"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.\",\"message\":\"", "t": 1795434535.519}
+{"step": "counter_gaps", "group": 3, "cycle": 1, "resume_code": 204, "gaps_start_epoch_and_len": [[1795434417, 16]], "t_pause_start": 1795434424.736, "t": 1795434535.664}
+{"step": "after_resume", "group": 3, "cycle": 1, "state": "running", "t": 1795434535.702}
+{"step": "pause", "group": 3, "cycle": 2, "code": 409, "took": 0.02, "t_start": 1795434535.801, "body": "{\"error\":{\"code\":\"conflict\",\"fix\":\"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.\",\"message\":\"The request conflicts with existing state or route policy.\",\"request_id\":\"01a2083c-db79-798b-a55b-cd9c4196aa61\",\"outcome\":\"not_started\",\"retry\":\"after_fix\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-codes#conflict", "t": 1795434535.825}
+{"step": "after_unknown", "group": 3, "cycle": 2, "since": 0.0, "state": "running", "t": 1795434535.863}
+{"step": "after_unknown", "group": 3, "cycle": 2, "since": 18.4, "state": "paused", "t": 1795434554.252}
+{"step": "pause_again", "group": 3, "cycle": 2, "code": 409, "body": "{\"error\":{\"code\":\"not_running\",\"fix\":\"Resume sandbox 01a2083a-ea72-8001-ac73-81ae588857c9, check cold_restart, then send this call again.\",\"message\":\"The sandbo", "t": 1795434586.929}
+{"step": "counter_gaps", "group": 3, "cycle": 2, "resume_code": 200, "gaps_start_epoch_and_len": [[1795434417, 16], [1795434433, 103]], "t_pause_start": 1795434535.801, "t": 1795434587.685}
+{"step": "after_resume", "group": 3, "cycle": 2, "state": "running", "t": 1795434587.726}
+{"step": "pause", "group": 3, "cycle": 3, "code": 409, "took": 0.01, "t_start": 1795434587.833, "body": "{\"error\":{\"code\":\"conflict\",\"fix\":\"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.\",\"message\":\"The request conflicts with existing state or route policy.\",\"request_id\":\"01a2083d-a6b9-799e-a3eb-48d819400aac\",\"outcome\":\"not_started\",\"retry\":\"after_fix\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-codes#conflict", "t": 1795434587.846}
+{"step": "after_unknown", "group": 3, "cycle": 3, "since": 0.0, "state": "running", "t": 1795434587.888}
+{"step": "after_unknown", "group": 3, "cycle": 3, "since": 21.1, "state": "paused", "t": 1795434608.926}
+{"step": "pause_again", "group": 3, "cycle": 3, "code": 409, "body": "{\"error\":{\"code\":\"not_running\",\"fix\":\"Resume sandbox 01a2083a-ea72-8001-ac73-81ae588857c9, check cold_restart, then send this call again.\",\"message\":\"The sandbo", "t": 1795434639.585}
+{"step": "counter_gaps", "group": 3, "cycle": 3, "resume_code": 200, "gaps_start_epoch_and_len": [[1795434417, 16], [1795434433, 103], [1795434551, 36]], "t_pause_start": 1795434587.833, "t": 1795434640.142}
+{"step": "after_resume", "group": 3, "cycle": 3, "state": "running", "t": 1795434640.221}
+{"step": "pause", "group": 3, "cycle": 4, "code": 409, "took": 0.02, "t_start": 1795434640.314, "body": "{\"error\":{\"code\":\"conflict\",\"fix\":\"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.\",\"message\":\"The request conflicts with existing state or route policy.\",\"request_id\":\"01a2083e-73bb-7e01-9b80-4a7710566138\",\"outcome\":\"not_started\",\"retry\":\"after_fix\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-codes#conflict", "t": 1795434640.333}
+{"step": "after_unknown", "group": 3, "cycle": 4, "since": 0.0, "state": "running", "t": 1795434640.37}
+{"step": "after_unknown", "group": 3, "cycle": 4, "since": 18.4, "state": "paused", "t": 1795434658.755}
+{"step": "pause_again", "group": 3, "cycle": 4, "code": 409, "body": "{\"error\":{\"code\":\"not_running\",\"fix\":\"Resume sandbox 01a2083a-ea72-8001-ac73-81ae588857c9, check cold_restart, then send this call again.\",\"message\":\"The sandbo", "t": 1795434691.548}
+{"step": "counter_gaps", "group": 3, "cycle": 4, "resume_code": 200, "gaps_start_epoch_and_len": [[1795434417, 16], [1795434433, 103], [1795434551, 36], [1795434602, 38], [1795434654, 37]], "t_pause_start": 1795434640.314, "t": 1795434692.14}
+{"step": "after_resume", "group": 3, "cycle": 4, "state": "running", "t": 1795434692.177}
+{"step": "destroyed", "group": 3, "code": 202, "t": 1795434692.257}
+{"step": "created", "group": 4, "sid": "01a2083f-4213-8001-8ba9-c7fc895a8550", "took": 0.9, "t": 1795434693.153}
+{"step": "pause", "group": 4, "cycle": 0, "code": 200, "took": 15.23, "t_start": 1795434693.473, "resume_code": 200, "resume_took": 0.5, "t": 1795434709.2}
+{"step": "pause", "group": 4, "cycle": 1, "code": 200, "took": 4.78, "t_start": 1795434709.297, "resume_code": 200, "resume_took": 0.16, "t": 1795434714.236}
+{"step": "pause", "group": 4, "cycle": 2, "code": 200, "took": 2.7, "t_start": 1795434714.337, "resume_code": 200, "resume_took": 3.65, "t": 1795434720.689}
+{"step": "pause", "group": 4, "cycle": 3, "code": 200, "took": 5.34, "t_start": 1795434720.799, "resume_code": 200, "resume_took": 3.49, "t": 1795434729.636}
+{"step": "pause", "group": 4, "cycle": 4, "code": 200, "took": 5.93, "t_start": 1795434729.755, "resume_code": 200, "resume_took": 7.29, "t": 1795434742.978}
+{"step": "destroyed", "group": 4, "code": 202, "t": 1795434743.236}
+{"step": "created", "group": 5, "sid": "01a20840-0967-8001-bcb2-1ad68e127cb2", "took": 0.96, "t": 1795434744.191}
+{"step": "pause", "group": 5, "cycle": 0, "code": 200, "took": 12.21, "t_start": 1795434744.492, "resume_code": 200, "resume_took": 0.61, "t": 1795434757.314}
+{"step": "pause", "group": 5, "cycle": 1, "code": 200, "took": 14.36, "t_start": 1795434758.001, "resume_code": 200, "resume_took": 0.19, "t": 1795434772.554}
+{"step": "pause", "group": 5, "cycle": 2, "code": 200, "took": 15.37, "t_start": 1795434772.656, "resume_code": 200, "resume_took": 0.19, "t": 1795434788.218}
+{"step": "pause", "group": 5, "cycle": 3, "code": 200, "took": 5.34, "t_start": 1795434788.342, "resume_code": 200, "resume_took": 0.22, "t": 1795434793.898}
+{"step": "pause", "group": 5, "cycle": 4, "code": 200, "took": 3.89, "t_start": 1795434794.039, "resume_code": 200, "resume_took": 3.66, "t": 1795434801.596}
+{"step": "destroyed", "group": 5, "code": 202, "t": 1795434801.776}
+{"step": "summary", "cycles": 30, "pauses_ok": 26, "not_ok": 4, "pause_p50": 11.11, "pause_p95": 15.25, "pause_max": 15.37, "resume_p50": 0.22, "resume_p95": 6.95, "resume_max": 7.29, "t": 1795434801.776}

@@ -1,0 +1,43 @@
+create 201 0.91
+{"id": "01a2081f-68ba-8001-acf8-c4e486c2140e", "state": "running", "route": {"id": "<route>", "provider": "blaxel", "class": "default", "adapter_version": "discovery:42bcb80f7b79", "account_id": "<account>", "supply": "byok", "selection": {"considered": 1, "eligible": 1, "ranked_by": null, "excluded": [], "attempts": [], "preparation_skips": []}}, "image_setup": null}
+health: {"status":"ok","version":"0.2.81","gitCommit":"feb8541a51f71bd40a373b0374dd4ed811dbdf7d","buildTime":"2026-11-21T01:32:35Z","goVersion":"go1.27.3","os":"linux","arch":"amd64","uptime":"0s","uptimeSeconds":0.074745141,"upgradeCount":0,"startedAt":"2026-11-23T11:16:45Z","lastUpgrade":{"status":"idle","step":"none","version":""}}
+PASS health says version 0.2.81 {"status":"ok","version":"0.2.81","gitCommit":"feb8541a51f71bd40a373b0374dd4ed811dbdf7d","buildTime":"2026-11-21T01:32:35Z","goVersion":"go1.27.3","os":"linux","arch":"amd64","uptime":"0s","uptimeSeco
+PASS health commit feb8541a51f7 
+PASS run hi
+linux
+user
+/home/user
+
+PASS TERM and LANG set (0.2.81) hi
+linux
+user
+/home/user
+
+cwd body: {"stdout": "", "stderr": "bash: line 1: cd: /tmp/t5rh-new/dir: No such file or directory\n", "exit_code": 1, "timed_out": false, "stdout_truncated": false, "stderr_truncated": false, "native_error": null}
+INFO cwd that does not exist: exit 1 (same as before 0.2.81: run does its own cd)
+PASS files write 204
+PASS files read 200
+PASS process start {"id":"p1.0.9VwUiZ4gSzObeGqvcDUXHxpr-f5p83tQK84Zb-xz1OiuCHaTYL0Ykm2XEDQ_s1otIWi4BIQDMY6Md62yYoEPu-iW
+PASS lifetime extend {"seconds":3600,"remaining_seconds":3599,"ends_at":"2026-11-23T12:16:45.008495Z","kept_until":null,"at_end":"destroy","max_seconds":604800,"extendable
+FAIL cycle 1: pause 200 (504, 59.85, '{"error":{"code":"timeout","fix":"Do not send this again: read operation 01a2081f-79f3-7f2d-b4ef-73102fa6373b until its outcome is completed or not_st')
+FAIL cycle 1: state paused running
+PASS cycle 1: resume (204, 0.01, '')
+PASS cycle 1: counter frozen (12 s paused; +0 lines, pause call 59.85s, gap 1s) (0, 59.85, 1)
+PASS cycle 1: same PID, same start ('52', '123', '123')
+PASS cycle 1: counter counts again 7
+FAIL cycle 2: pause 200 (409, 0.02, '{"error":{"code":"conflict","fix":"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.","')
+FAIL cycle 2: state paused running
+PASS cycle 2: resume (204, 0.01, '')
+FAIL cycle 2: counter frozen (12 s paused; +12 lines, pause call 0.02s, gap 72s) (12, 0.02, 72)
+PASS cycle 2: same PID, same start ('52', '123', '123')
+PASS cycle 2: counter counts again 21
+FAIL after ~25 s idle Cloud reads the sandbox as paused running
+PASS pause of an already paused sandbox is 409 not_running (409, '{"error":{"code":"conflict","fix":"Read the sandbox or operation to see its current state; reuse an idempotency key only')
+PASS resume after the idle standby 204
+PASS the counter process survived the idle standby 
+PASS lifetime extend after a resume (200, '{"seconds":5400,"remaining_seconds":5280,"ends_at":"2026-11-23T12:46:45.008495Z","kept_until":null,"at_end":"destroy","max_seconds":604800,"extendable')
+destroy 202
+PASS resume of a never-paused sandbox is a no-op success (204, '')
+PASS pause of an ended sandbox answers gone/not found, not a provider error (410, '{"error":{"code":"sandbox_ended","fix":"Create a new sandbox; reading sandbox 01a20821-3ef2-8001-8483-a0a6389f4d9d still returns its record.","message')
+
+21/27 passed; failed: ['cycle 1: pause 200', 'cycle 1: state paused', 'cycle 2: pause 200', 'cycle 2: state paused', 'cycle 2: counter frozen (12 s paused; +12 lines, pause call 0.02s, gap 72s)', 'after ~25 s idle Cloud reads the sandbox as paused']

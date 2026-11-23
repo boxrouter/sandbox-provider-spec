@@ -132,3 +132,30 @@ v0.2.81 have both). The run above was on Blaxel's own base image. The images tha
 prepares, which every Cloud-created sandbox uses, carried version 0.2.74, and in production every
 `pause` of such a sandbox answered 404. The claim returns when the standard images are prepared with
 a `sandbox-api` that has the calls and the conformance row has passed on one of them, through Cloud.
+
+### Why the claim stays withdrawn (2026-11-23, measured)
+
+The prepared image now carries `sandbox-api` 0.2.81 (production's copy `boxrouter-img-std-...r3f7759b35ee7`
+answers `/health` with 0.2.81, commit `feb8541a51f7`), and through Cloud a pause and a resume work: the guest is
+frozen (a counter in the sandbox stops, the same PID runs after the resume), twice in a row
+([`through-cloud-proof.log`](pause-20261123/through-cloud-proof.log)). The claim is not restored because
+Blaxel's control-plane record does not always follow a standby that happened:
+
+- Through Cloud, command then pause at once then resume, 30 cycles twice
+  ([sample 1](pause-20261123/through-cloud-sample-1.log), [sample 2 with a counter in the sandbox](pause-20261123/through-cloud-sample-2-with-counter.log)):
+  pause p50 11 to 13 s, p95 15.3 s, max 15.4 s; resume p50 0.2 s, p95 3.3 to 7.0 s; the pause timed out (60 s,
+  the record never showed STANDBY) in 1 of 30 and in 1 of 30, and once more in the first proof run.
+- A variant of the package that sends one standby request and accepts the sandbox's own idle standby
+  ([sample 3, stopped after 25 cycles](pause-20261123/through-cloud-sample-3-no-resend-fix-stopped.log)) timed out
+  in 2 of 25, with a slower tail (19 to 33 s). So the early second request was not the cause.
+- In one failure the record's `state` field was absent for the whole 60 s on a sandbox created 4 s before; in
+  another it read RUNNING for 6 minutes while a counter in the sandbox showed the guest frozen. Every Blaxel
+  exchange of these runs is in the `wire-trace-sample-*.jsonl` files.
+- The record differs between RUNNING and STANDBY only in `state`, `lastUsedAt` and `expiresIn`; its `events` list
+  holds only the create and deploy events. There is no second signal.
+- Quiet window ([`quiet-window.jsonl`](pause-20261123/quiet-window.jsonl): one request, a wait of d seconds,
+  one `POST /standby`, then record reads only): took effect in 0 of 4 at 0.5 s, 1 of 4 at 2 s, 2 of 4 at 3.5 s, 16 of 16
+  from 5 s. The adapter-level rounds without a resume before the pause are in
+  [`adapter-level-8-rounds.jsonl`](pause-20261123/adapter-level-8-rounds.jsonl): no timeout in 8 of 8.
+
+Account and route identifiers are removed from the logs; sandbox names are kept.

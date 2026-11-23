@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.81: keeps the traces and sample logs behind the Blaxel pause finding (`providers/blaxel/pause-20261123/`) and says in the Blaxel evidence why `pause_resume` stays unclaimed. No declaration, vocabulary or conformance-suite change.
 - 0.5.80: `Provider.image_recipe_revision()`, an optional class method that returns the empty string by default: what a package adds to an image it prepares, as `[0-9a-f]{12}` derived from it, so a caller can carry it in the identity of a prepared copy (a copy made by an older recipe is another copy). A provider that does not state it behaves as before. No vocabulary or conformance-suite change.
 - 0.5.79: adds the Beam brand (`providers/beam/brand.yaml` and `brand/`: one-colour mark from the site's own favicon glyph, chart colour `#3B3C41`); no declaration, publication or conformance change.
 - 0.5.77: the Blaxel declaration no longer claims `pause_resume`: the calls are in the sandbox's `sandbox-api` from 0.2.78 on and the images the adapter prepares carried 0.2.74. The evidence says why and when it returns. No API, vocabulary or conformance-suite change.

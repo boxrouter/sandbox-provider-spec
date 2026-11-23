@@ -1,0 +1,46 @@
+{"step": "created", "group": 0, "sid": "01a20828-6f67-8001-96b8-afdb00674a9f", "took": 1.64, "t": 1795433197.436}
+{"step": "pause", "group": 0, "cycle": 0, "code": 200, "took": 3.9, "t_start": 1795433197.663, "resume_code": 200, "resume_took": 0.54, "t": 1795433202.097}
+{"step": "pause", "group": 0, "cycle": 1, "code": 200, "took": 14.28, "t_start": 1795433202.197, "resume_code": 200, "resume_took": 0.16, "t": 1795433216.637}
+{"step": "pause", "group": 0, "cycle": 2, "code": 200, "took": 15.43, "t_start": 1795433216.739, "resume_code": 200, "resume_took": 0.18, "t": 1795433232.345}
+{"step": "pause", "group": 0, "cycle": 3, "code": 200, "took": 3.75, "t_start": 1795433232.456, "resume_code": 200, "resume_took": 0.18, "t": 1795433236.385}
+{"step": "pause", "group": 0, "cycle": 4, "code": 200, "took": 15.2, "t_start": 1795433236.497, "resume_code": 200, "resume_took": 0.17, "t": 1795433251.875}
+{"step": "destroyed", "group": 0, "code": 202, "t": 1795433251.982}
+{"step": "created", "group": 1, "sid": "01a20829-47ed-8001-aa3c-3d732aa1c9eb", "took": 0.87, "t": 1795433252.855}
+{"step": "pause", "group": 1, "cycle": 0, "code": 200, "took": 13.26, "t_start": 1795433253.118, "resume_code": 200, "resume_took": 0.49, "t": 1795433266.859}
+{"step": "pause", "group": 1, "cycle": 1, "code": 200, "took": 14.28, "t_start": 1795433266.972, "resume_code": 200, "resume_took": 0.19, "t": 1795433281.438}
+{"step": "pause", "group": 1, "cycle": 2, "code": 200, "took": 4.01, "t_start": 1795433281.535, "resume_code": 200, "resume_took": 0.2, "t": 1795433285.746}
+{"step": "pause", "group": 1, "cycle": 3, "code": 200, "took": 15.23, "t_start": 1795433285.869, "resume_code": 200, "resume_took": 0.2, "t": 1795433301.3}
+{"step": "pause", "group": 1, "cycle": 4, "code": 200, "took": 14.22, "t_start": 1795433301.443, "resume_code": 200, "resume_took": 0.18, "t": 1795433315.838}
+{"step": "destroyed", "group": 1, "code": 202, "t": 1795433315.924}
+{"step": "created", "group": 2, "sid": "01a2082a-4201-8001-ab16-bcaed463e957", "took": 0.95, "t": 1795433316.873}
+{"step": "pause", "group": 2, "cycle": 0, "code": 200, "took": 14.23, "t_start": 1795433317.11, "resume_code": 200, "resume_took": 0.52, "t": 1795433331.855}
+{"step": "pause", "group": 2, "cycle": 1, "code": 200, "took": 3.74, "t_start": 1795433331.988, "resume_code": 200, "resume_took": 0.16, "t": 1795433335.892}
+{"step": "pause", "group": 2, "cycle": 2, "code": 200, "took": 15.24, "t_start": 1795433335.998, "resume_code": 200, "resume_took": 0.19, "t": 1795433351.435}
+{"step": "pause", "group": 2, "cycle": 3, "code": 200, "took": 4.8, "t_start": 1795433351.565, "resume_code": 200, "resume_took": 0.16, "t": 1795433356.532}
+{"step": "pause", "group": 2, "cycle": 4, "code": 200, "took": 4.79, "t_start": 1795433356.645, "resume_code": 200, "resume_took": 0.18, "t": 1795433361.621}
+{"step": "destroyed", "group": 2, "code": 202, "t": 1795433361.705}
+{"step": "created", "group": 3, "sid": "01a2082a-f299-8001-af7a-287f43c63237", "took": 0.38, "t": 1795433362.081}
+{"step": "pause", "group": 3, "cycle": 0, "code": 200, "took": 14.19, "t_start": 1795433362.407, "resume_code": 200, "resume_took": 0.44, "t": 1795433377.033}
+{"step": "pause", "group": 3, "cycle": 1, "code": 200, "took": 4.81, "t_start": 1795433377.152, "resume_code": 200, "resume_took": 0.85, "t": 1795433382.822}
+{"step": "pause", "group": 3, "cycle": 2, "code": 200, "took": 3.76, "t_start": 1795433382.931, "resume_code": 200, "resume_took": 7.05, "t": 1795433393.744}
+{"step": "pause", "group": 3, "cycle": 3, "code": 200, "took": 6.88, "t_start": 1795433393.918, "resume_code": 200, "resume_took": 0.19, "t": 1795433400.985}
+{"step": "pause", "group": 3, "cycle": 4, "code": 200, "took": 5.09, "t_start": 1795433401.086, "resume_code": 200, "resume_took": 0.15, "t": 1795433406.332}
+{"step": "destroyed", "group": 3, "code": 202, "t": 1795433406.432}
+{"step": "created", "group": 4, "sid": "01a2082b-a338-8001-abf2-0c00c488380a", "took": 0.86, "t": 1795433407.297}
+{"step": "pause", "group": 4, "cycle": 0, "code": 200, "took": 13.32, "t_start": 1795433407.549, "resume_code": 200, "resume_took": 0.56, "t": 1795433421.427}
+{"step": "pause", "group": 4, "cycle": 1, "code": 200, "took": 4.78, "t_start": 1795433421.759, "resume_code": 200, "resume_took": 0.15, "t": 1795433426.69}
+{"step": "pause", "group": 4, "cycle": 2, "code": 200, "took": 3.76, "t_start": 1795433426.799, "resume_code": 200, "resume_took": 0.14, "t": 1795433430.7}
+{"step": "pause", "group": 4, "cycle": 3, "code": 200, "took": 14.19, "t_start": 1795433430.793, "resume_code": 200, "resume_took": 0.15, "t": 1795433445.134}
+{"step": "pause", "group": 4, "cycle": 4, "code": 200, "took": 15.28, "t_start": 1795433445.24, "resume_code": 200, "resume_took": 0.18, "t": 1795433460.702}
+{"step": "destroyed", "group": 4, "code": 202, "t": 1795433460.79}
+{"step": "created", "group": 5, "sid": "01a2082c-75b8-8001-974c-a4a94cf2673d", "took": 0.39, "t": 1795433461.184}
+{"step": "pause", "group": 5, "cycle": 0, "code": 200, "took": 14.21, "t_start": 1795433461.433, "resume_code": 200, "resume_took": 0.54, "t": 1795433476.185}
+{"step": "pause", "group": 5, "cycle": 1, "code": 200, "took": 5.83, "t_start": 1795433476.309, "resume_code": 200, "resume_took": 3.33, "t": 1795433485.47}
+{"step": "pause", "group": 5, "cycle": 2, "code": 200, "took": 5.82, "t_start": 1795433485.584, "resume_code": 200, "resume_took": 0.36, "t": 1795433491.763}
+{"step": "pause", "group": 5, "cycle": 3, "code": 504, "took": 60.04, "t_start": 1795433491.867, "body": "{\"error\":{\"code\":\"timeout\",\"fix\":\"Do not send this again: read operation 01a2082c-eda6-7672-a0dc-40f2897d6b0f until its outcome is completed or not_started.\",\"message\":\"The provider response timed out; execution may have occurred.\",\"request_id\":\"01a2082c-ed9a-7f5d-b539-fc463fdef3a1\",\"outcome\":\"unknown\",\"retry\":\"check_outcome\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-co", "t": 1795433551.905}
+{"step": "after_unknown", "group": 5, "cycle": 3, "since": 0.1, "state": "running", "pause_again": [409, "conflict"], "took": 0.02, "t": 1795433551.973}
+{"step": "pause", "group": 5, "cycle": 4, "code": 409, "took": 0.02, "t_start": 1795433862.389, "body": "{\"error\":{\"code\":\"conflict\",\"fix\":\"Read the sandbox or operation to see its current state; reuse an idempotency key only with an identical request.\",\"message\":\"The request conflicts with existing state or route policy.\",\"request_id\":\"01a20832-94f5-7473-b420-41303adedf5a\",\"outcome\":\"not_started\",\"retry\":\"after_fix\",\"retry_after_seconds\":null,\"doc_url\":\"https://boxrouter.ai/docs/error-codes#conflict", "t": 1795433862.404}
+{"step": "after_unknown", "group": 5, "cycle": 4, "since": 0.1, "state": "running", "pause_again": [409, "conflict"], "took": 0.01, "t": 1795433862.457}
+{"step": "after_unknown", "group": 5, "cycle": 4, "since": 18.6, "state": "paused", "pause_again": [409, "not_running"], "took": 0.01, "t": 1795433881.011}
+{"step": "destroyed", "group": 5, "code": 202, "t": 1795434173.21}
+{"step": "summary", "cycles": 30, "pauses_ok": 28, "not_ok": 2, "pause_p50": 13.26, "pause_p95": 15.28, "pause_max": 15.43, "resume_p50": 0.19, "resume_p95": 3.33, "resume_max": 7.05, "t": 1795434173.21}
