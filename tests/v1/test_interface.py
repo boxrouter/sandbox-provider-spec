@@ -142,7 +142,8 @@ def test_every_json_object_type_is_covered() -> None:
     plain = {
         "Decimal", "Timestamp", "Labels", "Env", "FilePath", "Port", "PriceItem", "PriceUnit",
         "EmptyObject", "Error", "ErrorResponse", "SandboxSize", "LifetimeExtendRequest",
-        "PreviewRequest", "TcpLinkRequest", "LabelsUpdateRequest", "NetworkUpdateRequest",
+        "PreviewRequest", "ResumeRequest", "TcpLinkRequest", "LabelsUpdateRequest",
+        "NetworkUpdateRequest",
         "TerminalId",
         "MkdirRequest", "EntryType", "UserName", "ImageConfig", "ImageDigest", "ImageResources",
         "StartWindow", "Concurrency", "Prepaid", "StoredArtifacts",

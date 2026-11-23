@@ -20,7 +20,7 @@ import time
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
 from concurrent.futures import Future
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from importlib.metadata import version
 from typing import Any, TypeVar, cast
 from urllib.parse import urlsplit, urlunsplit
@@ -194,6 +194,11 @@ def _secret_headers(items: object) -> tuple[SecretHeader, ...]:
         SecretHeader(str(item["name"]), str(item.get("prefix", "")), str(item.get("suffix", "")))
         for item in items
     )
+
+
+#: `resume.lifetime`: the clock skew allowed below the asked end, and the timer step above it.
+RESUME_SKEW_S = 5
+RESUME_STEP_S = 60
 
 
 def _iso(moment: datetime | None) -> str | None:
@@ -711,6 +716,31 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         if sandbox is None:
             return observed
         return {**observed, "state": "active" if sandbox.state == "running" else sandbox.state}
+
+    def resume_lifetime(self, target: object, inputs: Inputs) -> Observation:
+        """`resume` with `lifetime_seconds` (claim `resume.lifetime`). `armed` is whether the
+        sandbox's `ends_at` is `lifetime_seconds` after the resume: no earlier than the send plus
+        the seconds (less `RESUME_SKEW_S` of clock skew), no later than the answer plus the seconds
+        plus `RESUME_STEP_S` (a timer that rounds up to its step). A provider that returned no
+        record, or one without `ends_at`, is read once."""
+        sandbox_id = self._sandbox(target)
+        seconds = number(inputs, "lifetime_seconds", 0)
+        sent = datetime.now(UTC)
+        sandbox = self.wait(self.api.resume(sandbox_id, lifetime_seconds=seconds))
+        answered = datetime.now(UTC)
+        if sandbox is None or sandbox.ends_at is None:
+            sandbox = self.wait(self.api.get(sandbox_id))
+        ends = sandbox.ends_at
+        armed = ends is not None and sent + timedelta(
+            seconds=seconds - RESUME_SKEW_S
+        ) <= ends <= answered + timedelta(seconds=seconds + RESUME_STEP_S)
+        return {
+            "resource": resource(target),
+            "identity": sandbox_id,
+            "state": "active" if sandbox.state == "running" else sandbox.state,
+            "ends_at": _iso(ends),
+            "armed": armed,
+        }
 
     def lifetime_extend(self, target: object, inputs: Inputs) -> Observation:
         sandbox_id = self._sandbox(target)

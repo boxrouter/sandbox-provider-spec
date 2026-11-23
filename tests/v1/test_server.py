@@ -165,7 +165,10 @@ class Recorder(Provider, manifest=False):
         self._note("pause", sandbox_id)
         return example(Sandbox)
 
-    async def resume(self, sandbox_id: str) -> Sandbox | None:
+    async def resume(
+        self, sandbox_id: str, *, lifetime_seconds: int | None = None
+    ) -> Sandbox | None:
+        del lifetime_seconds
         self._note("resume", sandbox_id)
         return example(Sandbox)
 
@@ -550,7 +553,10 @@ def test_an_operation_that_returns_nothing_is_answered_with_one_get(
             self._note("pause", sandbox_id)
             return None
 
-        async def resume(self, sandbox_id: str) -> Sandbox | None:
+        async def resume(
+            self, sandbox_id: str, *, lifetime_seconds: int | None = None
+        ) -> Sandbox | None:
+            del lifetime_seconds
             self._note("resume", sandbox_id)
             return None
 
@@ -563,6 +569,41 @@ def test_an_operation_that_returns_nothing_is_answered_with_one_get(
     assert reply.status == 200
     assert reply.json() == to_json(example(Sandbox))  # the wire answer is still the sandbox
     assert Recorder.calls == [(operation, args), ("get", ("sbx-1",))]
+
+
+def test_a_resume_passes_lifetime_seconds_only_when_it_is_set() -> None:
+    class Arming(Recorder, manifest=False):
+        async def resume(
+            self, sandbox_id: str, *, lifetime_seconds: int | None = None
+        ) -> Sandbox | None:
+            self._note("resume", sandbox_id, lifetime_seconds)
+            return example(Sandbox)
+
+    app = create_app(Arming)
+    path = "/v1/sandboxes/sbx-1/resume"
+    assert asyncio.run(call(app, "POST", path, body=j({}))).status == 200
+    assert asyncio.run(call(app, "POST", path, body=j({"lifetime_seconds": 420}))).status == 200
+    assert asyncio.run(call(app, "POST", path, body=j({"lifetime_seconds": 0}))).status == 400
+    assert asyncio.run(call(app, "POST", path, body=j({"seconds": 5}))).status == 400
+    assert Recorder.calls == [("resume", ("sbx-1", None)), ("resume", ("sbx-1", 420))]
+
+
+def test_a_provider_with_the_short_resume_signature_refuses_a_lifetime_before_any_call() -> None:
+    """A provider written before `lifetime_seconds` cannot arm it (rule
+    `provider-api/resume-lifetime`): `unsupported`, and nothing is resumed."""
+
+    class Short(Recorder, manifest=False):
+        async def resume(self, sandbox_id: str) -> Sandbox | None:  # type: ignore[override]  # pylint: disable=arguments-differ
+            self._note("resume", sandbox_id)
+            return example(Sandbox)
+
+    app = create_app(Short)
+    path = "/v1/sandboxes/sbx-1/resume"
+    refused = asyncio.run(call(app, "POST", path, body=j({"lifetime_seconds": 420})))
+    assert refused.status == 422 and refused.json()["error"]["code"] == "unsupported"
+    assert Recorder.calls == []
+    assert asyncio.run(call(app, "POST", path, body=j({}))).status == 200
+    assert Recorder.calls == [("resume", ("sbx-1",))]
 
 
 @pytest.mark.parametrize(

@@ -5649,6 +5649,45 @@ tests:
   rules:
   - provider-api/run-base64
   proves: []
+- id: resume.lifetime
+  title: A resume that names the lifetime left arms the timer in the same call, so the sandbox ends that many seconds after the resume and outlives the lifetime it was created with.
+  rules:
+  - provider-api/resume-lifetime
+  proves: []
+  steps:
+  - op: create
+    in:
+      lifetime_seconds: 300
+      requirements:
+        pause_resume:
+          keeps: any
+    as: box
+  - op: pause
+    target: box
+  - op: resume.lifetime
+    target: box
+    in:
+      lifetime_seconds: 420
+    as: again
+    expect:
+      equals:
+        armed: true
+  - wait_ms: 305000
+  - op: run
+    target: again
+    in:
+      bash_script: 'true'
+    expect:
+      equals:
+        exit_code: 0
+  - op: get
+    target: again
+    expect:
+      equals:
+        state:
+          one_of:
+          - active
+          - paused
 - id: contract.files_write_missing_parent
   title: A write under a missing parent either creates the parents and the bytes read back, or is not_found and creates nothing.
   steps:

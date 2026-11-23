@@ -819,3 +819,19 @@ would shorten one reads the deadline before the call, never after it. `get` is w
 consumer reads the record (its state, size, lifetime and times), so a consumer never relies on a
 result being present. Over HTTP the answer stays the sandbox: the reference server answers a
 provider's `None` with one `get` of its own, so the wire answer of 1.0 is unchanged.
+
+`resume` takes an optional `lifetime_seconds` (in process, the keyword argument of that name; over
+HTTP, the body field), the lifetime the sandbox has left. It is an input of the operation, as
+`create`'s `lifetime_seconds` is: a consumer that keeps a sandbox's lifetime budget sends what is
+left, so a paused sandbox runs on that budget again without a second call. A class offers it by
+listing `resume.lifetime` in `classes[].operations`; left out, `resume` does what it did without it.
+
+- A class that lists `resume.lifetime` **MUST**, for a `resume` with `lifetime_seconds` N, arm its <!-- rule: provider-api/resume-lifetime -->
+  lifetime timer in the same call so that it ends the sandbox N seconds after the resume (rounded
+  up to the timer's `step_seconds`), as `lifetime_timer.at_end` says, whatever the timer held
+  before the pause. A class that does not list it **MUST** answer `unsupported` to a request that
+  sets `lifetime_seconds`, and changes nothing; its consumer resumes without it and then extends
+  the lifetime (`lifetime.extend`).
+
+The answer follows the paragraph above: a sandbox or `None`. A consumer that reads `ends_at` from
+a returned sandbox can see the armed timer; a `None` says nothing more than the claim does.

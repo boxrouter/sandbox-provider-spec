@@ -697,12 +697,15 @@ paths:
       operationId: resume
       tags: [optional]
       summary: Resume a paused sandbox
-      description: Section `pause_resume`.
+      description: >-
+        Section `pause_resume`. With `lifetime_seconds`, a class that lists `resume.lifetime` in `classes[].operations`
+        arms its lifetime timer to end the sandbox that many seconds after the resume, in the same call; a class that
+        does not list it answers `unsupported` and changes nothing.
       requestBody:
         required: true
         content:
           application/json:
-            schema: {$ref: "#/components/schemas/EmptyObject"}
+            schema: {$ref: "#/components/schemas/ResumeRequest"}
       responses:
         "200":
           description: The sandbox after the resume.
@@ -1899,6 +1902,7 @@ components:
               - image.cost
               - cost.capture
               - account.capacity
+              - resume.lifetime
           allOf:
             - if: {contains: {enum: [files.list, files.mkdir, files.remove, files.exists]}}
               then:
@@ -1921,7 +1925,7 @@ components:
             Optional operations that no SPS gate covers. `files.list`, `files.mkdir`, `files.remove` and `files.exists` are
             listed all four or none, and so are the image operations `image.prepare`, `image.get`, `image.list` and
             `image.delete` (the class also claims `custom_images` knob `prepared`). `run.base64` says that `run` accepts
-            `output: base64`, and `labels.update`, `cost.capture` and `account.capacity` each stand alone (they are not part of either group). Two more need
+            `output: base64`, and `labels.update`, `cost.capture` and `account.capacity` each stand alone (they are not part of either group), and so does `resume.lifetime` (`resume` takes `lifetime_seconds` and arms that lifetime in the same call; it needs the `pause_resume` section). Two more need
             `image.prepare`: `image.cost` (`GET /v1/images/{id}/cost`) and `image.prepare.oci_layout` (an OCI image arrives as
             an image-layout tar in the `context` part, and the provider states `limits.image_layout_bytes`). They turn on when
             the tester passes them.
@@ -2779,6 +2783,16 @@ components:
           description: The multipart form field that carries the bytes, or null when the body is the raw bytes.
         expires_at: {$ref: "#/components/schemas/Timestamp"}
         reusable: {type: boolean, default: false, description: "True when the link may be used more than once."}
+    ResumeRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        lifetime_seconds:
+          type: integer
+          minimum: 1
+          description: >-
+            The lifetime the sandbox has left: the timer ends it this many seconds after the resume. Only for a class
+            that lists `resume.lifetime`; left out, the provider's timer does what it does without it.
     LifetimeExtendRequest:
       type: object
       additionalProperties: false

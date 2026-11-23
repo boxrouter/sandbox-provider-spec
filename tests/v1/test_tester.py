@@ -515,14 +515,21 @@ class _Pausing(LocalProvider, manifest=False):
     """Pauses and resumes; `answers` says whether each returns the sandbox or nothing."""
 
     answers = True
+    armed_short = 0
 
     async def pause(self, sandbox_id: str) -> Sandbox | None:
         box = dataclasses.replace(await self.get(sandbox_id), state="paused")
         self.boxes[sandbox_id] = box
         return box if self.answers else None
 
-    async def resume(self, sandbox_id: str) -> Sandbox | None:
+    async def resume(
+        self, sandbox_id: str, *, lifetime_seconds: int | None = None
+    ) -> Sandbox | None:
         box = dataclasses.replace(await self.get(sandbox_id), state="running")
+        if lifetime_seconds is not None:
+            # `armed_short` stands for a provider that arms less than it was asked for.
+            seconds = lifetime_seconds - self.armed_short
+            box = dataclasses.replace(box, ends_at=datetime.now(UTC) + timedelta(seconds=seconds))
         self.boxes[sandbox_id] = box
         return box if self.answers else None
 
@@ -552,6 +559,44 @@ def test_pause_and_resume_may_return_nothing(answers: bool) -> None:
         assert extended == {"ends_at": "2026-11-22T12:01:00Z"}
     finally:
         driver.close()
+
+
+@pytest.mark.parametrize(
+    ("answers", "short", "armed"), [(True, 0, True), (False, 0, True), (True, 30, False)]
+)
+def test_a_resume_with_a_lifetime_observes_whether_the_timer_was_armed(
+    answers: bool, short: int, armed: bool
+) -> None:
+    """`resume.lifetime`: armed is the sandbox's end `lifetime_seconds` after the resume; a
+    provider that returned nothing is read once."""
+    provider = _Pausing()
+    provider.answers, provider.armed_short = answers, short
+    driver = ProviderDriver(provider, run="run-1")
+    try:
+        made = driver.call("create", None, {})
+        driver.call("pause", made, {})
+        again = driver.call("resume.lifetime", made, {"lifetime_seconds": 420})
+        assert again["identity"] == made["identity"]
+        assert (again["state"], again["armed"]) == ("active", armed)
+    finally:
+        driver.close()
+
+
+def test_resume_lifetime_runs_only_where_a_class_lists_it() -> None:
+    suite = shared_suite()
+    assert "resume.lifetime" in unsupported_operations(with_gates({"pause_resume": {}}))
+    plain = {
+        test.id
+        for test in select_tests(suite, with_gates({"pause_resume": {}}), TestOptions()).tests
+    }
+    assert "resume.lifetime" not in plain
+    discovery = with_gates({"pause_resume": {}})
+    first = dataclasses.replace(discovery.classes[0], operations=("resume.lifetime",))
+    listed = dataclasses.replace(discovery, classes=[first, *discovery.classes[1:]])
+    assert "resume.lifetime" not in unsupported_operations(listed)
+    assert "resume.lifetime" in {
+        test.id for test in select_tests(suite, listed, TestOptions()).tests
+    }
 
 
 def test_driver_runs_a_bash_script_as_argv(driver: ProviderDriver) -> None:

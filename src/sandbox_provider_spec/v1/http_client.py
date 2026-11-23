@@ -631,8 +631,13 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     async def pause(self, sandbox_id: str) -> Sandbox:
         return await self._json(Sandbox, "POST", self._sandbox_path(sandbox_id, "/pause"), body={})
 
-    async def resume(self, sandbox_id: str) -> Sandbox:
-        return await self._json(Sandbox, "POST", self._sandbox_path(sandbox_id, "/resume"), body={})
+    async def resume(self, sandbox_id: str, *, lifetime_seconds: int | None = None) -> Sandbox:
+        body: dict[str, Any] = {}
+        if lifetime_seconds is not None:
+            body["lifetime_seconds"] = lifetime_seconds
+        return await self._json(
+            Sandbox, "POST", self._sandbox_path(sandbox_id, "/resume"), body=body
+        )
 
     async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox:
         return await self._json(

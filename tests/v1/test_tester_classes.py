@@ -61,7 +61,8 @@ class ClassedProvider(LocalProvider, manifest=False):
         self.boxes[sandbox_id] = box
         return box
 
-    async def resume(self, sandbox_id: str) -> Sandbox:
+    async def resume(self, sandbox_id: str, *, lifetime_seconds: int | None = None) -> Sandbox:
+        del lifetime_seconds
         box = dataclasses.replace(await self.get(sandbox_id), state="running")
         self.boxes[sandbox_id] = box
         return box

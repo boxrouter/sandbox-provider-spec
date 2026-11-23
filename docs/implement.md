@@ -364,9 +364,13 @@ is still a valid 1.0 provider.
   result carries `stdout_base64` and `stderr_base64`, the exact bytes of each stream, and
   `stdout` and `stderr` are empty. A provider claims it by listing `run.base64` in the
   `operations` of a class, beside the directory operations or alone.
+- **A lifetime on resume.** `resume` takes `lifetime_seconds`, the lifetime the sandbox has left,
+  and arms the timer to end it that many seconds after the resume, in the same call. A provider
+  claims it by listing `resume.lifetime` in a class's `operations`; a class that does not list it
+  answers `unsupported` to the number and its consumer extends the lifetime after the resume.
 
-The tester runs `run.user`, `files.write.user`, `process.start.user` and `run.base64` only when the
-claim is made. Your Python `Provider` receives `RunRequest.user` and `RunRequest.output`,
+The tester runs `run.user`, `files.write.user`, `process.start.user`, `run.base64` and
+`resume.lifetime` only when the claim is made. Your Python `Provider` receives `RunRequest.user` and `RunRequest.output`,
 `ProcessStartRequest.user` and, only when a user is named, a `user` keyword on `files_write`.
 
 ### Prepared images: facts, layouts, bindings and cost

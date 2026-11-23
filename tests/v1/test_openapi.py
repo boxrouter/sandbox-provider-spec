@@ -344,6 +344,7 @@ def test_request_schemas_are_found() -> None:
         "NetworkUpdateRequest",
         "PreviewRequest",
         "ProcessStartRequest",
+        "ResumeRequest",
         "RunRequest",
         "SnapshotRequest",
         "TcpLinkRequest",

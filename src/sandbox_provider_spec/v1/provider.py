@@ -263,8 +263,18 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         26). The HTTP server answers a None with one `get`, so the wire answer is unchanged."""
         raise self._unsupported("pause")
 
-    async def resume(self, sandbox_id: str) -> Sandbox | None:
-        """Resume the sandbox. Returns the sandbox or None, as `pause` does."""
+    async def resume(
+        self, sandbox_id: str, *, lifetime_seconds: int | None = None
+    ) -> Sandbox | None:
+        """Resume the sandbox. Returns the sandbox or None, as `pause` does.
+
+        `lifetime_seconds` is the lifetime the sandbox has left: a class that lists
+        `resume.lifetime` in `classes[].operations` arms its timer to end the sandbox that many
+        seconds after the resume, in the same call (rule `provider-api/resume-lifetime`); None
+        keeps the provider's own behaviour. A class that does not list it answers `unsupported`
+        to a number and changes nothing; its caller resumes without it and extends the lifetime
+        (`lifetime.extend`). A provider written before the argument may keep the shorter
+        signature `(sandbox_id)`: the server passes it only when a caller sets it."""
         raise self._unsupported("resume")
 
     async def lifetime_extend(self, sandbox_id: str, seconds: int) -> Sandbox | None:

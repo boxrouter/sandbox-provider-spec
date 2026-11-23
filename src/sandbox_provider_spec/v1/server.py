@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import inspect
 import json
 import re
 import time
@@ -576,8 +577,17 @@ async def _pause(p: Provider, r: _Request) -> Reply:
 
 async def _resume(p: Provider, r: _Request) -> Reply:
     sandbox_id = _entity(r.path_params[0], "sandbox_id")
-    await r.json_body("EmptyObject", empty_ok=True)
-    resumed = await p.resume(sandbox_id)
+    body = await r.json_body("ResumeRequest", empty_ok=True)
+    seconds = body.get("lifetime_seconds")
+    if seconds is None:
+        resumed = await p.resume(sandbox_id)
+    else:
+        # A provider written before `lifetime_seconds` keeps the shorter signature: it cannot arm
+        # the timer in its resume, so the request is refused before anything is sent.
+        if "lifetime_seconds" not in inspect.signature(p.resume).parameters:
+            provider = getattr(type(p), "provider_id", type(p).__name__)
+            raise SpsError("unsupported", f"{provider} does not take resume.lifetime")
+        resumed = await p.resume(sandbox_id, lifetime_seconds=seconds)
     return 200, to_json(resumed if resumed is not None else await p.get(sandbox_id))
 
 

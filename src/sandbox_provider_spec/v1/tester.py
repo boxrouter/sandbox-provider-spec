@@ -89,6 +89,8 @@ OPERATION_CLAIMS = {
     "files.link": ("gate", "file_links"),
     "pause": ("gate", "pause_resume"),
     "resume": ("gate", "pause_resume"),
+    # `resume` with `lifetime_seconds`, armed in that call (rule `provider-api/resume-lifetime`).
+    "resume.lifetime": ("operations", "resume.lifetime"),
     "preview.link": ("gate", "previews"),
     "preview.revoke": ("knob", ("previews", "revocable")),
     "tcp.link": ("gate", "tcp_ports"),
