@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.95: the boxd declaration states `snapshots.original_after: briefly_paused` and its three custom-image sources (dockerfile, oci, provider_artifact), as its discovery does and its committed clean tester reports prove. Its previews stay unstated: the committed coverage run answered `unsupported` on those rows. No vocabulary or conformance-suite change.
+
 - 0.5.94: the Agent37 default class's declaration states its one region (`agent37:us`), its reattaching terminal and its two custom-image sources (prepared oci, provider artifact), as its discovery does and its committed clean tester reports prove. The vm class declaration is unchanged: no committed report pinned to that class proves them yet. No vocabulary or conformance-suite change.
 
 - 0.5.93: every suite `create` step now has an offline test that it encodes on the wire (`tests/v1/test_suite_requests_encode.py`; a step with a `$runner`/`$receiver` value, or one the driver answers `unsupported`, is left out), after 0.5.91's row found by a live run an hour in. It found four more rows that could never be sent over HTTP: `lifetime_timer.counts_paused_time.true`, `.false` and `network_lockdown.after_resume` asked `pause_resume.keeps: any` (now `pause_resume: {}`), and `lifetime_timer.at_end.stopped` asked `at_end: stopped`, which 1.0 cannot name (the driver now answers `unsupported`). Those rows are re-run by the next prober pass.

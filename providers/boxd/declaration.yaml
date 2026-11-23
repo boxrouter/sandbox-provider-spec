@@ -1,8 +1,8 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-18
-  sdks: {boxd: 0.3.0}
+  date: 2026-11-22
+  sdks: {boxd: 0.3.0, sandbox-provider-spec: 0.5.64}
 resources:
   kernel: dedicated
   sizes:
@@ -65,8 +65,14 @@ gates:
   - keeps: files_and_memory
   snapshots:
   - keeps: files_and_memory
-    original_after: unknown
+    original_after: briefly_paused
     deletable: true
+  # Custom images build from a Dockerfile, a registry image or a Cloud-prepared artifact; the
+  # clean tester run passes all three source rows.
+  custom_images:
+  - source: dockerfile
+  - source: oci
+  - source: provider_artifact
 x-boxd:
   isolated: true
   usage_records: boxd.machines.usage
@@ -103,10 +109,26 @@ evidence:
     tests:
     - snapshots.keeps.files_and_memory
     report: reports/snapshot.json
+  gates.snapshots.0.original_after:
+    tests:
+    - snapshots.original_after.briefly_paused
+    report: reports/tester-default-core.json
   gates.snapshots.0.deletable:
     tests:
     - snapshots.deletable.true
     report: reports/snapshot.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.dockerfile
+    report: reports/tester-default-core.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.oci
+    report: reports/tester-default-core.json
+  gates.custom_images.2.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/tester-default-core.json
   gates.processes.0:
     tests:
     - processes.input.true
