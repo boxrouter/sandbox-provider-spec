@@ -83,7 +83,7 @@ Blaxel's [sandbox overview](https://docs.blaxel.ai/Sandboxes/Overview) says a sa
 active connection "automatically transitions to a warm standby mode", "in approximately 15
 seconds", keeping its memory, processes and filesystem, and that reconnecting wakes it. The SDKs have no
 call to enter or leave standby ([standby control](https://docs.blaxel.ai/Sandboxes/Standby-control)),
-but the sandbox API does (see [Pause and resume](#pause-and-resume-pause_resume-keeps-files_and_memory--2026-11-23)).
+but the sandbox API does (see [Pause and resume](#pause-and-resume-pause_resume-with-keeps-files_and_memory--2026-11-23)).
 That is the spec's `idle_shutdown` with `on_idle: paused`, with no caller-chosen idle time.
 
 The claim was declared until 2026-10-21 and withdrawn then for lack of current evidence, not because
