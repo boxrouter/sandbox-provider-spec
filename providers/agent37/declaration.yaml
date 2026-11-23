@@ -1,12 +1,11 @@
 spec: sandbox-provider-spec/0.1
 provider: agent37
 # Every value is `unknown` or absent until a committed run report or a dated quote of Agent37's
-# documentation proves it. Kernel, regions and every gate but network_lockdown stay unknown
-# until a report proves them.
+# documentation proves it. Kernel stays unknown until a report proves it.
 verified:
-  date: 2026-11-18
+  date: 2026-11-22
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
-  sdks: {"httpx": "0.28.1"}
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.64"}
 resources:
   kernel: unknown
   disk_in_memory: false
@@ -22,7 +21,7 @@ resources:
   default_user: node
   default_cwd: /home/node
   gpus: unknown
-  regions: unknown
+  regions: ["agent37:us"]
   located_in: ["US"]
   # Agent37 supplies no timer; the selected BoxRouter benchmark lease enforces finite lifetimes.
   max_lifetime_seconds: unlimited
@@ -54,6 +53,16 @@ gates:
   - input: true
     cancel: true
     reattach: true
+  # A terminal opened under a caller id reattaches: the coverage report's terminal.reattach row
+  # passes on the default class.
+  terminal:
+  - reattach: true
+  # Prepared images are templates, which both classes boot from; a Cloud-prepared copy is named by
+  # its artifact id (see the package's facts).
+  custom_images:
+  - source: oci
+    prepared: true
+  - source: provider_artifact
 evidence:
   resources.disk_in_memory:
     tests: [coverage.facts.disk_in_memory.false]
@@ -101,6 +110,29 @@ evidence:
     source: https://github.com/boxrouter/sandbox-provider-spec/blob/main/spec/declarations.md
     read: 2026-11-14
     quote: A router-enforced lifetime destroys the sandbox.
+  resources.regions:
+    source: https://www.agent37.com/docs/agents-api/instances/create
+    read: 2026-11-11
+    quote: >-
+      `us` is the only region that runs every instance type. `eu` and `ap-south` run VM and
+      Performance instances, so a create in either should also send `"type": "vm"` or
+      `"type": "performance"`. A `default` create there returns `400 invalid_request`
+  gates.terminal.0.reattach:
+    tests:
+    - coverage.terminal.reattach
+    report: reports/tester-default-coverage.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.oci
+    report: reports/tester-default-core.json
+  gates.custom_images.0.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/tester-default-coverage.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/tester-default-core.json
   resources.located_in:
     source: https://www.agent37.com/docs/agents-api/instances/create
     read: 2026-11-11

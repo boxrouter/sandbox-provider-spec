@@ -5,6 +5,8 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.94: the Agent37 default class's declaration states its one region (`agent37:us`), its reattaching terminal and its two custom-image sources (prepared oci, provider artifact), as its discovery does and its committed clean tester reports prove. The vm class declaration is unchanged: no committed report pinned to that class proves them yet. No vocabulary or conformance-suite change.
+
 - 0.5.93: every suite `create` step now has an offline test that it encodes on the wire (`tests/v1/test_suite_requests_encode.py`; a step with a `$runner`/`$receiver` value, or one the driver answers `unsupported`, is left out), after 0.5.91's row found by a live run an hour in. It found four more rows that could never be sent over HTTP: `lifetime_timer.counts_paused_time.true`, `.false` and `network_lockdown.after_resume` asked `pause_resume.keeps: any` (now `pause_resume: {}`), and `lifetime_timer.at_end.stopped` asked `at_end: stopped`, which 1.0 cannot name (the driver now answers `unsupported`). Those rows are re-run by the next prober pass.
 
 - 0.5.92: `v1.connections.provider_client` no longer sends a `ConnectError` again when the caller supplied the transport: such a transport (an address-checking one) raises it for a destination it refuses by policy, and a refusal is never tried again (a second resolution of a name that resolved to a forbidden address is what a rebinding attacker wants). The library's own transport still sends a refused connect once more. A request with no body counts as framed for the HTTP/1.1 write-failure rule (its resend was missed for a GET). No vocabulary, declaration or conformance-suite change.
