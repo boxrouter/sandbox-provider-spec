@@ -1,0 +1,5 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.billing: Sailboxes are billed on used CPU, memory and state disk — not the allocated
+  shape — metered per second at published rates, plus a per-creation fee that some plans waive.
+note.size: "The declared sizes are ceilings, not charges: a Sailbox's vCPU, memory and disk
+  limits bound it, and the bill follows measured use."

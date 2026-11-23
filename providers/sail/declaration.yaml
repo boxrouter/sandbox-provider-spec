@@ -1,0 +1,62 @@
+spec: sandbox-provider-spec/0.1
+provider: sail
+class: default
+# Every value is `unknown`, absent or a dated quote of Sail's documentation. The adapter serves
+# the baseline surface — create, get, list, destroy, run, files, native processes by
+# reattach and cost — and claims no gate, so every other gate stays unknown until a run
+# report proves it. Sail's own pause, checkpoint, egress and listener features exist, but
+# nothing through this adapter exposes them, and a declaration records what was proven.
+# (The values the sps-provider-sail adapter's first tester reports prove — arch, libc,
+# package_manager, disk_in_memory, default_user, default_cwd, root, max_process_seconds and
+# the lifetime-timer rows — land with those reports; the reports were still being
+# regenerated on a clean checkout when this declaration was committed.)
+verified:
+  date: 2026-11-23
+  # The adapter calls Sail's Sailbox HTTP API through httpx, not Sail's own SDK; the newest
+  # report records the tester stack it ran with.
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.85"}
+resources:
+  kernel: dedicated
+  arch: unknown
+  libc: unknown
+  package_manager: unknown
+  disk_in_memory: unknown
+  # The four sizes the adapter offers stay undeclared: a shape may only be declared with a
+  # matching price in sandbox-provider-pricing, and Sail pricing is still being landed.
+  # A create's request floors pick the smallest listed size that meets them; each value is
+  # a limit, not a reservation, and Sail bills the actual usage below it.
+  sizes: unknown
+  size_is_ceiling: unknown
+  default_user: unknown
+  root: unknown
+  gpus: unknown
+  regions: unknown
+  # The longest `lifetime_seconds` this integration accepts on a create (Sail itself
+  # documents an unlimited lifetime); a longer request is refused, not clamped.
+  max_lifetime_seconds: 604800
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  on_memory_exhausted: unknown
+  extendable_lifetime: unknown
+  paused_retention_seconds: unknown
+# The adapter claims no gate requirement in discovery, so the declaration claims none:
+# a declaration records what was proven. Sail's own pause, preview and user-selection
+# gates that discovery does state are recorded as drift until committed reports prove
+# each knob value, and process input/cancel stay unclaimed.
+gates: {}
+evidence:
+  resources.kernel:
+    source: https://docs.sailresearch.com/sailboxes.md
+    read: 2026-11-23
+    quote: >-
+      Every Sailbox is an isolated VM that can have up to 64 vCPUs and terabytes of RAM and
+      disk.
+  resources.max_lifetime_seconds:
+    source: https://docs.sailresearch.com/sailbox-openapi.json
+    read: 2026-11-23
+    quote: >-
+      "Terminate this Sailbox after this many wall-clock seconds from creation, including
+      time spent waiting for capacity, sleeping, or paused. ... Omit or pass null for
+      unlimited lifetime. The deadline cannot be extended. Expiration is checked
+      periodically" — the API accepts 1 to 4294967295; this integration accepts up to
+      604800 (7 days) on a create.

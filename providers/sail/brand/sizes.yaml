@@ -1,0 +1,5 @@
+# Drawn-ink size of the mark, in px, when it is drawn "contain" in a 16 px box (measured with the
+# path geometry of tests/test_provider_brand.py, 2026-11-23).
+# tests/test_provider_brand.py holds a mark to within 1 px of this.
+width: 16.0
+height: 14.3

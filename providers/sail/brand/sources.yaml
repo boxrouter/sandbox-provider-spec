@@ -1,0 +1,24 @@
+retrieved_at: '2026-11-23'
+owner: Sail Research
+source_page: https://docs.sailresearch.com
+assets:
+  mark.svg:
+    source: https://mintcdn.com/sailresearch/aahfB_XYfgCoK57N/favicon.svg (the docs site's icon)
+    role: The two-triangle sail symbol in the brand's own navy (#2C4681)
+    modifications: >-
+      The light background rectangle was removed and the viewBox cropped to the symbol's ink
+      ("42 51.4 166.3 149.2"); the two paths and their #2C4681 fill are unchanged.
+  logo.svg:
+    source: https://mintcdn.com/sailresearch/X8kOeTTR9DVS13DJ/logo/solo.svg (the docs site's header logo)
+    role: >-
+      The served lockup: the sail symbol and the "sail" wordmark in #2C4681, byte-identical to the
+      served file
+    modifications: none
+notes:
+  colours: >-
+    The docs site's own configuration names #2c4681 its primary and dark colour and #74a6ef its
+    light; the marketing site draws the same artwork in the page's text colour. A white-on-dark
+    variant of the lockup is also served (logo/solo-white.svg, not kept).
+  terms: >-
+    No brand guidelines or reuse terms were found on sailresearch.com or docs.sailresearch.com
+    (checked 2026-11-23).
