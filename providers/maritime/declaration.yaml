@@ -5,14 +5,14 @@ class: default
 # tester report (the `sps-provider-maritime` adapter over Maritime's HTTP API, control plane
 # api.maritime.sh plus the per-sandbox data plane the create answer carries). The adapter
 # serves the baseline surface, directories, labels.update, account.capacity and
-# resume.lifetime, and discovery states six gates (custom images, idle shutdown,
-# pause/resume, previews, network lockdown, processes and snapshots); the gates land here as
-# their suite reports do. Everything else stays unknown until a run report proves it.
+# resume.lifetime, and discovery states five gates (pause/resume, previews, network
+# lockdown, processes and snapshots; custom images and idle shutdown stay unclaimed
+# pending fixtures). Everything else stays unknown until a run report proves it.
 verified:
   date: 2026-11-24
   # The adapter calls Maritime's HTTP API through httpx, not Maritime's own SDK; the newest
   # report records the tester stack it ran with.
-  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.107"}
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.112"}
 resources:
   kernel: dedicated
   arch: [amd64]
@@ -40,26 +40,34 @@ lifetime_timer:
   enforced_by: provider
   counts_paused_time: true
   at_end: [destroyed]
-# The gates a committed run report already proves: previews publishes any guest port and the
-# link survives a pause, and the egress policy is replaceable on a running sandbox. The
-# allowlist and deny_all policies, the `names` entry kind (with `*.` wildcards) and `changeable`
-# are supported by probe but stay unclaimed until a committed run report proves them.
-# idle_shutdown, pause_resume, processes, snapshots and custom_images stay out until their
-# suites run.
+# The gates the committed core report proves: snapshots keep files and memory and delete,
+# a resume keeps files and memory, background processes cancel and reattach, previews publish
+# any guest port on public or private access with the credential in the link, and the egress
+# policy is an allowlist of host names (with `*.` wildcards), `deny_all` or `open`, replaceable
+# on a running sandbox. idle_shutdown and custom_images stay out: their suite rows need
+# fixtures Maritime's timings cannot meet (idle granularity, a provider-artifact image).
 gates:
   previews:
-    # Public and private links both exist by probe (a `token` flag on the URL create carries
-    # the credential in the link), but no suite row proves `access` or `credential` yet.
-  - access: unknown
+  - access: [public, private]
+    credential: link
     any_port: true
-    survives_pause: true
+  pause_resume:
+  - keeps: files_and_memory
+  processes:
+  - cancel: true
+    reattach: true
+  snapshots:
+  - keeps: files_and_memory
+    deletable: true
   network_lockdown:
-    # The allowlist/deny_all/open policies and the names entry kind wait on the suite's
-    # proving rows (network_lockdown.deny_all, network_lockdown.allowlist.names), which the
-    # in-flight core run produces; declared `unknown` stays permissive for the discovery.
-  - policy: unknown
-    entry_kinds: unknown
+  - policy: allowlist
+    entry_kinds: [names]
+    allow_wildcards: true
+  - policy: [allowlist, deny_all, open]
+    entry_kinds: [names]
+    allow_wildcards: true
     switchable: true
+    changeable: true
 evidence:
   resources.kernel:
     source: https://maritime.sh/docs/ephemeral-sandboxes
@@ -100,8 +108,11 @@ evidence:
     tests: [coverage.facts.on_memory_exhausted.process_killed]
     report: reports/tester-default-coverage.json
   lifetime_timer.enforced_by:
-    tests: [lifetime_timer.at_end.destroyed]
-    report: reports/tester-default-select.json
+    source: https://maritime.sh/docs/ephemeral-sandboxes
+    read: '2026-11-24'
+    quote: >-
+      "When it has been idle for a few minutes, or when its time limit passes, Maritime ends
+      the machine and its disk." The deadline is a wall-clock instant, so paused time counts.
   lifetime_timer.counts_paused_time:
     source: https://maritime.sh/docs/ephemeral-sandboxes
     read: '2026-11-24'
@@ -109,14 +120,59 @@ evidence:
       "When it has been idle for a few minutes, or when its time limit passes, Maritime ends
       the machine and its disk." The deadline is a wall-clock instant, so paused time counts.
   lifetime_timer.at_end:
-    tests: [lifetime_timer.at_end.destroyed]
-    report: reports/tester-default-select.json
+    source: https://maritime.sh/docs/ephemeral-sandboxes
+    read: '2026-11-24'
+    quote: >-
+      "When it has been idle for a few minutes, or when its time limit passes, Maritime ends
+      the machine and its disk."
+  gates.previews.0.access:
+    tests: [previews.access.public, previews.access.private]
+    report: reports/tester-default-core.json
+  gates.previews.0.credential:
+    tests: [previews.credential.link]
+    report: reports/tester-default-core.json
   gates.previews.0.any_port:
     tests: [coverage.previews.any_port]
     report: reports/tester-default-coverage.json
-  gates.previews.0.survives_pause:
-    tests: [coverage.previews.survives_pause]
+  gates.pause_resume.0.keeps:
+    tests: [pause_resume.files_and_memory]
+    report: reports/tester-default-core.json
+  gates.processes.0.cancel:
+    tests: [processes.cancel.true]
+    report: reports/tester-default-core.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/tester-default-core.json
+  gates.snapshots.0.keeps:
+    tests: [snapshots.keeps.files_and_memory]
+    report: reports/tester-default-core.json
+  gates.snapshots.0.deletable:
+    tests: [snapshots.deletable.true]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.policy:
+    tests: [network_lockdown.allowlist.names]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.entry_kinds:
+    tests: [network_lockdown.allowlist.names]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.policy:
+    reports:
+    - report: reports/tester-default-core.json
+      tests: [network_lockdown.deny_all, network_lockdown.allowlist.names]
+    - report: reports/tester-default-coverage.json
+      tests: [coverage.network_lockdown.open]
+  gates.network_lockdown.1.entry_kinds:
+    tests: [network_lockdown.allowlist.names]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests: [network_lockdown.wildcards]
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.switchable:
+    tests: [coverage.network_lockdown.switchable.true, coverage.network_lockdown.open]
     report: reports/tester-default-coverage.json
-  gates.network_lockdown.0.switchable:
-    tests: [coverage.network_lockdown.switchable.true]
-    report: reports/tester-default-lockdown.json
+  gates.network_lockdown.1.changeable:
+    tests: [coverage.network_lockdown.changeable.true]
+    report: reports/tester-default-coverage.json

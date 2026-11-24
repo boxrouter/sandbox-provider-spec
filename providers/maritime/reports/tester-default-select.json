@@ -2,35 +2,33 @@
   "baseline": "not_run",
   "check_digests": {
     "facts.default_cwd": "sha256:e07928727882d8fad7beb05e24ad4be9aad3c99c3edda77f8bdfa23f20e91907",
-    "facts.default_user": "sha256:669eb777df6d9f7d5bd38b1711fe67b5a7c87122a79e1605a9406b485efa3ec4",
-    "lifetime_timer.at_end.destroyed": "sha256:75a8d1ae46a35234dba8c8c05247867bb5ce9db82d071cb7cd6e44f4a7f488f0"
+    "facts.default_user": "sha256:669eb777df6d9f7d5bd38b1711fe67b5a7c87122a79e1605a9406b485efa3ec4"
   },
   "class": "default",
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.107"
+    "version": "0.5.112"
   },
-  "finished_at": "2026-11-24T06:47:31.702637+00:00",
+  "finished_at": "2026-11-24T09:24:16.938528+00:00",
   "provider": "maritime",
-  "revision": "e9e6ca87221024dd779ae3658f0c95ca31016175",
-  "run_id": "public-b3412862c061abcbc694",
+  "revision": "8eec8774fe7a5296d4d28a7651bbf7b1a1602f51",
+  "run_id": "public-310eef05a93f79f083c0",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.107"
+    "sandbox-provider-spec": "0.5.112"
   },
   "selected_tests": [
     "facts.default_user",
-    "facts.default_cwd",
-    "lifetime_timer.at_end.destroyed"
+    "facts.default_cwd"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T06:42:12.365635+00:00",
+  "started_at": "2026-11-24T09:24:00.737413+00:00",
   "subject": {
-    "discovery_digest": "sha256:d176d5f6d2826ad780aa7e384a2c476dddb53c37a24b9f22d670e277c10ac2fd",
+    "discovery_digest": "sha256:f7c6da46f1ab2bc49f5e79c74b0d35094d956164b287d352b18005fab23feeab",
     "package": "sps-provider-maritime",
-    "package_digest": "sha256:151a7b1ffbb4e15e1c1366e3959b9b3f078cf6f7f4a4d6e92235c3ee4e2bd57d",
-    "version": "0.1.0"
+    "package_digest": "sha256:428ce339a69b95f347f5a259b557c9ffa943738d422c0e02192f094844925ec1",
+    "version": "0.1.1"
   },
   "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
   "tests": [
@@ -42,7 +40,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2027,
+      "duration_ms": 5042,
       "id": "facts.default_user",
       "proves": [
         {
@@ -77,7 +75,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2172,
+      "duration_ms": 5444,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -100,56 +98,6 @@
             "default_cwd": "<HOME>"
           },
           "operation": "environment.observe",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 310933,
-      "id": "lifetime_timer.at_end.destroyed",
-      "proves": [
-        {
-          "fact": "lifetime_timer.at_end",
-          "value": "destroyed"
-        },
-        {
-          "fact": "lifetime_timer.enforced_by",
-          "value": "provider"
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "facts/lifetime-timer",
-        "provider-api/lifetime-enforced"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "operation": "wait",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "state": {
-              "actual": {
-                "truncated": false,
-                "utf8": "destroyed"
-              },
-              "matches": true
-            }
-          },
-          "operation": "get",
           "result": "passed"
         }
       ]
