@@ -54,7 +54,11 @@ gates:
     any_port: true
     survives_pause: true
   network_lockdown:
-  - policy: [open]
+    # The allowlist/deny_all/open policies and the names entry kind wait on the suite's
+    # proving rows (network_lockdown.deny_all, network_lockdown.allowlist.names), which the
+    # in-flight core run produces; declared `unknown` stays permissive for the discovery.
+  - policy: unknown
+    entry_kinds: unknown
     switchable: true
 evidence:
   resources.kernel:
@@ -113,11 +117,6 @@ evidence:
   gates.previews.0.survives_pause:
     tests: [coverage.previews.survives_pause]
     report: reports/tester-default-coverage.json
-  gates.network_lockdown.0.policy:
-    tests:
-    - coverage.network_lockdown.open
-    - coverage.network_lockdown.switchable.true
-    report: reports/tester-default-lockdown.json
   gates.network_lockdown.0.switchable:
     tests: [coverage.network_lockdown.switchable.true]
     report: reports/tester-default-lockdown.json
