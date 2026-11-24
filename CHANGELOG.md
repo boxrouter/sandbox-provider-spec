@@ -3,6 +3,13 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.125 — 2026-11-24
+
+- the environment's distribution and entry-point scans (`packages_distributions`, the spec-provider
+`entry_points`) are read once per process, not once per `report_subject`: a roster build asked the
+filesystem for the same answer per provider, and a cold `providers()` could cost seconds per
+package it read. No report, digest or subject changes.
+
 ## Unreleased
 
 - 0.5.124: a row's `create` that the provider answers `unavailable` is asked again, then not run, never an `error` (cloud#10041: a boxd run recorded `resume.lifetime` as `error: unavailable` because the setup create was refused for 36 s, a verdict on nothing that would have replaced a passing row). The create is asked again with the SAME idempotency key (the first answer's outcome may be `unknown` and the first call may have made a sandbox), waiting `retry_after_seconds` (1 to 30 s) for up to 180 s in all; if it is still refused the row is `not_run` with reason `provider_unavailable` and the step's `detail` holds `code`, `outcome` and `retry_after_seconds` (no provider text, no id). The code is `SetupRetryDriver` in the new `v1/suite_driver_setup.py`, which the tester installs in place of `ProviderDriver`; it is in no row's check dependencies, so `runner.py`, `driver.py` and `suite_driver.py` are not edited: the check digests of all 290 rows and the suite digest (`sha256:b0c201cc…`) are byte-identical before and after (canonical JSON of `check_digests(shared_suite().tests)` compared; `tests/test_setup_create_unavailable.py` also asserts no row depends on the new module or `v1/tester.py`). Only a `create` step is retried; a restore's create and every other failure are unchanged. No claim, vocabulary or suite-row change.
