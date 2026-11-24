@@ -19,35 +19,62 @@
     "baseline.run_exit_code": "sha256:40e4e87e6ecfc3a268c1bde72e8d750d5eee7186e8f85f944e2b96bde64c7152",
     "baseline.run_output": "sha256:8d67d382c7f149a4f8f9d24a4ffd788a700727fa46073138a87ad9c7b2dbc7a5",
     "baseline.run_separate_streams": "sha256:bfcf4ae087600bc47a13c17e0acc078710a71679af0f4ceb5219721898ddf9c6",
-    "contract.destroy_repeat": "sha256:0ae1b780a382625f00622df48542a7b03879772daab802a44c7cf597c8d367c9",
-    "contract.discovery_valid": "sha256:5456ae0cf9b6e96746620a8d99cc0d14720012019e39d720e9ba141217db7901",
-    "contract.discovery_within_static": "sha256:83ea66170f23dbf8aa0645a8c4b9b03e8a03f967e2b90d661148feea0cd0d4a9",
+    "contract.destroy_repeat": "sha256:9326245edfc8055522a8414f5f6e13f82f7d300e020f4a9924f467b4ebb3b0b9",
+    "contract.discovery_valid": "sha256:b4567d589f0dada11cbf72d31a5ef23389dd4a569f184326f61f41ec4d3ef389",
+    "contract.discovery_within_static": "sha256:35407a073cad9e79589b6bc703e2aac7640dfad5fb9825da0d93bead25b56e7c",
     "contract.files_1gib_roundtrip": "sha256:04a29e4ce3b95fc90e57f724757f80acee3876b7a7ff2ee58fc33696fd5bb3af",
-    "contract.files_write_missing_parent": "sha256:dbbebfbf1c0ebab14d2a40b818cfedfe138a646ebedbb39bcb6308b5f57d3eb7",
+    "contract.files_write_missing_parent": "sha256:a3a6710e87d9d700fd643c4326e6e640f8651dd70083f3c653c1fca8932d0793",
     "contract.idempotent_create_other_body": "sha256:21f1aa1d65a7a146b4c388cfedecde1c84cfa729b1952d1095497d7bd72f575e",
     "contract.idempotent_create_same_body": "sha256:15860a0987729eea992af05d87175ef99deb83da7192556ce8e7daf11d5c1f97",
     "contract.lifetime_ends": "sha256:1d140a3981e31ab3a8355b1081fe209883b25c24c507ba3c007d05009e9e8c99",
     "contract.list_label_filter": "sha256:73131956a62313b614b7c675640381990d7a2e9f9667bc3c926cb7b8d3ca4850",
-    "contract.not_found_codes": "sha256:761bf4b2120378c7357a87630eaaf35f667e2f1960c8707f8d0704c640210088",
-    "contract.run_timeout_ends_command": "sha256:946ae4e4f83a27b39159e23e417af1cf35ab2fcc0b43b8961db05994535d1b1f",
+    "contract.not_found_codes": "sha256:8ff2139600fe946d799d1de806cf18852de4805e7d8ac21fc9efa36375e892a1",
+    "contract.run_timeout_ends_command": "sha256:382e6eeaf13adf7f0b4f7f0aef4c34e0e7f7bd655149a0adc65d19d03c98a83f",
     "contract.stored_artifacts": "sha256:6da7bcff288877b65d57f7eca653fab8ab73e3d5cbe4d56f4a74a6ee95997628",
     "contract.unsupported_unclaimed": "sha256:162848313c11ed888903d38e9b6fe0420b95eb28580dc9e400b983edaef4f0ce",
+    "directories.exists": "sha256:43425131f0390959ad9359f209e0a01b035b60c7a68a8586d0b17183811e0734",
+    "directories.list": "sha256:e3cebda6905bdb3583870f1b014dee0bb28e8f627e1158cb79cc962411f71505",
+    "directories.list_errors": "sha256:67ccfe90abf8088cc95c62a87d80df1057511a097b65affe0991eddb85c3ada1",
+    "directories.list_paging": "sha256:1868543411fb67f3f4e464e4d77c8e329a693bcdf4fe324a4871646d1a8c0ec8",
+    "directories.mkdir": "sha256:5a4af9c87de59b6925e00a074f52fc2bbea67bf84bf8fa8eede74d80ace51311",
+    "directories.remove": "sha256:b68b0ddca7b8257cb6f4a5e11795be6b7922bb9a32f447d67b637525eb3703da",
+    "network_lockdown.after_resume": "sha256:a56a418e778db6e5406ae9cfa7601edd8f904edcae0b046af4304fba684fbda7",
+    "network_lockdown.allowlist.addresses": "sha256:ac1de043ae87bc3bd3dfd9dafd1488b244c99ac5f994b711d39adaf1f096ee47",
+    "network_lockdown.allowlist.names": "sha256:a17151b64e6ac214dccd9c933c73d00349fd70e0c80aee069c08f9713023d7b2",
+    "network_lockdown.deny_all": "sha256:aa8cbd0f0bee1a45c4a50bbec4ffa3cfe8a5575a9eff7bf08680df448a2f764c",
+    "network_lockdown.max_allow": "sha256:9f5ccb6f8cd6b6912df699348924acefbda74e386fa80c3c5653c5c2009dceae",
+    "network_lockdown.root_cannot_lift": "sha256:9b4a425ee91beba36042bb88de510a77053dad3b7e610c185c2e2256bedb48d0",
+    "network_lockdown.wildcards": "sha256:977b40a686a5d97603640e927eab24ba299e80e90c29c32e28c829275794cfa3",
     "pause_resume.files_and_memory": "sha256:bca0a38518992bd2f11201b45d8ba43c994495c32b7b8f3143d320c0e3cfbe47",
+    "previews.access.public": "sha256:49a54377d39071e2e1e9830627652cba728ab85bf059e996962ba67a161a8022",
+    "previews.revocable.true.public": "sha256:d7763e7058cc618ba249c6743d3061e0ad274bd8842b01120424991ed236e1b8",
     "processes.cancel.true": "sha256:f468c76dae96f5ba4a73884e7462612054008baa41ebcc04e1df96228358757f",
+    "processes.input.true": "sha256:f2fd37f4f6335fc5427e8a6d06d8c833a1af460cf4a49aee2f3b8be82bfb9e20",
     "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237",
-    "run.base64": "sha256:559307b8b9a7b70f886af9b2ef867baf43eab18b3c13ab5d8ee388112deff329"
+    "run.base64": "sha256:559307b8b9a7b70f886af9b2ef867baf43eab18b3c13ab5d8ee388112deff329",
+    "snapshots.deletable.true": "sha256:d3588affabc45d45cc4dee9dfcf2f04d119f3fccecdc80b071c2f8e3c34890eb",
+    "snapshots.keeps.files_and_memory": "sha256:e8d90421101c6a1547ec12742acd6d8b9cc0e486fbfa316d855bf8d341a2e37d",
+    "snapshots.original_after.briefly_paused": "sha256:2149bfe1c0b3801932bdd0af705de832b81442b461fecb5fb9e8e48f0a28649a",
+    "snapshots.restore_options": "sha256:ce817a2aa4ba0ee1478a2e262b3cb6feb067aff9418558fe0a3c4add51707015",
+    "snapshots.restores_many_times": "sha256:bdf239de165606920308b74999d245bf820b0546f6b39475e97465d70ee75cb4",
+    "snapshots.v1.completed_writes": "sha256:18d4f4b71c198812edd822e9f4710dd235321698e39933bebf87b06a1081fea4",
+    "snapshots.v1.deleted_not_found": "sha256:384fb0f3ac3a678d748f60663b2a6840c7cb49258f8d50a1d6a937525409c6cc",
+    "snapshots.v1.get_and_list": "sha256:ac29683257223f60ca0f8a05a0c3170b524573454ed39da58d6211afd31a7d5f",
+    "snapshots.v1.idempotent_create": "sha256:38efeb9308abd46dbc651e475e9cd5b7d4b6ad068470a6ebaff428b7cafa698c",
+    "snapshots.v1.outlives_source": "sha256:68a50293c4ad55edbf3660fd0dbfee891c1cf954cfb706dea834403634d2d30e",
+    "snapshots.v1.restore_rules": "sha256:5ed430a921ea2796a754cd18714c233dc10d3f5cdc174d56e68a8043283fe03b"
   },
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.103"
+    "version": "0.5.116"
   },
-  "finished_at": "2026-11-24T05:36:40.771606+00:00",
+  "finished_at": "2026-11-24T09:49:24.352671+00:00",
   "provider": "luxor",
-  "revision": "5359b3f99695da2c3d33460e10b681424c925e4c",
-  "run_id": "public-10910e851fba416b177f",
+  "revision": "475dbcb3895dc42cfaf16efca8c33caa2807d111",
+  "run_id": "public-a57c291ec4408fc6c80f",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.103"
+    "sandbox-provider-spec": "0.5.116"
   },
   "selected_tests": [
     "baseline.create_env",
@@ -62,12 +89,33 @@
     "baseline.files_write",
     "baseline.files_read",
     "baseline.process_stream",
+    "processes.input.true",
     "processes.cancel.true",
     "processes.reattach.true",
     "baseline.environment_bash",
     "baseline.environment_python3",
     "baseline.outbound_network",
     "pause_resume.files_and_memory",
+    "snapshots.keeps.files_and_memory",
+    "snapshots.original_after.briefly_paused",
+    "snapshots.deletable.true",
+    "snapshots.restores_many_times",
+    "snapshots.restore_options",
+    "snapshots.v1.outlives_source",
+    "snapshots.v1.completed_writes",
+    "snapshots.v1.get_and_list",
+    "snapshots.v1.idempotent_create",
+    "snapshots.v1.restore_rules",
+    "snapshots.v1.deleted_not_found",
+    "network_lockdown.deny_all",
+    "network_lockdown.allowlist.names",
+    "network_lockdown.allowlist.addresses",
+    "network_lockdown.after_resume",
+    "network_lockdown.root_cannot_lift",
+    "network_lockdown.max_allow",
+    "network_lockdown.wildcards",
+    "previews.access.public",
+    "previews.revocable.true.public",
     "baseline.process_eof_is_not_exit",
     "contract.discovery_valid",
     "contract.discovery_within_static",
@@ -81,20 +129,26 @@
     "contract.files_1gib_roundtrip",
     "contract.destroy_repeat",
     "contract.lifetime_ends",
+    "directories.list",
+    "directories.list_paging",
+    "directories.list_errors",
+    "directories.mkdir",
+    "directories.remove",
+    "directories.exists",
     "run.base64",
     "contract.files_write_missing_parent",
     "baseline.no_metadata",
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T05:35:56.787253+00:00",
+  "started_at": "2026-11-24T09:39:57.158310+00:00",
   "subject": {
-    "discovery_digest": "sha256:4fb8e2f2a3c8980ce0b9d9ef0c77f823c1d61558f57370ec27cd7684cd175b7c",
+    "discovery_digest": "sha256:9645005db68fd054439213825e08b48c90a559898a6f305eafd8f814705e24e5",
     "package": "sps-provider-luxor",
-    "package_digest": "sha256:1c61e765d8c6f62064a905a4906d90a67667af891685bfb090ef7e429c438ecd",
-    "version": "0.1.0"
+    "package_digest": "sha256:1d1f0bfc370b185570eb44c25156793ead732f4818f6758c07ef777e0596d1ce",
+    "version": "0.1.2"
   },
-  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "suite_digest": "sha256:b0c201ccdbf98c7f49091a98d23fe0c707440e9b62f3995dce1be51727104091",
   "tests": [
     {
       "class": "default",
@@ -104,7 +158,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 583,
+      "duration_ms": 634,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -140,7 +194,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 512,
+      "duration_ms": 448,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -176,7 +230,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 410,
+      "duration_ms": 411,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -208,7 +262,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 409,
+      "duration_ms": 410,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -249,7 +303,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 446,
+      "duration_ms": 430,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -285,7 +339,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 391,
+      "duration_ms": 387,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -318,7 +372,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 487,
+      "duration_ms": 401,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -361,7 +415,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 432,
+      "duration_ms": 441,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -397,7 +451,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 503,
+      "duration_ms": 431,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -433,7 +487,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 721,
+      "duration_ms": 643,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -484,7 +538,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 503,
+      "duration_ms": 531,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -534,7 +588,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15494,
+      "duration_ms": 15476,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -603,7 +657,63 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 763,
+      "duration_ms": 552,
+      "id": "processes.input.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.write_stdin",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 5,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 799,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -705,7 +815,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 714,
+      "duration_ms": 718,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -767,7 +877,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 399,
+      "duration_ms": 389,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -801,7 +911,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 411,
+      "duration_ms": 424,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -835,7 +945,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 530,
+      "duration_ms": 686,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -881,7 +991,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3576,
+      "duration_ms": 3885,
       "id": "pause_resume.files_and_memory",
       "proves": [
         {
@@ -997,6 +1107,14 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
           "kind": "process",
           "result": "already_released"
         },
@@ -1005,7 +1123,1431 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 768,
+      "duration_ms": 38569,
+      "id": "snapshots.keeps.files_and_memory",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "keeps",
+          "value": "files_and_memory"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/files-and-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "bWVtb3J5LW1hcmtlcg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 37353,
+      "id": "snapshots.original_after.briefly_paused",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "original_after",
+          "value": "briefly_paused"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/original-after"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.snapshot_ticker_start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "advancing": {
+              "actual": true,
+              "matches": true
+            },
+            "baseline_gap_ms": 100,
+            "capture": "native_default",
+            "longest_gap_ms": 1534,
+            "original_after": {
+              "actual": {
+                "truncated": false,
+                "utf8": "briefly_paused"
+              },
+              "matches": true
+            }
+          },
+          "operation": "fixture.snapshot_ticker_observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 27048,
+      "id": "snapshots.deletable.true",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "deletable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "snapshots/deletable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 33652,
+      "id": "snapshots.restores_many_times",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "snapshots/restores-many-times"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "Zmlyc3Q=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 39468,
+      "id": "snapshots.restore_options",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "snapshots/restore-takes-its-own-options"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "bmV3",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 39389,
+      "id": "snapshots.v1.outlives_source",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-outlives-sandbox"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "c2F2ZWQ=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 84121,
+      "id": "snapshots.v1.completed_writes",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-consistency"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AAH/",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "dHdv",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "dGhyZWU=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "cmFu",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 49385,
+      "id": "snapshots.v1.get_and_list",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-list"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready"
+              },
+              "matches": true
+            }
+          },
+          "operation": "snapshot.get",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "count": {
+              "matches": true
+            }
+          },
+          "operation": "snapshot.list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 31536,
+      "id": "snapshots.v1.idempotent_create",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-idempotent"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.create_keyed",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.create_keyed",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "snapshot.create_keyed",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "snapshot",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 40696,
+      "id": "snapshots.v1.restore_rules",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-restore"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "native_code": "invalid_request",
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.get",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "labels": {
+              "matches": true
+            },
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "snapshot",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 29243,
+      "id": "snapshots.v1.deleted_not_found",
+      "proves": [
+        {
+          "gate": "snapshots",
+          "knob": "deletable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "provider-api/snapshot-delete"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.take",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "snapshot.delete",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "snapshot.restore",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "deleted"
+              },
+              "matches": true
+            }
+          },
+          "operation": "snapshot.delete_again",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "snapshot.get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 9673,
+      "id": "network_lockdown.deny_all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "deny_all"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/deny-all"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1868,
+      "id": "network_lockdown.allowlist.names",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 17414,
+      "id": "network_lockdown.allowlist.addresses",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "addresses"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4434,
+      "id": "network_lockdown.after_resume",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/holds-after-resume"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "pause",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "resume",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 11226,
+      "id": "network_lockdown.root_cannot_lift",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/root-cannot-lift"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cm9vdC1hdHRlbXB0ZWQK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "fixture.root_attack",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cm9vdC1hdHRlbXB0ZWQK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "fixture.root_attack",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 22583,
+      "id": "network_lockdown.max_allow",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "max_allow",
+          "value": {
+            "at_least": 32
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/max-allow"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1769,
+      "id": "network_lockdown.wildcards",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "allow_wildcards",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/wildcards"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1081,
+      "id": "previews.access.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "access",
+          "value": "public"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/public-serves-anyone",
+        "provider-api/preview-access"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1469,
+      "id": "previews.revocable.true.public",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "revocable",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/revocable"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.link",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "preview.revoke",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 785,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -1040,7 +2582,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 86,
+      "duration_ms": 68,
       "id": "contract.discovery_valid",
       "proves": [],
       "result": "passed",
@@ -1065,7 +2607,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 46,
+      "duration_ms": 51,
       "id": "contract.discovery_within_static",
       "proves": [],
       "result": "passed",
@@ -1115,7 +2657,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 635,
+      "duration_ms": 598,
       "id": "contract.idempotent_create_same_body",
       "proves": [],
       "result": "passed",
@@ -1188,7 +2730,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 427,
+      "duration_ms": 397,
       "id": "contract.idempotent_create_other_body",
       "proves": [],
       "result": "passed",
@@ -1229,7 +2771,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1293,
+      "duration_ms": 802,
       "id": "contract.list_label_filter",
       "proves": [],
       "result": "passed",
@@ -1317,7 +2859,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 790,
+      "duration_ms": 426,
       "id": "contract.not_found_codes",
       "proves": [],
       "result": "passed",
@@ -1350,7 +2892,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 123,
+      "duration_ms": 42,
       "id": "contract.unsupported_unclaimed",
       "proves": [],
       "result": "passed",
@@ -1387,7 +2929,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5520,
+      "duration_ms": 5486,
       "id": "contract.run_timeout_ends_command",
       "proves": [],
       "result": "passed",
@@ -1439,7 +2981,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 323,
+      "duration_ms": 303,
       "id": "contract.files_1gib_roundtrip",
       "proves": [],
       "reason": "fixture_missing",
@@ -1473,7 +3015,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 839,
+      "duration_ms": 810,
       "id": "contract.destroy_repeat",
       "proves": [],
       "result": "passed",
@@ -1580,7 +3122,444 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 567,
+      "duration_ms": 464,
+      "id": "directories.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-list"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "entries": {
+              "contains": true
+            },
+            "names": {
+              "actual": [
+                "a",
+                "b",
+                "c",
+                "d"
+              ],
+              "matches": true
+            },
+            "next_cursor": {
+              "matches": true
+            },
+            "types": {
+              "matches": true
+            }
+          },
+          "operation": "files.list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 648,
+      "id": "directories.list_paging",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-list-paging"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "has_more": {
+              "matches": true
+            },
+            "names": {
+              "actual": {
+                "unrecorded": true
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.list",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "names": {
+              "actual": {
+                "unrecorded": true
+              },
+              "matches": true
+            },
+            "next_cursor": {
+              "matches": true
+            }
+          },
+          "operation": "files.list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 535,
+      "id": "directories.list_errors",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-list"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "files.list",
+          "result": "passed"
+        },
+        {
+          "native_code": "invalid_request",
+          "operation": "files.list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 894,
+      "id": "directories.mkdir",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-mkdir"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "files.mkdir",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.mkdir",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.mkdir",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.mkdir",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "files.mkdir",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "files.mkdir",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1052,
+      "id": "directories.remove",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-remove"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.remove",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "files.remove",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.remove",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.remove",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "files.remove",
+          "result": "passed"
+        },
+        {
+          "native_code": "invalid_request",
+          "operation": "files.remove",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 789,
+      "id": "directories.exists",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/files-exists"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            },
+            "type": {
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            },
+            "type": {
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": true,
+              "matches": true
+            },
+            "type": {
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": false,
+              "matches": true
+            },
+            "type": {
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exists": {
+              "actual": false,
+              "matches": true
+            },
+            "type": {
+              "matches": true
+            }
+          },
+          "operation": "files.exists",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 429,
       "id": "run.base64",
       "proves": [],
       "result": "passed",
@@ -1627,7 +3606,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1165,
+      "duration_ms": 523,
       "id": "contract.files_write_missing_parent",
       "proves": [],
       "result": "passed",
@@ -1660,7 +3639,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2162,
+      "duration_ms": 766,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -1696,7 +3675,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 890,
+      "duration_ms": 527,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",

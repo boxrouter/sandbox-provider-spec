@@ -23,14 +23,14 @@
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.103"
+    "version": "0.5.116"
   },
-  "finished_at": "2026-11-24T05:36:21.653583+00:00",
+  "finished_at": "2026-11-24T09:40:22.133023+00:00",
   "provider": "luxor",
-  "revision": "5359b3f99695da2c3d33460e10b681424c925e4c",
-  "run_id": "public-f4ed215fd98404fc672f",
+  "revision": "475dbcb3895dc42cfaf16efca8c33caa2807d111",
+  "run_id": "public-09e7c67a9afdc2afbd98",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.103"
+    "sandbox-provider-spec": "0.5.116"
   },
   "selected_tests": [
     "baseline.create_env",
@@ -53,14 +53,14 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T05:35:56.764250+00:00",
+  "started_at": "2026-11-24T09:39:57.298830+00:00",
   "subject": {
-    "discovery_digest": "sha256:4fb8e2f2a3c8980ce0b9d9ef0c77f823c1d61558f57370ec27cd7684cd175b7c",
+    "discovery_digest": "sha256:9645005db68fd054439213825e08b48c90a559898a6f305eafd8f814705e24e5",
     "package": "sps-provider-luxor",
-    "package_digest": "sha256:1c61e765d8c6f62064a905a4906d90a67667af891685bfb090ef7e429c438ecd",
-    "version": "0.1.0"
+    "package_digest": "sha256:1d1f0bfc370b185570eb44c25156793ead732f4818f6758c07ef777e0596d1ce",
+    "version": "0.1.2"
   },
-  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "suite_digest": "sha256:b0c201ccdbf98c7f49091a98d23fe0c707440e9b62f3995dce1be51727104091",
   "tests": [
     {
       "class": "default",
@@ -70,7 +70,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 725,
+      "duration_ms": 670,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -106,7 +106,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 440,
+      "duration_ms": 400,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -142,7 +142,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 425,
+      "duration_ms": 422,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -174,7 +174,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 316,
+      "duration_ms": 441,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -215,7 +215,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 381,
+      "duration_ms": 427,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -251,7 +251,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 405,
+      "duration_ms": 403,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -284,7 +284,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 400,
+      "duration_ms": 414,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -327,7 +327,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 449,
+      "duration_ms": 431,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -363,7 +363,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 428,
+      "duration_ms": 418,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -399,7 +399,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 752,
+      "duration_ms": 634,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -450,7 +450,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 609,
+      "duration_ms": 509,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -500,7 +500,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15452,
+      "duration_ms": 15481,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -565,7 +565,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 411,
+      "duration_ms": 398,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -599,7 +599,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 353,
+      "duration_ms": 468,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -633,7 +633,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 451,
+      "duration_ms": 661,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -679,7 +679,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 799,
+      "duration_ms": 709,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -719,7 +719,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 771,
+      "duration_ms": 799,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -755,7 +755,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 586,
+      "duration_ms": 560,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",

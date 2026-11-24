@@ -3,42 +3,38 @@
   "check_digests": {
     "facts.default_cwd": "sha256:e07928727882d8fad7beb05e24ad4be9aad3c99c3edda77f8bdfa23f20e91907",
     "facts.default_user": "sha256:669eb777df6d9f7d5bd38b1711fe67b5a7c87122a79e1605a9406b485efa3ec4",
-    "labels.update": "sha256:31c2b42fd5282570ed28ea8c4b31de19bc817c4b5da2a8cb52ff31af2f6bfea5",
     "processes.cancel.true": "sha256:f468c76dae96f5ba4a73884e7462612054008baa41ebcc04e1df96228358757f",
-    "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237",
-    "resume.lifetime": "sha256:4ba43264d71567d39a704c02bd2ef0fb7aa1cf4a604d79660d0bf4c24d4ddb04",
-    "run.base64": "sha256:559307b8b9a7b70f886af9b2ef867baf43eab18b3c13ab5d8ee388112deff329"
+    "processes.input.true": "sha256:f2fd37f4f6335fc5427e8a6d06d8c833a1af460cf4a49aee2f3b8be82bfb9e20",
+    "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237"
   },
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.103"
+    "version": "0.5.116"
   },
-  "finished_at": "2026-11-24T05:24:41.548291+00:00",
+  "finished_at": "2026-11-24T09:49:29.705376+00:00",
   "provider": "luxor",
-  "revision": "5359b3f99695da2c3d33460e10b681424c925e4c",
-  "run_id": "public-443f22be36415dd69027",
+  "revision": "475dbcb3895dc42cfaf16efca8c33caa2807d111",
+  "run_id": "public-d5793897652116a9d37a",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.103"
+    "sandbox-provider-spec": "0.5.116"
   },
   "selected_tests": [
+    "processes.input.true",
     "processes.cancel.true",
     "processes.reattach.true",
     "facts.default_user",
-    "facts.default_cwd",
-    "run.base64",
-    "resume.lifetime",
-    "labels.update"
+    "facts.default_cwd"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T05:24:37.897001+00:00",
+  "started_at": "2026-11-24T09:49:25.941629+00:00",
   "subject": {
-    "discovery_digest": "sha256:4fb8e2f2a3c8980ce0b9d9ef0c77f823c1d61558f57370ec27cd7684cd175b7c",
+    "discovery_digest": "sha256:9645005db68fd054439213825e08b48c90a559898a6f305eafd8f814705e24e5",
     "package": "sps-provider-luxor",
-    "package_digest": "sha256:1c61e765d8c6f62064a905a4906d90a67667af891685bfb090ef7e429c438ecd",
-    "version": "0.1.0"
+    "package_digest": "sha256:1d1f0bfc370b185570eb44c25156793ead732f4818f6758c07ef777e0596d1ce",
+    "version": "0.1.2"
   },
-  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "suite_digest": "sha256:b0c201ccdbf98c7f49091a98d23fe0c707440e9b62f3995dce1be51727104091",
   "tests": [
     {
       "class": "default",
@@ -52,7 +48,63 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 975,
+      "duration_ms": 809,
+      "id": "processes.input.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "input",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/input"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.write_stdin",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 5,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 816,
       "id": "processes.cancel.true",
       "proves": [
         {
@@ -154,7 +206,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 757,
+      "duration_ms": 668,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -216,7 +268,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 384,
+      "duration_ms": 427,
       "id": "facts.default_user",
       "proves": [
         {
@@ -249,9 +301,13 @@
         {
           "kind": "sandbox",
           "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
         }
       ],
-      "duration_ms": 450,
+      "duration_ms": 426,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -275,96 +331,6 @@
           },
           "operation": "environment.observe",
           "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 385,
-      "id": "run.base64",
-      "proves": [],
-      "result": "passed",
-      "rules": [
-        "provider-api/run-base64"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "exit_code": {
-              "actual": 0,
-              "matches": true
-            },
-            "stderr": {
-              "actual": {
-                "b64": "ZXKAAHI=",
-                "truncated": false
-              },
-              "matches": true
-            },
-            "stdout": {
-              "actual": {
-                "b64": "/wD+b3V0",
-                "truncated": false
-              },
-              "matches": true
-            }
-          },
-          "operation": "run",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "resume.lifetime",
-      "proves": [],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "provider-api/resume-lifetime"
-      ],
-      "steps": [
-        {
-          "operation": "resume.lifetime",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 0,
-      "id": "labels.update",
-      "proves": [],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "provider-api/labels-update"
-      ],
-      "steps": [
-        {
-          "operation": "labels.update",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
         }
       ]
     }

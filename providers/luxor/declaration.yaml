@@ -5,10 +5,18 @@ provider: luxor
 verified:
   date: 2026-11-24
   # Luxor's SDKs are not run: the adapter calls the control and data plane as Connect JSON over httpx.
-  sdks: {"sandbox-provider-spec": "0.5.103"}
+  sdks: {"sandbox-provider-spec": "0.5.116"}
 resources:
-  kernel: unknown
-  sizes: unknown
+  kernel: dedicated
+  # The sizes every self-serve account gets (Starter: up to 4 cores and 8 GB); a Team workspace takes 16 cores and 64 GB.
+  sizes:
+  - cpu: [1, 4]
+    memory_mib: [512, 8192]
+    disk_mib: [5120, 102400]
+  default_size:
+    cpu: 2
+    memory_mib: 4096
+    disk_mib: 5120
   gpus: unknown
   regions: unknown
   long_running: unknown
@@ -27,12 +35,54 @@ lifetime_timer:
   counts_paused_time: true
   at_end: destroyed
 gates:
+  idle_shutdown: unsupported
   pause_resume:
   - keeps: files_and_memory
   processes:
-  - cancel: true
+  - input: true
+    cancel: true
     reattach: true
+  snapshots:
+  - keeps: files_and_memory
+    original_after: briefly_paused
+    deletable: true
+  previews:
+  - access: public
+    revocable: true
+    any_port: true
+  network_lockdown:
+  - policy: [deny_all, allowlist]
+    entry_kinds: [names]
+    allow_wildcards: true
+    max_allow: {at_least: 32}
+    changeable: false
+  - policy: [deny_all, allowlist]
+    entry_kinds: [addresses]
+    allow_wildcards: true
+    max_allow: {at_least: 32}
+    changeable: false
+  - policy: [deny_all, allowlist]
+    entry_kinds: [names, addresses]
+    allow_wildcards: true
+    max_allow: {at_least: 32}
+    changeable: false
 evidence:
+  resources.kernel:
+    source: https://luxor.ai/docs/sandbox/concepts
+    read: '2026-11-24'
+    quote: "A running full Linux VM"
+  resources.sizes:
+    source: https://luxor.ai/pricing
+    read: '2026-11-24'
+    quote: "Up to 4 cores and 8 GB RAM"
+  resources.default_size:
+    source: https://luxor.ai/docs/sandbox/sessions
+    read: '2026-11-24'
+    quote: "Unset options fall back to service defaults of 2 vCPU, 4096 MB, and a 5 GiB root disk."
+  gates.idle_shutdown:
+    source: https://luxor.ai/docs/sandbox/product
+    read: '2026-11-24'
+    quote: "Sandboxes are not paused for inactivity: a running sandbox accrues compute charges until you pause or terminate it"
   resources.max_lifetime_seconds:
     source: https://luxor.ai/docs/sandbox/sessions
     read: '2026-11-24'
@@ -90,3 +140,94 @@ evidence:
     tests:
     - processes.reattach.true
     report: reports/tester-default-select.json
+  gates.processes.0.input:
+    tests:
+    - processes.input.true
+    report: reports/tester-default-core.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_and_memory
+    report: reports/tester-default-core.json
+  gates.snapshots.0.original_after:
+    tests:
+    - snapshots.original_after.briefly_paused
+    report: reports/tester-default-core.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/tester-default-core.json
+  gates.previews.0.access:
+    tests:
+    - previews.access.public
+    report: reports/tester-default-core.json
+  gates.previews.0.revocable:
+    tests:
+    - previews.revocable.true.public
+    report: reports/tester-default-core.json
+  gates.previews.0.any_port:
+    tests:
+    - coverage.previews.any_port
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.0.policy:
+    tests:
+    - network_lockdown.deny_all
+    - network_lockdown.allowlist.names
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.names
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.0.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.false
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.1.policy:
+    tests:
+    - network_lockdown.deny_all
+    - network_lockdown.allowlist.addresses
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.entry_kinds:
+    tests:
+    - network_lockdown.allowlist.addresses
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.1.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.false
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.policy:
+    tests:
+    - network_lockdown.deny_all
+    - coverage.network_lockdown.allowlist.mixed
+    report: reports/tester-default-claims-20261124.json
+  gates.network_lockdown.2.entry_kinds:
+    tests:
+    - coverage.network_lockdown.allowlist.mixed
+    report: reports/tester-default-coverage.json
+  gates.network_lockdown.2.allow_wildcards:
+    tests:
+    - network_lockdown.wildcards
+    report: reports/tester-default-core.json
+  gates.network_lockdown.2.max_allow:
+    tests:
+    - network_lockdown.max_allow
+    report: reports/tester-default-core.json
+  gates.network_lockdown.2.changeable:
+    tests:
+    - coverage.network_lockdown.changeable.false
+    report: reports/tester-default-coverage.json

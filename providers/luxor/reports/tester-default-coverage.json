@@ -71,22 +71,8 @@
     "coverage.network_lockdown.allowlist.mixed": "sha256:f3fa91246e8d8c72bd94dd72d4c455480d0e048631d310610b197a787a00467f",
     "coverage.network_lockdown.allowlist.range": "sha256:11d4531f05920b5d137c335973a83d888f5bdba886dfb7920f5fa0d2f9072d43",
     "coverage.network_lockdown.changeable.false": "sha256:a85b3108c00b7f55de68e0fc651dae249eae4b3327234de872c3ded0d7841b36",
-    "coverage.network_lockdown.changeable.true": "sha256:49a74a306aa38a2d746ef47406d44416356c2a8e04f975190cf9cc0b6e1c9bb3",
-    "coverage.network_lockdown.denylist.addresses": "sha256:b4f0a1a65a37a5fce5ecdc5989c1f5a99de2782479e58f4e36330e6dde52217a",
-    "coverage.network_lockdown.denylist.mixed": "sha256:718e1b8e0ed52c6f0f8059512e834a4c3ad17b4dd06dd9133a67edaf7315e3fd",
-    "coverage.network_lockdown.denylist.names": "sha256:1fac600d4ad2aeac0c44acace669c61f36844b201012f538b76e8ab4eb6b3dfa",
-    "coverage.network_lockdown.max_deny": "sha256:57a3a29907e0b218f5a161f50c4307960a3f94eb305d306ba52b30ea31a8e0b8",
-    "coverage.network_lockdown.open": "sha256:dd1242eb67ff148560e31f90fa69495db512001907c085c482e1275776c6f703",
-    "coverage.network_lockdown.policy_transition.denylist": "sha256:15389588cc797fefdcb09f366531bcd1b8ded545dd5c7b8746d23c830623695e",
-    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:a50352ee0986728188c6dabb1700f7051dbddd916bc1e2e14145e56166951e48",
-    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:c10201c467913e9ee6869111380fc219f36be8a25bc37167a24800c750f379c5",
     "coverage.network_lockdown.switchable.false": "sha256:9e772deeaf3b566858440326dae2637536094c2e0e83d4ed022377c540c6d855",
-    "coverage.network_lockdown.switchable.true": "sha256:da06d065ea75dcb0fa1382655996279ce22fb2cdaffc86524518d47ccb760fbb",
     "coverage.previews.any_port": "sha256:ab5838c838358c61ce57c19e4d3b4db13af939ffbf14e9e2992047db8e590ec4",
-    "coverage.previews.loopback": "sha256:a31201c270b2828152a150f821240f1c4ea8585f06cf21a348bfff93b29aea49",
-    "coverage.previews.reserved_ports": "sha256:35fb22e6117060152682016bceda29693ecba12d5b5ab492c56d6e70645ca1ab",
-    "coverage.previews.survives_pause": "sha256:79747e4618ad59801c13365770b9a3f89f5c6151bee2dcfd70542a43da643c6d",
-    "coverage.previews.websocket": "sha256:f1fafea4cc32f2481494bf99420fb614592a3202a9f456d27c19b52c156cd639",
     "coverage.tcp_ports.none": "sha256:afc5317410573d45a97ba0c0d7c8b8e4c7e24fbd909b0557ec3054dce03db204",
     "coverage.terminal.end": "sha256:51f8fc53244b955b36a9f21ea503128704c1fcaadd7167fd7dac0f0096452bcd",
     "coverage.terminal.reattach": "sha256:348b368c4fdef5718aa45b70a725c17c6c26761d28a67d2c049b098d5335814d",
@@ -95,14 +81,14 @@
   "clean": true,
   "driver": {
     "name": "ProviderDriver",
-    "version": "0.5.103"
+    "version": "0.5.116"
   },
-  "finished_at": "2026-11-24T05:46:44.755258+00:00",
+  "finished_at": "2026-11-24T10:05:31.049966+00:00",
   "provider": "luxor",
-  "revision": "5359b3f99695da2c3d33460e10b681424c925e4c",
-  "run_id": "public-b62278a0a5062ec0b74d",
+  "revision": "475dbcb3895dc42cfaf16efca8c33caa2807d111",
+  "run_id": "public-1bb6d509c17f877f61eb",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.103"
+    "sandbox-provider-spec": "0.5.116"
   },
   "selected_tests": [
     "coverage.guest_user.selectable",
@@ -140,28 +126,15 @@
     "coverage.tcp_ports.none",
     "coverage.desktop.control",
     "coverage.desktop.live_view",
-    "coverage.previews.websocket",
-    "coverage.previews.loopback",
     "coverage.previews.any_port",
-    "coverage.previews.survives_pause",
-    "coverage.previews.reserved_ports",
     "coverage.terminal.reattach",
     "coverage.terminal.end",
     "coverage.custom_images.runs_entrypoint.true",
     "coverage.custom_images.runs_entrypoint.false",
-    "coverage.network_lockdown.denylist.names",
-    "coverage.network_lockdown.denylist.addresses",
-    "coverage.network_lockdown.denylist.mixed",
     "coverage.network_lockdown.allowlist.mixed",
     "coverage.network_lockdown.allowlist.range",
-    "coverage.network_lockdown.changeable.true",
     "coverage.network_lockdown.changeable.false",
-    "coverage.network_lockdown.switchable.true",
-    "coverage.network_lockdown.policy_transition.denylist",
-    "coverage.network_lockdown.open",
     "coverage.network_lockdown.switchable.false",
-    "coverage.network_lockdown.switchable.cuts_open_connections.true",
-    "coverage.network_lockdown.switchable.cuts_open_connections.false",
     "coverage.hidden_secrets.rotates.true",
     "coverage.hidden_secrets.rotates.false",
     "coverage.hidden_secrets.scrubs_responses.true",
@@ -171,7 +144,6 @@
     "coverage.hidden_secrets.intercepts.all_https",
     "coverage.hidden_secrets.max_inject_into",
     "coverage.hidden_secrets.wildcards",
-    "coverage.network_lockdown.max_deny",
     "coverage.hidden_secrets.transparent.true",
     "coverage.hidden_secrets.transparent.false",
     "coverage.custom_images.build_context",
@@ -197,14 +169,14 @@
     "coverage.facts.guest_reserved_tcp_ports.8080"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T05:35:56.940251+00:00",
+  "started_at": "2026-11-24T09:49:26.068080+00:00",
   "subject": {
-    "discovery_digest": "sha256:4fb8e2f2a3c8980ce0b9d9ef0c77f823c1d61558f57370ec27cd7684cd175b7c",
+    "discovery_digest": "sha256:9645005db68fd054439213825e08b48c90a559898a6f305eafd8f814705e24e5",
     "package": "sps-provider-luxor",
-    "package_digest": "sha256:1c61e765d8c6f62064a905a4906d90a67667af891685bfb090ef7e429c438ecd",
-    "version": "0.1.0"
+    "package_digest": "sha256:1d1f0bfc370b185570eb44c25156793ead732f4818f6758c07ef777e0596d1ce",
+    "version": "0.1.2"
   },
-  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "suite_digest": "sha256:b0c201ccdbf98c7f49091a98d23fe0c707440e9b62f3995dce1be51727104091",
   "tests": [
     {
       "class": "default",
@@ -214,7 +186,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 631,
+      "duration_ms": 645,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
@@ -265,20 +237,47 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 300400,
       "id": "coverage.facts.max_lifetime.active",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "fact": "resources.max_lifetime_seconds",
+          "value": {
+            "at_least": 300
+          }
+        }
+      ],
+      "result": "passed",
       "rules": [
         "facts/max-lifetime"
       ],
       "steps": [
         {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            },
+            "window_completed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_active_lifetime",
+          "result": "passed"
         }
       ]
     },
@@ -315,7 +314,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 719,
+      "duration_ms": 653,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -354,7 +353,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 674,
+      "duration_ms": 582,
       "id": "coverage.facts.arch.arm64",
       "proves": [
         {
@@ -394,7 +393,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 726,
+      "duration_ms": 735,
       "id": "coverage.facts.root.by_default",
       "proves": [
         {
@@ -434,7 +433,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 765,
+      "duration_ms": 987,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -473,7 +472,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 700,
+      "duration_ms": 803,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -509,7 +508,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 398,
+      "duration_ms": 533,
       "id": "coverage.facts.kernel_features.fuse",
       "proves": [
         {
@@ -545,7 +544,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 368,
+      "duration_ms": 354,
       "id": "coverage.facts.kernel_features.ebpf",
       "proves": [
         {
@@ -581,7 +580,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 358,
+      "duration_ms": 397,
       "id": "coverage.facts.kernel_features.nested_cgroups",
       "proves": [
         {
@@ -617,7 +616,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 283,
+      "duration_ms": 354,
       "id": "coverage.facts.kernel_features.netfilter",
       "proves": [
         {
@@ -710,7 +709,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3721,
+      "duration_ms": 3903,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -747,7 +746,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 709,
+      "duration_ms": 648,
       "id": "coverage.facts.package_manager.apk",
       "proves": [
         {
@@ -785,7 +784,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 718,
+      "duration_ms": 945,
       "id": "coverage.facts.package_manager.dnf",
       "proves": [
         {
@@ -823,7 +822,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 608,
+      "duration_ms": 727,
       "id": "coverage.facts.package_manager.pacman",
       "proves": [
         {
@@ -861,7 +860,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 649,
+      "duration_ms": 613,
       "id": "coverage.facts.package_manager.none",
       "proves": [
         {
@@ -899,7 +898,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 615,
+      "duration_ms": 628,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -936,7 +935,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 692,
+      "duration_ms": 600,
       "id": "coverage.facts.libc.musl",
       "proves": [
         {
@@ -978,7 +977,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10688,
+      "duration_ms": 10612,
       "id": "coverage.facts.on_memory_exhausted.process_killed",
       "proves": [
         {
@@ -1016,7 +1015,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10573,
+      "duration_ms": 10616,
       "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
       "proves": [
         {
@@ -1050,7 +1049,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5038,
+      "duration_ms": 4896,
       "id": "coverage.facts.disk_in_memory.true",
       "proves": [
         {
@@ -1089,7 +1088,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5747,
+      "duration_ms": 4827,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -1184,7 +1183,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 345,
+      "duration_ms": 426,
       "id": "coverage.facts.max_run",
       "proves": [
         {
@@ -1224,7 +1223,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 600873,
+      "duration_ms": 601555,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -1393,58 +1392,21 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.previews.websocket",
-      "proves": [
+      "cleanup": [
         {
-          "gate": "previews",
-          "knob": "websocket",
-          "value": true
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
         }
       ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "previews/websocket"
-      ],
-      "steps": [
-        {
-          "operation": "preview.link",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.previews.loopback",
-      "proves": [
-        {
-          "gate": "previews",
-          "knob": "loopback",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "previews/loopback"
-      ],
-      "steps": [
-        {
-          "operation": "preview.link",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 1252,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -1453,60 +1415,37 @@
           "value": true
         }
       ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
+      "result": "passed",
       "rules": [
         "previews/any-port"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "fixture.coverage_server",
+          "result": "passed"
+        },
+        {
+          "observations": {},
           "operation": "preview.link",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.previews.survives_pause",
-      "proves": [
+          "result": "passed"
+        },
         {
-          "gate": "previews",
-          "knob": "survives_pause",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "previews/survives-pause"
-      ],
-      "steps": [
-        {
-          "operation": "preview.link",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.previews.reserved_ports",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "previews/reserved-ports"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "observations": {
+            "body": {
+              "matches": true
+            },
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
         }
       ]
     },
@@ -1601,79 +1540,54 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.denylist.names",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/denylist"
-      ],
-      "steps": [
+      "cleanup": [
         {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "kind": "sandbox",
+          "result": "deleted"
         }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.denylist.addresses",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/denylist"
       ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.denylist.mixed",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/denylist",
-        "network_lockdown/entry-kinds"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 2013,
       "id": "coverage.network_lockdown.allowlist.mixed",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names",
+            "addresses"
+          ]
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/allowlist",
         "network_lockdown/entry-kinds"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "listed_address_allowed": {
+              "matches": true
+            },
+            "listed_name_allowed": {
+              "matches": true
+            },
+            "unlisted_denied": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_allowlist",
+          "result": "passed"
         }
       ]
     },
@@ -1699,98 +1613,42 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.changeable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/changeable",
-        "provider-api/network-update"
-      ],
-      "steps": [
+      "cleanup": [
         {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "kind": "sandbox",
+          "result": "deleted"
         }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      ],
+      "duration_ms": 3792,
       "id": "coverage.network_lockdown.changeable.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": false
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/changeable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.switchable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/switchable",
-        "provider-api/network-update"
-      ],
-      "steps": [
+          "result": "passed"
+        },
         {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.policy_transition.denylist",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/switchable"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.open",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/open"
-      ],
-      "steps": [
-        {
-          "operation": "fixture.coverage_network_checks",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
@@ -1799,55 +1657,23 @@
       "cleanup": [],
       "duration_ms": 0,
       "id": "coverage.network_lockdown.switchable.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/switchable"
-      ],
-      "steps": [
+      "proves": [
         {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": false
         }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/switchable"
-      ],
-      "steps": [
-        {
-          "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
         }
       ]
     },
@@ -1855,11 +1681,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1060,
       "id": "coverage.hidden_secrets.rotates.true",
       "proves": [
         {
@@ -1885,11 +1723,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1077,
       "id": "coverage.hidden_secrets.rotates.false",
       "proves": [
         {
@@ -1915,11 +1765,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1059,
       "id": "coverage.hidden_secrets.scrubs_responses.true",
       "proves": [
         {
@@ -1945,11 +1807,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1093,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -1975,11 +1849,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1097,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -2005,11 +1891,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1175,
       "id": "coverage.hidden_secrets.intercepts.injected_hosts",
       "proves": [
         {
@@ -2035,11 +1933,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1136,
       "id": "coverage.hidden_secrets.intercepts.all_https",
       "proves": [
         {
@@ -2101,32 +2011,25 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.network_lockdown.max_deny",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "network_lockdown/max-deny"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
       "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
         {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1153,
       "id": "coverage.hidden_secrets.transparent.true",
       "proves": [
         {
@@ -2152,11 +2055,23 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
           "kind": "secret",
           "result": "already_released"
         }
       ],
-      "duration_ms": 0,
+      "duration_ms": 1022,
       "id": "coverage.hidden_secrets.transparent.false",
       "proves": [
         {
@@ -2693,12 +2608,7 @@
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
+      "cleanup": [],
       "duration_ms": 0,
       "id": "coverage.facts.guest_reserved_tcp_ports.8080",
       "proves": [],

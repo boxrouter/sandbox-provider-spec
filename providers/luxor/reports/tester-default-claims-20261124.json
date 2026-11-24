@@ -1,0 +1,129 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.network_lockdown.allowlist.mixed": "sha256:f3fa91246e8d8c72bd94dd72d4c455480d0e048631d310610b197a787a00467f",
+    "network_lockdown.deny_all": "sha256:aa8cbd0f0bee1a45c4a50bbec4ffa3cfe8a5575a9eff7bf08680df448a2f764c"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.116"
+  },
+  "finished_at": "2026-11-24T10:05:48.833054+00:00",
+  "provider": "luxor",
+  "revision": "475dbcb3895dc42cfaf16efca8c33caa2807d111",
+  "run_id": "public-292f67a4cbf921489f5c",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.116"
+  },
+  "selected_tests": [
+    "network_lockdown.deny_all",
+    "coverage.network_lockdown.allowlist.mixed"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-24T10:05:35.324471+00:00",
+  "subject": {
+    "discovery_digest": "sha256:9645005db68fd054439213825e08b48c90a559898a6f305eafd8f814705e24e5",
+    "package": "sps-provider-luxor",
+    "package_digest": "sha256:1d1f0bfc370b185570eb44c25156793ead732f4818f6758c07ef777e0596d1ce",
+    "version": "0.1.2"
+  },
+  "suite_digest": "sha256:b0c201ccdbf98c7f49091a98d23fe0c707440e9b62f3995dce1be51727104091",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10096,
+      "id": "network_lockdown.deny_all",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "deny_all"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/deny-all"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_network_checks",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2585,
+      "id": "coverage.network_lockdown.allowlist.mixed",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names",
+            "addresses"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "listed_address_allowed": {
+              "matches": true
+            },
+            "listed_name_allowed": {
+              "matches": true
+            },
+            "unlisted_denied": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_allowlist",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
