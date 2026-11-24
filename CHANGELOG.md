@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.117: the cleanup entry of a failed release is built as a plain `dict` before it is returned as an `Observation`, so the package type-checks standalone (mypy flagged three indexed assignments on a `Mapping`); this held every private SPS mirror sync since 05:21Z. No behaviour, vocabulary, schema or conformance-suite change.
 - 0.5.116: adds the official Archil symbol as a one-colour provider mark, with source and size metadata; no vocabulary or conformance-suite change.
 - 0.5.115: documents Archil's supported pause and delete timeout actions from the pinned Python SDK; no vocabulary or conformance-suite change.
 - 0.5.113: adds the Archil sandbox declaration (`providers/archil/`) with its documented regions, sizes and timeout actions. Declaration files only; no vocabulary or conformance-suite change.

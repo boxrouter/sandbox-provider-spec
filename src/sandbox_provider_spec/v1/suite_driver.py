@@ -230,7 +230,7 @@ def _cleanup_failure(kind: str, error: Exception, resource_id: object) -> Observ
     The entry has the spec code, outcome and retry hint of a provider's refusal, never a provider
     message or an id: reports are committed and mirrored. The id is in the run's own log only,
     where a person reading a run's output looks for it."""
-    entry: Observation = {
+    entry: dict[str, object] = {
         "kind": kind,
         "result": "error",
         "reason": "NativeFailure" if isinstance(error, NativeFailure) else type(error).__name__,
