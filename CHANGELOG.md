@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.110: adds Luxor (hidden): its brand mark, and its declaration for the default class, stating only what its committed tester reports prove. No vocabulary, schema or conformance-suite change.
 - 0.5.109: the Sail declaration states `snapshots` (`keeps: files_only`, `deletable`, `retention_seconds`), cited to a committed tester report from a clean checkout and a dated quote of Sail's documentation for the retention; no vocabulary or conformance-suite change.
 - 0.5.108: the Maritime declaration (`providers/maritime/declaration.yaml`) lands with its committed evidence reports (coverage, select); declared values cite the reports or dated documentation quotes, unproven values stay `unknown`. Declaration files only; no vocabulary or conformance-suite change.
 - 0.5.107: publishes Sail (`providers/sail/publication.yaml`: the provider and its `default` class, `default_class: default`) under the founder records `founder-2026-11-24-sail-publish` and `founder-2026-11-24-sail-default-publish` (merged first): "quick fill run on the existing benchmarks to add sail". Receipts come from `provider_assets.publication_receipt`. Publication files only; no declaration, vocabulary or catalog change.

@@ -1,0 +1,21 @@
+retrieved_at: '2026-11-24'
+owner: Luxor AI (formerly Tenki)
+source_page: https://luxor.ai
+assets:
+  mark.svg:
+    source: https://luxor.ai/icon.svg (the site's own icon, referenced by its `<link rel="icon">`)
+    role: The two-shape Luxor symbol in the brand's own yellow (#FFC547)
+    modifications: >-
+      The viewBox was cropped to the symbol's ink ("1.22 3.42 29.41 25.03", the symbol's ink in the frame of
+      the group's translate); the two paths, the group's translate and the #FFC547 fill are unchanged.
+  logo.svg:
+    source: https://luxor.ai/icon.svg
+    role: >-
+      The only served vector artwork: the symbol, byte-identical to the served file. The site's
+      wordmark is not served as an SVG, so the symbol stands as the logo.
+    modifications: none
+notes:
+  colours: >-
+    The icon is drawn in #FFC547 on a transparent ground; the site's `theme-color` is #000000.
+  terms: >-
+    No brand guidelines or reuse terms were found on luxor.ai (checked 2026-11-24).
