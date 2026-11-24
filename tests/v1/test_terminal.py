@@ -315,6 +315,7 @@ def test_a_named_terminal_outlives_its_connection_and_is_reached_by_its_id() -> 
                 assert await collect(first, 10) == b"export X=1"
                 await first.close()  # detaches: the program keeps running
                 shell = ReattachProvider.named["terminal-0123abcd"]
+                await eventually(lambda: shell.closed, "the named terminal was not closed")
                 assert shell.closed and shell.exit_code is None
                 again = await provider.terminal_reattach("sbx-17", "terminal-0123abcd")
                 await again.write(b"echo $X")

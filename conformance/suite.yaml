@@ -5055,7 +5055,11 @@ tests:
   - op: run
     target: box
     in:
-      bash_script: 'echo before; sleep 1000 & echo $! > /tmp/sps-timeout-child; sleep 1000'
+      bash_script: |-
+        child="${TMPDIR:-/tmp}/sps-timeout-child"
+        echo before
+        sleep 1000 & echo $! > "$child"
+        sleep 1000
       timeout_ms: 3000
     expect:
       equals:
@@ -5067,7 +5071,8 @@ tests:
     in:
       bash_script: |-
         sleep 2
-        state=$(awk '{print $3}' /proc/$(cat /tmp/sps-timeout-child)/stat 2>/dev/null)
+        child="${TMPDIR:-/tmp}/sps-timeout-child"
+        state=$(awk '{print $3}' /proc/$(cat "$child")/stat 2>/dev/null)
         if [ -z "$state" ] || [ "$state" = Z ]; then echo gone; else echo alive; fi
     expect:
       equals:

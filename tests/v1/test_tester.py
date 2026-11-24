@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import stat
+import tempfile
 from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Callable, Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -1048,6 +1049,8 @@ class ContractProvider(LocalProvider, manifest=False):
         self.filter_labels = True
         self.repeat_destroy = True
         self.kill_group = True
+        self._timeout_directory = tempfile.TemporaryDirectory(prefix="sps-contract-")
+        self.timeout_child = Path(self._timeout_directory.name) / "sps-timeout-child"
 
     async def create(self, request: CreateRequest, *, idempotency_key: str) -> Sandbox:
         if request.image not in (None, "base") or float(request.resources.get("cpu_min", 0)) > 4:  # type: ignore[arg-type]
@@ -1087,7 +1090,12 @@ class ContractProvider(LocalProvider, manifest=False):
         process = await asyncio.create_subprocess_exec(
             *request.argv,
             cwd=request.cwd,
-            env={**os.environ, **self.environment, **request.env},
+            env={
+                **os.environ,
+                **self.environment,
+                **request.env,
+                "TMPDIR": self._timeout_directory.name,
+            },
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             start_new_session=True,
@@ -1169,6 +1177,12 @@ def test_a_provider_that_keeps_the_contract_passes_every_contract_test() -> None
     assert all(box.state == "destroyed" for box in provider.boxes.values())
 
 
+def test_contract_providers_have_distinct_timeout_directories() -> None:
+    first = ContractProvider()
+    second = ContractProvider()
+    assert first.timeout_child.parent != second.timeout_child.parent
+
+
 @pytest.mark.parametrize(
     ("flag", "failing"),
     [
@@ -1200,7 +1214,7 @@ def test_a_provider_that_leaves_the_commands_children_running_fails_the_timeout_
             "contract.run_timeout_ends_command": "differs"
         }
     finally:  # the children that the provider left behind
-        child = Path("/tmp/sps-timeout-child")
+        child = provider.timeout_child
         if child.is_file():
             os.system(f"kill -9 {int(child.read_text())} 2>/dev/null")  # noqa: S605
 
