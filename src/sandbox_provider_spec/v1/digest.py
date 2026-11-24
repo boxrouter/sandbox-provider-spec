@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from functools import cache
 from importlib.metadata import entry_points, packages_distributions, version
 from pathlib import Path
 
@@ -44,11 +45,24 @@ def _top_package(cls: type) -> tuple[str, Path] | None:
     return None if where is None else (top, Path(where).resolve().parent)
 
 
+@cache
+def _distributions() -> dict[str, list[str]]:
+    """The environment's package-to-distribution map: process-static, but a full filesystem
+    scan, so the roster's per-provider subjects share one read instead of one scan each."""
+    return packages_distributions()
+
+
+@cache
+def _spec_entries() -> tuple:
+    """The installed `sandbox_provider_spec.providers` entry points: process-static."""
+    return tuple(entry_points(group="sandbox_provider_spec.providers"))
+
+
 def _distribution_names(top: str) -> list[str]:
     """The distributions that hold the top-level package `top`. An editable install does not
     list its package, so a provider's own entry point names it too."""
-    names = list(packages_distributions().get(top, ()))
-    for entry in entry_points(group="sandbox_provider_spec.providers"):
+    names = list(_distributions().get(top, ()))
+    for entry in _spec_entries():
         if entry.dist is not None and entry.value.split(".")[0].split(":")[0] == top:
             names.append(entry.dist.name)
     return names
