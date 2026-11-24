@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.126 — 2026-11-24
+
+- `credential_fields[].account_identity: false` (optional, default `true`) and `CredentialField.account_identity`: a field that only tunes how the provider is served (a mode or a default), not which account it is. A host that fingerprints an account by its credential fields (a route id, a document it vouches for the account) leaves such a field out, so adding or setting it does not make the account a new one. A field without it is unchanged. No vocabulary, declaration or conformance-suite change.
+
 ## 0.5.125 — 2026-11-24
 
 - the environment's distribution and entry-point scans (`packages_distributions`, the spec-provider
