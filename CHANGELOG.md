@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.132 — 2026-11-24
+
+- Luxor's mark says `mark_colours: own`: the file is already the brand's yellow (`#FFC547`) and passes the coloured-mark test, so every page draws it as an image in that colour, not as a one-colour mask in the page's text colour. No vocabulary, schema or conformance-suite change.
+
 ## 0.5.131 — 2026-11-24
 
 - the README `sps:counts` line moves to 291 conformance tests, tracking the
