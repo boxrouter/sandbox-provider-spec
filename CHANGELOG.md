@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.133 — 2026-11-24
+
+- Agent37's default class declares `kernel: filtered` (was `unknown`): a live read on 2026-11-24 found gVisor (`4.19.0-gvisor`, no `/dev/kvm`); evidence in `providers/agent37/evidence.md`.
+
 ## 0.5.132 — 2026-11-24
 
 - Luxor's mark says `mark_colours: own`: the file is already the brand's yellow (`#FFC547`) and passes the coloured-mark test, so every page draws it as an image in that colour, not as a one-colour mask in the page's text colour. No vocabulary, schema or conformance-suite change.
