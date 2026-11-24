@@ -1,0 +1,18 @@
+owner: Archil, Inc.
+source_page: https://archil.com
+assets:
+  mark.svg:
+    source: https://archil.com/icon.svg
+    retrieved_at: '2026-11-24'
+    role: Official white Archil symbol, without the dark background and outline.
+    modifications: >-
+      The official path was retained. Its dark square and outline were removed and the viewBox was
+      recropped to the path bounds for use as a one-colour provider mark.
+terms:
+  source: https://archil.com/legal/terms
+  reuse_permission: not_verified
+  adoption: project_owner_requested
+  adoption_date: '2026-11-24'
+  adoption_scope: >-
+    The project owner requested the Archil BYOK provider integration. This records the source asset
+    and the intended identification use; it does not assert that Archil granted a license to reuse it.
