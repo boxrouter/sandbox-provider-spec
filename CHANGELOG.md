@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.137 — 2026-11-24
+
+- Agent37's default class declares kernel `unknown` again, as before cloud#10100 (discovery must match the declaration): `filtered` made Cloud withhold the standard image from the class, which Agent37's gVisor boots. The evidence note keeps the gVisor fact.
+
 ## 0.5.136 — 2026-11-24
 
 - `tester.rows_as_run(tests, discovery)` and `tester.run_discovery(discovery, sandbox_class)`: the ONE place a row is rewritten for a provider before it runs and is digested (label assertions left out for a router that keeps labels; each sandbox destroyed before its image is deleted when an image delete conflicts). `select_tests` now calls it. The report records the digest of the rows as run, so whoever judges a report must digest the same rows: Cloud's facts reader and the adapter kit's `suite_findings` did digest the plain suite row, which read 11 passing rows of four providers stale on every rerun (t5nf's reproduction). No row's check digest moves: the rewrites and what they produce are unchanged.
