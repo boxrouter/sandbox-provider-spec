@@ -5,6 +5,7 @@ one budget shared by the whole cleanup phase (cloud#9848)."""
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any
@@ -26,8 +27,8 @@ def slept_fixture(monkeypatch: pytest.MonkeyPatch) -> list[float]:
         slept.append(seconds)
         clock[0] += seconds
 
-    monkeypatch.setattr(cleanup.time, "sleep", sleep)
-    monkeypatch.setattr(cleanup.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(time, "sleep", sleep)
+    monkeypatch.setattr(time, "monotonic", lambda: clock[0])
     return slept
 
 
