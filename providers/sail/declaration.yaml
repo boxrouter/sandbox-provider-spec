@@ -4,11 +4,11 @@ class: default
 # Every value is `unknown`, absent, a dated quote of Sail's documentation or a committed
 # tester report (the `sps-provider-sail` adapter over Sail's HTTP API). The adapter serves
 # the baseline surface (create, get, list, destroy, run, files, native processes by reattach
-# and cost) and states five gates in discovery (user selection, pause and resume, previews,
-# network lockdown and custom images), each proven by a tester run from a clean checkout. Every other gate stays
+# and cost) and states six gates in discovery (user selection, pause and resume, previews,
+# network lockdown, custom images and snapshots), each proven by a tester run from a clean checkout. Every other gate stays
 # unknown until a run report proves it.
 verified:
-  date: 2026-11-23
+  date: 2026-11-24
   # The adapter calls Sail's Sailbox HTTP API through httpx, not Sail's own SDK; the newest
   # report records the tester stack it ran with.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.84"}
@@ -43,7 +43,11 @@ lifetime_timer:
   counts_paused_time: true
   at_end: [destroyed]
 # Gates the adapter offers in discovery, each proven by a tester run from a clean checkout
-# (reports/tester-default-{pause-resume,user-selection,previews,network-lockdown,custom-images}.json).
+# (reports/tester-default-{pause-resume,user-selection,previews,network-lockdown,custom-images,snapshots}.json).
+# Snapshots: a Sail checkpoint of the files (`include_memory` false) that outlives its Sailbox, deletes on
+# demand and lasts seven days; a snapshot's labels are kept by the router. `files_and_memory` is not declared:
+# a restore continues only detached processes, not this adapter's. `original_after` is not declared (the
+# tester's ticker cannot read the short freeze).
 # Custom images: Sail builds a registry image (Debian- or Ubuntu-based only) ahead of creation and a
 # sandbox starts from it; the labels of a prepared image are kept by the router. `image_config`,
 # `image_defaults` and Dockerfile sources are not declared (the tester's Alpine image cannot be built).
@@ -53,6 +57,10 @@ lifetime_timer:
 # `open`, replaceable on a running Sailbox. A denylist is not declared: Sail blocks a name only
 # under an allowlist. Process input and cancel stay unclaimed (no native operation).
 gates:
+  snapshots:
+  - keeps: files_only
+    deletable: true
+    retention_seconds: 604800
   custom_images:
   - source: provider_artifact
   - source: oci
@@ -239,3 +247,17 @@ evidence:
     tests:
     - coverage.custom_images.prepare.registry
     report: reports/tester-default-custom-images.json
+  gates.snapshots.0.keeps:
+    tests:
+    - snapshots.keeps.files_only
+    report: reports/tester-default-snapshots.json
+  gates.snapshots.0.deletable:
+    tests:
+    - snapshots.deletable.true
+    report: reports/tester-default-snapshots.json
+  gates.snapshots.0.retention_seconds:
+    source: https://docs.sailresearch.com/sailboxes-forking.md
+    read: 2026-11-24
+    quote: >-
+      A checkpoint is a durable snapshot with an id, an optional name, and an expiry. It lasts
+      seven days by default unless you set a TTL.

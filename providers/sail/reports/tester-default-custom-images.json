@@ -4,8 +4,6 @@
     "coverage.custom_images.prepare.delete": "sha256:b092ad2f2aed384b26d78e13cf263f71ecee62068044e4c5ff1f7ab269257f1e",
     "coverage.custom_images.prepare.idempotent": "sha256:831214e228c00e2e714947b1b8aca78a88580ac98bb4abb90fb2487415813775",
     "coverage.custom_images.prepare.registry": "sha256:0318d6ca2e84860ea4417047417a1f8f191f9c307c3657884f3382596ce9446e",
-    "coverage.custom_images.prepare.size": "sha256:007b4ce79b247ee58f6f6f7032fc6de0b3c3907dee86db4068694a57c0e870cb",
-    "coverage.custom_images.prepared_size_without_request": "sha256:38d3117730f743f0feab04749d73eae1a0d71e4c54f794d697488415706999a4",
     "custom_images.oci": "sha256:424e746dca5c0ac0e4bbaa7375bac10f6de3f89d7171bbd86625eb9cda61d2fa",
     "custom_images.provider_artifact": "sha256:a4a48f1490a42fa7f4af02c66c85f0cf46c8153b343567697092a00e77b1e5e7",
     "images.v1.get_and_list": "sha256:8fb43264ff6fe0153d6971776010ed8c9bfdd1c6204d2264946356e5d2945c21",
@@ -18,10 +16,10 @@
     "name": "ProviderDriver",
     "version": "0.5.84"
   },
-  "finished_at": "2026-11-23T20:19:56.212518+00:00",
+  "finished_at": "2026-11-24T06:29:40.884886+00:00",
   "provider": "sail",
-  "revision": "5adb2b0f9d5f4fb1f5abece95e572d583f9be89a",
-  "run_id": "public-5373cfabb07e4d7561a9",
+  "revision": "99a44a615d6f12e9beef88e3158b4d1c9d412d5d",
+  "run_id": "public-59401994bf3c2fdc576f",
   "sdk_versions": {
     "sandbox-provider-spec": "0.5.84"
   },
@@ -32,18 +30,16 @@
     "custom_images.oci",
     "custom_images.provider_artifact",
     "coverage.custom_images.prepare.registry",
-    "coverage.custom_images.prepare.size",
-    "coverage.custom_images.prepared_size_without_request",
     "coverage.custom_images.prepare.idempotent",
     "coverage.custom_images.prepare.delete"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T20:19:42.254313+00:00",
+  "started_at": "2026-11-24T06:29:26.958470+00:00",
   "subject": {
-    "discovery_digest": "sha256:d5f6445be9f2a0b84aaa49e9ea48de64c5e41ec8e95ff989cd6d190fb7dc6f88",
+    "discovery_digest": "sha256:668c1e29b236d024261181a0b6229a11114f42f15ae272275458de9fcd9311e8",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:aa943af7c87427ce2bd7a47ee9baba58cce5ed549358108945e733f8629c990a",
-    "version": "0.1.0"
+    "package_digest": "sha256:3d5b36a22bb6aeb048f1a7ca169d3ecd7bd5272ce09a53300fadc0e86dc53c12",
+    "version": "0.2.0"
   },
   "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
   "tests": [
@@ -59,7 +55,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3273,
+      "duration_ms": 3252,
       "id": "images.v1.prepare_oci",
       "proves": [],
       "result": "passed",
@@ -155,7 +151,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 527,
+      "duration_ms": 508,
       "id": "images.v1.idempotent_prepare",
       "proves": [],
       "result": "passed",
@@ -197,7 +193,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 591,
+      "duration_ms": 574,
       "id": "images.v1.get_and_list",
       "proves": [],
       "result": "passed",
@@ -264,7 +260,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2328,
+      "duration_ms": 2442,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -326,7 +322,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1976,
+      "duration_ms": 1893,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -388,7 +384,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2277,
+      "duration_ms": 2009,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -431,51 +427,13 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.size",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepared_size_without_request",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
       "cleanup": [
         {
           "kind": "image",
           "result": "deleted"
         }
       ],
-      "duration_ms": 453,
+      "duration_ms": 449,
       "id": "coverage.custom_images.prepare.idempotent",
       "proves": [
         {
@@ -532,7 +490,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 380,
+      "duration_ms": 374,
       "id": "coverage.custom_images.prepare.delete",
       "proves": [
         {
