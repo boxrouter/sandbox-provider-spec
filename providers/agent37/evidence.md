@@ -27,6 +27,16 @@ proves. Values without supporting evidence remain `unknown`. No conformance repo
   `reports/adapter-default-size-ceiling.json`. The instance's cgroup holds a 2-core CPU quota
   (`cpu.cfs_quota_us` 200000 over 100000) and a 4294967296-byte memory limit.
 
+## Default class kernel (`declaration.yaml`)
+
+- `kernel: filtered`: the VM instances page (read 2026-11-24) says "The default gVisor instance type
+  cannot run a Docker daemon." A live read on 2026-11-24 of one default instance (template `agent37-base`,
+  created through `sps-provider-agent37`, labelled `run=kernel-probe-*`, destroyed afterwards) found
+  gVisor. `uname -a` and `/proc/version` read `4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016`;
+  `dmesg` began `Starting gVisor...`; `/` was a `9p` mount with `directfs`; process 1 was `tini`;
+  `/dev/kvm` was absent. The `vm` class reads a dedicated kernel (below), so the two classes differ
+  in what sits between the code and the host.
+
 ## VM class (`declaration-vm.yaml`)
 
 Agent37's `vm` instance type: a full Linux virtual machine with its own kernel, on the same API
