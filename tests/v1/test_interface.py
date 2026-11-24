@@ -421,6 +421,26 @@ def test_a_field_can_say_it_is_not_part_of_the_account(
     assert [f.account_identity for f in impl.credential_fields] == [True, True, False]
 
 
+def test_forgets_ended_sandboxes_defaults_to_false_and_reads_the_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    make_package(tmp_path, "default_provider", GOOD_MANIFEST)
+    make_package(tmp_path, "forgetful_provider", {**GOOD_MANIFEST, "forgets_ended_sandboxes": True})
+    make_package(tmp_path, "keeping_provider", {**GOOD_MANIFEST, "forgets_ended_sandboxes": False})
+    assert (
+        import_package(monkeypatch, tmp_path, "default_provider").Impl.forgets_ended_sandboxes
+        is False
+    )
+    assert (
+        import_package(monkeypatch, tmp_path, "forgetful_provider").Impl.forgets_ended_sandboxes
+        is True
+    )
+    assert (
+        import_package(monkeypatch, tmp_path, "keeping_provider").Impl.forgets_ended_sandboxes
+        is False
+    )
+
+
 def test_subclass_without_a_manifest_fails_when_defined(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -454,6 +474,7 @@ def test_a_class_in_this_test_package_has_no_manifest() -> None:
         },  # secret only
         {"api_domains": ["https://api.example.com"]},
         {"api_domains": []},
+        {"forgets_ended_sandboxes": "yes"},  # a boolean
         {"surprise": 1},
     ],
 )

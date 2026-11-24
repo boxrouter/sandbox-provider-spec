@@ -111,6 +111,8 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     # Both are empty for a class defined with `manifest=False`.
     credential_fields: ClassVar[tuple[CredentialField, ...]] = ()
     api_domains: ClassVar[tuple[str, ...]] = ()  # every host name the adapter connects to
+    #: The provider's `list` stops showing a sandbox once it is destroyed (`sps-provider.yaml`).
+    forgets_ended_sandboxes: ClassVar[bool] = False
 
     def __init_subclass__(cls, *, manifest: bool = True, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -138,6 +140,7 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         cls.spec_version = data["spec_version"]
         cls.credential_fields = fields
         cls.api_domains = tuple(data["api_domains"])
+        cls.forgets_ended_sandboxes = data.get("forgets_ended_sandboxes", False)
 
     def __init__(self, credentials: Mapping[str, str]) -> None:
         """Raises SpsError("unauthenticated") when a declared field is missing or empty."""

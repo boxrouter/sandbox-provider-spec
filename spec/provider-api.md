@@ -372,8 +372,10 @@ its own account may leave out but that a deployment running the provider on its 
 supply), an optional `account_identity: false` (a field that only tunes how the provider is served,
 not which account it is, so a host that fingerprints an account by its credential fields leaves it
 out) and, for a secret, an optional `public_prefix` such as `dtn_` that its values start
-with) and `api_domains`. Each `api_domains` entry is an exact host
-name or a suffix written with a leading dot (`.example.com`), which matches every host under it.
+with), `api_domains` and an optional `forgets_ended_sandboxes` (`true` when the provider's `list`
+stops showing a sandbox as soon as it is destroyed; false when left out). Each `api_domains` entry
+is an exact host name or a suffix written with a leading dot (`.example.com`), which matches every
+host under it.
 The package validates the manifest against a schema when a `Provider` subclass is defined. Release
 tools, the tester and hosts read the file without importing the adapter.
 
