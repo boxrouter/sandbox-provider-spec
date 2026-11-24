@@ -4,13 +4,13 @@
 
 from __future__ import annotations
 
+import time
 from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
 
 from sandbox_provider_spec.driver import RATE_LIMIT_BUDGET_SECONDS, NativeFailure
-from sandbox_provider_spec.v1 import suite_driver
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 
 
@@ -40,8 +40,8 @@ def slept_fixture(monkeypatch: pytest.MonkeyPatch) -> list[float]:
         slept.append(seconds)
         clock[0] += seconds
 
-    monkeypatch.setattr(suite_driver.time, "sleep", sleep)
-    monkeypatch.setattr(suite_driver.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(time, "sleep", sleep)
+    monkeypatch.setattr(time, "monotonic", lambda: clock[0])
     return slept
 
 
