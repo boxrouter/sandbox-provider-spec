@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.128 — 2026-11-24
+
+- adds the optional operation `cost.batch` (`GET /v1/costs?sandbox_id=`, `CostBatch`, `Provider.cost_batch`): the costs of up to `limits.cost_batch_max` sandboxes in one call, for a provider whose cost source is one report of the account that a read of one sandbox filters; each is the `Cost` that `cost` states for that sandbox, a sandbox not found is absent (read with `cost`), and a provider that states the limit also states `limits.cost_final_within_seconds`. Rules `provider-api/cost-batch-same` and `provider-api/cost-batch-complete`; conformance test `contract.cost_batch`, run by a driver subclass of its own (`v1/suite_driver_cost_batch.py`, `cost_batch_checks.py`) so that no existing row's check digest moves (0 of 147 rows move, 1 is added). The suite digest changes with the new row: `conformance/historical-suite-rules.json` keeps the prior suite (the 290 tests of `suite.yaml` and `coverage.yaml`) so every committed report stays recognized.
+
 ## 0.5.127 — 2026-11-24
 
 - the cached environment scans keep `packages_distributions`' `Mapping` return and the
