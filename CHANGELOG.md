@@ -5,6 +5,7 @@ says what each kind of release may change.
 
 ## Unreleased
 
+- 0.5.118: `conformance/historical-suite-rules.json` keeps the rules of the shared suite `sha256:e1c57e01…` (the suite before 0.5.113's timeout-probe change). 0.5.113 moved the suite digest to `b0c201cc…` but recorded another digest in the history, so every report made on the prior suite read "report suite digest is not recognized by this package" and the declaration check failed on main for each declaration citing one (maritime). The entry is the 290 tests of `suite.yaml` and `coverage.yaml` at that suite, digest verified; their rules equal the current suite's (only a bash script changed). The repository's declaration check now also runs when the conformance suite or its history changes. No suite row, vocabulary or claim change.
 - 0.5.117: the cleanup entry of a failed release is built as a plain `dict` before it is returned as an `Observation`, so the package type-checks standalone (mypy flagged three indexed assignments on a `Mapping`); this held every private SPS mirror sync since 05:21Z. No behaviour, vocabulary, schema or conformance-suite change.
 - 0.5.116: adds the official Archil symbol as a one-colour provider mark, with source and size metadata; no vocabulary or conformance-suite change.
 - 0.5.115: documents Archil's supported pause and delete timeout actions from the pinned Python SDK; no vocabulary or conformance-suite change.
