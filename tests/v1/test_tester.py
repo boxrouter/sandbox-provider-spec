@@ -19,7 +19,7 @@ import json
 import os
 import shutil
 import stat
-from collections.abc import AsyncIterable, AsyncIterator, Callable, Mapping
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Callable, Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -484,7 +484,7 @@ def test_cost_final_gives_the_created_sandbox_creation_time_as_the_hint(
     sandbox from one that never was (cloud#9848); the tester has the creation time to give."""
     seen: list[datetime | None] = []
     provider: Any = driver.api
-    read = provider.cost
+    read: Callable[..., Awaitable[Cost]] = provider.cost
 
     async def cost(sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
         seen.append(created_at)

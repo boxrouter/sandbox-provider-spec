@@ -21,6 +21,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mappin
 from concurrent.futures import Future
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from functools import partial
 from importlib.metadata import version
 from typing import Any, TypeVar, cast
 from urllib.parse import urlsplit, urlunsplit
@@ -451,7 +452,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         found: builtins.list[Sandbox] = []
         cursor: str | None = None
         while True:
-            page = self.read(lambda at=cursor: self.api.list(labels=wanted, cursor=at))
+            page = self.read(partial(self.api.list, labels=wanted, cursor=cursor))
             found.extend(page.sandboxes)
             cursor = page.next_cursor
             if cursor is None:
