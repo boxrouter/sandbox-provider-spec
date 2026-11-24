@@ -16,7 +16,6 @@ import builtins
 import contextlib
 import hashlib
 import re
-import sys
 import threading
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
@@ -45,7 +44,7 @@ from sandbox_provider_spec.driver import (
     strings,
     text,
 )
-from sandbox_provider_spec.v1 import idempotency
+from sandbox_provider_spec.v1 import idempotency, suite_driver_cleanup
 from sandbox_provider_spec.v1.errors import SpsError
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver_account import AccountSteps
@@ -54,7 +53,6 @@ from sandbox_provider_spec.v1.suite_driver_processes import ProcessHandle, Proce
 from sandbox_provider_spec.v1.two_instances import provider_class
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
-    DestroyResult,
     FileLinkRequest,
     ProcessStartRequest,
     RunRequest,
@@ -223,34 +221,6 @@ class ProviderFailure(NativeFailure):
         self.outcome = outcome
 
 
-def _cleanup_failure(kind: str, error: Exception, resource_id: object) -> Observation:
-    """The report's cleanup entry for a release that failed, and one line on stderr naming the
-    resource.
-
-    The entry has the spec code, outcome and retry hint of a provider's refusal, never a provider
-    message or an id: reports are committed and mirrored. The id is in the run's own log only,
-    where a person reading a run's output looks for it."""
-    entry: dict[str, object] = {
-        "kind": kind,
-        "result": "error",
-        "reason": "NativeFailure" if isinstance(error, NativeFailure) else type(error).__name__,
-    }
-    if isinstance(error, NativeFailure):
-        entry["code"] = error.code
-        outcome = getattr(error, "outcome", None)
-        if isinstance(outcome, str):
-            entry["outcome"] = outcome
-        if error.retry_after_seconds is not None:
-            entry["retry_after_seconds"] = error.retry_after_seconds
-    print(
-        f"cleanup failed: kind={kind} id={resource_id} reason={entry['reason']}"
-        f" code={entry.get('code', '-')} outcome={entry.get('outcome', '-')}",
-        file=sys.stderr,
-        flush=True,
-    )
-    return entry
-
-
 class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """A `Driver` whose operations call a `Provider`: `SpsError("unsupported")` becomes
     `Unsupported`, any other `SpsError` `NativeFailure(code)`. The provider is async, so the
@@ -293,6 +263,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         self._images: dict[str, Resource] = {}
         self._image_keys: dict[str, tuple[str, Resource]] = {}
         self._sent_keys: set[str] = set()
+        self._cleanup_budget = suite_driver_cleanup.CleanupBudget()
         self._terminals: builtins.list[TerminalHandle] = []
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
@@ -468,26 +439,11 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         run = hashlib.sha256(self.run_id.encode()).hexdigest()[:20]
         return f"sps-{run}-{name}"
 
-    def _destroy_when_free(self, sandbox_id: str) -> DestroyResult:
-        """Destroy, asking again while the provider answers `unavailable`: busy in a state change
-        (a snapshot capture), where the same call works later. It waits what the provider says
-        (`retry_after_seconds`, bounded) for up to `RATE_LIMIT_BUDGET_SECONDS`, then fails as
-        before; one long capture must not leave a sandbox behind or a report unclean."""
-        started = time.monotonic()
-        while True:
-            try:
-                return self.wait(self.api.destroy(sandbox_id))
-            except NativeFailure as error:
-                if error.code != "unavailable":
-                    raise
-                pause = rate_limit_pause(error)
-                if time.monotonic() + pause > started + RATE_LIMIT_BUDGET_SECONDS:
-                    raise
-                time.sleep(pause)
-
     def _destroy(self, sandbox_id: str) -> Observation:
         try:
-            self._destroy_when_free(sandbox_id)
+            suite_driver_cleanup.destroy_when_free(
+                lambda: self.wait(self.api.destroy(sandbox_id)), self._cleanup_budget
+            )
         except NativeFailure as error:
             if error.code != "not_found":
                 raise
@@ -531,7 +487,9 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         try:
             return super().release(owned)
         except Exception as error:  # pylint: disable=broad-exception-caught
-            return _cleanup_failure(owned.kind, error, getattr(owned.native, "id", None))
+            return suite_driver_cleanup.cleanup_failure(
+                owned.kind, error, getattr(owned.native, "id", None)
+            )
 
     def release_or_raise(self, owned: Resource) -> Observation:
         """Release for a step: a failure is raised, as the step's result."""
@@ -544,7 +502,11 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
     def destroy_again(self, target: object, inputs: Inputs) -> Observation:
         """Destroy a sandbox that an earlier step already destroyed, and report the state."""
         del inputs
-        return {"state": self._destroy_when_free(self._sandbox(target)).state}
+        sandbox_id = self._sandbox(target)
+        done = suite_driver_cleanup.destroy_when_free(
+            lambda: self.wait(self.api.destroy(sandbox_id))
+        )
+        return {"state": done.state}
 
     def destroy_unknown(self, target: object, inputs: Inputs) -> Observation:
         """Destroy an id that the provider has never issued. The contract answers `not_found`."""
@@ -1311,7 +1273,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             try:
                 results.append({"kind": "sandbox", **self._destroy(sandbox_id)})
             except Exception as error:  # pylint: disable=broad-exception-caught
-                results.append(_cleanup_failure("sandbox", error, sandbox_id))
+                results.append(suite_driver_cleanup.cleanup_failure("sandbox", error, sandbox_id))
         try:
             snapshot_ids = self.snapshot_leftovers()
         except Exception as error:  # pylint: disable=broad-exception-caught
@@ -1323,7 +1285,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             try:
                 results.append({"kind": "snapshot", **self._delete_snapshot(snapshot_id)})
             except Exception as error:  # pylint: disable=broad-exception-caught
-                results.append(_cleanup_failure("snapshot", error, snapshot_id))
+                results.append(suite_driver_cleanup.cleanup_failure("snapshot", error, snapshot_id))
         return results + self.sweep_images()
 
 

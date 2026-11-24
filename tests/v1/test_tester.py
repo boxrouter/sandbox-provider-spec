@@ -63,7 +63,7 @@ from sandbox_provider_spec.v1 import (
     from_json,
     to_json,
 )
-from sandbox_provider_spec.v1 import suite_driver as suite_driver_module
+from sandbox_provider_spec.v1 import suite_driver_cleanup as suite_driver_cleanup_module
 from sandbox_provider_spec.v1 import tester as tester_module
 from sandbox_provider_spec.v1.suite_driver import RUN_LABEL, ProviderDriver
 from sandbox_provider_spec.v1.tester import (
@@ -803,11 +803,11 @@ def test_the_tester_labels_its_sandboxes_with_the_run_id_a_sweep_lists_by(
     """A sandbox the tester could not delete is found by a sweep by the run's id (cloud#9887)."""
     monkeypatch.setattr(run_id_module, "_RUN", None)
     monkeypatch.setenv(run_id_module.ENVIRONMENT, "sweep-check-1")
-    # Its destroys answer `unavailable`, which the driver asks again for up to
-    # RATE_LIMIT_BUDGET_SECONDS (180 s) of real time per sandbox: 909 s of this test in the
-    # pre-push unit step (2026-11-24). The wait is test_destroy_busy_wait's; here the destroy
-    # only has to fail.
-    monkeypatch.setattr(suite_driver_module, "RATE_LIMIT_BUDGET_SECONDS", 0)
+    # Its destroys answer `unavailable`, which the cleanup asks again for up to
+    # `CLEANUP_BUDGET_SECONDS` of real time (one budget for the whole phase): 909 s of this test in
+    # the pre-push unit step (2026-11-24) when it was per sandbox. The wait is
+    # test_destroy_busy_wait's; here the destroy only has to fail.
+    monkeypatch.setattr(suite_driver_cleanup_module, "CLEANUP_BUDGET_SECONDS", 0)
 
     class Undeletable(LocalProvider, manifest=False):
         async def destroy(self, sandbox_id: str) -> DestroyResult:
