@@ -41,8 +41,9 @@ lifetime_timer:
   counts_paused_time: true
   at_end: [destroyed]
 # The gates a committed run report already proves: previews publishes any guest port and the
-# link survives a pause, and the egress policy is allowlist/deny_all/open names (with `*.`
-# wildcards by probe, still awaiting its suite row), replaceable on a running sandbox.
+# link survives a pause, and the egress policy is replaceable on a running sandbox. The
+# allowlist and deny_all policies, the `names` entry kind (with `*.` wildcards) and `changeable`
+# are supported by probe but stay unclaimed until a committed run report proves them.
 # idle_shutdown, pause_resume, processes, snapshots and custom_images stay out until their
 # suites run.
 gates:
@@ -53,10 +54,8 @@ gates:
     any_port: true
     survives_pause: true
   network_lockdown:
-  - policy: [allowlist, deny_all, open]
-    entry_kinds: [names]
+  - policy: [open]
     switchable: true
-    changeable: true
 evidence:
   resources.kernel:
     source: https://maritime.sh/docs/ephemeral-sandboxes
@@ -119,12 +118,6 @@ evidence:
     - coverage.network_lockdown.open
     - coverage.network_lockdown.switchable.true
     report: reports/tester-default-lockdown.json
-  gates.network_lockdown.0.entry_kinds:
-    tests: [coverage.network_lockdown.switchable.true]
-    report: reports/tester-default-lockdown.json
   gates.network_lockdown.0.switchable:
     tests: [coverage.network_lockdown.switchable.true]
-    report: reports/tester-default-lockdown.json
-  gates.network_lockdown.0.changeable:
-    tests: [coverage.network_lockdown.changeable.true]
     report: reports/tester-default-lockdown.json
