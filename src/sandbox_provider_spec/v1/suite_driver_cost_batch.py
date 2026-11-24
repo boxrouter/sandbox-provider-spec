@@ -22,6 +22,6 @@ class BatchProviderDriver(SetupRetryDriver):
 
     def cost_batch(self, target: object, inputs: Inputs) -> Observation:
         """Read the costs of the target and the sandboxes in `with` in one call, and each alone."""
-        others = cast("Sequence[object]", inputs.get("with", []))
+        others = cast(Sequence[object], inputs.get("with", []))
         ids = [self._sandbox(target), *(self._sandbox(other) for other in others)]
         return cost_batch_checks.batch(self, ids, inputs)
