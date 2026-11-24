@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.135 — 2026-11-24
+
+- The tester's snapshot delete (the cleanup of a snapshot a row took, and the `snapshot.delete` step) asks again while the provider answers `unavailable` (cloud#10080): waiting what `retry_after_seconds` says, under the cleanup phase's shared budget, then the failure stands. A provider that is still capturing a snapshot does not delete it (one may undo a delete by finishing the capture as a new snapshot of the same name), so it answers `unavailable` with a wait, and a slow capture no longer leaves a report `clean: false`. The helper `suite_driver_cleanup.destroy_when_free` is now the generic `ask_until_free`, and `SetupRetryDriver` overrides `_delete_snapshot`; no row's check digest moves (measured: 0 of 148), the suite and its digest are unchanged.
+
 ## 0.5.134 — 2026-11-24
 
 - Publishes Beam (`providers/beam/publication.yaml`: the provider and its `default` class, `default_class: default`) under the founder records `founder-2026-11-24-beam-publish` and `founder-2026-11-24-beam-default-publish` (merged first in cloud#10058): "my goal is to have all the benchmarks on the page in 6 hours". Receipts come from `provider_assets.publication_receipt`. Publication files only; no declaration, vocabulary or catalog change.
