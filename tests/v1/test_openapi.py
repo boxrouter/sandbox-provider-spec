@@ -28,6 +28,7 @@ OPERATION_IDS = [
     "account_capacity",
     "account_cost",
     "cost",
+    "cost_batch",
     "cost_capture",
     "create",
     "destroy",

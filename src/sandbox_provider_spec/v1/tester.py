@@ -20,7 +20,7 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
-from sandbox_provider_spec.v1.suite_driver_setup import SetupRetryDriver
+from sandbox_provider_spec.v1.suite_driver_cost_batch import BatchProviderDriver
 from sandbox_provider_spec.v1.two_instances import two_instances
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
@@ -32,6 +32,7 @@ QUICK_SKIPS = frozenset(
     {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.cost_batch",
         "contract.lifetime_ends",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
@@ -55,6 +56,10 @@ NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED}
 # `cost_final_within_seconds`. From 1.1 `cost` is required, so a run keeps them and they fail.
 SNAPSHOT_COST_TEST = "snapshots.v1.cost"
 COST_TESTS = ("contract.cost", SNAPSHOT_COST_TEST)
+
+# `contract.cost_batch` needs an offered `cost.batch`: a provider that states no
+# `limits.cost_batch_max` has the operation `unsupported` and a run leaves the test out.
+COST_BATCH_TEST = "contract.cost_batch"
 
 # `contract.cost_final` reads a destroyed sandbox's cost, which a class that lists `cost.capture` is
 # exempt from keeping (contract section 10), so a run leaves it out for such a provider.
@@ -360,6 +365,11 @@ def cost_offered(discovery: Discovery | None) -> bool:
     return discovery is not None and discovery.limits.cost_final_within_seconds is not None
 
 
+def cost_batch_offered(discovery: Discovery | None) -> bool:
+    """Whether discovery states `cost_batch_max`, which is how a provider offers `cost.batch`."""
+    return discovery is not None and discovery.limits.cost_batch_max is not None
+
+
 def cost_required(discovery: Discovery | None) -> bool:
     """Whether discovery states a `spec_version` of 1.1 or later, which requires `cost` (contract
     sections 10 and 13). A version that does not parse is held to the newest rules."""
@@ -624,6 +634,14 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             and not cost_required(discovery)
         ):
             wanted = not test.id.startswith(COST_TESTS)
+        if (
+            wanted
+            and not options.tests
+            and test.id == COST_BATCH_TEST
+            and discovery is not None
+            and not cost_batch_offered(discovery)
+        ):
+            wanted = False
         if wanted and not options.tests and snapshot_cost_unavailable(discovery):
             wanted = test.id != SNAPSHOT_COST_TEST
         if wanted and not options.tests and discovery is not None:
@@ -771,7 +789,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         provider = two_instances(provider, options.new_client())
     # The run id the report records and every cleanup sweep lists by (`SPS_RUN_ID` when set): a
     # driver left to pick its own labelled each sandbox with a random id no sweep could find.
-    driver = SetupRetryDriver(provider, new_client=options.new_client, run=run_id())
+    driver = BatchProviderDriver(provider, new_client=options.new_client, run=run_id())
     started = now()
     try:
         discovery: Discovery | None

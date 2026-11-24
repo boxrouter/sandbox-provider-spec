@@ -1,0 +1,33 @@
+{
+  "costs": [
+    {
+      "sandbox_id": "sbx_1",
+      "status": "final",
+      "total_usd": "0.00444",
+      "source": "reported",
+      "lines": [
+        {
+          "item": "cpu",
+          "amount_usd": "0.00336",
+          "start": "2026-11-13T10:00:00Z",
+          "end": "2026-11-13T11:00:00Z"
+        },
+        {
+          "item": "memory",
+          "amount_usd": "0.00108",
+          "start": "2026-11-13T10:00:00Z",
+          "end": "2026-11-13T11:00:00Z"
+        }
+      ],
+      "as_of": "2026-11-13T11:05:00Z"
+    },
+    {
+      "sandbox_id": "sbx_2",
+      "status": "accruing",
+      "total_usd": null,
+      "source": "reported",
+      "lines": [],
+      "as_of": "2026-11-13T11:05:00Z"
+    }
+  ]
+}

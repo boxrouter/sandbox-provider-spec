@@ -276,6 +276,21 @@ quantities, no amounts and a null `total_usd`, as for a sandbox cost). It needs 
 counts charges for sandboxes that are gone, and a billing true-up compares it with the sum of the
 sandbox costs (the consumer prices a `usage` account cost as it prices a `usage` sandbox cost). A window that is empty, reversed or longer than the stated limit is `invalid_request`.
 Without the limit `account.cost` answers `unsupported`.
+
+A provider that states `limits.cost_batch_max`, and `limits.cost_final_within_seconds`, offers
+`cost.batch` (`GET /v1/costs?sandbox_id=&sandbox_id=`), which returns the `Cost` of each of up to
+`cost_batch_max` sandboxes in one call, for a provider whose cost source is one report of the
+account that a read of one sandbox filters. It has no `created_at` hint: a provider that needs one
+does not offer it. No id, a repeated id or more ids than the limit is `invalid_request`; without the
+limit it answers `unsupported`.
+
+- A provider that offers `cost.batch` **MUST**, for each sandbox it finds, return the `Cost` that <!-- rule: provider-api/cost-batch-same -->
+  `cost` returns for that sandbox when read at the same time: the same `status`, `total_usd`,
+  `source` and `lines` (`as_of` may differ).
+- A provider that offers `cost.batch` **MUST** return every sandbox of the call that it finds, <!-- rule: provider-api/cost-batch-complete -->
+  following its own paging, **MUST NOT** return one that was not asked for, and **MUST** leave out
+  one it does not find: a sandbox that is not in the answer is read with `cost`, so a missing
+  sandbox is never stated as a zero cost.
 **Capturing the cost before the end.** Some providers delete their usage records with the sandbox,
 so `cost` cannot be read after the end. Such a provider lists `cost.capture` in `classes[].operations`
 of each class that has it. `POST /v1/sandboxes/{sandbox_id}/cost/capture`, with an `Idempotency-Key`

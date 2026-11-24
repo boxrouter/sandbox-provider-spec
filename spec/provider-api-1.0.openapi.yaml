@@ -1252,6 +1252,42 @@ paths:
         "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthenticated"}
         "403": {$ref: "#/components/responses/Forbidden"}
+  /v1/costs:
+    get:
+      operationId: cost_batch
+      tags: [optional]
+      summary: The costs of several sandboxes in one call
+      description: >-
+        Section `cost.batch`. Offered when discovery states `limits.cost_batch_max`, the most ids one call takes; without it
+        the answer is `unsupported`, and more ids than the limit, no id or a repeated id is `invalid_request`. The answer
+        holds one `Cost` for each sandbox the provider found, each as `cost` would state it for that sandbox; an id the
+        provider does not find is absent, never a zero cost, and the caller reads it with `cost`. The provider follows its
+        own paging, so the answer holds every sandbox it found.
+      parameters:
+        - name: sandbox_id
+          in: query
+          required: true
+          style: form
+          explode: true
+          description: A sandbox to read, repeated once for each. At least one and at most `limits.cost_batch_max`, all different.
+          schema:
+            type: array
+            minItems: 1
+            items: {type: string, pattern: "^[A-Za-z0-9._:-]{1,128}$"}
+      responses:
+        "200":
+          description: The costs of the sandboxes the provider found.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CostBatch"}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthenticated"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "422": {$ref: "#/components/responses/Unsupported"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "500": {$ref: "#/components/responses/ProviderError"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504": {$ref: "#/components/responses/Timeout"}
   /v1/images/{image_id}/cost:
     parameters:
       - {$ref: "#/components/parameters/ImageId"}
@@ -1769,9 +1805,9 @@ components:
     Limits:
       type: object
       description: >-
-        The provider's limits. Each value except `cost_final_within_seconds` and `account_cost_window_seconds` is at least its
-        floor, which every conforming provider meets. Those two are the provider's own statements, and stating one offers
-        `cost` or `account.cost`.
+        The provider's limits. Each value except `cost_final_within_seconds`, `account_cost_window_seconds` and
+        `cost_batch_max` is at least its floor, which every conforming provider meets. Those three are the provider's own
+        statements, and stating one offers `cost`, `account.cost` or `cost.batch`.
       required:
         - file_bytes
         - run_timeout_ms
@@ -1808,6 +1844,12 @@ components:
           minimum: 1
           description: >-
             Offers `account.cost`. The longest window, in seconds, that `account.cost` answers. The spec sets no ceiling.
+        cost_batch_max:
+          type: integer
+          minimum: 1
+          description: >-
+            Offers `cost.batch`. The most sandbox ids one `cost.batch` call takes. The spec sets no ceiling. A provider that
+            states it also states `cost_final_within_seconds`.
         image_layout_bytes:
           type: integer
           minimum: 1
@@ -2374,6 +2416,18 @@ components:
         What the account was charged between `start` and `end`. Each line has an `item` and an `amount_usd`, and a
         `quantity` and `unit` when the `source` is `calculated` or `usage`. A `usage` account cost states quantities from the
         provider's own records and no amounts, as a `usage` sandbox `Cost` does.
+    CostBatch:
+      type: object
+      required: [costs]
+      properties:
+        costs:
+          type: array
+          items: {$ref: "#/components/schemas/Cost"}
+          description: >-
+            One `Cost` for each sandbox the provider found, in any order, each with its `sandbox_id`. A sandbox that was asked
+            for and is not here was not found by this read.
+      description: >-
+        The costs of several sandboxes read in one call (`cost.batch`).
     DestroyResult:
       type: object
       required: [sandbox_id, state]

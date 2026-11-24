@@ -452,6 +452,16 @@ async def _cost(p: Provider, r: _Request) -> Reply:
     return 200, to_json(await p.cost(sandbox_id, created_at=created_at))
 
 
+async def _cost_batch(p: Provider, r: _Request) -> Reply:
+    ids = [_entity(item, "sandbox_id") for item in r.query_all("sandbox_id")]
+    r.check_query_used()
+    if not ids:
+        raise SpsError("invalid_request", "Query parameter 'sandbox_id' is required")
+    if len(set(ids)) != len(ids):
+        raise SpsError("invalid_request", "Query parameter 'sandbox_id' repeats an id")
+    return 200, to_json(await p.cost_batch(ids))
+
+
 async def _account_cost(p: Provider, r: _Request) -> Reply:
     start = _time_param(r, "start", required=True)
     end = _time_param(r, "end", required=True)
@@ -812,6 +822,7 @@ _ROUTES: list[tuple[str, re.Pattern[str], _Handler | None]] = [
         ("GET", f"{_P}/output", _process_output),
         ("GET", f"{_S}/cost", _cost),
         ("GET", "/v1/cost", _account_cost),
+        ("GET", "/v1/costs", _cost_batch),
         ("POST", f"{_S}/cost/capture", _cost_capture),
         ("GET", "/v1/account/capacity", _account_capacity),
         ("POST", f"{_S}/file-links", _files_link),

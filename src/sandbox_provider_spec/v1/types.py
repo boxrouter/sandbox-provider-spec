@@ -191,6 +191,15 @@ class Cost:
 
 
 @dataclass(frozen=True)
+class CostBatch:
+    """The costs of several sandboxes read in one call (`cost.batch`): one `Cost` for each sandbox
+    the provider found, in any order. A sandbox that was asked for and is not here was not found by
+    this read; the caller reads it with `cost`."""
+
+    costs: Sequence[Cost]
+
+
+@dataclass(frozen=True)
 class AccountCost:
     """What the account was charged, or used, between `start` and `end`."""
 
@@ -557,6 +566,7 @@ class Limits:
     cost_final_within_seconds: int | None = None  # stating it offers `cost`
     image_context_bytes: int | None = None  # the largest build context `image_prepare` accepts
     account_cost_window_seconds: int | None = None  # stating it offers `account.cost`
+    cost_batch_max: int | None = None  # stating it offers `cost.batch`: the most ids one call takes
     image_layout_bytes: int | None = None  # largest OCI image layout of `image.prepare.oci_layout`
     # What the provider documents for its default plan: the most prepared images and snapshots,
     # counted together, that an account may keep. Display only: a consumer never enforces it, never

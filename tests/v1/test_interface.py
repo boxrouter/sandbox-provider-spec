@@ -79,6 +79,7 @@ OPTIONAL = {
         "account.cost",
         (datetime(2026, 11, 13, tzinfo=UTC), datetime(2026, 11, 14, tzinfo=UTC)),
     ),
+    "cost_batch": ("cost.batch", (["s"],)),
     "image_cost": ("image.cost", ("i",)),
     "cost_capture": ("cost.capture", ("s", {"idempotency_key": "idem-key-1"})),
     "account_capacity": ("account.capacity", ()),
@@ -105,7 +106,7 @@ def test_operation_ids_equal_provider_methods() -> None:
         if method in {"get", "put", "post", "delete", "patch"}
     }
     assert ids == coroutine_methods(Provider)
-    assert len(ids) == 43
+    assert len(ids) == 44
 
 
 def test_error_table_is_the_openapi_table() -> None:

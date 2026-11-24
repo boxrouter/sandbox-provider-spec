@@ -25,6 +25,7 @@ from sandbox_provider_spec.v1.types import (
     AccountCost,
     Concurrency,
     Cost,
+    CostBatch,
     CostLine,
     CreateRequest,
     DestroyResult,
@@ -444,6 +445,7 @@ def _enc_limits(value: Limits) -> Json:
     _put(out, "cost_final_within_seconds", value.cost_final_within_seconds)
     _put(out, "image_context_bytes", value.image_context_bytes)
     _put(out, "account_cost_window_seconds", value.account_cost_window_seconds)
+    _put(out, "cost_batch_max", value.cost_batch_max)
     _put(out, "image_layout_bytes", value.image_layout_bytes)
     _put(out, "stored_artifacts_documented", value.stored_artifacts_documented)
     return out
@@ -579,6 +581,14 @@ def _dec_cost_line(data: Json) -> CostLine:
         start=_opt(data.get("start"), _time),
         end=_opt(data.get("end"), _time),
     )
+
+
+def _enc_cost_batch(value: CostBatch) -> Json:
+    return {"costs": [_enc_cost(item) for item in value.costs]}
+
+
+def _dec_cost_batch(data: Json) -> CostBatch:
+    return CostBatch(costs=tuple(_dec_cost(item) for item in data["costs"]))
 
 
 def _dec_cost(data: Json) -> Cost:
@@ -754,6 +764,7 @@ _CODECS: dict[type, _Codec] = {
     CostLine: _Codec("CostLine", _enc_cost_line, _dec_cost_line),
     Cost: _Codec("Cost", _enc_cost, _dec_cost),
     AccountCost: _Codec("AccountCost", _enc_account_cost, _dec_account_cost),
+    CostBatch: _Codec("CostBatch", _enc_cost_batch, _dec_cost_batch),
     ProviderTime: _Codec("ProviderTime", _enc_provider_time, _dec_provider_time),
     Secret: _Codec("Secret", _enc_secret, _dec_secret),
     AccountCapacity: _Codec("AccountCapacity", _enc_account_capacity, _dec_account_capacity),

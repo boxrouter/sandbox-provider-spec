@@ -157,6 +157,7 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
     "destroy.again": ("v1/suite_driver.py",),
     "destroy.unknown": ("v1/suite_driver.py",),
     "cost.final": ("v1/suite_driver.py",),
+    "cost.batch": ("v1/suite_driver_cost_batch.py",),
     "files.list": ("v1/suite_driver.py",),
     "files.mkdir": ("v1/suite_driver.py",),
     "files.remove": ("v1/suite_driver.py",),

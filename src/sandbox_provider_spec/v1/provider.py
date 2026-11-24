@@ -22,6 +22,7 @@ from sandbox_provider_spec.v1.types import (
     AccountCapacity,
     AccountCost,
     Cost,
+    CostBatch,
     CreateRequest,
     CredentialField,
     DestroyResult,
@@ -227,8 +228,8 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
 
     # Optional operations. Each default refuses with `unsupported`; a provider overrides the
     # ones whose section it claims and the tester passes. `cost` is one of them: a provider
-    # offers it by stating `limits.cost_final_within_seconds` (and `account.cost`, by stating
-    # `limits.account_cost_window_seconds`).
+    # offers it by stating `limits.cost_final_within_seconds` (`account.cost`, by stating
+    # `limits.account_cost_window_seconds`, and `cost.batch`, by stating `limits.cost_batch_max`).
 
     def _unsupported(self, operation: str) -> SpsError:
         provider = getattr(type(self), "provider_id", type(self).__name__)
@@ -238,6 +239,13 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         """The sandbox's cost. `created_at` is a lookup hint only: use it to bound where to look
         for records, never report a cost from before it, and ignore it when the time is known."""
         raise self._unsupported("cost")
+
+    async def cost_batch(self, sandbox_ids: Sequence[str]) -> CostBatch:
+        """The costs of several sandboxes in one call (`cost.batch`). A provider offers it by
+        stating `limits.cost_batch_max`, the most ids one call takes; more is `invalid_request`.
+        Each `Cost` is what `cost` returns for that sandbox; an id the provider does not find is
+        absent from the answer, never a zero cost. The provider follows its own paging."""
+        raise self._unsupported("cost.batch")
 
     async def account_cost(self, start: datetime, end: datetime) -> AccountCost:
         """The account's cost for the window from `start` up to `end` (`account.cost`). A provider

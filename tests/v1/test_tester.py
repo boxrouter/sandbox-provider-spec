@@ -739,6 +739,7 @@ def test_a_selection_names_tests_by_prefix_and_quick_skips_the_slow_ones() -> No
     assert QUICK_SKIPS == {
         "contract.files_1gib_roundtrip",
         "contract.cost_final",
+        "contract.cost_batch",
         "contract.lifetime_ends",
         "snapshots.v1.cost",
         "terminal.v1.idle_kept",
@@ -1160,13 +1161,14 @@ def results(provider: Provider, tests: tuple[str, ...] = CONTRACT_TESTS) -> dict
     return {str(row["id"]): str(row["result"]) for row in report["tests"]}
 
 
-def test_there_are_fourteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
+def test_there_are_fifteen_contract_tests_and_the_tester_selects_each_by_default() -> None:
     suite = shared_suite()
     ids = {test.id for test in suite.tests if test.id.startswith("contract.")}
     assert ids == {
         *CONTRACT_TESTS,
         "contract.files_1gib_roundtrip",
         "contract.files_write_missing_parent",
+        "contract.cost_batch",
         "contract.lifetime_ends",
         "contract.discovery_within_static",
         "contract.stored_artifacts",

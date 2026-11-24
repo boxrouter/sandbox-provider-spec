@@ -29,6 +29,7 @@ from sandbox_provider_spec.v1.types import (
     AccountCapacity,
     AccountCost,
     Cost,
+    CostBatch,
     CreateRequest,
     DestroyResult,
     DirectoryPage,
@@ -600,6 +601,10 @@ class HttpProvider(Provider, manifest=False):  # pylint: disable=too-many-public
     async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
         params = None if created_at is None else [("created_at", timestamp(created_at))]
         return await self._json(Cost, "GET", self._sandbox_path(sandbox_id, "/cost"), params=params)
+
+    async def cost_batch(self, sandbox_ids: Sequence[str]) -> CostBatch:
+        params = [("sandbox_id", sandbox_id) for sandbox_id in sandbox_ids]
+        return await self._json(CostBatch, "GET", "/v1/costs", params=params)
 
     async def account_cost(self, start: datetime, end: datetime) -> AccountCost:
         params = [("start", timestamp(start)), ("end", timestamp(end))]

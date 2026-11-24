@@ -5210,6 +5210,47 @@ tests:
   - provider-api/cost-priced-from-discovery
   - provider-api/cost-provider-records
   proves: []
+- id: contract.cost_batch
+  title: The costs of two destroyed sandboxes read in one call are the costs each states alone, a sandbox the provider does not hold is absent from the answer, and no other is added.
+  steps:
+  - op: create
+    as: first
+  - op: create
+    as: second
+  - op: run
+    target: first
+    in:
+      bash_script: printf ok
+    expect:
+      equals:
+        stdout:
+          utf8: ok
+  - op: run
+    target: second
+    in:
+      bash_script: printf ok
+    expect:
+      equals:
+        stdout:
+          utf8: ok
+  - op: destroy
+    target: first
+  - op: destroy
+    target: second
+  - op: cost.batch
+    target: first
+    in:
+      with: [$second]
+    expect:
+      equals:
+        same_sandboxes: true
+        same_costs: true
+        none_unasked: true
+        unknown_absent: true
+  rules:
+  - provider-api/cost-batch-same
+  - provider-api/cost-batch-complete
+  proves: []
 - id: directories.list
   title: A directory lists its immediate entries in name order, with the type and size of each, and never follows a link.
   steps:

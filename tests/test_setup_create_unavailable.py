@@ -27,6 +27,7 @@ from sandbox_provider_spec.v1 import (
     tester,
 )
 from sandbox_provider_spec.v1.errors import SpsError
+from sandbox_provider_spec.v1.suite_driver_cost_batch import BatchProviderDriver
 from sandbox_provider_spec.v1.suite_driver_setup import SetupRetryDriver
 
 EXAMPLES = Path(__file__).resolve().parent / "spec" / "provider-api-1.0-examples"
@@ -189,7 +190,9 @@ def test_any_other_failure_of_a_create_is_still_the_rows_error(
 
 
 def test_the_tester_uses_this_driver() -> None:
-    assert "SetupRetryDriver(provider" in inspect.getsource(tester.run_tests)
+    # The tester builds `BatchProviderDriver`, which is this driver plus the `cost.batch` step.
+    assert "BatchProviderDriver(provider" in inspect.getsource(tester.run_tests)
+    assert issubclass(BatchProviderDriver, SetupRetryDriver)
 
 
 def test_no_row_digests_the_new_code_or_the_tester() -> None:
