@@ -5,9 +5,9 @@ class: vm
 # kernel. Every value is `unknown` or absent until a committed run report or a dated quote of
 # Agent37's documentation proves it.
 verified:
-  date: 2026-11-18
+  date: 2026-11-24
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
-  sdks: {"httpx": "0.28.1"}
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.116"}
 resources:
   compliance: [soc2, soc2_type2]
   data_retention: retained
@@ -52,6 +52,14 @@ gates:
   - input: true
     cancel: true
     reattach: true
+  # A terminal opened under a caller id reattaches, and prepared images are templates, as on the
+  # default class (see declaration.yaml); the vm tester reports prove both on VMs.
+  terminal:
+  - reattach: true
+  custom_images:
+  - source: oci
+    prepared: true
+  - source: provider_artifact
   user_selection:
   - commands: true
     files_write: true
@@ -166,6 +174,22 @@ evidence:
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
     report: reports/processes-vm-core.json
+  gates.terminal.0.reattach:
+    tests:
+    - coverage.terminal.reattach
+    report: reports/tester-vm-coverage.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.oci
+    report: reports/tester-vm-core.json
+  gates.custom_images.0.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/tester-vm-coverage.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/tester-vm-core.json
   gates.user_selection.0.commands:
     tests:
     - coverage.guest_user.selectable
