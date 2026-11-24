@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Matching and checking for the data_retention and compliance facts."""
 
+from collections.abc import Mapping
 from typing import Any
 
 import pytest
@@ -113,11 +114,12 @@ def test_requests_name_catalog_values() -> None:
         {"resources": {"compliance": ["soc2_type2", "iso27001"]}},
     ):
         assert sandbox_provider_spec.check_request(request) == [], request
-    for request in (
+    bad: Mapping[str, object]
+    for bad in (
         {"resources": {"data_retention": "zero"}},
         {"resources": {"data_retention": []}},
         {"resources": {"compliance": "soc2"}},
         {"resources": {"compliance": []}},
         {"resources": {"compliance": ["soc1"]}},
     ):
-        assert sandbox_provider_spec.check_request(request), request
+        assert sandbox_provider_spec.check_request(bad), bad
