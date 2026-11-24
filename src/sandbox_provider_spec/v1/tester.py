@@ -651,12 +651,37 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
             chosen.append(test)
     if not chosen:
         raise ValueError("no shared tests match the selection")
+    return Suite(suite.digest, rows_as_run(chosen, discovery), suite.baseline_ids)
+
+
+def rows_as_run(tests: Sequence[Test], discovery: Discovery | None) -> tuple[Test, ...]:
+    """The rows as the tester runs them against a provider that states `discovery`.
+
+    This is the ONE place a row is rewritten for a provider before it runs and is digested: a
+    provider whose images cannot be deleted while a sandbox runs from them has each sandbox of a
+    row destroyed before its image delete, and one whose router keeps labels has the label
+    assertions of that kind left out. The report records the digest of THESE rows, so whoever
+    judges a report (Cloud's facts, the adapter kit) must digest these rows too, never the plain
+    suite's, or every rewritten row reads stale on every rerun. A provider that states nothing
+    that rewrites gets its rows back unchanged."""
+    rows = tuple(tests)
     if image_delete_blocked(discovery):
-        chosen = [_destroy_before_image_delete(test) for test in chosen]
+        rows = tuple(_destroy_before_image_delete(test) for test in rows)
     kept = labels_kept(discovery)
     if not all(kept.values()):
-        chosen = [_without_label_assertions(test, kept) for test in chosen]
-    return Suite(suite.digest, tuple(chosen), suite.baseline_ids)
+        rows = tuple(_without_label_assertions(test, kept) for test in rows)
+    return rows
+
+
+def run_discovery(discovery: Discovery, sandbox_class: str | None) -> Discovery:
+    """The discovery the tester runs against: one class's when a run is pinned to it (the report
+    then names its `class`), else the whole provider's. A class the provider lacks is the whole."""
+    if sandbox_class is None:
+        return discovery
+    for item in discovery.classes:
+        if item.id == sandbox_class:
+            return _alone(discovery, item)
+    return discovery
 
 
 def _applies(row: Mapping[str, Any]) -> bool:
