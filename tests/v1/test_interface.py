@@ -407,6 +407,19 @@ def test_a_field_can_be_required_for_a_managed_deployment_only(
     assert "wallet" not in impl({"api_key": "k"}).credentials
 
 
+def test_a_field_can_say_it_is_not_part_of_the_account(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mode = {"name": "mode", "secret": False, "required": False, "account_identity": False}
+    make_package(
+        tmp_path,
+        "mode_provider",
+        {**GOOD_MANIFEST, "credential_fields": [*GOOD_MANIFEST["credential_fields"], mode]},
+    )
+    impl = import_package(monkeypatch, tmp_path, "mode_provider").Impl
+    assert [f.account_identity for f in impl.credential_fields] == [True, True, False]
+
+
 def test_subclass_without_a_manifest_fails_when_defined(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

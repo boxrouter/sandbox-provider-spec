@@ -52,6 +52,9 @@ class CredentialField:
     # A field that is not `required` but that a deployment running the provider on its own account
     # must supply (a billing wallet, say); a consumer with its own account may leave it out.
     required_for_managed: bool = False
+    # False for a field that only tunes how the provider is served, not which account it is: a
+    # deployment that fingerprints an account by its credential fields leaves it out.
+    account_identity: bool = True
     default: str | None = None  # only for a field that is not secret
     description: str = ""
     # How a secret's values start (`dtn_`, `ak-`): 2 to 8 lowercase letters or digits and `_` or

@@ -122,6 +122,7 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
                 secret=item.get("secret", True),
                 required=item.get("required", True),
                 required_for_managed=item.get("required_for_managed", False),
+                account_identity=item.get("account_identity", True),
                 default=item.get("default"),
                 description=item.get("description", ""),
                 public_prefix=item.get("public_prefix"),

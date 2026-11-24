@@ -30,6 +30,7 @@
           "name": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"},
           "secret": {"type": "boolean", "default": true, "description": "True when the value must never be logged or returned."},
           "required": {"type": "boolean", "default": true},
+          "account_identity": {"type": "boolean", "default": true, "description": "False when the field only tunes how the provider is served (a mode or a default), not which account it is. A deployment that records an account by a fingerprint of its credential fields (a route id, a document it vouches for the account) leaves such a field out, so setting or adding it does not make the account a new one."},
           "required_for_managed": {"type": "boolean", "default": false, "description": "True when a deployment that runs the provider on its own account must also supply this value, although a consumer with its own account may leave it out (a field that is not `required`). Such a deployment reads it into the account's identity, so a document it vouches for that account binds to it."},
           "default": {"type": "string", "description": "The value used when the consumer gives none. Only for a field that is not secret."},
           "description": {"type": "string"},
