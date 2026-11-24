@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.134 — 2026-11-24
+
+- Publishes Beam (`providers/beam/publication.yaml`: the provider and its `default` class, `default_class: default`) under the founder records `founder-2026-11-24-beam-publish` and `founder-2026-11-24-beam-default-publish` (merged first in cloud#10058): "my goal is to have all the benchmarks on the page in 6 hours". Receipts come from `provider_assets.publication_receipt`. Publication files only; no declaration, vocabulary or catalog change.
+
 ## 0.5.133 — 2026-11-24
 
 - Agent37's default class declares `kernel: filtered` (was `unknown`): a live read on 2026-11-24 found gVisor (`4.19.0-gvisor`, no `/dev/kvm`); evidence in `providers/agent37/evidence.md`.
