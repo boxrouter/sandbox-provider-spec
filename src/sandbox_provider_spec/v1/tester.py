@@ -15,6 +15,7 @@ from sandbox_provider_spec.conformance import run_suite
 from sandbox_provider_spec.driver import NativeFailure, NotRun
 from sandbox_provider_spec.proofs import proof_fixtures
 from sandbox_provider_spec.report import DEVELOPMENT_REVISION, report, revision
+from sandbox_provider_spec.run_id import run_id
 from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
@@ -767,7 +768,9 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         if options.new_client is None:
             raise CannotRun("two provider objects need a way to make a second one (new_client)")
         provider = two_instances(provider, options.new_client())
-    driver = ProviderDriver(provider, new_client=options.new_client)
+    # The run id the report records and every cleanup sweep lists by (`SPS_RUN_ID` when set): a
+    # driver left to pick its own labelled each sandbox with a random id no sweep could find.
+    driver = ProviderDriver(provider, new_client=options.new_client, run=run_id())
     started = now()
     try:
         discovery: Discovery | None

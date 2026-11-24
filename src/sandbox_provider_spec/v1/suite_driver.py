@@ -14,6 +14,7 @@ import asyncio
 import base64
 import builtins
 import contextlib
+import hashlib
 import re
 import threading
 import time
@@ -419,7 +420,11 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             return str(uuid4())
         if not isinstance(name, str) or not name:
             raise ValueError("idempotency_key must name the key")
-        return f"sps-{self.run_id[:20]}-{name}"
+        # A wire idempotency key is lowercase `[a-z0-9-]` (8 to 63): the run id can be any text
+        # (`SPS_RUN_ID`, or the generated `<lane>-<UTC time>-<hex>`), so the key carries a digest
+        # of it, the same 20 characters for every key of one run.
+        run = hashlib.sha256(self.run_id.encode()).hexdigest()[:20]
+        return f"sps-{run}-{name}"
 
     def _destroy_when_free(self, sandbox_id: str) -> DestroyResult:
         """Destroy, asking again while the provider answers `unavailable`: busy in a state change

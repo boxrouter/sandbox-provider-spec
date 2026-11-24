@@ -17,6 +17,7 @@ import fcntl
 import itertools
 import json
 import os
+import re
 import shutil
 import stat
 from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Callable, Mapping
@@ -29,6 +30,7 @@ import jsonschema
 import pytest
 
 from sandbox_provider_spec import cli, cost_checks
+from sandbox_provider_spec import run_id as run_id_module
 from sandbox_provider_spec.cli import main
 from sandbox_provider_spec.driver import NativeFailure, NotRun, Unsupported, resource
 from sandbox_provider_spec.v1 import (
@@ -791,6 +793,34 @@ def test_run_tests_deletes_what_a_failed_test_left_behind() -> None:
     provider = Stubborn()
     run_tests(provider, TestOptions(tests=["baseline.get"]))
     assert all(box.state == "destroyed" for box in provider.boxes.values())
+
+
+def test_the_tester_labels_its_sandboxes_with_the_run_id_a_sweep_lists_by(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A sandbox the tester could not delete is found by a sweep by the run's id (cloud#9887)."""
+    monkeypatch.setattr(run_id_module, "_RUN", None)
+    monkeypatch.setenv(run_id_module.ENVIRONMENT, "sweep-check-1")
+
+    class Undeletable(LocalProvider, manifest=False):
+        async def destroy(self, sandbox_id: str) -> DestroyResult:
+            raise SpsError("unavailable", "refused")
+
+    provider = Undeletable()
+    run_tests(provider, TestOptions(tests=["baseline.get"]))
+    assert {labels[RUN_LABEL] for labels in provider.created_labels} == {"sweep-check-1"}
+    left = asyncio.run(provider.list(labels={RUN_LABEL: run_id_module.run_id()}))
+    assert [box.id for box in left.sandboxes] == list(provider.boxes)
+
+
+def test_a_named_key_stays_a_wire_key_for_any_run_id() -> None:
+    """The run id is free text (`SPS_RUN_ID`, or `<lane>-<UTC time>-<hex>` with capitals), and a
+    named idempotency key built from it must still be lowercase `[a-z0-9-]` for the wire."""
+    for run in ("t5nf-boxd-20261124T032430Z-core", "run-20261124T034512Z-ab12", "x"):
+        driver = ProviderDriver(LocalProvider(), run=run)
+        key = driver._key({"idempotency_key": "image-same"})  # pylint: disable=protected-access
+        assert re.fullmatch(r"[a-z0-9][a-z0-9-]{7,62}", key), key
+        assert key == driver._key({"idempotency_key": "image-same"})  # pylint: disable=protected-access
 
 
 def fake_report(passed: bool) -> Report:
