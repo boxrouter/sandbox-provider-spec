@@ -272,6 +272,26 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
                 ) from None
             raise NativeFailure(error.code, retry_after_seconds=error.retry_after_seconds) from None
 
+    def read(self, make: Callable[[], Awaitable[T]]) -> T:
+        """`wait` for a read, pausing what a `rate_limited` answer says and asking again.
+
+        A provider may rate-limit reads for the whole account (a burst, then a steady rate, with
+        `retry_after_seconds`): the contract has the caller wait that long. The pause is at least
+        1 s and at most `MAX_RATE_LIMIT_PAUSE_SECONDS`, and the read is asked again for up to
+        `RATE_LIMIT_BUDGET_SECONDS`, then the failure stands. Any other failure is raised at once.
+        """
+        started = time.monotonic()
+        while True:
+            try:
+                return self.wait(make())
+            except NativeFailure as error:
+                if error.code != "rate_limited":
+                    raise
+                pause = rate_limit_pause(error)
+                if time.monotonic() + pause > started + RATE_LIMIT_BUDGET_SECONDS:
+                    raise
+                time.sleep(pause)
+
     def close(self) -> None:
         """Release the provider's clients and stop the loop."""
         try:
@@ -409,7 +429,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
 
     def get(self, target: object, inputs: Inputs) -> Observation:
         try:
-            sandbox = self.wait(self.api.get(self._sandbox(target)))
+            sandbox = self.read(lambda: self.api.get(self._sandbox(target)))
         except NativeFailure as error:
             if error.code == "not_found":
                 return {"state": "destroyed"}
@@ -431,7 +451,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         found: builtins.list[Sandbox] = []
         cursor: str | None = None
         while True:
-            page = self.wait(self.api.list(labels=wanted, cursor=cursor))
+            page = self.read(lambda at=cursor: self.api.list(labels=wanted, cursor=at))
             found.extend(page.sandboxes)
             cursor = page.next_cursor
             if cursor is None:

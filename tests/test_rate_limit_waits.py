@@ -15,6 +15,7 @@ from sandbox_provider_spec.driver import (
     NativeFailure,
     rate_limit_pause,
 )
+from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 
 
 class _Driver:
@@ -81,3 +82,35 @@ def test_a_read_that_stays_limited_fails_once_the_budget_is_spent(slept: list[fl
     with pytest.raises(NativeFailure):
         _read(driver)
     assert sum(slept) <= cost_checks.RATE_LIMIT_BUDGET_SECONDS
+
+
+def test_a_driver_read_waits_out_a_rate_limit_and_asks_again(
+    monkeypatch: pytest.MonkeyPatch, slept: list[float]
+) -> None:
+    answers: list[Any] = [NativeFailure("rate_limited", retry_after_seconds=9), "page"]
+
+    def wait(self: Any, call: Any) -> Any:
+        del self, call
+        answer = answers.pop(0)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    monkeypatch.setattr(ProviderDriver, "wait", wait)
+    driver = object.__new__(ProviderDriver)
+    asked: list[int] = []
+    assert driver.read(lambda: asked.append(1) or cast(Any, None)) == "page"
+    assert slept == [9] and len(asked) == 2
+
+
+def test_a_driver_read_raises_any_other_failure_at_once(
+    monkeypatch: pytest.MonkeyPatch, slept: list[float]
+) -> None:
+    def wait(self: Any, call: Any) -> Any:
+        del self, call
+        raise NativeFailure("not_found")
+
+    monkeypatch.setattr(ProviderDriver, "wait", wait)
+    with pytest.raises(NativeFailure):
+        object.__new__(ProviderDriver).read(lambda: cast(Any, None))
+    assert slept == []
