@@ -11,8 +11,9 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from collections.abc import Mapping
 from functools import cache
-from importlib.metadata import entry_points, packages_distributions, version
+from importlib.metadata import EntryPoints, entry_points, packages_distributions, version
 from pathlib import Path
 
 from sandbox_provider_spec.v1.types import Discovery
@@ -46,16 +47,16 @@ def _top_package(cls: type) -> tuple[str, Path] | None:
 
 
 @cache
-def _distributions() -> dict[str, list[str]]:
+def _distributions() -> Mapping[str, list[str]]:
     """The environment's package-to-distribution map: process-static, but a full filesystem
     scan, so the roster's per-provider subjects share one read instead of one scan each."""
     return packages_distributions()
 
 
 @cache
-def _spec_entries() -> tuple:
+def _spec_entries() -> EntryPoints:
     """The installed `sandbox_provider_spec.providers` entry points: process-static."""
-    return tuple(entry_points(group="sandbox_provider_spec.providers"))
+    return entry_points(group="sandbox_provider_spec.providers")
 
 
 def _distribution_names(top: str) -> list[str]:
