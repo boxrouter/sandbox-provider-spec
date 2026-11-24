@@ -393,7 +393,7 @@ def call(provider: ExampleProvider, method: str, *args: Any, **kwargs: Any) -> A
 def test_manifest_loaded() -> None:
     provider = make_provider(FakeCloud())
     assert provider.provider_id == "example"
-    assert provider.spec_version == "1.0"
+    assert provider.spec_version == "1.1"
     assert provider.api_domains == ("api.example.test",)
     assert [f.name for f in provider.credential_fields] == ["api_key", "endpoint"]
 

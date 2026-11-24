@@ -136,7 +136,7 @@ def refs(value: Any) -> list[str]:
 
 def test_header_and_servers() -> None:
     assert DOCUMENT["openapi"].startswith("3.1")
-    assert DOCUMENT["info"]["version"] == "1.0.0"
+    assert DOCUMENT["info"]["version"] == "1.1.0"
     assert [server["url"] for server in DOCUMENT["servers"]] == ["{base_url}"]
     assert DOCUMENT["security"] == [{"bearerAuth": []}]
     assert DOCUMENT["components"]["securitySchemes"]["bearerAuth"] == {
@@ -229,7 +229,7 @@ def test_example_validates(name: str) -> None:
 
 def test_discovery_example_is_the_one_in_the_design() -> None:
     example = json.loads((EXAMPLES / "Discovery.json").read_text(encoding="utf-8"))
-    assert example["spec_version"] == "1.0"
+    assert example["spec_version"] == "1.1"
     assert example["classes"][0]["prices"][0] == {
         "item": "cpu",
         "price_usd": "0.000014",
@@ -438,3 +438,14 @@ def test_idempotency_key_pattern() -> None:
     assert not re.fullmatch(pattern, "short")
     assert not re.fullmatch(pattern, "-leading-dash-key")
     assert not re.fullmatch(pattern, "UPPERCASE-KEY-1234")
+
+
+@pytest.mark.rule("provider-api/cost-required")
+def test_the_discovery_schema_refuses_a_1_1_discovery_without_a_cost_limit() -> None:
+    document = json.loads((EXAMPLES / "Discovery.json").read_text(encoding="utf-8"))
+    without = {**document, "limits": dict(document["limits"])}
+    del without["limits"]["cost_final_within_seconds"]
+    check = validator("Discovery")
+    assert check.is_valid(document)
+    assert not check.is_valid({**without, "spec_version": "1.1"})
+    assert check.is_valid({**without, "spec_version": "1.0"})

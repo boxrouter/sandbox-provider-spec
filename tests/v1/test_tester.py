@@ -63,10 +63,12 @@ from sandbox_provider_spec.v1 import (
 from sandbox_provider_spec.v1 import tester as tester_module
 from sandbox_provider_spec.v1.suite_driver import RUN_LABEL, ProviderDriver
 from sandbox_provider_spec.v1.tester import (
+    COST_TESTS,
     QUICK_SKIPS,
     Report,
     TestOptions,
     claimed_gates,
+    cost_required,
     run_tests,
     select_tests,
     shared_suite,
@@ -1379,12 +1381,14 @@ def test_a_provider_that_states_no_prices_passes_discovery_valid() -> None:
     assert report.all_passed
 
 
-def test_a_provider_that_states_no_final_window_does_not_offer_cost() -> None:
+def test_a_1_0_provider_that_states_no_final_window_does_not_offer_cost() -> None:
     class NoCost(ContractProvider, manifest=False):
         async def discovery(self) -> Discovery:
             found = await super().discovery()
             return dataclasses.replace(
-                found, limits=dataclasses.replace(found.limits, cost_final_within_seconds=None)
+                found,
+                spec_version="1.0",
+                limits=dataclasses.replace(found.limits, cost_final_within_seconds=None),
             )
 
         async def cost(self, sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
@@ -1399,6 +1403,7 @@ def test_a_provider_that_states_no_final_window_does_not_offer_cost() -> None:
     assert "contract.cost_final" in default
     silent = dataclasses.replace(
         example(Discovery),
+        spec_version="1.0",
         limits=dataclasses.replace(example(Discovery).limits, cost_final_within_seconds=None),
     )
     left_out = {test.id for test in select_tests(shared_suite(), silent, TestOptions()).tests}
@@ -2004,3 +2009,50 @@ def test_driver_answers_unsupported_for_an_end_state_1_0_cannot_name(
     `WireError`, so the driver says `unsupported` and sends nothing."""
     with pytest.raises(Unsupported):
         driver.call("create", None, {"at_end": "stopped"})
+
+
+def _cost_discovery(spec_version: str, *, cost: bool) -> Discovery:
+    discovery = example(Discovery)
+    limits = (
+        discovery.limits
+        if cost
+        else dataclasses.replace(discovery.limits, cost_final_within_seconds=None)
+    )
+    return dataclasses.replace(discovery, spec_version=spec_version, limits=limits)
+
+
+@pytest.mark.rule("provider-api/cost-required")
+@pytest.mark.parametrize(
+    ("spec_version", "required"), [("1.0", False), ("1.1", True), ("1.12", True)]
+)
+def test_a_provider_that_states_1_1_or_later_must_offer_cost(
+    spec_version: str, required: bool
+) -> None:
+    assert cost_required(_cost_discovery(spec_version, cost=False)) is required
+
+
+@pytest.mark.rule("provider-api/cost-required")
+def test_a_run_keeps_the_cost_tests_of_a_1_1_provider_that_offers_no_cost() -> None:
+    def chosen(spec_version: str) -> set[str]:
+        discovery = _cost_discovery(spec_version, cost=False)
+        selection = select_tests(shared_suite(), discovery, TestOptions())
+        return {test.id for test in selection.tests if test.id.startswith(COST_TESTS)}
+
+    assert "contract.cost_final" in chosen("1.1")
+    assert chosen("1.0") == set()
+
+
+@pytest.mark.rule("provider-api/cost-required")
+@pytest.mark.parametrize(
+    ("spec_version", "status", "passes"), [("1.0", "unsupported", True), ("1.1", "differs", False)]
+)
+def test_a_1_1_provider_without_cost_fails_the_run(
+    spec_version: str, status: str, passes: bool
+) -> None:
+    class Stated(LocalProvider, manifest=False):
+        async def discovery(self) -> Discovery:
+            return _cost_discovery(spec_version, cost=False)
+
+    report = run_tests(Stated(), TestOptions(tests=COMMAND_TESTS))
+    assert f"operation cost {status}" in report.lines
+    assert report.all_passed is passes

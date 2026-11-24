@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 provider_id: example
 name: Example Cloud
-spec_version: "1.0"
+spec_version: "1.1"
 credential_fields:
   - name: api_key
     secret: true

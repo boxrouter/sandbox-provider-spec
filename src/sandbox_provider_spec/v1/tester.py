@@ -48,8 +48,9 @@ LIFETIME_NOT_CLAIMED = (
 # then counts for neither its section nor the run: the Python form has no link to reuse.
 NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED})
 
-# The tests that need an offered `cost` (contract section 10): a run leaves them out, and the
-# `cost` operation reports `unsupported`, when discovery states no `cost_final_within_seconds`.
+# The tests that need an offered `cost` (contract section 10): a run of a 1.0 provider leaves them
+# out, and the `cost` operation reports `unsupported`, when discovery states no
+# `cost_final_within_seconds`. From 1.1 `cost` is required, so a run keeps them and they fail.
 SNAPSHOT_COST_TEST = "snapshots.v1.cost"
 COST_TESTS = ("contract.cost", SNAPSHOT_COST_TEST)
 
@@ -70,7 +71,7 @@ OPERATIONS = (
     "process.start",
     "process.output",
     "cost",
-)  # `cost` is required only of a provider that offers it
+)  # `cost` is required of a provider that offers it or states 1.1 or later
 STEP_OPERATION = {
     "create": "create",
     "get": "get",
@@ -357,6 +358,17 @@ def cost_offered(discovery: Discovery | None) -> bool:
     return discovery is not None and discovery.limits.cost_final_within_seconds is not None
 
 
+def cost_required(discovery: Discovery | None) -> bool:
+    """Whether discovery states a `spec_version` of 1.1 or later, which requires `cost` (contract
+    sections 10 and 13). A version that does not parse is held to the newest rules."""
+    if discovery is None:
+        return False
+    try:
+        return int(discovery.spec_version.split(".", 1)[1]) >= 1
+    except (IndexError, ValueError):
+        return True
+
+
 _UNRESOLVED = object()
 
 
@@ -602,7 +614,13 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         if wanted and test.id in CLAIMED_TESTS and discovery is not None:
             # Left out unless the class lists its operation; a test named by its whole id stays.
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
-        if wanted and not options.tests and discovery is not None and not cost_offered(discovery):
+        if (
+            wanted
+            and not options.tests
+            and discovery is not None
+            and not cost_offered(discovery)
+            and not cost_required(discovery)
+        ):
             wanted = not test.id.startswith(COST_TESTS)
         if wanted and not options.tests and snapshot_cost_unavailable(discovery):
             wanted = test.id != SNAPSHOT_COST_TEST
@@ -654,9 +672,10 @@ def _subject_discovery(provider: Provider, live: Discovery | None) -> Discovery 
 
 def _probe_cost(driver: ProviderDriver, discovery: Discovery | None) -> str:
     """Create a sandbox, read its cost, destroy it: the one operation no baseline test uses. A
-    provider that does not offer cost has `unsupported`."""
+    1.0 provider that does not offer cost has `unsupported`; one that states 1.1 or later
+    `differs`, because 1.1 requires it."""
     if discovery is not None and not cost_offered(discovery):
-        return "unsupported"
+        return "differs" if cost_required(discovery) else "unsupported"
     created = None
     try:
         created = driver.wait(

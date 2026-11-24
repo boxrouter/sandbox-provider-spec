@@ -23,7 +23,7 @@ adapter and move to a native API later.
 
 ## Required Operations
 
-Every provider implements these ten operations, and may offer an eleventh, `cost` (see [Cost](#cost)). Paths are relative to your base URL.
+Every provider implements these ten operations and an eleventh, `cost` (see [Cost](#cost)), which a provider that states `spec_version` 1.1 or later must offer. Paths are relative to your base URL.
 
 | Operation | HTTP | What it does |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ system ([section 13](../spec/spec.md#13-where-the-specification-stops)); open an
 
 ```json
 {
-  "spec_version": "1.0",
+  "spec_version": "1.1",
   "provider": {"id": "example", "name": "Example Cloud"},
   "limits": {"file_bytes": 5368709120, "run_timeout_ms": 600000, "output_bytes": 16777216, "wait_ms": 60000,
              "process_output_bytes": 4194304, "process_retention_seconds": 3600, "list_limit": 1000,
@@ -127,7 +127,7 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 
 ## Cost
 
-`cost` is optional: state `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`, or leave it out and `cost` answers `unsupported`. If you offer it:
+State `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`. From 1.1 `cost` is required: a router that bills from your figures cannot bill, or let a customer pay with credits for, a sandbox that has no cost, so a discovery that states `spec_version` 1.1 or later without the limit is invalid and fails the tester. A 1.0 provider may leave it out, and `cost` then answers `unsupported`. The least you need is your own record of what each sandbox used: a `usage` cost (item 5) states those quantities and no prices. When you offer it:
 
 1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. If your usage records go with the sandbox, list `cost.capture` instead (below). Take quantities from your own records, never from a clock in the consumer or an adapter.
 2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee) or `usage` (what the line reports, with `amount_usd` null). `total_usd` is the sum of the lines, and null for `usage`. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
@@ -243,7 +243,7 @@ and the `Provider` class reads it when your subclass is defined
 ```yaml
 provider_id: example          # a-z 0-9 -, 2 to 32 characters; also the entry point's name
 name: Example Cloud
-spec_version: "1.0"
+spec_version: "1.1"
 credential_fields:
   - {name: api_key, secret: true, description: "API key from the Example Cloud console"}
 api_domains: [api.example.com]
@@ -283,10 +283,11 @@ uvx --from 'sandbox-provider-spec[http] @ git+https://github.com/boxrouter/sandb
 
 The tester runs the baseline and contract tests, then the tests of every optional section that
 your discovery claims, and deletes every sandbox that it created. It prints one line per test, then
-one per required operation, one for `cost` (`operation cost unsupported` when discovery states no
-`cost_final_within_seconds`) and one per claimed section, such as `operation create passed`; a status is
-`passed`, `differs`, `unsupported`, `not_run`, or `error`. It writes a JSON report
-(`sps-report.json`) and exits 0 only when every test that it ran passed, `cost` included when you offer it.
+one per required operation, one for `cost` and one per claimed section, such as
+`operation create passed`; a status is `passed`, `differs`, `unsupported`, `not_run`, or `error`.
+When discovery states no `cost_final_within_seconds`, `cost` is `differs` for a 1.1 provider and
+`unsupported` for a 1.0 one. It writes a JSON report (`sps-report.json`) and exits 0 only when
+every test that it ran passed, `cost` included.
 A full run also waits for a final cost, up to your `cost_final_within_seconds` after it destroys a
 sandbox, and for a sandbox to end at the lifetime that it asked for (60 seconds, plus up to 30). `--quick`
 skips the 1 GiB round trip and those waits while you iterate, and prints `not_run` for what it did
@@ -422,5 +423,7 @@ Other sections are set at create, with no operation of their own: `custom_images
 SPS follows semantic versioning. The URL path carries the major version (`/v1`), and the
 `spec_version` in discovery and in the manifest carries `major.minor`. A 1.x release only adds
 optional operations, optional request fields, result fields, and vocabulary. The twelve error codes
-stay fixed for all of 1.x, so nothing that a 1.0 provider does becomes wrong in a later 1.x. A
-consumer sends only the fields of the minor that you declare. A 2.0 would be a new path, `/v2`.
+stay fixed for all of 1.x, so nothing that a 1.0 provider does becomes wrong in a later 1.x. A minor
+may require an operation that was optional before, but only of a provider that states that minor:
+1.1 requires `cost`. A consumer sends only the fields of the minor that you declare. A 2.0 would be
+a new path, `/v2`.

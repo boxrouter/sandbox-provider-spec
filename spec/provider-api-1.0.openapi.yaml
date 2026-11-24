@@ -3,10 +3,11 @@
 openapi: 3.1.0
 info:
   title: Sandbox Provider API
-  version: 1.0.0
+  version: 1.1.0
   summary: The operations that a sandbox provider implements.
   description: |
-    A provider implements ten required operations and any of the optional ones. This file is the
+    A provider implements ten required operations and any of the optional ones; a provider that states
+    `spec_version` 1.1 or later implements `cost` too. This file is the
     authority for the shapes of every request and result. The rules that span operations
     (idempotency, lifetime, ids, destroy, files, processes, cost, errors, versioning) are in
     provider-api.md next to this file.
@@ -550,7 +551,8 @@ paths:
       tags: [optional]
       summary: The sandbox's cost
       description: >-
-        Offered when discovery states `limits.cost_final_within_seconds`; without it the answer is `unsupported`. Works in
+        Offered when discovery states `limits.cost_final_within_seconds`; without it the answer is `unsupported`. Required
+        of a provider whose discovery states `spec_version` 1.1 or later. Works in
         every state, including after the sandbox ends. While the sandbox exists the status is `accruing`. The cost reaches
         `final` within `limits.cost_final_within_seconds` after the sandbox ends and stays readable at least until it is
         `final`. A class that lists `cost.capture` is exempt from the readable-after-the-end rule.
@@ -1794,7 +1796,7 @@ components:
           minimum: 0
           description: >-
             Offers `cost`. The provider makes a sandbox's `cost` `final` within this many seconds after the sandbox ends. The
-            spec sets no ceiling.
+            spec sets no ceiling. Required when `spec_version` is 1.1 or later.
         image_context_bytes:
           type: integer
           minimum: 536870912
@@ -1989,6 +1991,12 @@ components:
       type: object
       required: [spec_version, provider, limits, classes]
       allOf:
+        - if:
+            properties:
+              spec_version: {const: "1.0"}
+          else:
+            properties:
+              limits: {required: [cost_final_within_seconds]}
         - if:
             properties:
               classes:

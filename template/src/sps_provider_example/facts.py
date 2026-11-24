@@ -81,7 +81,7 @@ def build_discovery(provider_id: str, provider_name: str) -> Discovery:
         gates={"snapshots": [SNAPSHOTS], "terminal": [{"reattach": False}]},
     )
     return Discovery(
-        spec_version="1.0",
+        spec_version="1.1",
         provider=ProviderInfo(provider_id, provider_name, "https://docs.example.test"),
         limits=LIMITS,
         classes=(klass,),

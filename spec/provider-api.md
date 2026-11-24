@@ -199,9 +199,16 @@ keep running, or exit while a child holds a stream open. This is the rule of the
 
 ## 10. Cost
 
-`cost` is offered, not required. A provider offers it by stating `limits.cost_final_within_seconds` <!-- rule: provider-api/cost-offered -->
-in discovery. Without that value `cost` answers `unsupported`, and a consumer treats the provider
-as one that does not state a cost.
+A provider offers `cost` by stating `limits.cost_final_within_seconds` in discovery. Without <!-- rule: provider-api/cost-offered -->
+that value `cost` answers `unsupported`, and a consumer treats the provider as one that does not
+state a cost.
+
+- A provider whose discovery states `spec_version` 1.1 or later **MUST** offer `cost`. A <!-- rule: provider-api/cost-required -->
+  consumer that bills from these figures cannot bill a sandbox that has no cost, so from 1.1 the
+  operation is required. A 1.0 provider may still leave it out (section 13). The least a
+  provider needs is its own record of what each sandbox used: a `usage` cost states those
+  quantities and no prices. A provider whose records go with the sandbox lists `cost.capture`
+  (below).
 
 `cost` returns what a sandbox cost: a `status` of `accruing` or `final`, a `source` of `reported`,
 `calculated` or `usage`, the `lines` and their `total_usd`, and `as_of`. `reported` means that the
@@ -327,7 +334,10 @@ Discovery's `spec_version` and an adapter's `spec_version` carry `major.minor`.
 
 A 1.x minor release only adds. It may add optional operations, optional request fields, result
 fields and vocabulary, and it never adds or changes an error code: the twelve codes stay fixed for
-all of 1.x. Nothing that a 1.0 provider does becomes wrong in a later 1.x. A consumer reads
+all of 1.x. Nothing that a 1.0 provider does becomes wrong in a later 1.x. A minor may require an
+operation that an earlier minor left optional, but only of a provider whose discovery states that
+minor or a later one; a consumer still handles providers of the earlier minor, which may leave it
+out. 1.1 requires `cost` (section 10). A consumer reads
 `spec_version` and sends only the fields of that minor or older; because a provider refuses
 unknown request fields (section 2), a requirement is never dropped without notice. A 2.0 would be
 a new path (`/v2`), served beside `/v1` for a transition period.

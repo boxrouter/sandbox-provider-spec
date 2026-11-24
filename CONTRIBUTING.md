@@ -61,6 +61,10 @@ stays `unknown`; never guess a value.
 
 ## Adding a provider
 
+An adapter states Provider API 1.1, which requires `cost`: a router cannot bill, or accept
+credits for, a sandbox whose provider states no cost. Reporting the quantities each sandbox used,
+from your own usage records, is enough ([Cost](docs/implement.md#cost)).
+
 A declaration and its adapter describe the provider's Linux sandboxes only. A provider that
 also offers macOS, Windows, Android or iOS machines leaves those classes out for now; open an
 issue before adding one (see [section 13](spec/spec.md#13-where-the-specification-stops)).
