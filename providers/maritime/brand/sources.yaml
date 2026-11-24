@@ -1,0 +1,17 @@
+retrieved_at: '2026-11-24'
+owner: Maritime
+source_page: https://maritime.sh
+assets:
+  mark.png:
+    source: https://maritime.sh/maritimeround.png
+    role: >-
+      Official Maritime mark: a white sail on a black rounded square, the logo the site's
+      structured data names. The brand colour #2553C4 is the accent the site's buttons
+      and links share.
+    modifications: cropped to the opaque pixels and scaled to 512 px; the artwork is unchanged
+notes:
+  no_brand_page: no brand kit or press page is linked from maritime.sh
+  no_wordmark: >-
+    the site sets its name in text, not in a lockup image, so the round mark serves as both
+    logo and mark
+  terms: no reuse terms or brand guidelines were found

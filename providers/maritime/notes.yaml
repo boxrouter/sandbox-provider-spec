@@ -1,0 +1,5 @@
+# Provider sentences, in the provider's folder: the benchmarks and pricing pages print them as published.
+fact.billing: A Maritime sandbox is billed for the machine time it runs — metered per interval
+  and reported per sandbox — and a plan caps how many machines may be awake at once.
+note.size: "A sandbox's vCPU, memory and disk are its reservation: a named preset or custom
+  counts within the plan's limits, set on create."
