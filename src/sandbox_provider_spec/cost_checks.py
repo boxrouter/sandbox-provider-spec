@@ -11,12 +11,14 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from sandbox_provider_spec.driver import (
+    RATE_LIMIT_BUDGET_SECONDS,
     Inputs,
     NativeFailure,
     NotRun,
     Observation,
     Unsupported,
     number,
+    rate_limit_pause,
 )
 from sandbox_provider_spec.v1.types import Cost
 
@@ -47,13 +49,31 @@ def read_cost(driver: ProviderDriver, read: Callable[[], Awaitable[Cost]], input
     until_final = inputs.get("final") is True
     window = final_wait_seconds(driver, inputs) if until_final else 0
     deadline = time.monotonic() + window
+    started = time.monotonic()
     while True:
-        cost = driver.wait(read())
+        try:
+            cost = driver.wait(read())
+        except NativeFailure as error:
+            if not _wait_out_rate_limit(error, started):
+                raise
+            continue
         if not until_final or cost.status == "final":
             return cost
         if time.monotonic() >= deadline:
             raise NotRun("cost_not_final_in_window")
         time.sleep(poll_seconds(window))
+
+
+def _wait_out_rate_limit(error: NativeFailure, started: float) -> bool:
+    """Wait what the provider's `retry_after_seconds` says (bounded) and say True, when `error` is a
+    `rate_limited` read still inside the retry budget; False when the failure stands."""
+    if error.code != "rate_limited":
+        return False
+    pause = rate_limit_pause(error)
+    if time.monotonic() + pause > started + RATE_LIMIT_BUDGET_SECONDS:
+        return False
+    time.sleep(pause)
+    return True
 
 
 def poll_seconds(window: float) -> float:
@@ -69,7 +89,16 @@ def _read_final(
     finds nothing is no read."""
     window = final_wait_seconds(driver, inputs)
     deadline = time.monotonic() + window
-    while (cost := driver.wait(driver.api.cost(sandbox_id))).status != "final":
+    started = time.monotonic()
+    while True:
+        try:
+            cost = driver.wait(driver.api.cost(sandbox_id))
+        except NativeFailure as error:
+            if not _wait_out_rate_limit(error, started):
+                raise
+            continue
+        if cost.status == "final":
+            break
         if time.monotonic() >= deadline:
             raise NotRun("cost_not_final_in_window")
         time.sleep(poll_seconds(window))

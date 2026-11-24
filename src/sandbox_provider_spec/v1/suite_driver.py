@@ -28,6 +28,7 @@ from uuid import uuid4
 
 from sandbox_provider_spec import cost_checks, terminal_ordered
 from sandbox_provider_spec.driver import (
+    RATE_LIMIT_BUDGET_SECONDS,
     Driver,
     Inputs,
     NativeFailure,
@@ -36,6 +37,7 @@ from sandbox_provider_spec.driver import (
     Resource,
     Unsupported,
     number,
+    rate_limit_pause,
     resource,
     strings,
     text,
@@ -267,7 +269,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
                 raise Unsupported(
                     "the provider reports that it does not support the operation"
                 ) from None
-            raise NativeFailure(error.code) from None
+            raise NativeFailure(error.code, retry_after_seconds=error.retry_after_seconds) from None
 
     def close(self) -> None:
         """Release the provider's clients and stop the loop."""
@@ -1162,13 +1164,26 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         still ending) is retried with a short backoff, since the answer is needed to know that
         nothing is left behind.
         """
-        deadline = time.monotonic() + 30
+        started = time.monotonic()
+        deadline = started + 30
         delay = 0.2
         while True:
             try:
                 found = cast("builtins.list[dict[str, str]]", self.list(None, {})["sandboxes"])
                 return [item["identity"] for item in found]
             except NativeFailure as error:
+                if error.code == "rate_limited":
+                    # The provider says when a read can work again: wait that long (bounded), and
+                    # allow the answer the time to come: it is needed to know nothing is left.
+                    pause = rate_limit_pause(error)
+                    deadline = max(
+                        deadline,
+                        min(started + RATE_LIMIT_BUDGET_SECONDS, time.monotonic() + pause + 30),
+                    )
+                    if time.monotonic() + pause > started + RATE_LIMIT_BUDGET_SECONDS:
+                        raise
+                    time.sleep(pause)
+                    continue
                 if error.code not in RETRYABLE or time.monotonic() >= deadline:
                     raise
                 time.sleep(delay)

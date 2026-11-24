@@ -63,9 +63,26 @@ class NotRun(Exception):
 class NativeFailure(Exception):
     """A classified native response; no credential-bearing message is retained."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, retry_after_seconds: int | None = None) -> None:
         self.code = code
+        #: What the provider said about when a retry can work (`rate_limited`, `unavailable`).
+        self.retry_after_seconds = retry_after_seconds
         super().__init__(code)
+
+
+#: How long a rate limit's `retry_after_seconds` may hold one read, and how long a read that keeps
+#: being limited is retried in all. A provider that rate-limits reads for the whole account (for
+#: example fleet reads: a burst of ten, then about one a second, answered with `Retry-After`) is
+#: waited for, as the contract says, not failed.
+MAX_RATE_LIMIT_PAUSE_SECONDS = 30
+RATE_LIMIT_BUDGET_SECONDS = 180
+
+
+def rate_limit_pause(error: NativeFailure) -> float:
+    """Seconds to wait before retrying a `rate_limited` read: what the provider said, at least one,
+    at most `MAX_RATE_LIMIT_PAUSE_SECONDS`."""
+    asked = error.retry_after_seconds
+    return float(min(max(asked if asked is not None else 1, 1), MAX_RATE_LIMIT_PAUSE_SECONDS))
 
 
 @dataclass(eq=False)
