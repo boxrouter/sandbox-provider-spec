@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import time
 from types import SimpleNamespace
 from typing import Any, cast
 
@@ -12,6 +13,7 @@ import pytest
 from sandbox_provider_spec import cost_checks
 from sandbox_provider_spec.driver import (
     MAX_RATE_LIMIT_PAUSE_SECONDS,
+    RATE_LIMIT_BUDGET_SECONDS,
     NativeFailure,
     rate_limit_pause,
 )
@@ -44,8 +46,8 @@ def slept_fixture(monkeypatch: pytest.MonkeyPatch) -> list[float]:
         slept.append(seconds)
         clock[0] += seconds
 
-    monkeypatch.setattr(cost_checks.time, "sleep", sleep)
-    monkeypatch.setattr(cost_checks.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(time, "sleep", sleep)
+    monkeypatch.setattr(time, "monotonic", lambda: clock[0])
     return slept
 
 
@@ -81,7 +83,7 @@ def test_a_read_that_stays_limited_fails_once_the_budget_is_spent(slept: list[fl
     driver = _Driver([limited] * 20)
     with pytest.raises(NativeFailure):
         _read(driver)
-    assert sum(slept) <= cost_checks.RATE_LIMIT_BUDGET_SECONDS
+    assert sum(slept) <= RATE_LIMIT_BUDGET_SECONDS
 
 
 def test_a_driver_read_waits_out_a_rate_limit_and_asks_again(
@@ -99,7 +101,12 @@ def test_a_driver_read_waits_out_a_rate_limit_and_asks_again(
     monkeypatch.setattr(ProviderDriver, "wait", wait)
     driver = object.__new__(ProviderDriver)
     asked: list[int] = []
-    assert driver.read(lambda: asked.append(1) or cast(Any, None)) == "page"
+
+    def count() -> Any:
+        asked.append(1)
+        return cast(Any, None)
+
+    assert driver.read(count) == "page"
     assert slept == [9] and len(asked) == 2
 
 

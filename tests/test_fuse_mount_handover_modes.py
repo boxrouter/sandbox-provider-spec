@@ -429,11 +429,13 @@ def test_sps123_source_and_check_digest_are_unchanged() -> None:
     test = tests["fuse_mount.provider_terminal_handover"]
     assert check_digests((test,)) == {
         "fuse_mount.provider_terminal_handover": (
-            "sha256:4e62fb1056342e9e7b80eebf1989c6c138d41ccb385f4abfed3f11a1e9576d40"
+            "sha256:b3b6b2f73957dcaf06843c410ffdaef4146d18161198ad7ece48675f22b18c90"
         )
     }
     # SPS 0.5.10 (libyaml), 0.5.32 (failed-step report fields) and 0.5.41 (not_claimed tests)
-    # changed the shared digest; the digest recorded before each stands.
+    # changed the shared digest; the digest recorded before each stands. SPS 0.5.100 moved the
+    # check's own executable inputs (driver.py, v1/suite_driver.py rate-limit waits), so a report
+    # recorded under the prior digest is stale and nothing here re-pins it.
     assert check_digest_stands(
         test, "sha256:cb5ee12e5342e8d4745009eaffce9eccd59869f33f7c0d03659b696d6678de67", None
     )
