@@ -29,7 +29,13 @@ proves. Values without supporting evidence remain `unknown`. No conformance repo
 
 ## Default class kernel (`declaration.yaml`)
 
-- `kernel: filtered`: the VM instances page (read 2026-11-24) says "The default gVisor instance type
+- `kernel: unknown`, though the fact below is known. Cloud's `standard_image_offered`
+  (`cloud-routing` facts/types.py) withholds the standard image from a `filtered` class on the premise
+  that a syscall-filter runtime cannot boot the init wrapper, and Agent37's gVisor does boot it (613
+  creates, run full-20261124a). Stating `filtered` (cloud#10100) therefore refused or moved every
+  standard-image create to the VM class. The word returns when the rule reads a per-class proven
+  standard-image fact instead of the kernel word.
+- The fact: the VM instances page (read 2026-11-24) says "The default gVisor instance type
   cannot run a Docker daemon." A live read on 2026-11-24 of one default instance (template `agent37-base`,
   created through `sps-provider-agent37`, labelled `run=kernel-probe-*`, destroyed afterwards) found
   gVisor. `uname -a` and `/proc/version` read `4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016`;
