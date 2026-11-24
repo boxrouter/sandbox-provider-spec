@@ -20,6 +20,7 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
+from sandbox_provider_spec.v1.suite_driver_setup import SetupRetryDriver
 from sandbox_provider_spec.v1.two_instances import two_instances
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
@@ -770,7 +771,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         provider = two_instances(provider, options.new_client())
     # The run id the report records and every cleanup sweep lists by (`SPS_RUN_ID` when set): a
     # driver left to pick its own labelled each sandbox with a random id no sweep could find.
-    driver = ProviderDriver(provider, new_client=options.new_client, run=run_id())
+    driver = SetupRetryDriver(provider, new_client=options.new_client, run=run_id())
     started = now()
     try:
         discovery: Discovery | None
