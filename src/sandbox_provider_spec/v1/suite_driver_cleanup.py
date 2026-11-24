@@ -17,9 +17,12 @@ from __future__ import annotations
 import sys
 import time
 from collections.abc import Callable
+from typing import TypeVar
 
 from sandbox_provider_spec.driver import NativeFailure, rate_limit_pause
 from sandbox_provider_spec.v1.types import DestroyResult
+
+T = TypeVar("T")
 
 #: How long the whole cleanup phase asks again, in all. A busy refusal lasted 6 min 20 s over ten
 #: refusals on a live run: the 15 + 180 s this replaces gave up at 195 s.
@@ -40,18 +43,18 @@ class CleanupBudget:
         return self._ends
 
 
-def destroy_when_free(
-    destroy: Callable[[], DestroyResult], budget: CleanupBudget | None = None
-) -> DestroyResult:
-    """`destroy()`, asked again while the provider answers `unavailable`.
+def ask_until_free(
+    call: Callable[[], T], budget: CleanupBudget | None = None, *, step_seconds: float | None = None
+) -> T:
+    """`call()`, asked again while the provider answers `unavailable`.
 
     It waits what the provider says (`retry_after_seconds`, bounded) until `budget` ends (the
     cleanup phase's, shared) or, with none, until `STEP_BUDGET_SECONDS` have passed; then the
     failure stands and the caller reports it. Any other failure is raised at once."""
-    step_ends = time.monotonic() + STEP_BUDGET_SECONDS
+    step_ends = time.monotonic() + (STEP_BUDGET_SECONDS if step_seconds is None else step_seconds)
     while True:
         try:
-            return destroy()
+            return call()
         except NativeFailure as error:
             if error.code != "unavailable":
                 raise
@@ -60,6 +63,13 @@ def destroy_when_free(
             if time.monotonic() + pause > ends:
                 raise
             time.sleep(pause)
+
+
+def destroy_when_free(
+    destroy: Callable[[], DestroyResult], budget: CleanupBudget | None = None
+) -> DestroyResult:
+    """A destroy, asked again while the provider answers `unavailable` (see `ask_until_free`)."""
+    return ask_until_free(destroy, budget)
 
 
 def cleanup_failure(kind: str, error: Exception, resource_id: object) -> dict[str, object]:

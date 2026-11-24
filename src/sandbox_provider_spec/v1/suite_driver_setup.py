@@ -30,6 +30,7 @@ from sandbox_provider_spec.driver import (
     Observation,
     rate_limit_pause,
 )
+from sandbox_provider_spec.v1 import suite_driver_cleanup
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 
 NOT_RUN_REASON = "provider_unavailable"
@@ -77,3 +78,15 @@ class SetupRetryDriver(ProviderDriver):
                     self.sleep(pause)
         finally:
             self._pinned_key = pinned
+
+    def _delete_snapshot(self, snapshot_id: str) -> Observation:
+        """A snapshot delete that the provider answers `unavailable` is asked again (cloud#10080).
+
+        A provider that is still capturing a snapshot does not delete it (one may undo a delete
+        by finishing the capture as a new snapshot): it answers `unavailable` with a wait, and
+        the same call works once the capture ends. The cleanup asks again under its shared
+        budget, so a slow capture no longer reads as a snapshot that cannot be deleted."""
+        delete = super()._delete_snapshot
+        return suite_driver_cleanup.ask_until_free(
+            lambda: delete(snapshot_id), self._cleanup_budget
+        )
