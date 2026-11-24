@@ -82,9 +82,11 @@ def test_shipped_launch_state_leaves_out_the_unlaunched_providers_until_launch()
     launched = {name for name, declared in brands.items() if declared.get("launched")}
     assert launched == set(brands) - {
         "agent37",
+        "archil",
         "beam",
         "boat",
         "freestyle",
+        "luxor",
         "maritime",
         "sail",
         "superserve",
