@@ -3,6 +3,13 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.131 — 2026-11-24
+
+- the README `sps:counts` line moves to 291 conformance tests, tracking the
+suite row the cost batch driver added; the private mirror's standalone
+`check-docs` compares the marker to the generated catalog and failed with
+`recipe=docs-links` until the count caught up.
+
 ## 0.5.130 — 2026-11-24
 
 - `sps-provider.yaml` takes an optional `forgets_ended_sandboxes` (default false) and `Provider.forgets_ended_sandboxes` reads it: true for a provider whose `list` stops showing a sandbox as soon as it is destroyed. A consumer that must prove a sandbox never existed then knows an older ended sandbox cannot show the listing is complete. No vocabulary or conformance-suite change.
