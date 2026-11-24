@@ -172,6 +172,9 @@ class ImageSteps:
         def release(self, owned: Resource) -> Observation:
             raise NotImplementedError
 
+        def release_or_raise(self, owned: Resource) -> Observation:
+            raise NotImplementedError
+
         def _key(self, inputs: Inputs) -> str:
             raise NotImplementedError
 
@@ -305,7 +308,7 @@ class ImageSteps:
 
     def image_delete(self, target: object, inputs: Inputs) -> Observation:
         del inputs
-        return self.release(resource(target))
+        return self.release_or_raise(resource(target))
 
     def image_delete_again(self, target: object, inputs: Inputs) -> Observation:
         """Delete an image that an earlier step already deleted, and report the state."""
