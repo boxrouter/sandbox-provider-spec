@@ -167,7 +167,7 @@ consumer treats the fault as fixed by the code, whatever the message says.
 | `unsupported` | 422 | caller | The request names a class, region, size, image, section, or value that you do not offer |
 | `quota_exceeded` | 402 | caller | The account reached its plan, spending, or concurrency limit |
 | `rate_limited` | 429 | caller | The account sent too many requests |
-| `unavailable` | 503 | provider | You cannot serve a valid request now: no capacity, or maintenance |
+| `unavailable` | 503 | provider | You cannot serve a valid request now, and the same call will work later: no capacity, maintenance, or the sandbox is busy in a state change of your own (a destroy during a snapshot capture); set `retry_after_seconds` |
 | `timeout` | 504 | provider | You did not finish the operation in time |
 | `provider_error` | 500 | provider | Any other failure on your side |
 

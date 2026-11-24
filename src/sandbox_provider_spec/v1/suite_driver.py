@@ -52,6 +52,7 @@ from sandbox_provider_spec.v1.suite_driver_processes import ProcessHandle, Proce
 from sandbox_provider_spec.v1.two_instances import provider_class
 from sandbox_provider_spec.v1.types import (
     CreateRequest,
+    DestroyResult,
     FileLinkRequest,
     ProcessStartRequest,
     RunRequest,
@@ -420,9 +421,26 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
             raise ValueError("idempotency_key must name the key")
         return f"sps-{self.run_id[:20]}-{name}"
 
+    def _destroy_when_free(self, sandbox_id: str) -> DestroyResult:
+        """Destroy, asking again while the provider answers `unavailable`: busy in a state change
+        (a snapshot capture), where the same call works later. It waits what the provider says
+        (`retry_after_seconds`, bounded) for up to `RATE_LIMIT_BUDGET_SECONDS`, then fails as
+        before; one long capture must not leave a sandbox behind or a report unclean."""
+        started = time.monotonic()
+        while True:
+            try:
+                return self.wait(self.api.destroy(sandbox_id))
+            except NativeFailure as error:
+                if error.code != "unavailable":
+                    raise
+                pause = rate_limit_pause(error)
+                if time.monotonic() + pause > started + RATE_LIMIT_BUDGET_SECONDS:
+                    raise
+                time.sleep(pause)
+
     def _destroy(self, sandbox_id: str) -> Observation:
         try:
-            self.wait(self.api.destroy(sandbox_id))
+            self._destroy_when_free(sandbox_id)
         except NativeFailure as error:
             if error.code != "not_found":
                 raise
@@ -466,7 +484,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
     def destroy_again(self, target: object, inputs: Inputs) -> Observation:
         """Destroy a sandbox that an earlier step already destroyed, and report the state."""
         del inputs
-        return {"state": self.wait(self.api.destroy(self._sandbox(target))).state}
+        return {"state": self._destroy_when_free(self._sandbox(target)).state}
 
     def destroy_unknown(self, target: object, inputs: Inputs) -> Observation:
         """Destroy an id that the provider has never issued. The contract answers `not_found`."""
