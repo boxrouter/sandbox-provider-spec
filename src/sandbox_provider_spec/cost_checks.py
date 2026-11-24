@@ -23,6 +23,8 @@ from sandbox_provider_spec.driver import (
 from sandbox_provider_spec.v1.types import Cost
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from sandbox_provider_spec.v1.suite_driver import ProviderDriver
 
 MAX_FINAL_WAIT_SECONDS = 7 * 24 * 3600  # the longest that the tester waits for `final`
@@ -82,7 +84,7 @@ def poll_seconds(window: float) -> float:
 
 
 def _read_final(
-    driver: ProviderDriver, sandbox_id: str, inputs: Inputs
+    driver: ProviderDriver, sandbox_id: str, inputs: Inputs, created_at: datetime | None = None
 ) -> tuple[Cost, Cost | None]:
     """Read a destroyed sandbox's cost until it is final, then once more. A provider may stop
     answering once the cost is final (it only has to keep it until then), so a second read that
@@ -92,7 +94,7 @@ def _read_final(
     started = time.monotonic()
     while True:
         try:
-            cost = driver.wait(driver.api.cost(sandbox_id))
+            cost = driver.wait(driver.api.cost(sandbox_id, created_at=created_at))
         except NativeFailure as error:
             if not _wait_out_rate_limit(error, started):
                 raise
@@ -103,7 +105,7 @@ def _read_final(
             raise NotRun("cost_not_final_in_window")
         time.sleep(poll_seconds(window))
     try:
-        again: Cost | None = driver.wait(driver.api.cost(sandbox_id))
+        again: Cost | None = driver.wait(driver.api.cost(sandbox_id, created_at=created_at))
     except NativeFailure as error:
         if error.code != "not_found":
             raise
@@ -152,10 +154,12 @@ def amounts_match_prices(driver: ProviderDriver, cost: Cost) -> bool:
     return True
 
 
-def final(driver: ProviderDriver, sandbox_id: str, inputs: Inputs) -> Observation:
+def final(
+    driver: ProviderDriver, sandbox_id: str, inputs: Inputs, created_at: datetime | None = None
+) -> Observation:
     """A destroyed sandbox's final cost names it, adds up, has no open line and reads the same
-    twice."""
-    cost, again = _read_final(driver, sandbox_id, inputs)
+    twice. `created_at` is the sandbox's creation time, passed as the read's hint."""
+    cost, again = _read_final(driver, sandbox_id, inputs, created_at)
     return {
         "status": cost.status,
         "sandbox_matches": cost.sandbox_id == sandbox_id,

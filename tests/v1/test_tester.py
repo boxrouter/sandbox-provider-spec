@@ -477,6 +477,28 @@ def test_an_explicit_selection_still_drops_the_tests_of_a_knob_value_not_claimed
     }  # `snapshots.v1.cost` waits for a final cost, which --quick leaves out
 
 
+def test_cost_final_gives_the_created_sandbox_creation_time_as_the_hint(
+    driver: ProviderDriver,
+) -> None:
+    """A provider that drops the record soon after a destroy needs the hint to tell an ended
+    sandbox from one that never was (cloud#9848); the tester has the creation time to give."""
+    seen: list[datetime | None] = []
+    provider: Any = driver.api
+    read = provider.cost
+
+    async def cost(sandbox_id: str, *, created_at: datetime | None = None) -> Cost:
+        seen.append(created_at)
+        return await read(sandbox_id, created_at=created_at)
+
+    provider.cost = cost
+    made = driver.call("create", None, {})
+    created = provider.boxes[str(made["identity"])].created_at
+    driver.call("destroy", made, {})
+    driver.call("cost.final", made, {"timeout_ms": 5000})
+    assert seen and all(hint == created for hint in seen)
+    assert len(seen) == 2  # the read until final, and the read again
+
+
 @pytest.fixture(name="driver")
 def driver_fixture() -> Any:
     driver = ProviderDriver(LocalProvider(), run="run-1")

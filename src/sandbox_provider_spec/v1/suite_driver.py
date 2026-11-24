@@ -137,6 +137,7 @@ class SandboxHandle:
     """What a sandbox resource keeps in memory."""
 
     id: str
+    created_at: datetime | None = None
 
 
 @dataclass
@@ -339,7 +340,7 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
         key = self._key(inputs)
         with self._sending(key):
             created = self.wait(self.api.create(request, idempotency_key=key))
-        handle = SandboxHandle(created.id)
+        handle = SandboxHandle(created.id, created.created_at)
         owned = self.own("sandbox", handle, lambda: self._destroy(handle.id))
         return {"resource": owned, "identity": created.id}
 
@@ -479,7 +480,12 @@ class ProviderDriver(Driver, AccountSteps, ImageSteps, ProcessSteps):  # pylint:
 
     def cost_final(self, target: object, inputs: Inputs) -> Observation:
         """Read a destroyed sandbox's cost until it is final, within `cost_final_within_seconds`."""
-        return cost_checks.final(self, self._sandbox(target), inputs)
+        # The sandbox's own creation time goes with the read as the `created_at` hint, as Cloud's
+        # cost pass gives it for a sandbox that has ended: a provider that drops the record soon
+        # after a destroy reads a missing one under the hint as ended, not as unknown.
+        native = resource(target).native
+        created_at = native.created_at if isinstance(native, SandboxHandle) else None
+        return cost_checks.final(self, self._sandbox(target), inputs, created_at)
 
     # Commands and files
 
