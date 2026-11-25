@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.147 — 2026-11-25
+
+- The tester proves a provider's size list. `facts.sizes` was `not_run` (`driver_unimplemented`) for every 1.0 provider, so a provider whose documentation names no size range (Beam) could not declare `resources.sizes`. The 1.0 driver now implements `allocation.observe` by measuring the guest with the probe of `coverage.facts.sizes.delivered` and returns the CPU and memory it sees under the request's own keys; the row passes only when they equal the size asked, so a virtual machine whose kernel keeps some memory does not prove a size, and a provider's own record of a size (which can repeat the request) proves nothing. One report proves one size, and the evidence check already asks a proof for every entry of a declared list, so a list cites one `facts.sizes` run per size. The step is a driver subclass of its own (`v1/suite_driver_allocation.py`), as `create.stated_facts` is, and `allocation.observe` is a shared operation, so no row's check digest moves (measured on the shared suite); the snapshot resize rows, which use the same step, now run for a 1.0 provider that declares `resizes_on_restore` and a size fixture.
+
 ## 0.5.146 — 2026-11-25
 
 - Beam's declaration is re-verified on spec 0.5.145 (it was 0.5.84): every report it cites is rerun live from a clean tree.
