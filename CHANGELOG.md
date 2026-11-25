@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.144 — 2026-11-25
+
+- Maritime's brand mark is a one-colour SVG (`brand/mark.svg`, traced from Maritime's own black sail; `mark.png` is removed), so the benchmarks pages draw the sail instead of Maritime's initial tile. The logo is the same file. No declaration or catalog change.
+
 ## 0.5.143 — 2026-11-25
 
 - Sail's declaration is re-verified on spec 0.5.142 (it was 0.5.84): every report it cites is rerun live from a clean tree (baseline, select, user-selection, pause-resume, snapshots, previews, network-lockdown, custom-images, coverage, core and core with two instances), `verified.date` is 2026-11-25, and `size_is_ceiling: true` is stated from `coverage.facts.size_is_ceiling.true`.
