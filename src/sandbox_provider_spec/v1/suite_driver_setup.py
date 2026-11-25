@@ -28,6 +28,7 @@ from sandbox_provider_spec.driver import (
     NativeFailure,
     NotRun,
     Observation,
+    Unsupported,
     rate_limit_pause,
 )
 from sandbox_provider_spec.v1 import suite_driver_cleanup
@@ -54,6 +55,8 @@ class SetupRetryDriver(ProviderDriver):
     sleep: Callable[[float], None] = staticmethod(time.sleep)
     clock: Callable[[], float] = staticmethod(time.monotonic)
     _pinned_key: str | None = None
+    #: Why discovery does not claim `image.prepare`, or None when it does (set by the tester).
+    prepare_unclaimed: str | None = None
 
     def _key(self, inputs: Inputs) -> str:
         """The key of the create being retried, so every ask of it is the same request."""
@@ -78,6 +81,15 @@ class SetupRetryDriver(ProviderDriver):
                     self.sleep(pause)
         finally:
             self._pinned_key = pinned
+
+    def image_prepare(self, target: object, inputs: Inputs) -> Observation:
+        """The prepare of a `provider_artifact` borrows an image that the account already has and
+        calls no provider operation, so it runs where discovery does not claim `image.prepare`:
+        a class that creates from its own artifacts but prepares no image runs
+        `custom_images.provider_artifact`. Every other source is unsupported there."""
+        if self.prepare_unclaimed is not None and inputs.get("source") != "provider_artifact":
+            raise Unsupported(self.prepare_unclaimed)
+        return super().image_prepare(target, inputs)
 
     def _delete_snapshot(self, snapshot_id: str) -> Observation:
         """A snapshot delete that the provider answers `unavailable` is asked again (cloud#10080).

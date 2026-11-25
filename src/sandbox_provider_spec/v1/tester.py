@@ -137,6 +137,11 @@ OPERATION_CLAIMS = {
 # not marked unsupported; the driver falls back to the command.
 COMMAND_FALLBACK = frozenset({"files.exists"})
 
+# Not marked unsupported where discovery does not claim it, because one of its forms calls no
+# provider operation: the prepare of a `provider_artifact` borrows an image that the account
+# already has. The tester's driver refuses every other source (`SetupRetryDriver.image_prepare`).
+BORROWED_PREPARE = "image.prepare"
+
 # The tests of a section whose ids do not start with the section's name: `user_selection` is
 # proved by the three operation tests that select a user, so its summary line counts them.
 SECTION_TESTS = {
@@ -835,9 +840,14 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
             missing = unsupported_operations(discovery)
             driver.unsupported = {
                 **driver.unsupported,
-                **{name: why for name, why in missing.items() if name not in COMMAND_FALLBACK},
+                **{
+                    name: why
+                    for name, why in missing.items()
+                    if name not in COMMAND_FALLBACK and name != BORROWED_PREPARE
+                },
             }
             driver.command_fallback = set(COMMAND_FALLBACK) & set(missing)
+            driver.prepare_unclaimed = missing.get(BORROWED_PREPARE)
             driver.oci_layout = OCI_LAYOUT in claimed_operations(discovery)
             driver.not_claimed = not_claimed_tests(discovery)
             kept = labels_kept(discovery)

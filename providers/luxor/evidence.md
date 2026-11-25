@@ -62,9 +62,10 @@ read `differs` here; they prove nothing about a router-enforced one. `extendable
 - Not offered by the adapter, and why:
   - `terminal`: `RunStart.pty` exists, but nothing documents it and a resize has no message. Planned as stage 1c.
   - `volumes`: SPS 1.0 has no volume operation, and no provider declares one.
-  - `custom_images`: the tester borrows a provider artifact through `image.prepare`, which needs four image
-    operations Luxor cannot back (a template builds from a base image, a parent template or a snapshot, never from an
-    OCI image or a Dockerfile). A create from a registry image works.
+  - `custom_images`: Luxor cannot back the four image operations (a template builds from a base image, a parent
+    template or a snapshot, never from an OCI image or a Dockerfile). The tester's `custom_images.provider_artifact`
+    row no longer needs them: it borrows the artifact without calling the provider, so the adapter can claim
+    `source: provider_artifact` once a run proves it. A create from a registry image works.
   - `labels.update`: Luxor's session tags and metadata are fixed at create.
   - `hidden_secrets`: see above.
   - `user_selection`, `file_stream_max_bytes` (the 1 GiB rows need a rerun from the AWS test server on a clean tree).

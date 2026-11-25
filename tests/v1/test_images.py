@@ -832,3 +832,56 @@ def test_the_dockerfile_test_runs_only_for_a_class_that_claims_a_dockerfile_sour
         assert "images.v1.prepare_dockerfile_context" not in chosen
         both = {t.id for t in select_tests(suite, discovery(["oci", "dockerfile"]), options).tests}
         assert "images.v1.prepare_dockerfile_context" in both
+
+
+ARTIFACT_GATES = {"custom_images": {"source": ["provider_artifact"]}}
+
+
+class ArtifactProvider(ImageProvider, manifest=False):
+    """Creates sandboxes from images the account already has, and prepares none: its class claims
+    `custom_images` with `source: provider_artifact` and lists no image operation."""
+
+    async def discovery(self) -> Discovery:
+        return with_gates(ARTIFACT_GATES)
+
+
+def test_the_provider_artifact_test_needs_no_image_operation() -> None:
+    """The test borrows an artifact that the account already has, without calling the provider,
+    so a class that can create from its own artifacts but prepares no image passes it."""
+    ImageProvider.reset()
+    ImageProvider.images["golden"] = dataclasses.replace(
+        example(PreparedImage), id="golden", state="ready", error=None
+    )
+    ImageProvider.files["golden"] = {"/etc/os-release": b'NAME="Golden"\n'}
+    fixtures = {"provider_artifact_image": "golden", "image_marker": "Golden"}
+    try:
+        report = run_tests(
+            ArtifactProvider(),
+            TestOptions(tests=("custom_images.provider_artifact",), fixtures=fixtures),
+        )
+        assert outcome(report) == {"custom_images.provider_artifact": "passed"}, report["tests"]
+        assert ImageProvider.seen == []
+        assert ImageProvider.create_images == [
+            {"provider_artifact": "golden", "provider": "example"}
+        ]
+        assert ImageProvider.deleted == set()
+        chosen = select_tests(
+            shared_suite(), with_gates(ARTIFACT_GATES), TestOptions(fixtures=fixtures)
+        ).tests
+        assert "custom_images.provider_artifact" in {test.id for test in chosen}
+    finally:
+        ImageProvider.reset()
+
+
+def test_a_class_without_the_image_operations_still_prepares_no_other_source() -> None:
+    ImageProvider.reset()
+    try:
+        report = run_tests(ArtifactProvider(), TestOptions(tests=("images.v1.prepare_oci",)))
+        (row,) = report["tests"]
+        assert (row["result"], row["reason"]) == (
+            "unsupported",
+            "discovery does not claim the section that needs this operation",
+        )
+        assert ImageProvider.seen == []
+    finally:
+        ImageProvider.reset()
