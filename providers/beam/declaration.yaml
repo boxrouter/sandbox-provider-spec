@@ -3,7 +3,7 @@ provider: beam
 # Every value is `unknown`, absent or backed by a committed tester report (evidence.md says what each
 # rests on and what is left out).
 verified:
-  date: 2026-11-23
+  date: 2026-11-25
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
   sdks: {"sandbox-provider-spec": "0.5.84"}
 resources:
@@ -28,6 +28,13 @@ lifetime_timer:
   counts_paused_time: unknown
   at_end: [destroyed]
 gates:
+  # Prepared images: Beam builds a public OCI image ahead of creation (`image.prepare`) and a sandbox
+  # starts from it (`provider_artifact`); the image's labels are kept by the package. `image_config`,
+  # `image_defaults` and Dockerfile sources are not declared (the tester's rows for them were not run).
+  custom_images:
+  - source: provider_artifact
+  - source: oci
+    prepared: true
   # A process is read again by its id from a cursor (`process_output`). No `input` and no `cancel`
   # (Beam's exec takes no stdin here; nothing cancels a process): left out, not declared false.
   processes:
@@ -116,6 +123,18 @@ evidence:
     tests:
     - lifetime_timer.at_end.destroyed
     report: reports/tester-select-20261123.json
+  gates.custom_images.0.source:
+    tests:
+    - custom_images.provider_artifact
+    report: reports/tester-default-custom-images.json
+  gates.custom_images.1.source:
+    tests:
+    - custom_images.oci
+    report: reports/tester-default-custom-images.json
+  gates.custom_images.1.prepared:
+    tests:
+    - coverage.custom_images.prepare.registry
+    report: reports/tester-default-custom-images.json
   gates.processes.0.reattach:
     tests:
     - processes.reattach.true

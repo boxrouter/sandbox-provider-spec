@@ -7,6 +7,13 @@ spec tester 0.5.84: `tester-default-baseline.json` (`--test baseline.`, clean, 1
 `tester-default-core.json` and `tester-default-coverage.json` (whole selections), and
 `tester-select-20261123.json` (five tests the long suites do not hold as selections).
 
+`tester-default-custom-images.json` is a later run (2026-11-25, package 0.1.8, discovery digest
+`sha256:5d0d8796...`, spec tester 0.5.84, the version the declaration verifies, from an AWS test server, run id
+`t20-beam-img-20261125T0011Z`):
+`--test images.v1. --test custom_images. --test coverage.custom_images.` with `oci_image` a public
+Debian-based Python image pinned by digest, `image_marker=Debian` and `provider_artifact_image` the id of
+an image prepared by the package in the same account (deleted afterwards).
+
 ## What the reports cover
 
 - `processes.reattach: true`: `processes.reattach.true` (core).
@@ -17,6 +24,12 @@ spec tester 0.5.84: `tester-default-baseline.json` (`--test baseline.`, clean, 1
   at least 32, switchable and changeable. Run with the receiver fixtures of the earlier fixture
   deployment (`allowed_ip_url` replaced by a literal-IP connectivity check); those fixtures are not
   durable, so a rerun needs them again. No denylist.
+- `custom_images`: `provider_artifact` and `oci` with `prepared: true` (`custom_images.provider_artifact`,
+  `custom_images.oci`, `coverage.custom_images.prepare.registry`; the image tests `images.v1.prepare_oci`,
+  `images.v1.idempotent_prepare`, `images.v1.get_and_list` and `coverage.custom_images.prepare.idempotent`
+  and `.delete` pass too). `image_config`, `image_defaults` and Dockerfile sources are not declared, and
+  `coverage.custom_images.prepare.size` and `prepared_size_without_request` did not run (no `larger_size`
+  fixture).
 - `extendable_lifetime: true`, `default_user: root`, `default_cwd: /workspace`, `lifetime_timer`
   (provider-enforced, ends `destroyed`), `root: [by_default]`, `arch: [amd64]`, `libc: glibc`,
   `package_manager: apt`, `disk_in_memory: false`, `on_memory_exhausted: process_killed`.
@@ -30,8 +43,6 @@ spec tester 0.5.84: `tester-default-baseline.json` (`--test baseline.`, clean, 1
 - The 1 GiB file rows (`files.stream.v1.write.1gib`, `read.1gib`, and `contract.files_1gib_roundtrip`,
   `not_run` in the core report): they need an AWS test server this devbox lacks; the reports were run with
   `file_stream_large=false`. No `file_stream_max_bytes` is declared.
-- `custom_images`: not offered (Beam runs every sandbox as root in `/workspace`, so BoxRouter's standard image
-  cannot run).
 - `terminal`, `pause_resume`, `snapshots`, `idle_shutdown`, `user_selection`, `tcp_ports`: not offered; Beam has no PTY RPC
   in its client, no pause, and no snapshot delete. `processes.input` and `processes.cancel` are not claimed.
 - Coverage rows that did not pass (`differs`: arm64, sudo, other package managers, musl, memory exhaustion that
