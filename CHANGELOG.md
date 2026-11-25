@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.140 — 2026-11-25
+
+- Sail's declaration states its four sizes (1, 2, 4 and 8 vCPUs with 16, 16, 32 and 64 GiB of memory and 32, 32, 64 and 128 GiB of state disk) and a `default_size` of 1 vCPU, 16 GiB of memory and 32 GiB of disk, each with a quote of Sail's documented limits. They were `unknown`, so a credit check that asks for no size could not quote a hold. The default size's one-hour hold quote is bounded at 0.1754 USD, and each of the four sizes quotes bounded. The tester's `coverage.facts.size_is_ceiling.true` passed at each size; `coverage.facts.sizes.delivered` passes at 16 GiB and differs above it, because the guest starts with 16 GiB visible and grows toward the limit as the workload uses memory (the declaration comment records the measurement).
+
 ## 0.5.139 — 2026-11-25
 
 - Beam's declaration states `custom_images` (`provider_artifact` and a prepared `oci` source), proven by a live tester run of package 0.1.8 (`providers/beam/reports/tester-default-custom-images.json`).
