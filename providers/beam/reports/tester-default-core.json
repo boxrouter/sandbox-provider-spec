@@ -1,66 +1,73 @@
 {
   "baseline": "passed",
   "check_digests": {
-    "baseline.create_env": "sha256:25afb59a5f1ca7576231eb80b56ba8c1aed6598a8a702e197fe6a56d635cf5fe",
-    "baseline.destroy": "sha256:bf7709266fa96cd2d3265cd68e7ca5ea06c2b1357ca284d8c1b11896bc6f9784",
-    "baseline.environment_bash": "sha256:daaeec7bb375f73b44c624c96258dc7130ca32fcf889b05a0e6bef8f2f12d081",
-    "baseline.environment_python3": "sha256:58f6b9dcee034d50d165c8acc993b88fe1b76691cfa50e14d6a825ead88fef91",
-    "baseline.files_read": "sha256:5909fb7cbc1a1da958230d535f918345d91992f6194e959441070e4b8bc39434",
-    "baseline.files_write": "sha256:e44be6cf160f50405eac8ca37d5d22f369961449b58c6187c1f143a05154d9e3",
-    "baseline.files_write_binary": "sha256:fa44836e271b9c5cc67b6c09c84a7dc8ca605bed1f99b98dd4a05cc3df4433ee",
-    "baseline.get": "sha256:481f6ecee4814b9812fdf5fa20137e80cf6de08feb49d3f39c5cb1953b0ca7bf",
-    "baseline.list": "sha256:207377f8c79c0f0f9bb6e484c160882578f866e3af512a2a602b52cec99a2e02",
-    "baseline.no_metadata": "sha256:ae44611377f0ffea55bb99d7f81b1d101165d89103e4351c56cdaabaaa147a86",
-    "baseline.outbound_network": "sha256:43dd04dbcfcfcf8e32d31b59dd55b6033225676bb55d7206912e34466f16e468",
-    "baseline.process_eof_is_not_exit": "sha256:d5ed6f0c6e2d2bdfa07dc4450f320307e7d672ae16893a28241376bd6cca2b59",
-    "baseline.process_stream": "sha256:e94879baf928d5ead809b0bc4e9388aaa9aa2b4aca49f59d5467c9873dfa3059",
-    "baseline.run_cwd": "sha256:52183596ed9fb7b9e63f6fadee562659a5392dc46f69860f7f91a389f0add645",
-    "baseline.run_env": "sha256:db9acfe71ba9fad2bd14145841363b7a0e35e5549d0389acec508a7ed8e22d43",
-    "baseline.run_exit_code": "sha256:9a3a015d95eea4bf61fda86c1ad86c8be44d234957385e320ed360670d154212",
-    "baseline.run_output": "sha256:d1c17a60d6d13a71edfefde7a2c78272948e30baa13cbe1d2cc3b7ca9d3e7bf9",
-    "baseline.run_separate_streams": "sha256:05b749058f5d5fc0c4bf091dbb7be018a2a82b9aa856db8a156ed35759bce995",
-    "contract.destroy_repeat": "sha256:b82ace4ba83e7fa829df2eb76bdd1b8579be99c005a88e0527fe7668743bc44b",
-    "contract.discovery_valid": "sha256:956ab6f1a59b06d2173b845be1236cfe79799beac27a46f5339252af45151ce4",
-    "contract.discovery_within_static": "sha256:58295c8f4a1af03301f8551f431d9d0eb485047e59151cebe58709d025416b11",
-    "contract.files_1gib_roundtrip": "sha256:af0e566fb1c275671976e4e4169458559feddacea5aa99cf5d1cb7cc840da3e8",
-    "contract.files_write_missing_parent": "sha256:7a3206e2400ae15acb3c0c790f73ce3bdf4500729c148c41d93e1dec5efbad9e",
-    "contract.idempotent_create_other_body": "sha256:f28c55b546aaaa6f5f3697ee15793f7a3fcbacf8673d8af69fffb739d6a03c16",
-    "contract.idempotent_create_same_body": "sha256:c29746aa9b9db47ce6fa8c0d952d1be5789f7fbe51ffe743ec4d865f4d80bdcc",
-    "contract.lifetime_ends": "sha256:e65c72f18ace0b3f90b1e8e56124144a81b129ac7832e7217c0a6bb0bff7eb64",
-    "contract.list_label_filter": "sha256:a595af4509470ae417123ff1a50dd3c68853d8c8ac601aeabd4db17b5ba7c053",
-    "contract.not_found_codes": "sha256:a6f77782f784f051e6b6ed557249ea3fcd57fc28bba05b05aec347714536abcc",
-    "contract.run_timeout_ends_command": "sha256:af6fe7c67a155b9163ea4ddcc72c3bc146e442c2880d39bce23c9721ff6eccb6",
-    "contract.stored_artifacts": "sha256:d997cf357b817a00a7bf20564c2f5696064419923aa3afcc5bb259ea5519d6e2",
-    "contract.unsupported_unclaimed": "sha256:6683c963f1e50796b8fa9b47019f442b259d5573a8d2f5e2aa7331c845f10621",
-    "directories.exists": "sha256:7a20ffbb938cfa423dd21b7b39e275830111fd8e845432679e6bb2c7c7bb05c0",
-    "directories.list": "sha256:b0831cd0fc0c6b9201b2170537fc1e1165b4952398b1eb1f67fc95cc640d8773",
-    "directories.list_errors": "sha256:240fbfb4868aaae43166831e2e0d2ad770933a435e835c656ea984f011cc976a",
-    "directories.list_paging": "sha256:e5529e32ecc0cfd82f668785c96d60acd6f2a48f5bf82ac5b364018099992e4c",
-    "directories.mkdir": "sha256:0086f438a66d33a166c54fecef5c4c4262f15f4a00cd1dbe9b900574dbfef8b5",
-    "directories.remove": "sha256:91b92c2b8c4bd240b05f8a22a4cfd6f1371aa6480c8226e3f365a69ce3f334ea",
-    "network_lockdown.after_resume": "sha256:31a7d80bff8e2456deefed74c266d91645a57c023de3a57ee1f449294d324ee3",
-    "network_lockdown.allowlist.addresses": "sha256:3769f7bee7eb76fb832604c14d6e6c073d89e51f5c41d3b099add6b08ed6b13d",
-    "network_lockdown.allowlist.names": "sha256:7b01007e40457485346da5850b8fd7eb5264e2cad0372f064db0e7f39d05a8e2",
-    "network_lockdown.deny_all": "sha256:522d3f3fb734544708a0deb0e7474e30219e689aa524805f1f6d127d36a5167f",
-    "network_lockdown.max_allow": "sha256:94a2b29fd93ddf0f2a4bf20ee4f5cef13d763ef2441210b18214107f5bc36754",
-    "network_lockdown.root_cannot_lift": "sha256:f3d0cb472334aac2623e9e63d61fa95252484403ddb9ee7d0fa8c558e8d86e5d",
-    "network_lockdown.wildcards": "sha256:b4a5f788723e655039c056c8ad813937d72081cddb6d33ef74288992874d4207",
-    "previews.access.public": "sha256:f091f913ebbd4c0dd97862c63f47baf4f83a9de2e504109dc7730a015ae84a1b",
-    "previews.listed_ports": "sha256:3e6d03670fdd9d85fdecad8dbbdac2397e73cc57b70986320a64b715b71c3da9",
-    "previews.revocable.false.public": "sha256:39f74b1f1331594e93548688bca2903c31152d2b702d85a9e6c31b80bc3d33ce",
-    "processes.reattach.true": "sha256:7a2074d73ce9cb49070a2e6ba9317bd51ac9655b5ab484eab1a13ee9ddb5f483"
+    "baseline.create_env": "sha256:c8dfaf454e832c9a96a7a5d2a2d321811f6891809f28aa60fb6d23e30f409760",
+    "baseline.destroy": "sha256:2bde2661cd30ad7007fcfdc2acae11678e05b0d1b18d59de6e2fa3eda5e705d0",
+    "baseline.environment_bash": "sha256:23325deebeb57429d090497d7b6b3b5f05d3920e3574c5a58e27c029a160c3d7",
+    "baseline.environment_python3": "sha256:f085d194f9aaac134a3f9a96c4db9c6d87df06feba5afb3e75e9e05d11cef50e",
+    "baseline.files_read": "sha256:3dc6fbfdfce8d1bedbe11dfa1315c9b74e229a13439ba4ee308055e02b32ce12",
+    "baseline.files_write": "sha256:567a31dfdedc407c1f1a9d21245b6ad81d6c31f8ed63bd714754fc754cd9e79f",
+    "baseline.files_write_binary": "sha256:22f97dca3a78c4e0a6324d87b57d5b546162925a789547e6ec3bdaa167219c55",
+    "baseline.get": "sha256:1aa892339b9bde8f0fe5b94156c3bb04037ce1b85722f9bf4b4f31a425514ce1",
+    "baseline.list": "sha256:c658af6226a3c4b49323f1701b96bf2c987bd04ac7e20d95680f39cfe1b3b11e",
+    "baseline.no_metadata": "sha256:5f5c6affadd4e991d047e356deb9f8f16e03a1d07d7b75f491db166f4f104333",
+    "baseline.outbound_network": "sha256:7e1153f797c363733487833feb8ad559663c6f25311b663d89827d8db013738c",
+    "baseline.process_eof_is_not_exit": "sha256:c0add3c1666223b86d492d5f5d8b4d541ba8cf5768cc932ab4d2f3c0316681c6",
+    "baseline.process_stream": "sha256:63d9df42e047dc422e3297c6d4ce0bc25e80af0f16d1c26149a473e41bce46b6",
+    "baseline.run_cwd": "sha256:ed26226772fdda53ca75b54ca43afc6c4f7b6893add2f2017d1da7c66f07e17c",
+    "baseline.run_env": "sha256:22ba1c66d33ed56176170d7515ab7c685706e50e55381e6d3538ede1e57058ea",
+    "baseline.run_exit_code": "sha256:40e4e87e6ecfc3a268c1bde72e8d750d5eee7186e8f85f944e2b96bde64c7152",
+    "baseline.run_output": "sha256:8d67d382c7f149a4f8f9d24a4ffd788a700727fa46073138a87ad9c7b2dbc7a5",
+    "baseline.run_separate_streams": "sha256:bfcf4ae087600bc47a13c17e0acc078710a71679af0f4ceb5219721898ddf9c6",
+    "contract.create_meets_stated_facts": "sha256:ce7014fd3689967d733deff111cde84d23b42f56c4a24b6279f1bd481ff2f565",
+    "contract.destroy_repeat": "sha256:ac70ec6bada90844879d445d5e9bae0f8eca3187c5c852de54d71b7a23299aed",
+    "contract.discovery_valid": "sha256:83a4f20ac40c5c0ea50e4c950f0f2d1bad5bf44bb3700e26d445565cf91e7698",
+    "contract.discovery_within_static": "sha256:4bc6f2d80ef9cc76f8d14697918fa2a71b7f248e61ac91d38795137caa46ea0a",
+    "contract.files_1gib_roundtrip": "sha256:921182157223c3c1db2cefd75e6b916af15aaa2504e0d3979a6961df1724d36c",
+    "contract.files_write_missing_parent": "sha256:a108cdcdf1b29ad96267013d67d34989445fc72660fe2afc46470fd40cede3da",
+    "contract.idempotent_create_other_body": "sha256:21f1aa1d65a7a146b4c388cfedecde1c84cfa729b1952d1095497d7bd72f575e",
+    "contract.idempotent_create_same_body": "sha256:15860a0987729eea992af05d87175ef99deb83da7192556ce8e7daf11d5c1f97",
+    "contract.lifetime_ends": "sha256:1d140a3981e31ab3a8355b1081fe209883b25c24c507ba3c007d05009e9e8c99",
+    "contract.list_label_filter": "sha256:73131956a62313b614b7c675640381990d7a2e9f9667bc3c926cb7b8d3ca4850",
+    "contract.not_found_codes": "sha256:cd9278bb5e467e0d83b40244dd448bd4ac64c8566fffb6c1bb88eea807be7680",
+    "contract.run_timeout_ends_command": "sha256:382e6eeaf13adf7f0b4f7f0aef4c34e0e7f7bd655149a0adc65d19d03c98a83f",
+    "contract.stored_artifacts": "sha256:6da7bcff288877b65d57f7eca653fab8ab73e3d5cbe4d56f4a74a6ee95997628",
+    "contract.unsupported_unclaimed": "sha256:162848313c11ed888903d38e9b6fe0420b95eb28580dc9e400b983edaef4f0ce",
+    "custom_images.oci": "sha256:82ccf5ab5a0a187bfb0d044d9e4760f3e40b5a0b5e6d8bbf6d9213346e070cb4",
+    "custom_images.provider_artifact": "sha256:d341f47bc093c6a1b04e6bb6b3054761161085aa0162f5b00eee05e1426b76ab",
+    "directories.exists": "sha256:43425131f0390959ad9359f209e0a01b035b60c7a68a8586d0b17183811e0734",
+    "directories.list": "sha256:adbe6cec54dfa069efb1ce437095b1adb726a32e1adbbd3192f3cdcc7669073a",
+    "directories.list_errors": "sha256:fd88ba0e5bda1229c98bcfa8485f9a3e35c2e79d704864ac93052d5dd6a54fd9",
+    "directories.list_paging": "sha256:31be3851af19c807acee9ba4ec3410d4a4144024251abf49ae662c6952ae7f9e",
+    "directories.mkdir": "sha256:88e0968f61b24c90ef5a473901383e64359e98740e42eb7cb91c0dfe62f52ce2",
+    "directories.remove": "sha256:69daffff50a0a2253b76ac9b28f4456af46d3433b4ce86a56f050d870a0a17fb",
+    "images.v1.get_and_list": "sha256:7098aba9d9c9295f317696d952d432fff5ad2c95013ded2e9b4a932dce48d129",
+    "images.v1.idempotent_prepare": "sha256:60c0c48abea879f74cf6cf52da070f94cb54f60a3604e5138426ef56c759e10c",
+    "images.v1.prepare_oci": "sha256:25e2002f04b6387e80775f79561fa659645b5971038926fbffc3d062a04d3d53",
+    "network_lockdown.after_resume": "sha256:a56a418e778db6e5406ae9cfa7601edd8f904edcae0b046af4304fba684fbda7",
+    "network_lockdown.allowlist.addresses": "sha256:ac1de043ae87bc3bd3dfd9dafd1488b244c99ac5f994b711d39adaf1f096ee47",
+    "network_lockdown.allowlist.names": "sha256:a17151b64e6ac214dccd9c933c73d00349fd70e0c80aee069c08f9713023d7b2",
+    "network_lockdown.deny_all": "sha256:aa8cbd0f0bee1a45c4a50bbec4ffa3cfe8a5575a9eff7bf08680df448a2f764c",
+    "network_lockdown.max_allow": "sha256:9f5ccb6f8cd6b6912df699348924acefbda74e386fa80c3c5653c5c2009dceae",
+    "network_lockdown.root_cannot_lift": "sha256:9b4a425ee91beba36042bb88de510a77053dad3b7e610c185c2e2256bedb48d0",
+    "network_lockdown.wildcards": "sha256:977b40a686a5d97603640e927eab24ba299e80e90c29c32e28c829275794cfa3",
+    "previews.access.public": "sha256:49a54377d39071e2e1e9830627652cba728ab85bf059e996962ba67a161a8022",
+    "previews.listed_ports": "sha256:678d0dfec2962d994d8297ebc3f2890e8d7a65d5d94a3644cd734a647ea7e85d",
+    "previews.revocable.false.public": "sha256:ba447c6c8bdc32a641666a810fc94f55b55fcdaa1d0f107c77c54cf7c5afd2ba",
+    "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237"
   },
+  "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.145"
   },
-  "finished_at": "2026-11-23T15:46:40.076676+00:00",
+  "finished_at": "2026-11-25T12:18:54.757682+00:00",
   "provider": "beam",
-  "revision": "b0cfdaadffd544c3dfb8642fb4b61b6c96fd63bc",
-  "run_id": "public-c046d445901f1a9c5311",
+  "revision": "0f7d70f6cb637a83935dcac115126225fd68a894",
+  "run_id": "public-772083488d7bffe3322c",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.145"
   },
   "selected_tests": [
     "baseline.create_env",
@@ -79,6 +86,9 @@
     "baseline.environment_bash",
     "baseline.environment_python3",
     "baseline.outbound_network",
+    "images.v1.prepare_oci",
+    "images.v1.idempotent_prepare",
+    "images.v1.get_and_list",
     "network_lockdown.deny_all",
     "network_lockdown.allowlist.names",
     "network_lockdown.allowlist.addresses",
@@ -88,6 +98,8 @@
     "network_lockdown.wildcards",
     "previews.access.public",
     "previews.listed_ports",
+    "custom_images.oci",
+    "custom_images.provider_artifact",
     "previews.revocable.false.public",
     "baseline.process_eof_is_not_exit",
     "contract.discovery_valid",
@@ -95,6 +107,7 @@
     "contract.stored_artifacts",
     "contract.idempotent_create_same_body",
     "contract.idempotent_create_other_body",
+    "contract.create_meets_stated_facts",
     "contract.list_label_filter",
     "contract.not_found_codes",
     "contract.unsupported_unclaimed",
@@ -113,14 +126,14 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:44:24.385144+00:00",
+  "started_at": "2026-11-25T12:14:46.070936+00:00",
   "subject": {
-    "discovery_digest": "sha256:db100eafaa66cb28685caf18768f93fd5091f83d376645fa3cfa4c324c67ec90",
+    "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
     "package": "sps-provider-beam",
-    "package_digest": "sha256:5bb84af6f0494ca32f79a3fdb5715d9aa308ef6bedfeb05713351fbfdf818425",
-    "version": "0.1.4"
+    "package_digest": "sha256:7df63703952bdac6894421fe98a94f94051ab7ddea7e01ea3761adb199df0da9",
+    "version": "0.1.12"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -130,7 +143,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 550,
+      "duration_ms": 317,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -166,7 +179,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 390,
+      "duration_ms": 486,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -202,7 +215,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 534,
+      "duration_ms": 535,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -234,7 +247,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 470,
+      "duration_ms": 283,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -275,7 +288,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 432,
+      "duration_ms": 311,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -311,7 +324,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 496,
+      "duration_ms": 707,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -344,7 +357,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 431,
+      "duration_ms": 316,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -387,7 +400,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 418,
+      "duration_ms": 541,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -423,7 +436,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 422,
+      "duration_ms": 529,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -459,7 +472,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 525,
+      "duration_ms": 448,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -510,7 +523,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 495,
+      "duration_ms": 337,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -560,7 +573,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15483,
+      "duration_ms": 15779,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -633,7 +646,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 593,
+      "duration_ms": 482,
       "id": "processes.reattach.true",
       "proves": [
         {
@@ -695,7 +708,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 430,
+      "duration_ms": 707,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -729,7 +742,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 410,
+      "duration_ms": 298,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -763,7 +776,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 590,
+      "duration_ms": 623,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -803,9 +816,217 @@
         {
           "kind": "sandbox",
           "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "already_released"
         }
       ],
-      "duration_ms": 1065,
+      "duration_ms": 1071,
+      "id": "images.v1.prepare_oci",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-prepare",
+        "provider-api/image-create",
+        "provider-api/image-delete"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "length": 267,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "native_code": "not_found",
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "deleted"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.delete_again",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 185,
+      "id": "images.v1.idempotent_prepare",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-idempotent"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "native_code": "conflict",
+          "operation": "image.prepare",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 317,
+      "id": "images.v1.get_and_list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/image-list"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "labels": {
+              "matches": true
+            },
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "ready"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "count": {
+              "matches": true
+            }
+          },
+          "operation": "image.list",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1310,
       "id": "network_lockdown.deny_all",
       "proves": [
         {
@@ -843,7 +1064,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1674,
+      "duration_ms": 1709,
       "id": "network_lockdown.allowlist.names",
       "proves": [
         {
@@ -889,7 +1110,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 986,
+      "duration_ms": 1200,
       "id": "network_lockdown.allowlist.addresses",
       "proves": [
         {
@@ -958,7 +1179,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2782,
+      "duration_ms": 2588,
       "id": "network_lockdown.root_cannot_lift",
       "proves": [],
       "result": "passed",
@@ -1043,7 +1264,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 21415,
+      "duration_ms": 19946,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -1083,7 +1304,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1453,
+      "duration_ms": 1541,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
@@ -1129,7 +1350,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 926,
+      "duration_ms": 777,
       "id": "previews.access.public",
       "proves": [
         {
@@ -1207,7 +1428,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 939,
+      "duration_ms": 933,
       "id": "previews.listed_ports",
       "proves": [
         {
@@ -1298,6 +1519,130 @@
       "class": "default",
       "cleanup": [
         {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 502,
+      "id": "custom_images.oci",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/oci"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/workspace\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 267,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 407,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "root\n/workspace\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 267,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
           "kind": "preview",
           "result": "deleted"
         },
@@ -1310,7 +1655,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 936,
+      "duration_ms": 924,
       "id": "previews.revocable.false.public",
       "proves": [
         {
@@ -1375,7 +1720,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 705,
+      "duration_ms": 571,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -1410,7 +1755,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 26,
+      "duration_ms": 6,
       "id": "contract.discovery_valid",
       "proves": [],
       "result": "passed",
@@ -1435,7 +1780,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 3,
+      "duration_ms": 10,
       "id": "contract.discovery_within_static",
       "proves": [],
       "result": "passed",
@@ -1485,7 +1830,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 957,
+      "duration_ms": 449,
       "id": "contract.idempotent_create_same_body",
       "proves": [],
       "result": "passed",
@@ -1558,7 +1903,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 521,
+      "duration_ms": 361,
       "id": "contract.idempotent_create_other_body",
       "proves": [],
       "result": "passed",
@@ -1593,13 +1938,49 @@
         {
           "kind": "sandbox",
           "result": "deleted"
+        }
+      ],
+      "duration_ms": 309,
+      "id": "contract.create_meets_stated_facts",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "provider-api/create-meets-stated-facts"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create.stated_facts",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
         },
         {
           "kind": "sandbox",
           "result": "deleted"
         }
       ],
-      "duration_ms": 1337,
+      "duration_ms": 844,
       "id": "contract.list_label_filter",
       "proves": [],
       "result": "passed",
@@ -1687,7 +2068,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 432,
+      "duration_ms": 510,
       "id": "contract.not_found_codes",
       "proves": [],
       "result": "passed",
@@ -1720,7 +2101,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 117,
+      "duration_ms": 58,
       "id": "contract.unsupported_unclaimed",
       "proves": [],
       "result": "passed",
@@ -1757,7 +2138,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5846,
+      "duration_ms": 5535,
       "id": "contract.run_timeout_ends_command",
       "proves": [],
       "result": "passed",
@@ -1809,11 +2190,10 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 353,
+      "duration_ms": 115316,
       "id": "contract.files_1gib_roundtrip",
       "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "result": "passed",
       "rules": [
         "provider-api/files-whole-or-fail",
         "provider-api/files-limit-floor"
@@ -1825,9 +2205,34 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
           "operation": "fixture.file_stream",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "operation": {
+              "matches": true
+            },
+            "passed": {
+              "matches": true
+            },
+            "size": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.file_stream",
+          "result": "passed"
         }
       ]
     },
@@ -1843,7 +2248,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 849,
+      "duration_ms": 552,
       "id": "contract.destroy_repeat",
       "proves": [],
       "result": "passed",
@@ -1931,7 +2336,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 60400,
+      "duration_ms": 60263,
       "id": "contract.lifetime_ends",
       "proves": [],
       "result": "passed",
@@ -1971,7 +2376,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 488,
+      "duration_ms": 395,
       "id": "directories.list",
       "proves": [],
       "result": "passed",
@@ -2028,7 +2433,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 900,
+      "duration_ms": 719,
       "id": "directories.list_paging",
       "proves": [],
       "result": "passed",
@@ -2091,7 +2496,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 571,
+      "duration_ms": 414,
       "id": "directories.list_errors",
       "proves": [],
       "result": "passed",
@@ -2134,7 +2539,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 805,
+      "duration_ms": 606,
       "id": "directories.mkdir",
       "proves": [],
       "result": "passed",
@@ -2207,7 +2612,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1220,
+      "duration_ms": 869,
       "id": "directories.remove",
       "proves": [],
       "result": "passed",
@@ -2310,7 +2715,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 799,
+      "duration_ms": 588,
       "id": "directories.exists",
       "proves": [],
       "result": "passed",
@@ -2408,7 +2813,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 498,
+      "duration_ms": 367,
       "id": "contract.files_write_missing_parent",
       "proves": [],
       "result": "passed",
@@ -2441,7 +2846,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3047,
+      "duration_ms": 2917,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -2473,7 +2878,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 496,
+      "duration_ms": 363,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",

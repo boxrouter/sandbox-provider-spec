@@ -1,0 +1,151 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:631b6422c709af04815430a139ee58203a948162f543141719977ae7bd57a4c9",
+    "coverage.facts.sizes.delivered": "sha256:6aa6832029db6d1fc87bee3344566c7c33a4b454110fe8763b7af5e0d578cb06",
+    "facts.sizes": "sha256:45689a4e3e0d2ad7df6997ade9679fa2476ad5d77e56f8732259c2c16326270c"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "StatedFactsDriver",
+    "version": "0.5.145"
+  },
+  "finished_at": "2026-11-25T11:44:20.079414+00:00",
+  "provider": "beam",
+  "revision": "04dfdc461bed1f544641f1e69a4984dbdf6c1908",
+  "run_id": "public-fc092995f7e77a6405a7",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.145"
+  },
+  "selected_tests": [
+    "facts.sizes",
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.sizes.delivered"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-25T11:44:16.300063+00:00",
+  "subject": {
+    "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
+    "package": "sps-provider-beam",
+    "package_digest": "sha256:7df63703952bdac6894421fe98a94f94051ab7ddea7e01ea3761adb199df0da9",
+    "version": "0.1.12"
+  },
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 655,
+      "id": "facts.sizes",
+      "proves": [
+        {
+          "fact": "resources.sizes",
+          "value": [
+            {
+              "cpu": 1,
+              "memory_mib": 1024
+            }
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "allocation.observe",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 732,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"1073741824\"}, \"membership\": \"7:pids:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n6:memory:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n5:job:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n4:devices:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n3:cpuset:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n2:cpuacct:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n1:cpu:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 676,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            },
+            "observed_cpu": 2,
+            "observed_memory_mib": 2048
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

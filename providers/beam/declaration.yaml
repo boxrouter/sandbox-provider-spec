@@ -1,16 +1,21 @@
 spec: sandbox-provider-spec/0.1
 provider: beam
+class: default
 # Every value is `unknown`, absent or backed by a committed tester report (evidence.md says what each
 # rests on and what is left out).
 verified:
   date: 2026-11-25
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
-  sdks: {"sandbox-provider-spec": "0.5.84"}
+  sdks: {"sandbox-provider-spec": "0.5.145"}
 resources:
   compliance: [soc2, soc2_type2]
   data_retention: retained
   kernel: unknown
+  # `sizes` stays unknown: no tester row proves a list of sizes (`facts.sizes` is `driver_unimplemented`
+  # for the stated-facts driver) and Beam's documentation names no size range. Each size Cloud serves
+  # (1/1024, 2/2048, 4/4096 and 8/8192 MiB) is a ceiling: `coverage.facts.size_is_ceiling.true` passes at all four.
   sizes: unknown
+  size_is_ceiling: true
   gpus: unknown
   regions: unknown
   long_running: unknown
@@ -79,18 +84,28 @@ evidence:
     source: https://docs.beam.cloud/v2/security/privacy-policy
     read: '2026-11-23'
     quote: "Logs emitted by your workloads are Customer Data. They are retained for 30 days on the Developer and Team plans and for 1 year on the Growth plan, or as set out in your Order Form, and are governed by the Terms of Service and DPA."
+  resources.size_is_ceiling:
+    reports:
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-1.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-2.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-4.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-8.json
   resources.extendable_lifetime:
     tests:
     - facts.extendable_lifetime
-    report: reports/tester-select-20261123.json
+    report: reports/tester-default-select.json
   resources.default_user:
     tests:
     - facts.default_user
-    report: reports/tester-select-20261123.json
+    report: reports/tester-default-select.json
   resources.default_cwd:
     tests:
     - facts.default_cwd
-    report: reports/tester-select-20261123.json
+    report: reports/tester-default-select.json
   resources.root:
     tests:
     - coverage.facts.root.by_default
@@ -118,11 +133,11 @@ evidence:
   lifetime_timer.enforced_by:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/tester-select-20261123.json
+    report: reports/tester-default-select.json
   lifetime_timer.at_end:
     tests:
     - lifetime_timer.at_end.destroyed
-    report: reports/tester-select-20261123.json
+    report: reports/tester-default-select.json
   gates.custom_images.0.source:
     tests:
     - custom_images.provider_artifact

@@ -1,28 +1,29 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.custom_images.prepare.delete": "sha256:b092ad2f2aed384b26d78e13cf263f71ecee62068044e4c5ff1f7ab269257f1e",
-    "coverage.custom_images.prepare.idempotent": "sha256:831214e228c00e2e714947b1b8aca78a88580ac98bb4abb90fb2487415813775",
-    "coverage.custom_images.prepare.registry": "sha256:0318d6ca2e84860ea4417047417a1f8f191f9c307c3657884f3382596ce9446e",
-    "coverage.custom_images.prepare.size": "sha256:007b4ce79b247ee58f6f6f7032fc6de0b3c3907dee86db4068694a57c0e870cb",
-    "coverage.custom_images.prepared_size_without_request": "sha256:38d3117730f743f0feab04749d73eae1a0d71e4c54f794d697488415706999a4",
-    "custom_images.oci": "sha256:424e746dca5c0ac0e4bbaa7375bac10f6de3f89d7171bbd86625eb9cda61d2fa",
-    "custom_images.provider_artifact": "sha256:a4a48f1490a42fa7f4af02c66c85f0cf46c8153b343567697092a00e77b1e5e7",
-    "images.v1.get_and_list": "sha256:aab55a15a658ba80b9c50c05a23ca6f11782fba45c8649e5c2c17746ff3d662f",
-    "images.v1.idempotent_prepare": "sha256:ff1f632d5024cac8fb5976565aea1f5327f5e35a35cba76657e797c8f5ba1539",
-    "images.v1.prepare_oci": "sha256:0e64eaa38b355699f6b21d71da871d08350b7b7e5438b546b9139438f7f26cf7"
+    "coverage.custom_images.prepare.delete": "sha256:7f75091d7d55db1dd9088d6db1724dc154f26cb5117f3ba0ff7a50ceebb1cbd5",
+    "coverage.custom_images.prepare.idempotent": "sha256:e454290278e6ebcb937ef265233ce500c368ad4df66625e2de230c6e0731e3c5",
+    "coverage.custom_images.prepare.registry": "sha256:2fe6e057148d487dfe92f14edc5433f0d2f8bf2f4ef56b557ea76b23d3adb44a",
+    "coverage.custom_images.prepare.size": "sha256:ab6d7d46177298d60c0a12ff9508c7dd0babf6964e2481d6b3878b9f77fc7b81",
+    "coverage.custom_images.prepared_size_without_request": "sha256:f9163ef15681885df5abcd0ab10cac4e658d421bd48e3a68fd814e0a037adfcd",
+    "custom_images.oci": "sha256:82ccf5ab5a0a187bfb0d044d9e4760f3e40b5a0b5e6d8bbf6d9213346e070cb4",
+    "custom_images.provider_artifact": "sha256:d341f47bc093c6a1b04e6bb6b3054761161085aa0162f5b00eee05e1426b76ab",
+    "images.v1.get_and_list": "sha256:7098aba9d9c9295f317696d952d432fff5ad2c95013ded2e9b4a932dce48d129",
+    "images.v1.idempotent_prepare": "sha256:60c0c48abea879f74cf6cf52da070f94cb54f60a3604e5138426ef56c759e10c",
+    "images.v1.prepare_oci": "sha256:25e2002f04b6387e80775f79561fa659645b5971038926fbffc3d062a04d3d53"
   },
+  "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.145"
   },
-  "finished_at": "2026-11-25T00:12:09.261016+00:00",
+  "finished_at": "2026-11-25T11:44:12.755735+00:00",
   "provider": "beam",
-  "revision": "7ace1b6f8b638245d48d7a5b08f435500d15cf6c",
-  "run_id": "public-91cc4a9b659036ed1f80",
+  "revision": "04dfdc461bed1f544641f1e69a4984dbdf6c1908",
+  "run_id": "public-00530b764fe4304b4b68",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.145"
   },
   "selected_tests": [
     "images.v1.prepare_oci",
@@ -37,14 +38,14 @@
     "coverage.custom_images.prepare.delete"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-25T00:12:05.709505+00:00",
+  "started_at": "2026-11-25T11:44:02.443248+00:00",
   "subject": {
     "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
     "package": "sps-provider-beam",
-    "package_digest": "sha256:4d06daed1a1a24f75aca764b13ce9c7a848b09fbc556f87e9b02e0fc5964d8b4",
-    "version": "0.1.8"
+    "package_digest": "sha256:7df63703952bdac6894421fe98a94f94051ab7ddea7e01ea3761adb199df0da9",
+    "version": "0.1.12"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -58,7 +59,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 679,
+      "duration_ms": 1820,
       "id": "images.v1.prepare_oci",
       "proves": [],
       "result": "passed",
@@ -154,7 +155,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 182,
+      "duration_ms": 688,
       "id": "images.v1.idempotent_prepare",
       "proves": [],
       "result": "passed",
@@ -196,7 +197,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 237,
+      "duration_ms": 1299,
       "id": "images.v1.get_and_list",
       "proves": [],
       "result": "passed",
@@ -266,7 +267,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 734,
+      "duration_ms": 1175,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -328,7 +329,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 376,
+      "duration_ms": 780,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -390,7 +391,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 441,
+      "duration_ms": 1086,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -477,7 +478,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 141,
+      "duration_ms": 568,
       "id": "coverage.custom_images.prepare.idempotent",
       "proves": [
         {
@@ -534,7 +535,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 137,
+      "duration_ms": 611,
       "id": "coverage.custom_images.prepare.delete",
       "proves": [
         {

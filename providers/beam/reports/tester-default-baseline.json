@@ -1,36 +1,37 @@
 {
   "baseline": "passed",
   "check_digests": {
-    "baseline.create_env": "sha256:25afb59a5f1ca7576231eb80b56ba8c1aed6598a8a702e197fe6a56d635cf5fe",
-    "baseline.destroy": "sha256:bf7709266fa96cd2d3265cd68e7ca5ea06c2b1357ca284d8c1b11896bc6f9784",
-    "baseline.environment_bash": "sha256:daaeec7bb375f73b44c624c96258dc7130ca32fcf889b05a0e6bef8f2f12d081",
-    "baseline.environment_python3": "sha256:58f6b9dcee034d50d165c8acc993b88fe1b76691cfa50e14d6a825ead88fef91",
-    "baseline.files_read": "sha256:5909fb7cbc1a1da958230d535f918345d91992f6194e959441070e4b8bc39434",
-    "baseline.files_write": "sha256:e44be6cf160f50405eac8ca37d5d22f369961449b58c6187c1f143a05154d9e3",
-    "baseline.files_write_binary": "sha256:fa44836e271b9c5cc67b6c09c84a7dc8ca605bed1f99b98dd4a05cc3df4433ee",
-    "baseline.get": "sha256:481f6ecee4814b9812fdf5fa20137e80cf6de08feb49d3f39c5cb1953b0ca7bf",
-    "baseline.list": "sha256:207377f8c79c0f0f9bb6e484c160882578f866e3af512a2a602b52cec99a2e02",
-    "baseline.no_metadata": "sha256:ae44611377f0ffea55bb99d7f81b1d101165d89103e4351c56cdaabaaa147a86",
-    "baseline.outbound_network": "sha256:43dd04dbcfcfcf8e32d31b59dd55b6033225676bb55d7206912e34466f16e468",
-    "baseline.process_eof_is_not_exit": "sha256:d5ed6f0c6e2d2bdfa07dc4450f320307e7d672ae16893a28241376bd6cca2b59",
-    "baseline.process_stream": "sha256:e94879baf928d5ead809b0bc4e9388aaa9aa2b4aca49f59d5467c9873dfa3059",
-    "baseline.run_cwd": "sha256:52183596ed9fb7b9e63f6fadee562659a5392dc46f69860f7f91a389f0add645",
-    "baseline.run_env": "sha256:db9acfe71ba9fad2bd14145841363b7a0e35e5549d0389acec508a7ed8e22d43",
-    "baseline.run_exit_code": "sha256:9a3a015d95eea4bf61fda86c1ad86c8be44d234957385e320ed360670d154212",
-    "baseline.run_output": "sha256:d1c17a60d6d13a71edfefde7a2c78272948e30baa13cbe1d2cc3b7ca9d3e7bf9",
-    "baseline.run_separate_streams": "sha256:05b749058f5d5fc0c4bf091dbb7be018a2a82b9aa856db8a156ed35759bce995"
+    "baseline.create_env": "sha256:c8dfaf454e832c9a96a7a5d2a2d321811f6891809f28aa60fb6d23e30f409760",
+    "baseline.destroy": "sha256:2bde2661cd30ad7007fcfdc2acae11678e05b0d1b18d59de6e2fa3eda5e705d0",
+    "baseline.environment_bash": "sha256:23325deebeb57429d090497d7b6b3b5f05d3920e3574c5a58e27c029a160c3d7",
+    "baseline.environment_python3": "sha256:f085d194f9aaac134a3f9a96c4db9c6d87df06feba5afb3e75e9e05d11cef50e",
+    "baseline.files_read": "sha256:3dc6fbfdfce8d1bedbe11dfa1315c9b74e229a13439ba4ee308055e02b32ce12",
+    "baseline.files_write": "sha256:567a31dfdedc407c1f1a9d21245b6ad81d6c31f8ed63bd714754fc754cd9e79f",
+    "baseline.files_write_binary": "sha256:22f97dca3a78c4e0a6324d87b57d5b546162925a789547e6ec3bdaa167219c55",
+    "baseline.get": "sha256:1aa892339b9bde8f0fe5b94156c3bb04037ce1b85722f9bf4b4f31a425514ce1",
+    "baseline.list": "sha256:c658af6226a3c4b49323f1701b96bf2c987bd04ac7e20d95680f39cfe1b3b11e",
+    "baseline.no_metadata": "sha256:5f5c6affadd4e991d047e356deb9f8f16e03a1d07d7b75f491db166f4f104333",
+    "baseline.outbound_network": "sha256:7e1153f797c363733487833feb8ad559663c6f25311b663d89827d8db013738c",
+    "baseline.process_eof_is_not_exit": "sha256:c0add3c1666223b86d492d5f5d8b4d541ba8cf5768cc932ab4d2f3c0316681c6",
+    "baseline.process_stream": "sha256:63d9df42e047dc422e3297c6d4ce0bc25e80af0f16d1c26149a473e41bce46b6",
+    "baseline.run_cwd": "sha256:ed26226772fdda53ca75b54ca43afc6c4f7b6893add2f2017d1da7c66f07e17c",
+    "baseline.run_env": "sha256:22ba1c66d33ed56176170d7515ab7c685706e50e55381e6d3538ede1e57058ea",
+    "baseline.run_exit_code": "sha256:40e4e87e6ecfc3a268c1bde72e8d750d5eee7186e8f85f944e2b96bde64c7152",
+    "baseline.run_output": "sha256:8d67d382c7f149a4f8f9d24a4ffd788a700727fa46073138a87ad9c7b2dbc7a5",
+    "baseline.run_separate_streams": "sha256:bfcf4ae087600bc47a13c17e0acc078710a71679af0f4ceb5219721898ddf9c6"
   },
+  "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.145"
   },
-  "finished_at": "2026-11-23T15:32:10.465630+00:00",
+  "finished_at": "2026-11-25T11:43:58.672317+00:00",
   "provider": "beam",
-  "revision": "b0cfdaadffd544c3dfb8642fb4b61b6c96fd63bc",
-  "run_id": "public-f04cad74119c83fb8926",
+  "revision": "04dfdc461bed1f544641f1e69a4984dbdf6c1908",
+  "run_id": "public-61bf7611d12b586147c3",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.145"
   },
   "selected_tests": [
     "baseline.create_env",
@@ -53,14 +54,14 @@
     "baseline.files_write_binary"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:31:43.836925+00:00",
+  "started_at": "2026-11-25T11:43:27.228400+00:00",
   "subject": {
-    "discovery_digest": "sha256:db100eafaa66cb28685caf18768f93fd5091f83d376645fa3cfa4c324c67ec90",
+    "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
     "package": "sps-provider-beam",
-    "package_digest": "sha256:5bb84af6f0494ca32f79a3fdb5715d9aa308ef6bedfeb05713351fbfdf818425",
-    "version": "0.1.4"
+    "package_digest": "sha256:7df63703952bdac6894421fe98a94f94051ab7ddea7e01ea3761adb199df0da9",
+    "version": "0.1.12"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -70,7 +71,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 486,
+      "duration_ms": 754,
       "id": "baseline.create_env",
       "proves": [],
       "result": "passed",
@@ -106,7 +107,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 399,
+      "duration_ms": 494,
       "id": "baseline.get",
       "proves": [],
       "result": "passed",
@@ -142,7 +143,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 530,
+      "duration_ms": 955,
       "id": "baseline.list",
       "proves": [],
       "result": "passed",
@@ -174,7 +175,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 396,
+      "duration_ms": 523,
       "id": "baseline.destroy",
       "proves": [],
       "result": "passed",
@@ -215,7 +216,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 423,
+      "duration_ms": 525,
       "id": "baseline.run_output",
       "proves": [],
       "result": "passed",
@@ -251,7 +252,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 436,
+      "duration_ms": 497,
       "id": "baseline.run_exit_code",
       "proves": [],
       "result": "passed",
@@ -284,7 +285,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 412,
+      "duration_ms": 542,
       "id": "baseline.run_separate_streams",
       "proves": [],
       "result": "passed",
@@ -327,7 +328,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 421,
+      "duration_ms": 533,
       "id": "baseline.run_cwd",
       "proves": [],
       "result": "passed",
@@ -363,7 +364,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 444,
+      "duration_ms": 522,
       "id": "baseline.run_env",
       "proves": [],
       "result": "passed",
@@ -399,7 +400,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 546,
+      "duration_ms": 783,
       "id": "baseline.files_write",
       "proves": [],
       "result": "passed",
@@ -450,7 +451,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 495,
+      "duration_ms": 652,
       "id": "baseline.files_read",
       "proves": [],
       "result": "passed",
@@ -500,7 +501,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 15508,
+      "duration_ms": 15641,
       "id": "baseline.process_stream",
       "proves": [],
       "result": "passed",
@@ -565,7 +566,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 423,
+      "duration_ms": 509,
       "id": "baseline.environment_bash",
       "proves": [],
       "result": "passed",
@@ -599,7 +600,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 417,
+      "duration_ms": 506,
       "id": "baseline.environment_python3",
       "proves": [],
       "result": "passed",
@@ -633,7 +634,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 597,
+      "duration_ms": 700,
       "id": "baseline.outbound_network",
       "proves": [],
       "result": "passed",
@@ -679,7 +680,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 705,
+      "duration_ms": 1228,
       "id": "baseline.process_eof_is_not_exit",
       "proves": [],
       "result": "passed",
@@ -719,7 +720,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2997,
+      "duration_ms": 3557,
       "id": "baseline.no_metadata",
       "proves": [],
       "result": "passed",
@@ -751,7 +752,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 501,
+      "duration_ms": 795,
       "id": "baseline.files_write_binary",
       "proves": [],
       "result": "passed",
