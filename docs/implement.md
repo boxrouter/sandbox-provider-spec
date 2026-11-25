@@ -1,7 +1,7 @@
-# Implement SPS 1.0
+# Implement SPS
 
 The Sandbox Provider Spec (SPS) is an open standard interface for sandboxes. A provider that
-implements SPS 1.0 works with any consumer that speaks it: an SDK, an agent framework, an
+implements SPS works with any consumer that speaks it: an SDK, an agent framework, an
 evaluation harness, or a router. This page is everything you need to implement it. The
 [OpenAPI file](../spec/provider-api-1.0.openapi.yaml) defines every request and result, and the
 [rules page](../spec/provider-api.md) holds the rules that span several operations.
@@ -23,7 +23,7 @@ adapter and move to a native API later.
 
 ## Required Operations
 
-Every provider implements these ten operations and an eleventh, `cost` (see [Cost](#cost)), which a provider that states `spec_version` 1.1 or later must offer. Paths are relative to your base URL.
+Every provider implements these eleven operations. Paths are relative to your base URL.
 
 | Operation | HTTP | What it does |
 | --- | --- | --- |
@@ -37,6 +37,7 @@ Every provider implements these ten operations and an eleventh, `cost` (see [Cos
 | `files.write` | `PUT /v1/sandboxes/{sandbox_id}/files?path=` | Writes a file from a byte stream of at least 1 GiB |
 | `process.start` | `POST /v1/sandboxes/{sandbox_id}/processes` | Starts a background process |
 | `process.output` | `GET /v1/sandboxes/{sandbox_id}/processes/{process_id}/output` | Reads a process's output and exit status |
+| `cost` | `GET /v1/sandboxes/{sandbox_id}/cost` | Says what a sandbox cost, from your own records (see [Cost](#cost)) |
 
 Inside a sandbox, commands and the file operations see the same filesystem. A sandbox created
 without an image has `bash` and `python3` on its path, outbound HTTPS works, and sandbox code
@@ -127,7 +128,7 @@ price, so list a free item with `"price_usd": "0"` and `"included": true`.
 
 ## Cost
 
-State `limits.cost_final_within_seconds` in discovery to offer `GET /v1/sandboxes/{sandbox_id}/cost`. From 1.1 `cost` is required: a router that bills from your figures cannot bill, or let a customer pay with credits for, a sandbox that has no cost, so a discovery that states `spec_version` 1.1 or later without the limit is invalid and fails the tester. A 1.0 provider may leave it out, and `cost` then answers `unsupported`. The least you need is your own record of what each sandbox used: a `usage` cost (item 5) states those quantities and no prices. When you offer it:
+`cost` is required: a router that bills from your figures cannot bill, or let a customer pay with credits for, a sandbox that has no cost. State `limits.cost_final_within_seconds` in discovery and answer `GET /v1/sandboxes/{sandbox_id}/cost`; a discovery without the limit is invalid and fails the tester. The least you need is your own record of what each sandbox used: a `usage` cost (item 5) states those quantities and no prices. Then:
 
 1. Answer in every state, also after the sandbox ends (`get` reports `destroyed`, or it is gone), and keep the cost readable at least until it is `final`. If your usage records go with the sandbox, list `cost.capture` instead (below). Take quantities from your own records, never from a clock in the consumer or an adapter.
 2. Each line has an `item` and an `amount_usd`, and a `quantity` and `unit` when `source` is `calculated` (what the amount was priced from: `"240"` and `"vcpu_second"`, or `"1"` and `"each"` for a flat fee) or `usage` (what the line reports, with `amount_usd` null). `total_usd` is the sum of the lines, and null for `usage`. A line with `start` and `end` both null covers no period, as a fee does; `start` set and `end` null is open, and only while `accruing`. A line's `start` and `end` may be a billing period, such as an hour, that contains the usage.
@@ -185,7 +186,7 @@ The tester and a reference server ship in the `sandbox-provider-spec` package. T
 template are in the [GitHub repository](https://github.com/boxrouter/sandbox-provider-spec); the
 commands below run the package straight from it, so there is nothing else to install. Add `@` and
 a release tag after the URL (`git+https://github.com/boxrouter/sandbox-provider-spec@<tag>`) to pin a release.
-The contract that you implement is SPS 1.0; the package's own version numbers the tools, not the contract.
+The package's own version numbers the tools, not the contract that you implement.
 
 **Adapter.** The template is a complete adapter for Example Cloud, a small fake provider API that
 runs each sandbox as a local Docker container. Example Cloud is deliberately not shaped like SPS,
@@ -285,8 +286,7 @@ The tester runs the baseline and contract tests, then the tests of every optiona
 your discovery claims, and deletes every sandbox that it created. It prints one line per test, then
 one per required operation, one for `cost` and one per claimed section, such as
 `operation create passed`; a status is `passed`, `differs`, `unsupported`, `not_run`, or `error`.
-When discovery states no `cost_final_within_seconds`, `cost` is `differs` for a 1.1 provider and
-`unsupported` for a 1.0 one. It writes a JSON report (`sps-report.json`) and exits 0 only when
+When discovery states no `cost_final_within_seconds`, `cost` is `differs`. It writes a JSON report (`sps-report.json`) and exits 0 only when
 every test that it ran passed, `cost` included.
 A full run also waits for a final cost, up to your `cost_final_within_seconds` after it destroys a
 sandbox, and for a sandbox to end at the lifetime that it asked for (60 seconds, plus up to 30). `--quick`
@@ -359,7 +359,7 @@ passes its `images.` tests.
 ### Run as a named user, exact output bytes
 
 Two optional additions change `run`, `process.start` and `files.write`; a provider that skips them
-is still a valid 1.0 provider.
+still conforms.
 
 - **A named user.** `run` and `process.start` take `user` in the request, and `files.write` takes
   a `user` query parameter. Omitted or null means the class's default user. A provider claims it
@@ -383,7 +383,7 @@ The tester runs `run.user`, `files.write.user`, `process.start.user`, `run.base6
 ### Prepared images: facts, layouts, bindings and cost
 
 A provider that prepares images (section 19 of the provider API) may add five optional things. None
-is needed to be a valid 1.0 provider.
+is needed to conform.
 
 - **Facts the caller resolved.** An OCI source's `config` may carry `init`, `user_name` and `home`,
   and a Dockerfile source may carry `base` (its resolved `FROM` image). Use them; never read a
@@ -416,14 +416,14 @@ Two more operations are claimed in `classes[].operations`, each on its own, and 
 
 Other sections are set at create, with no operation of their own: `custom_images`,
 `network_lockdown`, `idle_shutdown`, `hidden_secrets`, and resource asks such as `arch`, `cpu_min`,
-`memory_min_mib`, `region`, and `gpu_model`. Desktops and volumes wait for later 1.x releases.
+`memory_min_mib`, `region`, and `gpu_model`. Desktops and volumes wait for later releases.
 
 ## Versioning
 
-SPS follows semantic versioning. The URL path carries the major version (`/v1`), and the
-`spec_version` in discovery and in the manifest carries `major.minor`. A 1.x release only adds
-optional operations, optional request fields, result fields, and vocabulary. The twelve error codes
-stay fixed for all of 1.x, so nothing that a 1.0 provider does becomes wrong in a later 1.x. A minor
-may require an operation that was optional before, but only of a provider that states that minor:
-1.1 requires `cost`. A consumer sends only the fields of the minor that you declare. A 2.0 would be
-a new path, `/v2`.
+The URL path carries the major version (`/v1`), and `spec_version` in discovery and in the
+manifest carries `major.minor`: state the newest, `1.1`, as the template does. A minor release adds
+optional operations, request fields, result fields and vocabulary, and the twelve error codes stay
+fixed within a major, so what a provider does never becomes wrong in a later minor. A minor may
+require an operation that was optional before, only of a provider that states it: `1.1` requires
+`cost`. A consumer sends only the fields of the minor that you state. A new major would be a new
+path.

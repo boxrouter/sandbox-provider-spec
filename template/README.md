@@ -1,10 +1,10 @@
 <!-- SPDX-FileCopyrightText: BoxRouter, Inc. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# Template: an SPS 1.0 provider adapter
+# Template: an SPS provider adapter
 
 This is the adapter a new provider starts from. `sps_provider_example` implements every
-required 1.0 operation, and the optional `snapshots` section, by calling Example Cloud
+required operation, and the optional `snapshots` section, by calling Example Cloud
 (`fake_cloud/`), a small fake provider API that runs each sandbox as a local Docker container. The API is deliberately not
 shaped like the standard, so `src/sps_provider_example/__init__.py` shows a real
 translation: a comment above each method names the Example Cloud call it maps.

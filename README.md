@@ -4,7 +4,7 @@ An open standard for running code in sandboxes and describing what each sandbox 
 
 **Status:** Provider API 1.0 · Capability, declaration, request, and matching formats 0.1 (working draft)
 
-[Implement SPS 1.0](docs/implement.md) · [OpenAPI file](spec/provider-api-1.0.openapi.yaml) · [Rules](spec/provider-api.md) · [Specification index](spec/README.md) · [Tutorial](docs/getting-started.md) · [Changelog](CHANGELOG.md) · [Contribute](CONTRIBUTING.md)
+[Implement SPS](docs/implement.md) · [OpenAPI file](spec/provider-api-1.0.openapi.yaml) · [Rules](spec/provider-api.md) · [Specification index](spec/README.md) · [Tutorial](docs/getting-started.md) · [Changelog](CHANGELOG.md) · [Contribute](CONTRIBUTING.md)
 
 > [!IMPORTANT]
 > **This specification is young and open to contribution.** It is published to be used and argued with, and it will keep moving as implementers find gaps. If your sandbox does something that the vocabulary cannot express, or if a rule is stated in a way that you cannot implement or test, please [open an issue](https://github.com/boxrouter/sandbox-provider-spec/issues). You can also propose a new capability or add your provider by following [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -29,7 +29,7 @@ The **Sandbox Provider Spec (SPS)** replaces private integrations and guesswork 
 
 ### SPS at a Glance
 
-Every provider that implements Provider API 1.0 supports ten required operations (`discovery`, `create`, `get`, `list`, `destroy`, `run`, `files.read`, `files.write`, `process.start`, and `process.output`), plus any optional operations that it claims for costs, file links, pause and resume, lifetime extension, process input and cancellation, HTTP previews, TCP ports, interactive terminals, snapshots, directories, and prepared images.
+Every provider that implements the Provider API supports eleven required operations (`discovery`, `create`, `get`, `list`, `destroy`, `run`, `files.read`, `files.write`, `process.start`, `process.output`, and `cost`), plus any optional operations that it claims for file links, pause and resume, lifetime extension, process input and cancellation, HTTP previews, TCP ports, interactive terminals, snapshots, directories, and prepared images.
 
 When a program needs specific runtime guarantees, it writes a short request in YAML or JSON:
 
@@ -46,7 +46,7 @@ SPS checks that request offline against each provider's published capability fil
 
 ## For Sandbox Providers
 
-Start with **[Implement SPS 1.0](docs/implement.md)**. It is a single-page guide that covers the two ways to conform, the ten required operations, discovery and price lists, the optional `cost` operation, the twelve error codes, optional feature sections, the template adapter, and the conformance tester.
+Start with **[Implement SPS](docs/implement.md)**. It is a single-page guide that covers the two ways to conform, the eleven required operations, discovery and price lists, the `cost` operation, the twelve error codes, optional feature sections, the template adapter, and the conformance tester.
 
 A provider conforms to Provider API 1.0 in one of two ways:
 
@@ -140,7 +140,7 @@ The vocabulary has 16 gates and 48 knobs; the conformance suite has 292 tests.
 
 | Read | To |
 | --- | --- |
-| [Implement SPS 1.0](docs/implement.md) | Make a provider conform with an adapter or a native HTTP API |
+| [Implement SPS](docs/implement.md) | Make a provider conform with an adapter or a native HTTP API |
 | [Tutorial](docs/getting-started.md) | Check a request and interpret a match offline without a provider account |
 | [Compare providers](docs/how-to/compare-providers.md), [read evidence](docs/how-to/read-evidence.md) | Compare provider declarations and inspect the cited conformance reports |
 | [Add a provider](docs/how-to/add-provider.md), [run conformance](docs/how-to/run-conformance.md) | Write a declaration and driver, and produce conformance reports |
