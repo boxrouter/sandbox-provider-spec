@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.149 — 2026-11-25
+
+- `PreparedImage` has an optional `last_used_at`: when a sandbox last started from the image, for a provider that reports it (absent or null otherwise). A caller that retires images nobody uses reads it, and never reads a missing value as unused. The wire form, the OpenAPI schema and the examples carry it; a response without it decodes to `None`, so older providers and servers still work.
+
 ## 0.5.148 — 2026-11-25
 
 - Beam's declaration states its four sizes (1, 2, 4 and 8 vCPUs with 1024, 2048, 4096 and 8192 MiB of memory; were `unknown`), each proved by the tester's `facts.sizes` row run live at that size (the guest shows exactly the CPUs and memory asked) and cited from `tester-default-size-1.json` to `-8.json`, which are rerun on spec 0.5.147 and also cite `size_is_ceiling`.
