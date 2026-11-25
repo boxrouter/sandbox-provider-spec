@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.139 — 2026-11-25
+
+- Beam's declaration states `custom_images` (`provider_artifact` and a prepared `oci` source), proven by a live tester run of package 0.1.8 (`providers/beam/reports/tester-default-custom-images.json`).
+
 ## 0.5.138 — 2026-11-25
 
 - The tester's `files.regular_write.usability.v1.authority` row accepts `forbidden`, the SPS 1.0 code for a refused call, as a refused write. The SPS 1.0 provider driver passes a provider's error code on unchanged, so before this the row read `error: authorization` for every in-process provider that refused the write correctly. The check digests of the nine `files.regular_write.usability.v1.*` rows move (their module changed); no committed report cites them.
