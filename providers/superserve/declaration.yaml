@@ -9,13 +9,16 @@ verified:
   sdks: {"superserve": "0.12.0", "sandbox-provider-spec": "0.5.63"}
 resources:
   kernel: dedicated
-  # A sandbox inherits its shape from the template it starts from and cannot override it, so each
-  # size is a template's: the default template `superserve/base` (templates page; live check
-  # 2026-11-13 in evidence.md) and the standard-image template the adapter builds itself
-  # (image_preparation.py: 2 vCPU, 2048 MiB, 8192 MiB, the team's legacy Free cap).
+  # A sandbox inherits its shape from the template it starts from, and a template may let each
+  # sandbox pick a size within a range, so one range stands for the shapes a template can be built
+  # at. The vCPU and memory upper bounds are the Pro plan's documented limits. The disk bounds are
+  # the default template's 8192 MiB and the 51200 MiB that `GET /billing/plan` (`effective_limits`)
+  # stated for the team the adapter ran against; the lower vCPU and memory bounds are the
+  # smallest shape the adapter builds (1 vCPU, 2048 MiB). The adapter's discovery states the same.
   sizes:
-  - {cpu: 2, memory_mib: 2048, disk_mib: 8192}
-  - {cpu: 2, memory_mib: 4096, disk_mib: 8192}
+  - cpu: [1, 16]
+    memory_mib: [2048, 65536]
+    disk_mib: [8192, 51200]
   default_size: {cpu: 2, memory_mib: 4096, disk_mib: 8192}
   size_is_ceiling: true
   default_user: root
@@ -137,11 +140,13 @@ evidence:
     read: 2026-11-16
     quote: Spin up an isolated Firecracker MicroVM in seconds, ready to run commands immediately.
   resources.sizes:
-    source: https://docs.superserve.ai/templates/overview
-    read: 2026-11-13
+    source: https://docs.superserve.ai/templates/build-spec
+    read: '2026-11-25'
     quote: >-
-      | `superserve/base` | `ubuntu:24.04` | 2 · 4096 MiB · 8192 MiB | ... A sandbox inherits its
-      VM shape (vCPU, memory, disk) from the template it starts from
+      Templates specify the VM shape and sandboxes inherit it. A template can also let sandboxes
+      grow with load, or choose their own size at create (see Size range). | Min | 1 vCPU | 256 MiB |
+      | Default | 1 vCPU | 1 GiB (1024 MiB) | | Pro max | 16 vCPU | 64 GiB (65536 MiB) | Limits
+      depend on your team's plan.
   resources.size_is_ceiling:
     tests:
     - coverage.facts.size_is_ceiling.true

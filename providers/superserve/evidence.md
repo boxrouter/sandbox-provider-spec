@@ -9,12 +9,18 @@ proves. Values without supporting evidence remain `unknown`.
   `CreateSandboxRequest`, read 2026-11-13), so 604800 is the longest window one create can ask for. The
   declaration states that bound as the admission cap. It is a cap on one window of active time, not on
   total lifetime: each resume starts a fresh window.
-- `sizes`, `default_size`: two shapes, because a sandbox inherits its shape from its template. The default
-  template `superserve/base` is 2 vCPU, 4096 MiB memory and 8192 MiB disk (the default size), from the
+- `sizes`: one range, because a sandbox inherits its shape from its template and a template can be built at
+  any shape within the team's plan. vCPU 1 to 16 and memory up to 65536 MiB are the Pro plan's limits on the
+  build-spec page (read 2026-11-25: "Pro max 16 vCPU 64 GiB (65536 MiB)"; the page's minimum is 256 MiB, and
+  the adapter builds nothing below 1 vCPU and 2048 MiB, the smallest shape a 2026-11-23 range probe booted).
+  The disk range, 8192 to 51200 MiB, is not on a page: 8192 MiB is the default template's disk (templates
+  page, read 2026-11-13) and 51200 MiB is the `effective_limits.max_disk_mib` that `GET /billing/plan` stated
+  for the team the adapter ran against on 2026-11-24 (the OpenAPI `BillingPlanLimits` documents the field, not its
+  value). The citation is the page's quote, not a report: no SPS conformance test proves `sizes`.
+- `default_size`: the default template `superserve/base` is 2 vCPU, 4096 MiB memory and 8192 MiB disk, from the
   templates page (read 2026-11-13). The adapter builds the standard-image template itself
-  (`image_preparation.py`) at 2 vCPU, 2048 MiB and 8192 MiB, inside the documented template limits
-  (build-spec page: minimum 256 MiB, Free plan maximum 2 vCPU and 4096 MiB) and within the team's legacy
-  Free cap; that shape is the adapter's own choice, not a quoted figure. The adapter sets no shape on create. A live check on 2026-11-13 (run `ss-sizes-20261113T035827Z`, one sandbox
+  (`image_preparation.py`) at 2 vCPU, 2048 MiB and 8192 MiB; that shape is the adapter's own choice, not a quoted
+  figure. The adapter sets no shape on create. A live check on 2026-11-13 (run `ss-sizes-20261113T035827Z`, one sandbox
   of `superserve/base`, destroyed) agreed with the page: the template record (`GET /templates`) says
   `vcpu` 2, `memory_mib` 4096, `disk_mib` 8192; `GET /sandboxes/{id}` says `vcpu_count` 2, `memory_mib`
   4096; inside, `nproc` printed 2, `/proc/meminfo` `MemTotal` 4034076 kB (the guest kernel keeps part of
@@ -23,8 +29,7 @@ proves. Values without supporting evidence remain `unknown`.
   of the system templates (`built_at` 2026-11-11T17:47:55Z); it no longer reproduces, and the declaration
   states the current measurement. The team's legacy Free plan is recorded at a cap of 2 vCPU, 2 GiB and 8 GiB disk per sandbox
   (research.md, 2026-11-13); the `superserve/base` sandbox above ran at 4096 MiB on this team regardless, so
-  the cap did not bind the system template. The citation is
-  the page's quote, not a report: no SPS conformance test proves `sizes`.
+  the cap did not bind the system template.
 - `size_is_ceiling: true`: `coverage.facts.size_is_ceiling.true` passed in
   `reports/adapter-default-size-ceiling.json` (run `ev-cert-superserve-local80eeed14f0-1-1`) by measured
   use: a CPU burn measured 1.00 CPU against a 2-CPU request (the sandbox is a VM, so no cgroup quota is

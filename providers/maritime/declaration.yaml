@@ -19,9 +19,16 @@ resources:
   libc: glibc
   package_manager: apt
   disk_in_memory: false
-  # The sizes a create can pick are not declared: a shape may only be declared with a
-  # matching price in sandbox-provider-pricing, and Maritime pricing is still being landed.
-  sizes: unknown
+  # One range. A size is any vCPU, memory and disk inside it: Maritime sells exact resources, not
+  # only presets. The vCPU and memory bounds are the documented ones. The disk upper bound is the
+  # 100 GiB (`maxDiskGb`) that Maritime's account-limits endpoint stated for the account the
+  # adapter was run against, under the documented 500 GiB; the lower bound is the 12 GiB `small`
+  # preset's, the smallest disk a request that names none lands on, not the 5 GiB the API accepts.
+  # The adapter's discovery states the same range.
+  sizes:
+  - cpu: [1, 16]
+    memory_mib: [1024, 65536]
+    disk_mib: [12288, 102400]
   size_is_ceiling: unknown
   default_user: user
   default_cwd: /home/user
@@ -74,6 +81,16 @@ evidence:
     read: '2026-11-24'
     quote: >-
       "Each one is its own micro-VM on the VM engine, with its own kernel."
+  resources.sizes:
+    source: https://maritime.sh/docs/limits
+    read: '2026-11-25'
+    quote: >-
+      Virtual machine and swarm virtual machine sizes: any size instead of the allocation
+      above: vcpu 1 to 16, memoryMib 1,024 to 65,536 (whole GiB), diskGib 5 to 500. Presets:
+      small 2 vCPU, 4 GB, 12 GB disk (default) · medium 4 vCPU, 8 GB, 50 GB · large 8 vCPU,
+      16 GB, 125 GB · xlarge 16 vCPU, 32 GB, 250 GB. GET /api/v1/account/limits returns the
+      numbers your account runs under now: your plan, included machines, the awake cap, how
+      many machines are awake, the size ceilings.
   resources.arch:
     tests: [coverage.facts.arch.amd64]
     report: reports/tester-default-coverage.json
