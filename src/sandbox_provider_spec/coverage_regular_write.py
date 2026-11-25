@@ -202,7 +202,8 @@ def _authority(driver: Driver, target: object, root: str) -> Mapping[str, object
     try:
         _write(driver, target, protected_file, b"bypass")
     except NativeFailure as error:
-        if error.code not in {"authorization", "permission_denied"}:
+        # `forbidden` is the SPS 1.0 code that the provider driver passes on for a refused write.
+        if error.code not in {"forbidden", "authorization", "permission_denied"}:
             raise NativeFailure("authorization") from error
         return _passed("authority", refused=True)
     raise NativeFailure("authorization")

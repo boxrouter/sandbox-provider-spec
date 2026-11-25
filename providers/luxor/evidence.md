@@ -55,9 +55,10 @@ read `differs` here; they prove nothing about a router-enforced one. `extendable
   Luxor's create has no region field, but a missing field is not a quote that says "none".
 - The 1 GiB file rows (`files.stream.v1.write.1gib`, `read.1gib`, `contract.files_1gib_roundtrip`): run
   from an AWS test server, see `sandbox-provider-pricing` `providers/luxor/evidence/`.
-- `files.regular_write.usability.v1.authority` reads `error`: the tester accepts only the codes
-  `authorization` and `permission_denied`, and an SPS driver reports `forbidden`
-  (coverage_regular_write.py). The adapter does answer `forbidden` for a protected path.
+- `files.regular_write.usability.v1.authority` read `error` in the cited run: the tester then accepted
+  only the codes `authorization` and `permission_denied`, and an SPS driver reports `forbidden`
+  (coverage_regular_write.py). The tester has accepted `forbidden` since then; the
+  adapter does answer `forbidden` for a protected path, so a new run can claim the row.
 - Not offered by the adapter, and why:
   - `terminal`: `RunStart.pty` exists, but nothing documents it and a resize has no message. Planned as stage 1c.
   - `volumes`: SPS 1.0 has no volume operation, and no provider declares one.

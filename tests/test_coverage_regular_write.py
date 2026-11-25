@@ -26,6 +26,7 @@ from sandbox_provider_spec.coverage_regular_write import (
 from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, Observation
 from sandbox_provider_spec.suite import Test as Scenario
 from sandbox_provider_spec.suite import read_suite, suite_path
+from sandbox_provider_spec.v1.suite_driver import ProviderFailure
 
 _SCRIPT = suite_path().parent / "fixtures" / "regular_write_usability.py"
 _PROBE = runpy.run_path(str(_SCRIPT))
@@ -42,6 +43,7 @@ class FakeFs(Driver):
         self.writes: list[tuple[str, int]] = []
         self.staging = {"owned_staging_present": False, "uncertain_identity_retained": False}
         self.refuse: set[str] = set()
+        self.refusal = NativeFailure("authorization")
         self.closed: list[str] = []
 
     def create(self, target: object, inputs: Inputs) -> Observation:
@@ -58,7 +60,7 @@ class FakeFs(Driver):
         path = str(inputs["path"])
         data = __import__("base64").b64decode(str(inputs["data"]), validate=True)
         if path in self.refuse:
-            raise NativeFailure("authorization")
+            raise self.refusal
         parent = str(Path(path).parent)
         if parent not in {"/", ""}:
             self.files.setdefault(parent, b"")
@@ -185,6 +187,25 @@ def test_e2b_style_refusal_happens_before_upload() -> None:
     result = guest(driver, {"identity": "box"}, {"case": "authority"}, {"run_nonce": "offline"})
     assert result["refused"] is True
     assert ("/tmp/sps-rw-offline/protected/secret", 6) not in driver.writes
+
+
+def test_authority_passes_on_the_sps_1_0_refusal() -> None:
+    """The SPS 1.0 provider driver passes a provider's `forbidden` on as a `ProviderFailure`."""
+    driver = FakeFs()
+    driver.refuse.add("/tmp/sps-rw-offline/protected/secret")
+    driver.refusal = ProviderFailure("forbidden", outcome="failed")
+    result = guest(driver, {"identity": "box"}, {"case": "authority"}, {"run_nonce": "offline"})
+    assert result["passed"] is True
+    assert result["refused"] is True
+
+
+def test_authority_fails_when_the_write_fails_for_another_reason() -> None:
+    driver = FakeFs()
+    driver.refuse.add("/tmp/sps-rw-offline/protected/secret")
+    driver.refusal = ProviderFailure("provider_error")
+    with pytest.raises(NativeFailure) as caught:
+        guest(driver, {"identity": "box"}, {"case": "authority"}, {"run_nonce": "offline"})
+    assert caught.value.code == "authorization"
 
 
 def test_byte_bound_refuses_before_dispatch() -> None:
