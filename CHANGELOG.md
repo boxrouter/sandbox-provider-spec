@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.138 — 2026-11-25
+
+- The tester's `files.regular_write.usability.v1.authority` row accepts `forbidden`, the SPS 1.0 code for a refused call, as a refused write. The SPS 1.0 provider driver passes a provider's error code on unchanged, so before this the row read `error: authorization` for every in-process provider that refused the write correctly. The check digests of the nine `files.regular_write.usability.v1.*` rows move (their module changed); no committed report cites them.
+
 ## 0.5.137 — 2026-11-24
 
 - Agent37's default class declares kernel `unknown` again, as before cloud#10100 (discovery must match the declaration): `filtered` made Cloud withhold the standard image from the class, which Agent37's gVisor boots. The evidence note keeps the gVisor fact.
