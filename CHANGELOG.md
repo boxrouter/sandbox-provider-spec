@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.145 — 2026-11-25
+
+- The Maritime and Superserve declarations state `resources.sizes` as Cloud serves it, each cited by a dated quote of the provider's documentation: Maritime one range (1 to 16 vCPU, 1024 to 65536 MiB memory, 12288 to 102400 MiB disk; was `unknown`) and Superserve one range (1 to 16 vCPU, 2048 to 65536 MiB memory, 8192 to 51200 MiB disk; was two fixed shapes). `size_is_ceiling` stays `unknown` for Maritime and Beam: no committed report proves it, and a new report would need a full re-verification at the current tester version.
+
 ## 0.5.144 — 2026-11-25
 
 - Maritime's brand mark is a one-colour SVG (`brand/mark.svg`, traced from Maritime's own black sail; `mark.png` is removed), so the benchmarks pages draw the sail instead of Maritime's initial tile. The logo is the same file. No declaration or catalog change.
