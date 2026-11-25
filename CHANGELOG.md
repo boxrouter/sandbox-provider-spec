@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.143 — 2026-11-25
+
+- Sail's declaration is re-verified on spec 0.5.142 (it was 0.5.84): every report it cites is rerun live from a clean tree (baseline, select, user-selection, pause-resume, snapshots, previews, network-lockdown, custom-images, coverage, core and core with two instances), `verified.date` is 2026-11-25, and `size_is_ceiling: true` is stated from `coverage.facts.size_is_ceiling.true`.
+
 ## 0.5.142 — 2026-11-25
 
 - New rule `provider-api/create-meets-stated-facts` (`provider-api.md` section 4): a provider does not refuse a `create` for an ask in its `resources` that the class's discovery states it meets. A router sends a class the asks it matched the class on, such as `extendable_lifetime: true` for a lifetime it renews, while the tester's rows ask only floors and the facts of their own claim, so a provider could pass every row and refuse every routed create. The new test `contract.create_meets_stated_facts` creates once with every yes-or-no resource fact (a boolean `resources` field of the request schema: `extendable_lifetime`, `long_running`, `size_is_ceiling`) that the class states `true`; a refusal as `unsupported` is the failure `stated_fact_refused`, and a class that states none of them reads `not_run` and does not count. Its step `create.stated_facts` is a driver subclass of its own (`v1/suite_driver_stated_facts.py`), so no existing row's check digest moves (0 of 291; 1 row added). The suite digest changes with the new row: `conformance/historical-suite-rules.json` keeps the prior shared suite (`sha256:d86dc50e…`, 291 tests) so every committed report stays recognized.
