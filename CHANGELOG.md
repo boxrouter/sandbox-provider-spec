@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.141 — 2026-11-25
+
+- The tester runs `custom_images.provider_artifact` for a class that lists no image operation. The row's `image.prepare` of a `provider_artifact` borrows an image that the account already has and calls no provider operation, but the tester marked `image.prepare` unsupported wherever discovery did not claim it, so a provider that can create from its own artifacts but prepares no image could not prove `custom_images` `source: provider_artifact`. The tester's driver (`SetupRetryDriver.image_prepare`) now refuses every other source in that case, so every other row reads `unsupported` as before. No row's check digest moves (measured: 0 of 291).
+
 ## 0.5.140 — 2026-11-25
 
 - Sail's declaration states its four sizes (1, 2, 4 and 8 vCPUs with 16, 16, 32 and 64 GiB of memory and 32, 32, 64 and 128 GiB of state disk) and a `default_size` of 1 vCPU, 16 GiB of memory and 32 GiB of disk, each with a quote of Sail's documented limits. They were `unknown`, so a credit check that asks for no size could not quote a hold. The default size's one-hour hold quote is bounded at 0.1754 USD, and each of the four sizes quotes bounded. The tester's `coverage.facts.size_is_ceiling.true` passed at each size; `coverage.facts.sizes.delivered` passes at 16 GiB and differs above it, because the guest starts with 16 GiB visible and grows toward the limit as the workload uses memory (the declaration comment records the measurement).
