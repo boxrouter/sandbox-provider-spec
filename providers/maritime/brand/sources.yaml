@@ -1,17 +1,24 @@
-retrieved_at: '2026-11-24'
+retrieved_at: '2026-11-25'
 owner: Maritime
 source_page: https://maritime.sh
 assets:
-  mark.png:
-    source: https://maritime.sh/maritimeround.png
+  mark.svg:
+    source: https://maritime.sh/maritimeroundblacknobg.png
     role: >-
-      Official Maritime mark: a white sail on a black rounded square, the logo the site's
-      structured data names. The brand colour #2553C4 is the accent the site's buttons
-      and links share.
-    modifications: cropped to the opaque pixels and scaled to 512 px; the artwork is unchanged
+      Official Maritime mark: the sail the site shows in its header, as the site's black sail on a
+      transparent background (the same file as assets/maritime-mark-black.png in the maritime-sh/agents
+      GitHub repository). The logo and the mark are this one file. The brand colour #2553C4 is the
+      accent the site's buttons and links share.
+    modifications: >-
+      Maritime publishes no vector mark (none on maritime.sh, in its docs or in its GitHub
+      organisation), so the 946 x 1272 PNG was traced to one path with potrace (potracer 0.0.4,
+      turdsize 8, alphamax 1.0, opticurve tolerance 0.2); the viewBox is the opaque pixels' extent.
+      The outline matches the PNG at full size; the fill is black, so it follows the page's text colour.
 notes:
   no_brand_page: no brand kit or press page is linked from maritime.sh
   no_wordmark: >-
-    the site sets its name in text, not in a lockup image, so the round mark serves as both
-    logo and mark
+    the site sets its name in text, not in a lockup image, so the sail serves as both logo and mark
+  replaced: >-
+    the previous mark, maritime.sh/maritimeround.png (the sail on a black rounded square), was a PNG,
+    which the benchmarks pages cannot flatten, so they drew Maritime's initial tile
   terms: no reuse terms or brand guidelines were found
