@@ -372,6 +372,7 @@ class PreparedImage:
     stored_bytes: int | None
     labels: Mapping[str, str]
     created_at: datetime
+    last_used_at: datetime | None = None  # when a sandbox last started from it; None: not reported
 
 
 @dataclass(frozen=True)

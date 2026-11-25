@@ -2626,6 +2626,11 @@ components:
           description: The bytes the provider stores for it, when the provider knows.
         labels: {$ref: "#/components/schemas/Labels"}
         created_at: {$ref: "#/components/schemas/Timestamp"}
+        last_used_at:
+          anyOf: [{$ref: "#/components/schemas/Timestamp"}, {type: "null"}]
+          description: >-
+            When a sandbox last started from the image, when the provider reports it; absent or null otherwise.
+            A caller that retires images nobody uses reads it, and never reads a missing value as unused.
     ImagePage:
       type: object
       required: [images, next_cursor]

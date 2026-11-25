@@ -86,6 +86,15 @@ def test_every_image_example_is_a_valid_value_and_round_trips() -> None:
         assert from_json(cls, to_json(value)) == value
 
 
+def test_an_image_reports_when_it_was_last_used_and_an_older_server_reports_nothing() -> None:
+    image = example(PreparedImage)
+    assert image.last_used_at == datetime(2026, 11, 24, 16, 33, tzinfo=UTC)
+    document = dict(to_json(image))
+    assert document["last_used_at"] == "2026-11-24T16:33:00Z"
+    del document["last_used_at"]
+    assert from_json(PreparedImage, document).last_used_at is None
+
+
 def test_the_three_sources_round_trip() -> None:
     config = ImageConfig(
         env={"A": "b"}, workdir="/app", user="1000", entrypoint=("/e",), cmd=("c",)

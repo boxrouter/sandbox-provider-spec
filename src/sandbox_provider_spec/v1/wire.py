@@ -336,6 +336,7 @@ def _enc_prepared_image(value: PreparedImage) -> Json:
         "stored_bytes": value.stored_bytes,
         "labels": dict(value.labels),
         "created_at": _stamp(value.created_at),
+        "last_used_at": _opt(value.last_used_at, _stamp),
     }
 
 
@@ -663,6 +664,7 @@ def _dec_prepared_image(data: Json) -> PreparedImage:
         stored_bytes=data["stored_bytes"],
         labels=dict(data["labels"]),
         created_at=_time(data["created_at"]),
+        last_used_at=_opt(data.get("last_used_at"), _time),
     )
 
 
