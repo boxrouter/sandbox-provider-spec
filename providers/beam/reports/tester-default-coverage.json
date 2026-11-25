@@ -71,15 +71,15 @@
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "StatedFactsDriver",
-    "version": "0.5.145"
+    "name": "AllocationDriver",
+    "version": "0.5.147"
   },
-  "finished_at": "2026-11-25T12:26:27.993147+00:00",
+  "finished_at": "2026-11-25T13:36:04.357348+00:00",
   "provider": "beam",
-  "revision": "04dfdc461bed1f544641f1e69a4984dbdf6c1908",
-  "run_id": "public-a243d399043cb98051c2",
+  "revision": "d5db414e7136fdedda0512e611643cd5aa2d4cf8",
+  "run_id": "public-35b25f633fb042b0562e",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.145"
+    "sandbox-provider-spec": "0.5.147"
   },
   "selected_tests": [
     "coverage.guest_user.selectable",
@@ -150,7 +150,7 @@
     "coverage.facts.guest_reserved_tcp_ports.8080"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-25T12:14:42.993320+00:00",
+  "started_at": "2026-11-25T13:23:43.791147+00:00",
   "subject": {
     "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
     "package": "sps-provider-beam",
@@ -167,7 +167,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 908,
+      "duration_ms": 808,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
@@ -268,7 +268,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 952,
+      "duration_ms": 737,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -307,7 +307,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 677,
+      "duration_ms": 697,
       "id": "coverage.facts.arch.arm64",
       "proves": [
         {
@@ -347,7 +347,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 938,
+      "duration_ms": 669,
       "id": "coverage.facts.root.by_default",
       "proves": [
         {
@@ -386,7 +386,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1016,
+      "duration_ms": 813,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -426,7 +426,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 518,
+      "duration_ms": 671,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -462,7 +462,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 462,
+      "duration_ms": 405,
       "id": "coverage.facts.kernel_features.fuse",
       "proves": [
         {
@@ -498,7 +498,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 552,
+      "duration_ms": 414,
       "id": "coverage.facts.kernel_features.ebpf",
       "proves": [
         {
@@ -534,7 +534,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 585,
+      "duration_ms": 414,
       "id": "coverage.facts.kernel_features.nested_cgroups",
       "proves": [
         {
@@ -570,7 +570,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 559,
+      "duration_ms": 429,
       "id": "coverage.facts.kernel_features.netfilter",
       "proves": [
         {
@@ -663,7 +663,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7386,
+      "duration_ms": 52692,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -700,7 +700,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 753,
+      "duration_ms": 754,
       "id": "coverage.facts.package_manager.apk",
       "proves": [
         {
@@ -738,7 +738,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 826,
+      "duration_ms": 781,
       "id": "coverage.facts.package_manager.dnf",
       "proves": [
         {
@@ -776,7 +776,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1034,
+      "duration_ms": 793,
       "id": "coverage.facts.package_manager.pacman",
       "proves": [
         {
@@ -814,7 +814,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 815,
+      "duration_ms": 821,
       "id": "coverage.facts.package_manager.none",
       "proves": [
         {
@@ -852,7 +852,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 818,
+      "duration_ms": 669,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -889,7 +889,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 667,
+      "duration_ms": 717,
       "id": "coverage.facts.libc.musl",
       "proves": [
         {
@@ -931,7 +931,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10990,
+      "duration_ms": 10864,
       "id": "coverage.facts.on_memory_exhausted.process_killed",
       "proves": [
         {
@@ -972,7 +972,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10872,
+      "duration_ms": 10983,
       "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
       "proves": [
         {
@@ -1010,7 +1010,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5419,
+      "duration_ms": 5439,
       "id": "coverage.facts.disk_in_memory.true",
       "proves": [
         {
@@ -1049,7 +1049,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5416,
+      "duration_ms": 5400,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -1081,114 +1081,58 @@
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1122,
+      "cleanup": [],
+      "duration_ms": 0,
       "id": "coverage.facts.size_is_ceiling.true",
-      "proves": [
-        {
-          "fact": "resources.size_is_ceiling",
-          "value": true
-        }
-      ],
-      "result": "passed",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
       "rules": [
         "facts/size-is-ceiling"
       ],
       "steps": [
         {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"1073741824\"}, \"membership\": \"7:pids:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n6:memory:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n5:job:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n4:devices:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n3:cpuset:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n2:cpuacct:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\\n1:cpu:/sandbox-76855d6a-d714-40c3-8402-4d02f9868a12-63a51910\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
-            "size_is_ceiling": {
-              "matches": true
-            }
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "passed"
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 863,
+      "cleanup": [],
+      "duration_ms": 0,
       "id": "coverage.facts.size_is_ceiling.false",
-      "proves": [
-        {
-          "fact": "resources.size_is_ceiling",
-          "value": false
-        }
-      ],
-      "reason": "size_is_ceiling",
-      "result": "differs",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
       "rules": [
         "facts/size-is-ceiling"
       ],
       "steps": [
         {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "size_is_ceiling": {
-              "matches": false
-            }
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "differs"
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 690,
+      "cleanup": [],
+      "duration_ms": 0,
       "id": "coverage.facts.sizes.delivered",
       "proves": [],
-      "result": "passed",
+      "reason": "fixture_missing",
+      "result": "not_run",
       "rules": [
         "facts/sizes"
       ],
       "steps": [
         {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "cpu_delivered": {
-              "matches": true
-            },
-            "memory_delivered": {
-              "matches": true
-            },
-            "observed_cpu": 2,
-            "observed_memory_mib": 2048
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "passed"
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
         }
       ]
     },
@@ -1200,7 +1144,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 556,
+      "duration_ms": 429,
       "id": "coverage.facts.max_run",
       "proves": [
         {
@@ -1240,7 +1184,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601762,
+      "duration_ms": 601077,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -1423,7 +1367,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1612,
+      "duration_ms": 1362,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -1525,7 +1469,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2455,
+      "duration_ms": 2548,
       "id": "coverage.network_lockdown.allowlist.mixed",
       "proves": [
         {
@@ -1578,7 +1522,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2345,
+      "duration_ms": 2111,
       "id": "coverage.network_lockdown.allowlist.range",
       "proves": [
         {
@@ -1624,7 +1568,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5415,
+      "duration_ms": 5320,
       "id": "coverage.network_lockdown.changeable.true",
       "proves": [
         {
@@ -1666,7 +1610,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 9903,
+      "duration_ms": 11462,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -1715,7 +1659,7 @@
     {
       "class": "default",
       "cleanup": [],
-      "duration_ms": 1,
+      "duration_ms": 0,
       "id": "coverage.network_lockdown.policy_transition.denylist",
       "proves": [
         {
@@ -1745,7 +1689,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5425,
+      "duration_ms": 5426,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
@@ -1804,7 +1748,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1286,
+      "duration_ms": 1875,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
       "proves": [
         {
@@ -1843,7 +1787,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1472,
+      "duration_ms": 1966,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
       "proves": [
         {
@@ -1890,7 +1834,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1123,
+      "duration_ms": 981,
       "id": "coverage.hidden_secrets.rotates.true",
       "proves": [
         {
@@ -1932,7 +1876,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 996,
+      "duration_ms": 1011,
       "id": "coverage.hidden_secrets.rotates.false",
       "proves": [
         {
@@ -1974,7 +1918,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1092,
+      "duration_ms": 1000,
       "id": "coverage.hidden_secrets.scrubs_responses.true",
       "proves": [
         {
@@ -2016,7 +1960,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1558,
+      "duration_ms": 1049,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -2058,7 +2002,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1007,
+      "duration_ms": 1162,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -2100,7 +2044,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1137,
+      "duration_ms": 1037,
       "id": "coverage.hidden_secrets.intercepts.injected_hosts",
       "proves": [
         {
@@ -2142,7 +2086,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1127,
+      "duration_ms": 1026,
       "id": "coverage.hidden_secrets.intercepts.all_https",
       "proves": [
         {
@@ -2172,7 +2116,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1,
+      "duration_ms": 0,
       "id": "coverage.hidden_secrets.max_inject_into",
       "proves": [
         {
@@ -2240,7 +2184,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1064,
+      "duration_ms": 1021,
       "id": "coverage.hidden_secrets.transparent.true",
       "proves": [
         {
@@ -2282,7 +2226,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1145,
+      "duration_ms": 1084,
       "id": "coverage.hidden_secrets.transparent.false",
       "proves": [
         {
@@ -2306,271 +2250,96 @@
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        },
-        {
-          "kind": "image",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1083,
+      "cleanup": [],
+      "duration_ms": 0,
       "id": "coverage.custom_images.prepare.registry",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "oci"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "observations": {},
-          "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "exit_code": {
-              "actual": 0,
-              "matches": true
-            }
-          },
-          "operation": "run",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        },
-        {
-          "kind": "image",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1482,
-      "id": "coverage.custom_images.prepare.size",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "oci"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "result": "passed",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "observations": {
-            "resources": {
-              "matches": true
-            }
-          },
-          "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "cpu_delivered": {
-              "matches": true
-            },
-            "memory_delivered": {
-              "matches": true
-            }
-          },
-          "operation": "fixture.coverage_fact",
-          "result": "passed"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [
-        {
-          "kind": "sandbox",
-          "result": "deleted"
-        },
-        {
-          "kind": "image",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 1745,
-      "id": "coverage.custom_images.prepared_size_without_request",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "oci"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "reason": "guest_fixture_unavailable",
+      "proves": [],
+      "reason": "fixture_missing",
       "result": "not_run",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
-          "observations": {},
           "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {},
-          "operation": "create",
-          "result": "passed"
-        },
-        {
-          "operation": "fixture.coverage_fact",
-          "reason": "guest_fixture_unavailable",
+          "reason": "fixture_missing",
           "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "image",
-          "result": "deleted"
-        }
-      ],
-      "duration_ms": 548,
-      "id": "coverage.custom_images.prepare.idempotent",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "oci"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "result": "passed",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.size",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
-          "observations": {},
           "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {},
-          "operation": "image.prepare",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "equal": {
-              "matches": true
-            }
-          },
-          "operation": "bindings.compare",
-          "result": "passed"
-        },
-        {
-          "observations": {
-            "equal": {
-              "matches": true
-            }
-          },
-          "operation": "bindings.compare",
-          "result": "passed"
+          "reason": "fixture_missing",
+          "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [
-        {
-          "kind": "image",
-          "result": "already_released"
-        }
-      ],
-      "duration_ms": 540,
-      "id": "coverage.custom_images.prepare.delete",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "oci"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "result": "passed",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepared_size_without_request",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
-          "observations": {},
           "operation": "image.prepare",
-          "result": "passed"
-        },
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.idempotent",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
         {
-          "observations": {},
-          "operation": "image.delete",
-          "result": "passed"
-        },
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.custom_images.prepare.delete",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "custom_images/prepared"
+      ],
+      "steps": [
         {
-          "observations": {
-            "state": {
-              "actual": {
-                "truncated": false,
-                "utf8": "absent"
-              },
-              "matches": true
-            }
-          },
-          "operation": "image.state",
-          "result": "passed"
+          "operation": "image.prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
         }
       ]
     },

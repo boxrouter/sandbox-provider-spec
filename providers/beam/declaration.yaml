@@ -6,15 +6,23 @@ class: default
 verified:
   date: 2026-11-25
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
-  sdks: {"sandbox-provider-spec": "0.5.145"}
+  sdks: {"sandbox-provider-spec": "0.5.147"}
 resources:
   compliance: [soc2, soc2_type2]
   data_retention: retained
   kernel: unknown
-  # `sizes` stays unknown: no tester row proves a list of sizes (`facts.sizes` is `driver_unimplemented`
-  # for the stated-facts driver) and Beam's documentation names no size range. Each size Cloud serves
-  # (1/1024, 2/2048, 4/4096 and 8/8192 MiB) is a ceiling: `coverage.facts.size_is_ceiling.true` passes at all four.
-  sizes: unknown
+  # Each size Cloud serves is proved by a live `facts.sizes` run at that size (the guest shows exactly the CPUs
+  # and MiB of memory asked) and is a ceiling: `coverage.facts.size_is_ceiling.true` passes at all four. Beam's
+  # documentation names no size range, so there is no quote.
+  sizes:
+  - cpu: 1
+    memory_mib: 1024
+  - cpu: 2
+    memory_mib: 2048
+  - cpu: 4
+    memory_mib: 4096
+  - cpu: 8
+    memory_mib: 8192
   size_is_ceiling: true
   gpus: unknown
   regions: unknown
@@ -84,6 +92,16 @@ evidence:
     source: https://docs.beam.cloud/v2/security/privacy-policy
     read: '2026-11-23'
     quote: "Logs emitted by your workloads are Customer Data. They are retained for 30 days on the Developer and Team plans and for 1 year on the Growth plan, or as set out in your Order Form, and are governed by the Terms of Service and DPA."
+  resources.sizes:
+    reports:
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-1.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-2.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-4.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-8.json
   resources.size_is_ceiling:
     reports:
     - tests: [coverage.facts.size_is_ceiling.true]

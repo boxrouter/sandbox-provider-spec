@@ -8,15 +8,15 @@
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "StatedFactsDriver",
-    "version": "0.5.145"
+    "name": "AllocationDriver",
+    "version": "0.5.147"
   },
-  "finished_at": "2026-11-25T11:44:20.079414+00:00",
+  "finished_at": "2026-11-25T13:23:26.229360+00:00",
   "provider": "beam",
-  "revision": "04dfdc461bed1f544641f1e69a4984dbdf6c1908",
-  "run_id": "public-fc092995f7e77a6405a7",
+  "revision": "d5db414e7136fdedda0512e611643cd5aa2d4cf8",
+  "run_id": "public-4f78ba51aa0b11fca617",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.145"
+    "sandbox-provider-spec": "0.5.147"
   },
   "selected_tests": [
     "facts.sizes",
@@ -24,7 +24,7 @@
     "coverage.facts.sizes.delivered"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-25T11:44:16.300063+00:00",
+  "started_at": "2026-11-25T13:23:22.043019+00:00",
   "subject": {
     "discovery_digest": "sha256:5d0d87962f0823d00bbaddcb16b1d22ed92fc83a2bb674525844ef36df52f7ae",
     "package": "sps-provider-beam",
@@ -41,7 +41,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 655,
+      "duration_ms": 996,
       "id": "facts.sizes",
       "proves": [
         {
@@ -54,8 +54,7 @@
           ]
         }
       ],
-      "reason": "driver_unimplemented",
-      "result": "not_run",
+      "result": "passed",
       "rules": [
         "facts/sizes"
       ],
@@ -66,9 +65,13 @@
           "result": "passed"
         },
         {
+          "observations": {
+            "allocation": {
+              "matches": true
+            }
+          },
           "operation": "allocation.observe",
-          "reason": "driver_unimplemented",
-          "result": "not_run"
+          "result": "passed"
         }
       ]
     },
@@ -80,7 +83,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 732,
+      "duration_ms": 701,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -100,7 +103,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"1073741824\"}, \"membership\": \"7:pids:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n6:memory:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n5:job:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n4:devices:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n3:cpuset:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n2:cpuacct:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\\n1:cpu:/sandbox-eb92c852-7ece-4c8c-ab06-ab27a1ae4043-d50bb467\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
+            "ceiling_evidence": "{\"cpu_bound\": \"1\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 1073741824, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/cpu/cpu.cfs_period_us\": \"100000\", \"/sys/fs/cgroup/cpu/cpu.cfs_quota_us\": \"100000\", \"/sys/fs/cgroup/memory/memory.limit_in_bytes\": \"1073741824\"}, \"membership\": \"7:pids:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n6:memory:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n5:job:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n4:devices:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n3:cpuset:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n2:cpuacct:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\\n1:cpu:/sandbox-b1440b19-a03e-4bb4-9605-8b6b8b3352b1-bb427dbb\"}, \"requested_cpu\": \"1\", \"requested_memory_bytes\": 1073741824}",
             "size_is_ceiling": {
               "matches": true
             }
@@ -118,7 +121,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 676,
+      "duration_ms": 810,
       "id": "coverage.facts.sizes.delivered",
       "proves": [],
       "result": "passed",
@@ -139,8 +142,8 @@
             "memory_delivered": {
               "matches": true
             },
-            "observed_cpu": 2,
-            "observed_memory_mib": 2048
+            "observed_cpu": 1,
+            "observed_memory_mib": 1024
           },
           "operation": "fixture.coverage_fact",
           "result": "passed"
