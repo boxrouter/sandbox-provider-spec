@@ -20,7 +20,7 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
-from sandbox_provider_spec.v1.suite_driver_cost_batch import BatchProviderDriver
+from sandbox_provider_spec.v1.suite_driver_stated_facts import NO_STATED_FACT, StatedFactsDriver
 from sandbox_provider_spec.v1.two_instances import two_instances
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
@@ -49,7 +49,7 @@ LIFETIME_NOT_CLAIMED = (
 
 # A test that cannot apply to this form of the provider says so with one of these reasons, and
 # then counts for neither its section nor the run: the Python form has no link to reuse.
-NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED})
+NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED, NO_STATED_FACT})
 
 # The tests that need an offered `cost` (contract section 10): a run of a 1.0 provider leaves them
 # out, and the `cost` operation reports `unsupported`, when discovery states no
@@ -780,7 +780,7 @@ def _class_line(name: str, results: Sequence[Mapping[str, Any]]) -> str:
 
 
 def _run_by_class(
-    driver: ProviderDriver,
+    driver: StatedFactsDriver,
     suite: Suite,
     discovery: Discovery | None,
     fixtures: dict[str, object],
@@ -800,6 +800,7 @@ def _run_by_class(
         driver.sandbox_class = name
         driver.not_claimed = not_claimed_tests(discovery, name)
         item = next(item for item in discovery.classes if item.id == name)
+        driver.class_resources = item.resources
         keeps = snapshot_keeps(item)
         own = {**fixtures, "snapshot_keeps": keeps} if keeps else fixtures
         for row in run_suite(driver, Suite(suite.digest, tuple(tests), suite.baseline_ids), own):
@@ -819,7 +820,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         provider = two_instances(provider, options.new_client())
     # The run id the report records and every cleanup sweep lists by (`SPS_RUN_ID` when set): a
     # driver left to pick its own labelled each sandbox with a random id no sweep could find.
-    driver = BatchProviderDriver(provider, new_client=options.new_client, run=run_id())
+    driver = StatedFactsDriver(provider, new_client=options.new_client, run=run_id())
     started = now()
     try:
         discovery: Discovery | None

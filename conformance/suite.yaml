@@ -4922,6 +4922,19 @@ tests:
   rules:
   - provider-api/idempotent-create
   proves: []
+- id: contract.create_meets_stated_facts
+  title: A create that asks every yes-or-no resource fact its class states, as a router's create does, starts a running sandbox.
+  steps:
+  - op: create.stated_facts
+    as: box
+  - op: get
+    target: box
+    expect:
+      equals:
+        state: active
+  rules:
+  - provider-api/create-meets-stated-facts
+  proves: []
 - id: contract.list_label_filter
   title: Get and list return labels exactly, and list matches every label filter exactly.
   steps:

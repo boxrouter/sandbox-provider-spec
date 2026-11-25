@@ -88,6 +88,10 @@ provider that cannot run a sandbox without a lifetime refuses `lifetime_seconds:
 `unsupported`. A request that no size, region, image, class or section can meet is refused with
 `unsupported`, and nothing is created.
 
+- A provider **MUST NOT** refuse a `create` for an ask in its `resources` that the class's <!-- rule: provider-api/create-meets-stated-facts -->
+  discovery states it meets (the "It fits when" column of `vocabulary.md`). A router sends a class
+  the asks it matched the class on, such as `extendable_lifetime: true` for a lifetime it renews.
+
 `create` takes `secrets` when its request names the `hidden_secrets` section (without that
 requirement the request is `invalid_request`). Each secret is a `placeholder` that code in the sandbox sees, the
 `value` that the provider adds to requests for its `hosts`, and optionally the `headers` that carry
