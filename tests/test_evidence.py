@@ -639,6 +639,55 @@ def test_report_evidence_requires_every_list_value_and_at_least_floor(tmp_path: 
     )
 
 
+@pytest.mark.rule("declaration/evidence-holds")
+def test_a_size_list_needs_a_passing_facts_sizes_row_for_every_size(tmp_path: Path) -> None:
+    """Each `facts.sizes` row proves one size, so a list is cited by one report per size, and a
+    size whose row did not pass leaves the list refused."""
+    small = _test(
+        "facts.sizes",
+        "passed",
+        [{"fact": "resources.sizes", "value": [{"cpu": 1, "memory_mib": 1024}]}],
+    )
+    large = _test(
+        "facts.sizes",
+        "passed",
+        [{"fact": "resources.sizes", "value": [{"cpu": 2, "memory_mib": 2048}]}],
+    )
+    differing = {**large, "result": "differs"}
+
+    def errors_for(second: dict[str, Any], name: str) -> list[str]:
+        report_path = _report_repository(
+            tmp_path / name,
+            [small],
+            reports=[
+                {"name": "size-1.json", "results": [small]},
+                {"name": "size-2.json", "results": [second]},
+            ],
+        )
+        declaration = _declaration()
+        declaration["resources"] = {
+            "sizes": [{"cpu": 1, "memory_mib": 1024}, {"cpu": 2, "memory_mib": 2048}]
+        }
+        declaration["gates"] = {}
+        declaration["evidence"] = {
+            "resources.sizes": {
+                "reports": [
+                    {"tests": ["facts.sizes"], "report": "reports/size-1.json"},
+                    {"tests": ["facts.sizes"], "report": "reports/size-2.json"},
+                ]
+            }
+        }
+        return check_evidence(
+            declaration, source_path=report_path, schema_errors=_schema_errors, catalog=CATALOG
+        )
+
+    assert errors_for(large, "proved") == []
+    refused = errors_for(differing, "differs")
+    assert any("must be passed, not differs" in error for error in refused), refused
+    unproved = errors_for(small, "unproved")  # the second report proves the first size again
+    assert any("do not prove declared value {'cpu': 2" in error for error in unproved), unproved
+
+
 @pytest.mark.rule("declaration/unknown-variant-needs-evidence")
 def test_all_unknown_gate_variant_requires_existence_evidence() -> None:
     declaration = {

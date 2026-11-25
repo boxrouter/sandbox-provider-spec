@@ -20,7 +20,8 @@ from sandbox_provider_spec.runner import now
 from sandbox_provider_spec.suite import Suite, Test, read_suite, suite_path
 from sandbox_provider_spec.v1.provider import Provider
 from sandbox_provider_spec.v1.suite_driver import ProviderDriver
-from sandbox_provider_spec.v1.suite_driver_stated_facts import NO_STATED_FACT, StatedFactsDriver
+from sandbox_provider_spec.v1.suite_driver_allocation import AllocationDriver
+from sandbox_provider_spec.v1.suite_driver_stated_facts import NO_STATED_FACT
 from sandbox_provider_spec.v1.two_instances import two_instances
 from sandbox_provider_spec.v1.types import CreateRequest, Discovery, SandboxClass
 
@@ -780,7 +781,7 @@ def _class_line(name: str, results: Sequence[Mapping[str, Any]]) -> str:
 
 
 def _run_by_class(
-    driver: StatedFactsDriver,
+    driver: AllocationDriver,
     suite: Suite,
     discovery: Discovery | None,
     fixtures: dict[str, object],
@@ -820,7 +821,7 @@ def run_tests(provider: Provider, options: TestOptions | None = None) -> Report:
         provider = two_instances(provider, options.new_client())
     # The run id the report records and every cleanup sweep lists by (`SPS_RUN_ID` when set): a
     # driver left to pick its own labelled each sandbox with a random id no sweep could find.
-    driver = StatedFactsDriver(provider, new_client=options.new_client, run=run_id())
+    driver = AllocationDriver(provider, new_client=options.new_client, run=run_id())
     started = now()
     try:
         discovery: Discovery | None

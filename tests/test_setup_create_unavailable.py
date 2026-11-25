@@ -27,6 +27,7 @@ from sandbox_provider_spec.v1 import (
     tester,
 )
 from sandbox_provider_spec.v1.errors import SpsError
+from sandbox_provider_spec.v1.suite_driver_allocation import AllocationDriver
 from sandbox_provider_spec.v1.suite_driver_setup import SetupRetryDriver
 from sandbox_provider_spec.v1.suite_driver_stated_facts import StatedFactsDriver
 
@@ -190,8 +191,9 @@ def test_any_other_failure_of_a_create_is_still_the_rows_error(
 
 
 def test_the_tester_uses_this_driver() -> None:
-    # The tester builds `StatedFactsDriver`, which is this driver plus the steps added after it.
-    assert "StatedFactsDriver(provider" in inspect.getsource(tester.run_tests)
+    # The tester builds `AllocationDriver`, which is this driver plus the steps added after it.
+    assert "AllocationDriver(provider" in inspect.getsource(tester.run_tests)
+    assert issubclass(AllocationDriver, StatedFactsDriver)
     assert issubclass(StatedFactsDriver, SetupRetryDriver)
 
 
