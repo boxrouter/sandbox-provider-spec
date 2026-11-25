@@ -1,32 +1,32 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.network_lockdown.allowlist.mixed": "sha256:33501c9688408d10aa9b8aa337976096efdfba63e2604a89dd3bf4f635232b95",
-    "coverage.network_lockdown.changeable.true": "sha256:3bbde8ab0cac5429931325082ff1aa094161bbafed90d6f43d9c9f59aa3134f3",
-    "coverage.network_lockdown.open": "sha256:5ed72fdbf637cd8daf97d57ef242831fbf8b4922aa87a504c880f4e6e81289ec",
-    "coverage.network_lockdown.policy_transition.denylist": "sha256:28969ca630a415a4e557275f8489f81828fdfc0dca9afe6477bd2dbba2853530",
-    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:c3004ecbf84d4239c1de0506880b3e56ff2ef680b02a12be54b26baee1bb02a7",
-    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:166e894f77918c21134fa30340402fbd55573d59a956c304b871091ce48acd80",
-    "coverage.network_lockdown.switchable.true": "sha256:8b3cbab9c8c4c309bd9d4154203c8b5168c6346542fc97806f6be9201013bdfd",
-    "network_lockdown.after_resume": "sha256:31a7d80bff8e2456deefed74c266d91645a57c023de3a57ee1f449294d324ee3",
-    "network_lockdown.deny_all": "sha256:522d3f3fb734544708a0deb0e7474e30219e689aa524805f1f6d127d36a5167f",
-    "network_lockdown.max_allow": "sha256:94a2b29fd93ddf0f2a4bf20ee4f5cef13d763ef2441210b18214107f5bc36754",
-    "network_lockdown.root_cannot_lift": "sha256:f3d0cb472334aac2623e9e63d61fa95252484403ddb9ee7d0fa8c558e8d86e5d",
-    "network_lockdown.wildcards": "sha256:b4a5f788723e655039c056c8ad813937d72081cddb6d33ef74288992874d4207"
+    "coverage.network_lockdown.allowlist.mixed": "sha256:f3fa91246e8d8c72bd94dd72d4c455480d0e048631d310610b197a787a00467f",
+    "coverage.network_lockdown.changeable.true": "sha256:49a74a306aa38a2d746ef47406d44416356c2a8e04f975190cf9cc0b6e1c9bb3",
+    "coverage.network_lockdown.open": "sha256:dd1242eb67ff148560e31f90fa69495db512001907c085c482e1275776c6f703",
+    "coverage.network_lockdown.policy_transition.denylist": "sha256:15389588cc797fefdcb09f366531bcd1b8ded545dd5c7b8746d23c830623695e",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:a50352ee0986728188c6dabb1700f7051dbddd916bc1e2e14145e56166951e48",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:c10201c467913e9ee6869111380fc219f36be8a25bc37167a24800c750f379c5",
+    "coverage.network_lockdown.switchable.true": "sha256:da06d065ea75dcb0fa1382655996279ce22fb2cdaffc86524518d47ccb760fbb",
+    "network_lockdown.after_resume": "sha256:a56a418e778db6e5406ae9cfa7601edd8f904edcae0b046af4304fba684fbda7",
+    "network_lockdown.deny_all": "sha256:aa8cbd0f0bee1a45c4a50bbec4ffa3cfe8a5575a9eff7bf08680df448a2f764c",
+    "network_lockdown.max_allow": "sha256:9f5ccb6f8cd6b6912df699348924acefbda74e386fa80c3c5653c5c2009dceae",
+    "network_lockdown.root_cannot_lift": "sha256:9b4a425ee91beba36042bb88de510a77053dad3b7e610c185c2e2256bedb48d0",
+    "network_lockdown.wildcards": "sha256:977b40a686a5d97603640e927eab24ba299e80e90c29c32e28c829275794cfa3"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-23T15:49:17.572485+00:00",
+  "finished_at": "2026-11-25T05:32:28.009008+00:00",
   "provider": "sail",
-  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
-  "run_id": "public-36e3fcb2aa190d124a7b",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-a0b524c8952cf4393a88",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "network_lockdown.deny_all",
@@ -43,14 +43,14 @@
     "coverage.network_lockdown.switchable.cuts_open_connections.false"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:48:19.629850+00:00",
+  "started_at": "2026-11-25T05:31:12.295687+00:00",
   "subject": {
-    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
-    "version": "0.1.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -60,7 +60,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2831,
+      "duration_ms": 3085,
       "id": "network_lockdown.deny_all",
       "proves": [
         {
@@ -98,7 +98,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4442,
+      "duration_ms": 4629,
       "id": "network_lockdown.after_resume",
       "proves": [],
       "result": "passed",
@@ -144,7 +144,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 5252,
+      "duration_ms": 6804,
       "id": "network_lockdown.root_cannot_lift",
       "proves": [],
       "result": "passed",
@@ -229,7 +229,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 19715,
+      "duration_ms": 29249,
       "id": "network_lockdown.max_allow",
       "proves": [
         {
@@ -269,7 +269,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2783,
+      "duration_ms": 2747,
       "id": "network_lockdown.wildcards",
       "proves": [
         {
@@ -307,7 +307,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3001,
+      "duration_ms": 3209,
       "id": "coverage.network_lockdown.allowlist.mixed",
       "proves": [
         {
@@ -360,7 +360,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 4701,
+      "duration_ms": 5790,
       "id": "coverage.network_lockdown.changeable.true",
       "proves": [
         {
@@ -402,7 +402,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 7854,
+      "duration_ms": 8314,
       "id": "coverage.network_lockdown.switchable.true",
       "proves": [
         {
@@ -481,7 +481,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5276,
+      "duration_ms": 5475,
       "id": "coverage.network_lockdown.open",
       "proves": [
         {
@@ -530,38 +530,78 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2219,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
-      "proves": [],
-      "reason": "fixture_missing",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "connection_harness_recorder_unavailable",
       "result": "not_run",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
           "operation": "fixture.coverage_open_connection",
-          "reason": "fixture_missing",
+          "reason": "connection_harness_recorder_unavailable",
           "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2209,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
-      "proves": [],
-      "reason": "fixture_missing",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "connection_harness_recorder_unavailable",
       "result": "not_run",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
           "operation": "fixture.coverage_open_connection",
-          "reason": "fixture_missing",
+          "reason": "connection_harness_recorder_unavailable",
           "result": "not_run"
         }
       ]

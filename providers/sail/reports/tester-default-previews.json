@@ -1,27 +1,27 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.previews.any_port": "sha256:dcceaaa19b64e6530e0bccdb505e061fb6e39b77289f62c9f79ead91a737f5f4",
-    "coverage.previews.reserved_ports": "sha256:43e949db2d1c635e92b87141a39b2eb0bf8ffdd65d991b162682fde0edcbd2fa",
-    "coverage.previews.survives_pause": "sha256:fed1a47b699a622b6042bce4b7b053a36f82502470ea92726ab07aea16bfd28e",
-    "coverage.previews.websocket": "sha256:0467325b9ed767b67e5dd5105f46b3c0c19ce35d4c1af5de190ab6c350ffdd88",
-    "previews.access.public": "sha256:f091f913ebbd4c0dd97862c63f47baf4f83a9de2e504109dc7730a015ae84a1b",
-    "previews.link_lifetime_seconds.public": "sha256:1565882a3810e32f4cbae067e901a677dda1bed9e9fbc885bc5104099225bc3c",
-    "previews.revocable.true.public": "sha256:673d0a354bbecf21c5ca55ee40c7e27ec71baf91032f68b0c619c397704c6dfc"
+    "coverage.previews.any_port": "sha256:ab5838c838358c61ce57c19e4d3b4db13af939ffbf14e9e2992047db8e590ec4",
+    "coverage.previews.reserved_ports": "sha256:35fb22e6117060152682016bceda29693ecba12d5b5ab492c56d6e70645ca1ab",
+    "coverage.previews.survives_pause": "sha256:79747e4618ad59801c13365770b9a3f89f5c6151bee2dcfd70542a43da643c6d",
+    "coverage.previews.websocket": "sha256:f1fafea4cc32f2481494bf99420fb614592a3202a9f456d27c19b52c156cd639",
+    "previews.access.public": "sha256:49a54377d39071e2e1e9830627652cba728ab85bf059e996962ba67a161a8022",
+    "previews.link_lifetime_seconds.public": "sha256:fb22c29816be831b2dbcfdc6f88c9519b27bdfc29e358d10cff44140fae7d6ba",
+    "previews.revocable.true.public": "sha256:d7763e7058cc618ba249c6743d3061e0ad274bd8842b01120424991ed236e1b8"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-23T16:21:36.815473+00:00",
+  "finished_at": "2026-11-25T05:31:11.227936+00:00",
   "provider": "sail",
-  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
-  "run_id": "public-62a8a01a3a11e3a2255e",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-f75f7d3d2789abafd80f",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "previews.access.public",
@@ -33,14 +33,14 @@
     "coverage.previews.reserved_ports"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T16:16:04.351249+00:00",
+  "started_at": "2026-11-25T05:25:34.765000+00:00",
   "subject": {
-    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
-    "version": "0.1.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -58,7 +58,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2563,
+      "duration_ms": 2536,
       "id": "previews.access.public",
       "proves": [
         {
@@ -136,7 +136,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 3535,
+      "duration_ms": 2980,
       "id": "previews.revocable.true.public",
       "proves": [
         {
@@ -254,7 +254,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 302811,
+      "duration_ms": 302391,
       "id": "previews.link_lifetime_seconds.public",
       "proves": [
         {
@@ -335,7 +335,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2404,
+      "duration_ms": 2526,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -391,7 +391,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2886,
+      "duration_ms": 2255,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -450,7 +450,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5132,
+      "duration_ms": 4564,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -572,7 +572,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 10724,
+      "duration_ms": 9780,
       "id": "coverage.previews.reserved_ports",
       "proves": [
         {

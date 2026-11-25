@@ -1,25 +1,25 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "facts.default_cwd": "sha256:947352e79dd672e6f464e224bc0a716b1d256d3fea48f3e53ea2fa8874c5807c",
-    "facts.default_user": "sha256:edcacbaaf78a80d689a5b337fc61527c126bfdb795daeea6373d28e590eb6f6a",
-    "lifetime_timer.at_end.destroyed": "sha256:077f2abf65fcc28b85352bf9eb07f0726efe9da2442c992db4d900eb51fcfd4b",
-    "processes.cancel.false": "sha256:db12eaf12e81d8d697d03b21395d1e290b4af569f4bf97184a633a2b58451a33",
-    "processes.input.false": "sha256:5d8d167be0070fcc8cb8a355d821c0446641dd5c50dbee388877c19d281fdb49"
+    "facts.default_cwd": "sha256:e07928727882d8fad7beb05e24ad4be9aad3c99c3edda77f8bdfa23f20e91907",
+    "facts.default_user": "sha256:669eb777df6d9f7d5bd38b1711fe67b5a7c87122a79e1605a9406b485efa3ec4",
+    "lifetime_timer.at_end.destroyed": "sha256:75a8d1ae46a35234dba8c8c05247867bb5ce9db82d071cb7cd6e44f4a7f488f0",
+    "processes.cancel.false": "sha256:85562281be5519fb200870de77e495d2fd3540b3ab9a5d25d6483f6bc6c2d744",
+    "processes.input.false": "sha256:18ed1a8b67e25026649c33bf41ee3e9256826d88e80e417d4f25508b824b55f7"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-23T15:47:44.079701+00:00",
+  "finished_at": "2026-11-25T05:23:26.248542+00:00",
   "provider": "sail",
-  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
-  "run_id": "public-f3e64eef9f5dd00a9a23",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-6bce60517c29bdcf224d",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "processes.input.false",
@@ -29,14 +29,14 @@
     "lifetime_timer.at_end.destroyed"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:42:31.966059+00:00",
+  "started_at": "2026-11-25T05:18:14.766687+00:00",
   "subject": {
-    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
-    "version": "0.1.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -102,7 +102,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1713,
+      "duration_ms": 1560,
       "id": "facts.default_user",
       "proves": [
         {
@@ -137,7 +137,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1768,
+      "duration_ms": 1485,
       "id": "facts.default_cwd",
       "proves": [
         {
@@ -172,7 +172,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 306460,
+      "duration_ms": 306268,
       "id": "lifetime_timer.at_end.destroyed",
       "proves": [
         {

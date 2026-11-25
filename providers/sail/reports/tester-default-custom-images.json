@@ -1,27 +1,28 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.custom_images.prepare.delete": "sha256:b092ad2f2aed384b26d78e13cf263f71ecee62068044e4c5ff1f7ab269257f1e",
-    "coverage.custom_images.prepare.idempotent": "sha256:831214e228c00e2e714947b1b8aca78a88580ac98bb4abb90fb2487415813775",
-    "coverage.custom_images.prepare.registry": "sha256:0318d6ca2e84860ea4417047417a1f8f191f9c307c3657884f3382596ce9446e",
-    "custom_images.oci": "sha256:424e746dca5c0ac0e4bbaa7375bac10f6de3f89d7171bbd86625eb9cda61d2fa",
-    "custom_images.provider_artifact": "sha256:a4a48f1490a42fa7f4af02c66c85f0cf46c8153b343567697092a00e77b1e5e7",
-    "images.v1.get_and_list": "sha256:8fb43264ff6fe0153d6971776010ed8c9bfdd1c6204d2264946356e5d2945c21",
-    "images.v1.idempotent_prepare": "sha256:ff1f632d5024cac8fb5976565aea1f5327f5e35a35cba76657e797c8f5ba1539",
-    "images.v1.prepare_oci": "sha256:0e64eaa38b355699f6b21d71da871d08350b7b7e5438b546b9139438f7f26cf7"
+    "coverage.custom_images.prepare.delete": "sha256:7f75091d7d55db1dd9088d6db1724dc154f26cb5117f3ba0ff7a50ceebb1cbd5",
+    "coverage.custom_images.prepare.idempotent": "sha256:e454290278e6ebcb937ef265233ce500c368ad4df66625e2de230c6e0731e3c5",
+    "coverage.custom_images.prepare.registry": "sha256:2fe6e057148d487dfe92f14edc5433f0d2f8bf2f4ef56b557ea76b23d3adb44a",
+    "custom_images.oci": "sha256:82ccf5ab5a0a187bfb0d044d9e4760f3e40b5a0b5e6d8bbf6d9213346e070cb4",
+    "custom_images.provider_artifact": "sha256:d341f47bc093c6a1b04e6bb6b3054761161085aa0162f5b00eee05e1426b76ab",
+    "images.v1.get_and_list": "sha256:31e30c7ef1875758dd38d4395c0834f376553d13146a516cc1ad0a30f941014e",
+    "images.v1.idempotent_prepare": "sha256:60c0c48abea879f74cf6cf52da070f94cb54f60a3604e5138426ef56c759e10c",
+    "images.v1.prepare_oci": "sha256:25e2002f04b6387e80775f79561fa659645b5971038926fbffc3d062a04d3d53"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-24T06:29:40.884886+00:00",
+  "finished_at": "2026-11-25T05:32:41.313838+00:00",
   "provider": "sail",
-  "revision": "99a44a615d6f12e9beef88e3158b4d1c9d412d5d",
-  "run_id": "public-59401994bf3c2fdc576f",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-126f85f83b70f3eb3535",
   "sdk_versions": {
-    "sandbox-provider-spec": "0.5.84"
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "images.v1.prepare_oci",
@@ -34,14 +35,14 @@
     "coverage.custom_images.prepare.delete"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-24T06:29:26.958470+00:00",
+  "started_at": "2026-11-25T05:32:29.048802+00:00",
   "subject": {
-    "discovery_digest": "sha256:668c1e29b236d024261181a0b6229a11114f42f15ae272275458de9fcd9311e8",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:3d5b36a22bb6aeb048f1a7ca169d3ecd7bd5272ce09a53300fadc0e86dc53c12",
-    "version": "0.2.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -55,7 +56,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 3252,
+      "duration_ms": 2985,
       "id": "images.v1.prepare_oci",
       "proves": [],
       "result": "passed",
@@ -151,7 +152,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 508,
+      "duration_ms": 334,
       "id": "images.v1.idempotent_prepare",
       "proves": [],
       "result": "passed",
@@ -193,7 +194,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 574,
+      "duration_ms": 396,
       "id": "images.v1.get_and_list",
       "proves": [],
       "result": "passed",
@@ -260,7 +261,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2442,
+      "duration_ms": 1981,
       "id": "custom_images.oci",
       "proves": [
         {
@@ -322,7 +323,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 1893,
+      "duration_ms": 1838,
       "id": "custom_images.provider_artifact",
       "proves": [
         {
@@ -384,7 +385,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2009,
+      "duration_ms": 1898,
       "id": "coverage.custom_images.prepare.registry",
       "proves": [
         {
@@ -433,7 +434,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 449,
+      "duration_ms": 288,
       "id": "coverage.custom_images.prepare.idempotent",
       "proves": [
         {
@@ -490,7 +491,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 374,
+      "duration_ms": 263,
       "id": "coverage.custom_images.prepare.delete",
       "proves": [
         {

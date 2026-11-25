@@ -1,101 +1,88 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "coverage.custom_images.build_context": "sha256:2f078cef514afabf74d935d6e5ec999f2b6e2c6de3f8d499d572a23b1176a4e3",
-    "coverage.custom_images.defaults.distro_dockerfile": "sha256:e220c20c84a2f8928114963e7e8155c53894f0e5c2f0625f3fb5ad5e3740a0fc",
-    "coverage.custom_images.defaults.dockerfile": "sha256:6aa5afbe4c57653a839c86b6640d557ba0eaadd171dd1bf591134758e0a2454f",
-    "coverage.custom_images.defaults.registry": "sha256:3176e7496065bef094dbd8e143d22ead00512fda097dc9156b3d3f893f6bb4ef",
-    "coverage.custom_images.prepare.delete": "sha256:b092ad2f2aed384b26d78e13cf263f71ecee62068044e4c5ff1f7ab269257f1e",
-    "coverage.custom_images.prepare.dockerfile_context": "sha256:db0b50c590cdbc9549585ed95c150d7118027412d185cd38a07960f65bea2e37",
-    "coverage.custom_images.prepare.dockerfile_distro": "sha256:a28f7af1c062418cfffe6a24bde42f9802a339ad8552b0f81d281f43e5a1c594",
-    "coverage.custom_images.prepare.dockerfile_distro_context": "sha256:7bd945870bc66b570980aaf4729953df5922f9bf2260dea9b13a09e169e86cc1",
-    "coverage.custom_images.prepare.dockerfile_standard_base_context": "sha256:9f8bfc4af33c84d469ff7493a8339e9a1ebae02a2b0aacf2b729392fe51a3157",
-    "coverage.custom_images.prepare.idempotent": "sha256:831214e228c00e2e714947b1b8aca78a88580ac98bb4abb90fb2487415813775",
-    "coverage.custom_images.prepare.image_config.env": "sha256:bdbb3ceb2a433aafdd4a1d1dd27bf37c09b020bc28838a4f9fba195a3e659feb",
-    "coverage.custom_images.prepare.image_config.user": "sha256:9d56b3ffebd97bc56c2dbd5b14687bc60e9c7a32d1f7f74a3b90b917cef038b7",
-    "coverage.custom_images.prepare.image_config.workdir": "sha256:6081189fa5793d4853605ca6fd2689fc4785e29ee9b85ae13663d97b8f71e737",
-    "coverage.custom_images.prepare.registry": "sha256:0318d6ca2e84860ea4417047417a1f8f191f9c307c3657884f3382596ce9446e",
-    "coverage.custom_images.prepare.size": "sha256:007b4ce79b247ee58f6f6f7032fc6de0b3c3907dee86db4068694a57c0e870cb",
-    "coverage.custom_images.prepared_size_without_request": "sha256:38d3117730f743f0feab04749d73eae1a0d71e4c54f794d697488415706999a4",
-    "coverage.custom_images.private_oci": "sha256:576aa39ef6efe901e9ec66a8af0f5784ccffef36ae7d7459bd2bc4014499b869",
-    "coverage.custom_images.runs_entrypoint.false": "sha256:b04cbed318b2a32f01b8d9140890ccad42ebe8a3ef11712d3af83caf5af567fc",
-    "coverage.custom_images.runs_entrypoint.true": "sha256:78ff0a44e97a38a86d0269c245a54f7c21967e5ec4a9d974df477af697416266",
-    "coverage.desktop.control": "sha256:6cdeb877063e968a90c8be6537f7529cdaa82ee7a304e81b1c43ee2f6c94119e",
-    "coverage.desktop.live_view": "sha256:55adc38afb85885507c8f3a52e5cad87ee279d016b6b23623710ed8cc55e03c3",
-    "coverage.docker.host": "sha256:513d3bdf8f412c5a070338b3b5c74d20cce62bee26850e20bc4434e3414736f6",
-    "coverage.facts.arch.amd64": "sha256:aa03eeef77289e3487619ad6f7bdc7d3a0424a309e731add3c40dbe9756903e4",
-    "coverage.facts.arch.arm64": "sha256:3e38868d6506671fc72d9a8ce80c541386fe7b4df992ea88c7c54d6dd586ce76",
-    "coverage.facts.disk_in_memory.false": "sha256:4a40e24e9f7fa258479394477571538c2fa7ef7de9b91e2ad57fb1f473145b46",
-    "coverage.facts.disk_in_memory.true": "sha256:c74089e5fd75c429bdfee0f7815046c7c20847e345faf01fb87569df6ae6be08",
-    "coverage.facts.guest_reserved_tcp_ports.8080": "sha256:909a81efb82b2209af35a7b5332284cfcd9b9b9a5674d275d80246a49b6ae534",
-    "coverage.facts.ipv4_destination_reach.native": "sha256:57d9ec2d275d4b2818fa726f7e40ffdc1ca061c77308d4a87973aea7cbd3415d",
-    "coverage.facts.kernel_features.ebpf": "sha256:607a2bbd29b02c6ccf80ddbafdcda105364991c6c4cb5d8cde020ccb4af559ae",
-    "coverage.facts.kernel_features.fuse": "sha256:03ddac35861982225639d5d2bcdc24a73dfd50f660bae6aa5ec9db548871f139",
-    "coverage.facts.kernel_features.nested_cgroups": "sha256:5e346247aaa38c73069e67243f6129af68969e618155d565281e3e5030dcff70",
-    "coverage.facts.kernel_features.netfilter": "sha256:378c94cabfbd435b6c046cba3a26ff8d85d78bd6924c1a2a0ef3f3ca2b2f5589",
-    "coverage.facts.libc.glibc": "sha256:b3162b23b1de2f453d8cebae3bdcfc4980c40e0d096490f4a05cc66fbfe57641",
-    "coverage.facts.libc.musl": "sha256:5a4708046e9017b114afdffac6c5b4c140b0826d5c05b670b37076191a0b0bb7",
-    "coverage.facts.max_lifetime.active": "sha256:efaa647bdc38c71517570c5a90ead57310d0e6540e90e884d7cc190628718aeb",
-    "coverage.facts.max_process": "sha256:a3d1ba6d773bd8e11908df7a1c3f2cd30a28fd3bd206c72a1814c6d116b8271f",
-    "coverage.facts.max_run": "sha256:1a1192170b9b31f16a097abcdfbf90ef99cc5f097bc4c9a584c4ce3016639b22",
-    "coverage.facts.on_memory_exhausted.process_killed": "sha256:c763d104ece85eb61ead0d8518eeb6b35d73101628d0c4227730294f62e9bb5a",
-    "coverage.facts.on_memory_exhausted.sandbox_ended": "sha256:e2bd78895f1bde63bbaf6931f843a90b6ade98297ba92d81d7553398d4311442",
-    "coverage.facts.outbound_ip_families.ipv4": "sha256:9236cd062bbf0241a6dd859d0117a04c39066ffb8c82108d2ea0f12bc4b265db",
-    "coverage.facts.outbound_ip_families.ipv6": "sha256:cecffa8ea7911f7a3fd3a320ed3d3e651cbc633c3b7758f7371e4103ab41eeb8",
-    "coverage.facts.outbound_traffic.any_tcp": "sha256:28eb5f8fcfa6efa903e35a35feabc98a361da7a8bdb30674defeeb8fede16925",
-    "coverage.facts.outbound_traffic.http": "sha256:5b3cc2b2ccb3e59af8d08a153bffe42ef7b497bdfde2f51312aea3c6ebfb5201",
-    "coverage.facts.outbound_traffic.udp": "sha256:470ebd9040c27c0faf2942f9fef63ddec7b6fa53f39a3fc960d6b214bb3b01af",
-    "coverage.facts.package_manager.apk": "sha256:c2272f144e8162f70e52a4fff8199160a83f3b9ab1d23a50b2cec03526c88e75",
-    "coverage.facts.package_manager.apt": "sha256:cc161d4463222b4ba198d393fbdff453f172f07ebb13a9d9c56f1964e201e964",
-    "coverage.facts.package_manager.dnf": "sha256:fc5f57faa84e2c8b7d9cfb998318089058d71003aadf9ac5c517e066231a59ca",
-    "coverage.facts.package_manager.none": "sha256:f0eabdc2e7ca399d6436caf032c38bfe262f1c7c56de37017f736ad6193f55bb",
-    "coverage.facts.package_manager.pacman": "sha256:a8a52471ec93ee0757155e7f6ef2812a98b2f88a2f77e227a7831715ac424355",
-    "coverage.facts.root.by_default": "sha256:d610266ff078d317700406348fc72769d71eccf902133184aa6d8101c1a9c195",
-    "coverage.facts.root.per_command": "sha256:a723a2b8d12ec759f795f5b030b01dc3702dce2c71a216b3e3109b97bae0f317",
-    "coverage.facts.root.sudo": "sha256:824181107edc638a0fe2983936a0d065930aadbf89eeafc10140268848a50ce9",
-    "coverage.facts.size_is_ceiling.false": "sha256:e7cbfdbe6fc7c30015730a3ab71ef6cf4968f2851c5c8fe6716a568ea7f44131",
-    "coverage.facts.size_is_ceiling.true": "sha256:58529f0e4ee99ac7315acbcf7d91d8f078ccfac4acddd4d4df383112b2eff8fd",
-    "coverage.facts.sizes.delivered": "sha256:5c5fdd2c9d65648c24a478dc7c3e529d53626ecb512ddff328cc65daf6953916",
-    "coverage.guest_user.selectable": "sha256:0af8ff397666f00b61823fb27a638e8384abaac7f029d572ed4f2a75717c075c",
-    "coverage.hidden_secrets.injection.sets_header": "sha256:3d70488e9ebedf1958ccf906d45030e6fb7d5daa1dbae89056cf7a9bcf6f7f4c",
-    "coverage.hidden_secrets.intercepts.all_https": "sha256:2a7aafe402806a563c56e77845a52d1e64e1e65fbed2ed7731878825e91d8f96",
-    "coverage.hidden_secrets.intercepts.injected_hosts": "sha256:60a50b4fddc7a0bbe5a64effde569aaa238a860a7364210584776f7613315b07",
-    "coverage.hidden_secrets.max_inject_into": "sha256:84974f43d4445c79aadc38ccb315bd1d0a58cbb4b081a9f5d12d377a56c42751",
-    "coverage.hidden_secrets.rotates.false": "sha256:11ae86e330e51e46f7b1478d52f108ed3ad743984e6613e2187dbe82c8681c32",
-    "coverage.hidden_secrets.rotates.true": "sha256:b728b1fe47b8cd91188da360ab96e93a84251b1cb4e50fe9d20ca290efaa2146",
-    "coverage.hidden_secrets.scrubs_responses.false": "sha256:9524d7c8449eadec3c9298f4d4c52e1df36d01ff66611b1394f65b4b2309b555",
-    "coverage.hidden_secrets.scrubs_responses.true": "sha256:315097a07487f00f62d9be3b4c28e5bfd3ab4481b55be4e5b7c805ecadb3ae97",
-    "coverage.hidden_secrets.transparent.false": "sha256:3866dbd1fe837ac952bff88259e65f3beb2b4661b3c222be715cd4776f4845c7",
-    "coverage.hidden_secrets.transparent.true": "sha256:85bb93a410fab8b8269aaf8c59a72bceda9547169038d92223f753e42a8a6bd9",
-    "coverage.hidden_secrets.wildcards": "sha256:be58d838a683bb7f4ea603cce10f34e1abf600a4699ba5bf12ac93bc9a37ec60",
-    "coverage.network_lockdown.allowlist.mixed": "sha256:33501c9688408d10aa9b8aa337976096efdfba63e2604a89dd3bf4f635232b95",
-    "coverage.network_lockdown.changeable.true": "sha256:3bbde8ab0cac5429931325082ff1aa094161bbafed90d6f43d9c9f59aa3134f3",
-    "coverage.network_lockdown.open": "sha256:5ed72fdbf637cd8daf97d57ef242831fbf8b4922aa87a504c880f4e6e81289ec",
-    "coverage.network_lockdown.policy_transition.denylist": "sha256:28969ca630a415a4e557275f8489f81828fdfc0dca9afe6477bd2dbba2853530",
-    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:c3004ecbf84d4239c1de0506880b3e56ff2ef680b02a12be54b26baee1bb02a7",
-    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:166e894f77918c21134fa30340402fbd55573d59a956c304b871091ce48acd80",
-    "coverage.network_lockdown.switchable.true": "sha256:8b3cbab9c8c4c309bd9d4154203c8b5168c6346542fc97806f6be9201013bdfd",
-    "coverage.previews.any_port": "sha256:dcceaaa19b64e6530e0bccdb505e061fb6e39b77289f62c9f79ead91a737f5f4",
-    "coverage.previews.survives_pause": "sha256:fed1a47b699a622b6042bce4b7b053a36f82502470ea92726ab07aea16bfd28e",
-    "coverage.previews.websocket": "sha256:0467325b9ed767b67e5dd5105f46b3c0c19ce35d4c1af5de190ab6c350ffdd88",
-    "coverage.tcp_ports.none": "sha256:0cb503716129b42c52b09b72633ed996afa1153934bbd514a5d7e7bcda7c63c5",
-    "coverage.terminal.end": "sha256:50acbf08641c98d09d8f5c365a6bb2f80e6e486f14e84eda28f426da07f70e3a",
-    "coverage.terminal.reattach": "sha256:2365ef8f9e4a9a65a54a25e865ca8d1066d6b5d956348257967da157a31c7e4c",
-    "coverage.volumes.read_only": "sha256:4cabd670986ef15f8f1d0747c093cb63ec512b5048aaf47d3fdec1f6456c0525"
+    "coverage.custom_images.prepare.delete": "sha256:7f75091d7d55db1dd9088d6db1724dc154f26cb5117f3ba0ff7a50ceebb1cbd5",
+    "coverage.custom_images.prepare.idempotent": "sha256:e454290278e6ebcb937ef265233ce500c368ad4df66625e2de230c6e0731e3c5",
+    "coverage.custom_images.prepare.registry": "sha256:2fe6e057148d487dfe92f14edc5433f0d2f8bf2f4ef56b557ea76b23d3adb44a",
+    "coverage.custom_images.prepare.size": "sha256:ab6d7d46177298d60c0a12ff9508c7dd0babf6964e2481d6b3878b9f77fc7b81",
+    "coverage.custom_images.prepared_size_without_request": "sha256:f9163ef15681885df5abcd0ab10cac4e658d421bd48e3a68fd814e0a037adfcd",
+    "coverage.desktop.control": "sha256:650fed19a4f482d509af4b624cbe56fe9ec8728a4c81bcac2121b0c11ce9fb5b",
+    "coverage.desktop.live_view": "sha256:70e6f0ae3f408c7c23ff0408ae164f6d48c9e53d3628862896687cee291145d9",
+    "coverage.docker.host": "sha256:8bdd37b806bdfdc6cc74a26d240c82579295cd1cffbb7e68a58272564e80304d",
+    "coverage.facts.arch.amd64": "sha256:a9049fb85f8c8602fa8dc3ad9fba3242a7b2d47970f86b696e03f12a7b48930a",
+    "coverage.facts.arch.arm64": "sha256:f472e5319b2b69b3856d12b3999f91ed7c4b9395d0c253a9cdf408977fc9dec0",
+    "coverage.facts.disk_in_memory.false": "sha256:2bb3e86b748a9f86aa205c5e5013a65d07eec04cd1c880b720c8a642e9086015",
+    "coverage.facts.disk_in_memory.true": "sha256:8785d0db6cac35768aeb572b2a232e9d36c8ba37e5a1ff4f08ff5c49fcc5e59d",
+    "coverage.facts.guest_reserved_tcp_ports.8080": "sha256:20ffde5a8289e678fdb72fc887341a5d9d7eba6dcbc717480b58279736f88e93",
+    "coverage.facts.ipv4_destination_reach.native": "sha256:2967eabb953765891c8d1c5f803f637d612991b8fd9a014db906c31a9ef04cee",
+    "coverage.facts.kernel_features.ebpf": "sha256:6bb1c09aa50b844be06e93f4ed6dffd4f46ad2f71669226b5f245da8dd5c98c4",
+    "coverage.facts.kernel_features.fuse": "sha256:6962e5b9c3293e31ee28e2fe10ab2ed869032c6eb679380cc66e12f0ffe2e8b1",
+    "coverage.facts.kernel_features.nested_cgroups": "sha256:9ccb585c225c301dcabd60fdb68ede38045fb96b52e303b2bed14a79bee71796",
+    "coverage.facts.kernel_features.netfilter": "sha256:5a71b04c597635ed8f2c16c9655de977f00555ad1f999564baa8673dc24309cc",
+    "coverage.facts.libc.glibc": "sha256:d49930ca47fc9b8816a845fd658bd2f2214e7b1f5671635fe82fd07ec634d657",
+    "coverage.facts.libc.musl": "sha256:b7373f4c827ba4de0eaa4be76d6507e208dc601f34b7e724b07e4a7ba489ffd0",
+    "coverage.facts.max_lifetime.active": "sha256:f8e0dab30d2a5c62ea926c015a0ffcda90a38f2d5a6b3f638bc9b86968dbccfb",
+    "coverage.facts.max_process": "sha256:0d334f49ef0ace4bb6a30dced463bc9aa6bf727a89313c62ed5240eb4aeeb95d",
+    "coverage.facts.max_run": "sha256:d5c71c6c70e87137d1ed6379bebf8cad88bdacbc3d8d1585e1cfec9c596d24e1",
+    "coverage.facts.on_memory_exhausted.process_killed": "sha256:cda05f586200f45200580d03dbdec7bd3313416a60fe657a2e7761ca1fc334f9",
+    "coverage.facts.on_memory_exhausted.sandbox_ended": "sha256:d3b5072760f54569446aca2149efee0cbcc7140ab03e8b011b9036738a2bbbc6",
+    "coverage.facts.outbound_ip_families.ipv4": "sha256:05ae447bd538ca0bc9d182ded9c7b59499f56c6099388c9a9bc388d02a9a1e7a",
+    "coverage.facts.outbound_ip_families.ipv6": "sha256:af0cd97a3835c517887964ad573fb6f2ba0175a6e277bffdd1f746c9defc3c68",
+    "coverage.facts.outbound_traffic.any_tcp": "sha256:ba6e9d0fd621f86df7e31d0a0e4757a709873f15e07c04eb65d2c3a02f6cb296",
+    "coverage.facts.outbound_traffic.http": "sha256:41731ae52ec97773731eb45174d2e025e86631e340a52485bd98b4e29c4c104a",
+    "coverage.facts.outbound_traffic.udp": "sha256:890cf6f797488a50da4870a588b015a2ed5bdafe9489e06a175d9cc646ead2a8",
+    "coverage.facts.package_manager.apk": "sha256:c44bc8200f7ba46217847b6a18c5a06824a1fb4a6eef74cd1370039e4acc970e",
+    "coverage.facts.package_manager.apt": "sha256:eb36b0c79ea4a513aa0f284ead8fca01dcfa7cd025dcb3e28297655171dce9a7",
+    "coverage.facts.package_manager.dnf": "sha256:b3e4b388b5d7c4f3756d37e1e07bbee83059b9b2dc4c774c471350dbdab8d3d8",
+    "coverage.facts.package_manager.none": "sha256:1d30cae6af9e82b88d2c4cd61a3b1e4bba851672c94db2a573e27d253ddb1691",
+    "coverage.facts.package_manager.pacman": "sha256:ef78bc1424e8aff0d095ec99a7471113d12c524460417352a1656b020a97e473",
+    "coverage.facts.root.by_default": "sha256:38ae2f18d08d83c275fa0db446b89ad0822fda4fbf93563d80dc40cd275254cf",
+    "coverage.facts.root.per_command": "sha256:10688b123505bc8ef6a5adf697ff03b40b1fef4da32d3538bf696a619a4a998c",
+    "coverage.facts.root.sudo": "sha256:1d84228d77733fd92cbc3d831918a946e99fd826fa66ebbf0b483927fd2b0a0c",
+    "coverage.facts.size_is_ceiling.false": "sha256:38a92110f7537cd2bfebee9ba6be215a117286c74d943a6d20628de97de6772a",
+    "coverage.facts.size_is_ceiling.true": "sha256:631b6422c709af04815430a139ee58203a948162f543141719977ae7bd57a4c9",
+    "coverage.facts.sizes.delivered": "sha256:6aa6832029db6d1fc87bee3344566c7c33a4b454110fe8763b7af5e0d578cb06",
+    "coverage.guest_user.selectable": "sha256:09f52a15a6db73d603293c2855a09223537fb9597f0101aad5d2f9675d5119fe",
+    "coverage.hidden_secrets.injection.sets_header": "sha256:4588bf5a0e00a332388dfb40c12eb52371892fae429f3bf515c9fce60857bce0",
+    "coverage.hidden_secrets.intercepts.all_https": "sha256:286a8bbef1b39f7bb82f6208e4ba5c68ab043f089cf900ba3319358ce3eff178",
+    "coverage.hidden_secrets.intercepts.injected_hosts": "sha256:a44e13d371611ef11e4035c8a2f579f2cfe10b5e8b5b5677e3193a4e7800954f",
+    "coverage.hidden_secrets.max_inject_into": "sha256:59d9d83e2297c0213c1186b2dbc463e34465909c5f8b929ce6520e5308d20d80",
+    "coverage.hidden_secrets.rotates.false": "sha256:4c18f42f5ca2c88f4d0b86f5b71c759ecbc096c470902fcdff9c727215893f38",
+    "coverage.hidden_secrets.rotates.true": "sha256:f0d0723d463dc1dc15b1bf7524aa15f5c4d799a8c55d712cff79e4e4e2cfd0d5",
+    "coverage.hidden_secrets.scrubs_responses.false": "sha256:6f39a546b297e859d3faabaaaf9f6dd209793e18166a3b33019abf8bb8fb34bf",
+    "coverage.hidden_secrets.scrubs_responses.true": "sha256:ee2c74e7ce4d83f781a545d164f44310d0e5c96e0b9ef3084c1b082ea1669f10",
+    "coverage.hidden_secrets.transparent.false": "sha256:dcd290e6d352223e7d1e1919af344c20f49ef09e68db4ec95bbccac5bce9abd1",
+    "coverage.hidden_secrets.transparent.true": "sha256:fefa575954fa54618b7a83687f6018b5cb5b49a9a40d595f6fb58aca617aa097",
+    "coverage.hidden_secrets.wildcards": "sha256:396b0b416f95d39164fe3a4d9aa3d0359588331ca98306f77765a767e3eecdb1",
+    "coverage.network_lockdown.allowlist.mixed": "sha256:f3fa91246e8d8c72bd94dd72d4c455480d0e048631d310610b197a787a00467f",
+    "coverage.network_lockdown.changeable.true": "sha256:49a74a306aa38a2d746ef47406d44416356c2a8e04f975190cf9cc0b6e1c9bb3",
+    "coverage.network_lockdown.open": "sha256:dd1242eb67ff148560e31f90fa69495db512001907c085c482e1275776c6f703",
+    "coverage.network_lockdown.policy_transition.denylist": "sha256:15389588cc797fefdcb09f366531bcd1b8ded545dd5c7b8746d23c830623695e",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:a50352ee0986728188c6dabb1700f7051dbddd916bc1e2e14145e56166951e48",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:c10201c467913e9ee6869111380fc219f36be8a25bc37167a24800c750f379c5",
+    "coverage.network_lockdown.switchable.true": "sha256:da06d065ea75dcb0fa1382655996279ce22fb2cdaffc86524518d47ccb760fbb",
+    "coverage.previews.any_port": "sha256:ab5838c838358c61ce57c19e4d3b4db13af939ffbf14e9e2992047db8e590ec4",
+    "coverage.previews.reserved_ports": "sha256:35fb22e6117060152682016bceda29693ecba12d5b5ab492c56d6e70645ca1ab",
+    "coverage.previews.survives_pause": "sha256:79747e4618ad59801c13365770b9a3f89f5c6151bee2dcfd70542a43da643c6d",
+    "coverage.previews.websocket": "sha256:f1fafea4cc32f2481494bf99420fb614592a3202a9f456d27c19b52c156cd639",
+    "coverage.tcp_ports.none": "sha256:afc5317410573d45a97ba0c0d7c8b8e4c7e24fbd909b0557ec3054dce03db204",
+    "coverage.terminal.end": "sha256:51f8fc53244b955b36a9f21ea503128704c1fcaadd7167fd7dac0f0096452bcd",
+    "coverage.terminal.reattach": "sha256:348b368c4fdef5718aa45b70a725c17c6c26761d28a67d2c049b098d5335814d",
+    "coverage.volumes.read_only": "sha256:fe4bd38c920e5b51266cfcc7a1b60731d0083ec6b042d651ea75d1475bfd5e15"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-23T15:59:34.878455+00:00",
+  "finished_at": "2026-11-25T05:46:08.158095+00:00",
   "provider": "sail",
-  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
-  "run_id": "public-f37dc05c8d3a31d4654e",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-b45a534e0cc77a6ab782",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "coverage.guest_user.selectable",
@@ -136,10 +123,9 @@
     "coverage.previews.websocket",
     "coverage.previews.any_port",
     "coverage.previews.survives_pause",
+    "coverage.previews.reserved_ports",
     "coverage.terminal.reattach",
     "coverage.terminal.end",
-    "coverage.custom_images.runs_entrypoint.true",
-    "coverage.custom_images.runs_entrypoint.false",
     "coverage.network_lockdown.allowlist.mixed",
     "coverage.network_lockdown.changeable.true",
     "coverage.network_lockdown.switchable.true",
@@ -158,19 +144,7 @@
     "coverage.hidden_secrets.wildcards",
     "coverage.hidden_secrets.transparent.true",
     "coverage.hidden_secrets.transparent.false",
-    "coverage.custom_images.build_context",
     "coverage.custom_images.prepare.registry",
-    "coverage.custom_images.private_oci",
-    "coverage.custom_images.prepare.image_config.env",
-    "coverage.custom_images.prepare.image_config.workdir",
-    "coverage.custom_images.prepare.image_config.user",
-    "coverage.custom_images.prepare.dockerfile_context",
-    "coverage.custom_images.defaults.dockerfile",
-    "coverage.custom_images.defaults.distro_dockerfile",
-    "coverage.custom_images.defaults.registry",
-    "coverage.custom_images.prepare.dockerfile_distro",
-    "coverage.custom_images.prepare.dockerfile_distro_context",
-    "coverage.custom_images.prepare.dockerfile_standard_base_context",
     "coverage.custom_images.prepare.size",
     "coverage.custom_images.prepared_size_without_request",
     "coverage.custom_images.prepare.idempotent",
@@ -181,14 +155,14 @@
     "coverage.facts.guest_reserved_tcp_ports.8080"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:47:45.869297+00:00",
+  "started_at": "2026-11-25T05:32:42.339604+00:00",
   "subject": {
-    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
-    "version": "0.1.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -202,7 +176,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2549,
+      "duration_ms": 2499,
       "id": "coverage.guest_user.selectable",
       "proves": [
         {
@@ -395,7 +369,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1747,
+      "duration_ms": 1721,
       "id": "coverage.facts.arch.amd64",
       "proves": [
         {
@@ -434,7 +408,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2000,
+      "duration_ms": 1707,
       "id": "coverage.facts.arch.arm64",
       "proves": [
         {
@@ -474,7 +448,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1744,
+      "duration_ms": 1594,
       "id": "coverage.facts.root.by_default",
       "proves": [
         {
@@ -513,7 +487,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1741,
+      "duration_ms": 1698,
       "id": "coverage.facts.root.sudo",
       "proves": [
         {
@@ -553,7 +527,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1537,
+      "duration_ms": 1504,
       "id": "coverage.facts.root.per_command",
       "proves": [
         {
@@ -589,7 +563,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1424,
+      "duration_ms": 1447,
       "id": "coverage.facts.kernel_features.fuse",
       "proves": [
         {
@@ -625,7 +599,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1575,
+      "duration_ms": 1247,
       "id": "coverage.facts.kernel_features.ebpf",
       "proves": [
         {
@@ -661,7 +635,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1482,
+      "duration_ms": 1357,
       "id": "coverage.facts.kernel_features.nested_cgroups",
       "proves": [
         {
@@ -697,7 +671,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1549,
+      "duration_ms": 1408,
       "id": "coverage.facts.kernel_features.netfilter",
       "proves": [
         {
@@ -790,7 +764,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6657,
+      "duration_ms": 4843,
       "id": "coverage.facts.package_manager.apt",
       "proves": [
         {
@@ -827,7 +801,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1748,
+      "duration_ms": 1782,
       "id": "coverage.facts.package_manager.apk",
       "proves": [
         {
@@ -865,7 +839,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1796,
+      "duration_ms": 1668,
       "id": "coverage.facts.package_manager.dnf",
       "proves": [
         {
@@ -903,7 +877,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1805,
+      "duration_ms": 2049,
       "id": "coverage.facts.package_manager.pacman",
       "proves": [
         {
@@ -941,7 +915,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1957,
+      "duration_ms": 1695,
       "id": "coverage.facts.package_manager.none",
       "proves": [
         {
@@ -979,7 +953,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1934,
+      "duration_ms": 1745,
       "id": "coverage.facts.libc.glibc",
       "proves": [
         {
@@ -1016,7 +990,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2171,
+      "duration_ms": 1809,
       "id": "coverage.facts.libc.musl",
       "proves": [
         {
@@ -1058,7 +1032,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 12269,
+      "duration_ms": 11774,
       "id": "coverage.facts.on_memory_exhausted.process_killed",
       "proves": [
         {
@@ -1096,7 +1070,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 12402,
+      "duration_ms": 12109,
       "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
       "proves": [
         {
@@ -1130,7 +1104,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6673,
+      "duration_ms": 6352,
       "id": "coverage.facts.disk_in_memory.true",
       "proves": [
         {
@@ -1169,7 +1143,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 6703,
+      "duration_ms": 6497,
       "id": "coverage.facts.disk_in_memory.false",
       "proves": [
         {
@@ -1201,58 +1175,39 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 28306,
       "id": "coverage.facts.size_is_ceiling.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "facts/size-is-ceiling"
       ],
       "steps": [
         {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.facts.size_is_ceiling.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "facts/size-is-ceiling"
-      ],
-      "steps": [
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
         {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.facts.sizes.delivered",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "facts/sizes"
-      ],
-      "steps": [
-        {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 4.006, \"burn_threads\": 2, \"burn_wall_seconds\": 4.0, \"cpu_quota\": null, \"processors\": 3}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.0015, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"1\", \"requested_memory_bytes\": 17179869184}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
         }
       ]
     },
@@ -1264,7 +1219,82 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1575,
+      "duration_ms": 31630,
+      "id": "coverage.facts.size_is_ceiling.false",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": false
+        }
+      ],
+      "reason": "size_is_ceiling",
+      "result": "differs",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "size_is_ceiling": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1469,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            },
+            "observed_cpu": 4,
+            "observed_memory_mib": 14979
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1265,
       "id": "coverage.facts.max_run",
       "proves": [
         {
@@ -1304,7 +1334,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 601854,
+      "duration_ms": 601858,
       "id": "coverage.facts.max_process",
       "proves": [
         {
@@ -1487,7 +1517,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2551,
+      "duration_ms": 2285,
       "id": "coverage.previews.websocket",
       "proves": [
         {
@@ -1543,7 +1573,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2424,
+      "duration_ms": 1996,
       "id": "coverage.previews.any_port",
       "proves": [
         {
@@ -1602,7 +1632,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 5018,
+      "duration_ms": 3959,
       "id": "coverage.previews.survives_pause",
       "proves": [
         {
@@ -1674,6 +1704,92 @@
     },
     {
       "class": "default",
+      "cleanup": [
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "preview",
+          "result": "deleted"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 9263,
+      "id": "coverage.previews.reserved_ports",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "reserved_ports",
+          "value": [
+            22,
+            10000,
+            10001,
+            15001,
+            15002
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "previews/reserved-ports"
+      ],
+      "steps": [
+        {
+          "observations": {
+            "common_served": {
+              "matches": true
+            },
+            "reserved_refused": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_reserved_ports",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
       "cleanup": [],
       "duration_ms": 0,
       "id": "coverage.terminal.reattach",
@@ -1725,99 +1841,150 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.runs_entrypoint.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/runs-entrypoint"
-      ],
-      "steps": [
+      "cleanup": [
         {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "kind": "sandbox",
+          "result": "deleted"
         }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.runs_entrypoint.false",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/runs-entrypoint"
       ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 3867,
       "id": "coverage.network_lockdown.allowlist.mixed",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "allowlist"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "entry_kinds",
+          "value": [
+            "names",
+            "addresses"
+          ]
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/allowlist",
         "network_lockdown/entry-kinds"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "listed_address_allowed": {
+              "matches": true
+            },
+            "listed_name_allowed": {
+              "matches": true
+            },
+            "unlisted_denied": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_allowlist",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 4672,
       "id": "coverage.network_lockdown.changeable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "changeable",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/changeable",
         "provider-api/network-update"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 8506,
       "id": "coverage.network_lockdown.switchable.true",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/switchable",
         "provider-api/network-update"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
@@ -1826,73 +1993,155 @@
       "cleanup": [],
       "duration_ms": 0,
       "id": "coverage.network_lockdown.policy_transition.denylist",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
           "operation": "create",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 5501,
       "id": "coverage.network_lockdown.open",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "policy",
+          "value": "open"
+        },
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "network_lockdown/open"
       ],
       "steps": [
         {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "passed": {
+              "matches": true
+            }
+          },
           "operation": "fixture.coverage_network_checks",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "policy_changed": {
+              "matches": true
+            },
+            "source_preserved": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_policy_change",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2186,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
-      "proves": [],
-      "reason": "fixture_missing",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "connection_harness_recorder_unavailable",
       "result": "not_run",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_open_connection",
+          "reason": "connection_harness_recorder_unavailable",
           "result": "not_run"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3328,
       "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
-      "proves": [],
-      "reason": "fixture_missing",
+      "proves": [
+        {
+          "gate": "network_lockdown",
+          "knob": "switchable",
+          "value": true
+        }
+      ],
+      "reason": "connection_harness_recorder_unavailable",
       "result": "not_run",
       "rules": [
         "network_lockdown/switchable"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "create",
-          "reason": "fixture_missing",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_open_connection",
+          "reason": "connection_harness_recorder_unavailable",
           "result": "not_run"
         }
       ]
@@ -1917,7 +2166,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2162,
+      "duration_ms": 2168,
       "id": "coverage.hidden_secrets.rotates.true",
       "proves": [
         {
@@ -1959,7 +2208,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2284,
+      "duration_ms": 1899,
       "id": "coverage.hidden_secrets.rotates.false",
       "proves": [
         {
@@ -2001,7 +2250,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2058,
+      "duration_ms": 2183,
       "id": "coverage.hidden_secrets.scrubs_responses.true",
       "proves": [
         {
@@ -2043,7 +2292,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2248,
+      "duration_ms": 2582,
       "id": "coverage.hidden_secrets.scrubs_responses.false",
       "proves": [
         {
@@ -2085,7 +2334,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2248,
+      "duration_ms": 1836,
       "id": "coverage.hidden_secrets.injection.sets_header",
       "proves": [
         {
@@ -2127,7 +2376,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2051,
+      "duration_ms": 2306,
       "id": "coverage.hidden_secrets.intercepts.injected_hosts",
       "proves": [
         {
@@ -2169,7 +2418,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2396,
+      "duration_ms": 1743,
       "id": "coverage.hidden_secrets.intercepts.all_https",
       "proves": [
         {
@@ -2193,20 +2442,38 @@
     },
     {
       "class": "default",
-      "cleanup": [],
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
       "duration_ms": 0,
       "id": "coverage.hidden_secrets.max_inject_into",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "max_inject_into",
+          "value": {
+            "at_least": 32
+          }
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
       "rules": [
         "hidden_secrets/max-inject-into"
       ],
       "steps": [
         {
-          "operation": "prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "observations": {},
+          "operation": "secret.create",
+          "result": "passed"
+        },
+        {
+          "operation": "create",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
         }
       ]
     },
@@ -2223,7 +2490,7 @@
       ],
       "steps": [
         {
-          "operation": "create",
+          "operation": "fixture.coverage_secret_wildcard",
           "reason": "fixture_missing",
           "result": "not_run"
         }
@@ -2249,7 +2516,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2300,
+      "duration_ms": 2006,
       "id": "coverage.hidden_secrets.transparent.true",
       "proves": [
         {
@@ -2291,7 +2558,7 @@
           "result": "already_released"
         }
       ],
-      "duration_ms": 2208,
+      "duration_ms": 2003,
       "id": "coverage.hidden_secrets.transparent.false",
       "proves": [
         {
@@ -2315,267 +2582,18 @@
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.build_context",
-      "proves": [
+      "cleanup": [
         {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
+          "kind": "sandbox",
+          "result": "deleted"
         },
         {
-          "gate": "custom_images",
-          "knob": "build_context",
-          "value": true
+          "kind": "image",
+          "result": "deleted"
         }
       ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/build-context"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "duration_ms": 2066,
       "id": "coverage.custom_images.prepare.registry",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.private_oci",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/private-oci",
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.image_config.env",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "image_config",
-          "value": [
-            "env"
-          ]
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.image_config.workdir",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "image_config",
-          "value": [
-            "workdir"
-          ]
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.image_config.user",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "image_config",
-          "value": [
-            "user"
-          ]
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.dockerfile_context",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        },
-        {
-          "gate": "custom_images",
-          "knob": "build_context",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/build-context"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.defaults.dockerfile",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        },
-        {
-          "gate": "custom_images",
-          "knob": "image_defaults",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/image-defaults"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.defaults.distro_dockerfile",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        },
-        {
-          "gate": "custom_images",
-          "knob": "image_defaults",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/image-defaults"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.defaults.registry",
       "proves": [
         {
           "gate": "custom_images",
@@ -2586,186 +2604,255 @@
           "gate": "custom_images",
           "knob": "prepared",
           "value": true
-        },
-        {
-          "gate": "custom_images",
-          "knob": "image_defaults",
-          "value": true
         }
       ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/image-defaults"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.dockerfile_distro",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
-        },
-        {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
+      "result": "passed",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
-        }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.dockerfile_distro_context",
-      "proves": [
-        {
-          "gate": "custom_images",
-          "knob": "source",
-          "value": "dockerfile"
+          "result": "passed"
         },
         {
-          "gate": "custom_images",
-          "knob": "prepared",
-          "value": true
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
         },
         {
-          "gate": "custom_images",
-          "knob": "build_context",
-          "value": true
-        }
-      ],
-      "reason": "discovery does not claim the section that needs this operation",
-      "result": "unsupported",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/build-context"
-      ],
-      "steps": [
-        {
-          "operation": "image.prepare",
-          "reason": "discovery does not claim the section that needs this operation",
-          "result": "unsupported"
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
-      "id": "coverage.custom_images.prepare.dockerfile_standard_base_context",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
-      "rules": [
-        "custom_images/prepared",
-        "custom_images/build-context"
-      ],
-      "steps": [
+      "cleanup": [
         {
-          "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
         }
-      ]
-    },
-    {
-      "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      ],
+      "duration_ms": 1927,
       "id": "coverage.custom_images.prepare.size",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
+          "observations": {
+            "resources": {
+              "matches": true
+            }
+          },
           "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2054,
       "id": "coverage.custom_images.prepared_size_without_request",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "cpu_delivered": {
+              "matches": true
+            },
+            "memory_delivered": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 309,
       "id": "coverage.custom_images.prepare.idempotent",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "equal": {
+              "matches": true
+            }
+          },
+          "operation": "bindings.compare",
+          "result": "passed"
         }
       ]
     },
     {
       "class": "default",
-      "cleanup": [],
-      "duration_ms": 0,
+      "cleanup": [
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 269,
       "id": "coverage.custom_images.prepare.delete",
-      "proves": [],
-      "reason": "fixture_missing",
-      "result": "not_run",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        }
+      ],
+      "result": "passed",
       "rules": [
         "custom_images/prepared"
       ],
       "steps": [
         {
+          "observations": {},
           "operation": "image.prepare",
-          "reason": "fixture_missing",
-          "result": "not_run"
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "image.delete",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "absent"
+              },
+              "matches": true
+            }
+          },
+          "operation": "image.state",
+          "result": "passed"
         }
       ]
     },

@@ -1,23 +1,23 @@
 {
   "baseline": "not_run",
   "check_digests": {
-    "files.write.user": "sha256:0dc3f3d84e52f4403e4afb2816e4b21df7db4479669e0e31342191edb87a783a",
-    "process.start.user": "sha256:3e5fd3325df32fb72a7163ea35e330df60de29412e7a4cdeb3f3bd935fdd9c0c",
-    "run.user": "sha256:7c81584ed130f96a686697ed79d12d12496bbfe6641497c5ef7ccb6bb3c3c082"
+    "files.write.user": "sha256:417c3430b2083ca74daece575b3411a705a6758ac87c9c75c3dbbf7abb4149bb",
+    "process.start.user": "sha256:c540209842e42e2e5418ce4cd4ea36e03240da8dedc059623d191ac291e31c6d",
+    "run.user": "sha256:48fd6fc53b18653450c55afa4e98b896070cc3948ae5d0d18b95fc80f05f65a3"
   },
   "class": "default",
   "clean": true,
   "driver": {
-    "name": "ProviderDriver",
-    "version": "0.5.84"
+    "name": "StatedFactsDriver",
+    "version": "0.5.142"
   },
-  "finished_at": "2026-11-23T15:42:55.187891+00:00",
+  "finished_at": "2026-11-25T05:23:34.946467+00:00",
   "provider": "sail",
-  "revision": "ee712e4c64b165877505d6547d7a9b4eb35d2e8e",
-  "run_id": "public-d051af66882911a68dbc",
+  "revision": "2fcd32da9250fecf8fe83fd0f7a1eec633732638",
+  "run_id": "public-b8b5c4bc805d4ed5cded",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.84"
+    "sandbox-provider-spec": "0.5.142"
   },
   "selected_tests": [
     "run.user",
@@ -25,14 +25,14 @@
     "process.start.user"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-23T15:42:46.732061+00:00",
+  "started_at": "2026-11-25T05:23:27.263153+00:00",
   "subject": {
-    "discovery_digest": "sha256:6655fbc84939a43cd101e609b46421ec9452545ac37ccf43bea725af9e38bdd1",
+    "discovery_digest": "sha256:aded0cb7b8e44f39ee7b8b8968d3a95e22795be3200003bc447274e2777fd6f6",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:dfdd7b327ec66fc161776b567af54b7afca09bf7c11faec8cc4bf7fb70b652ee",
-    "version": "0.1.0"
+    "package_digest": "sha256:5330244cdb44433802bfd321c47059e71ad7ae9dbc5d9067ccea5c2cc59f7fe7",
+    "version": "0.2.6"
   },
-  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
   "tests": [
     {
       "class": "default",
@@ -42,7 +42,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 2239,
+      "duration_ms": 1771,
       "id": "run.user",
       "proves": [],
       "result": "passed",
@@ -107,7 +107,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1966,
+      "duration_ms": 1745,
       "id": "files.write.user",
       "proves": [],
       "result": "passed",
@@ -176,7 +176,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1990,
+      "duration_ms": 2060,
       "id": "process.start.user",
       "proves": [],
       "result": "passed",
