@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.151 — 2026-11-25
+
+- The HTTP reference test for a locked identity store now tolerates host scheduling delay while still proving that a timed-out request does not dispatch later.
+
 ## 0.5.150 — 2026-11-25
 
 - the implement guide is "Implement SPS", with no version in its title or prose: `cost` is one of the eleven required operations (in the table), and Versioning says to state the newest minor, `1.1`. The README, `docs/README.md` and the template README drop "1.0" from their titles and links. No rule, schema or tester change.
