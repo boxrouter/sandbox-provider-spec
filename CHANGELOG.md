@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.150 — 2026-11-25
+
+- the implement guide is "Implement SPS", with no version in its title or prose: `cost` is one of the eleven required operations (in the table), and Versioning says to state the newest minor, `1.1`. The README, `docs/README.md` and the template README drop "1.0" from their titles and links. No rule, schema or tester change.
+
 ## 0.5.149 — 2026-11-25
 
 - `PreparedImage` has an optional `last_used_at`: when a sandbox last started from the image, for a provider that reports it (absent or null otherwise). A caller that retires images nobody uses reads it, and never reads a missing value as unused. The wire form, the OpenAPI schema and the examples carry it; a response without it decodes to `None`, so older providers and servers still work.
