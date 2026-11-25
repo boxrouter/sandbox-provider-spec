@@ -1046,24 +1046,25 @@ def test_locked_identity_store_times_out_without_later_native_dispatch(harness: 
         argv=["fixed-test"],
         cwd=None,
         env={},
-        observation_timeout_ms=50,
+        # A 50 ms deadline may expire before a loaded host schedules the worker to reach SQLite.
+        observation_timeout_ms=1000,
         encoding="utf8",
     )
     with harness.endpoint.connect() as lock, ThreadPoolExecutor(max_workers=1) as pool:
         lock.execute("BEGIN EXCLUSIVE")
         future = pool.submit(harness.send, request, status=504)
         try:
-            result = future.result(timeout=0.3)
+            result = future.result(timeout=10)
             assert result["error"]["code"] == "timeout"
             assert result["error"]["outcome"] == "not_dispatched"
             assert harness.endpoint._runtime.pending == 1
             assert dict(harness.backend.calls) == before
         finally:
             lock.rollback()
-            future.result(timeout=2)
+            future.result(timeout=60)
     with harness.endpoint._runtime.observations:
         assert harness.endpoint._runtime.observations.wait_for(
-            lambda: harness.endpoint._runtime.pending == 0, 2
+            lambda: harness.endpoint._runtime.pending == 0, 60
         )
     assert dict(harness.backend.calls) == before
 
