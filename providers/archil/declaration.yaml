@@ -3,7 +3,7 @@ provider: archil
 class: default
 verified:
   date: 2026-11-26
-  sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.152}
+  sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.160}
 resources:
   kernel: dedicated
   sizes:
@@ -24,12 +24,20 @@ lifetime_timer:
   counts_paused_time: false
   at_end: [destroyed, paused]
 gates:
+  custom_images:
+  - {source: oci, prepared: false}
   processes:
   - reattach: true
 evidence:
+  gates.custom_images.0.source:
+    tests: [coverage.custom_images.direct.oci]
+    report: reports/actions-direct-oci-20261126.json
+  gates.custom_images.0.prepared:
+    tests: [coverage.custom_images.direct.oci]
+    report: reports/actions-direct-oci-20261126.json
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
-    report: reports/actions-reattach-20261126.json
+    report: reports/actions-direct-oci-20261126.json
   resources.kernel:
     source: https://docs.archil.com/compute/sandboxes/introduction
     read: 2026-11-24

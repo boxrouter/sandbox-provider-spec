@@ -1,0 +1,920 @@
+{
+  "baseline": "passed",
+  "check_digests": {
+    "baseline.create_env": "sha256:c8dfaf454e832c9a96a7a5d2a2d321811f6891809f28aa60fb6d23e30f409760",
+    "baseline.destroy": "sha256:2bde2661cd30ad7007fcfdc2acae11678e05b0d1b18d59de6e2fa3eda5e705d0",
+    "baseline.environment_bash": "sha256:23325deebeb57429d090497d7b6b3b5f05d3920e3574c5a58e27c029a160c3d7",
+    "baseline.environment_python3": "sha256:f085d194f9aaac134a3f9a96c4db9c6d87df06feba5afb3e75e9e05d11cef50e",
+    "baseline.files_read": "sha256:3dc6fbfdfce8d1bedbe11dfa1315c9b74e229a13439ba4ee308055e02b32ce12",
+    "baseline.files_write": "sha256:567a31dfdedc407c1f1a9d21245b6ad81d6c31f8ed63bd714754fc754cd9e79f",
+    "baseline.files_write_binary": "sha256:22f97dca3a78c4e0a6324d87b57d5b546162925a789547e6ec3bdaa167219c55",
+    "baseline.get": "sha256:1aa892339b9bde8f0fe5b94156c3bb04037ce1b85722f9bf4b4f31a425514ce1",
+    "baseline.list": "sha256:c658af6226a3c4b49323f1701b96bf2c987bd04ac7e20d95680f39cfe1b3b11e",
+    "baseline.no_metadata": "sha256:a5f5e7d4ba027299d4e60b4ef78fa8b6457740333d1fa5d9f9e5fd1649a72022",
+    "baseline.outbound_network": "sha256:7e1153f797c363733487833feb8ad559663c6f25311b663d89827d8db013738c",
+    "baseline.process_eof_is_not_exit": "sha256:c0add3c1666223b86d492d5f5d8b4d541ba8cf5768cc932ab4d2f3c0316681c6",
+    "baseline.process_stream": "sha256:63d9df42e047dc422e3297c6d4ce0bc25e80af0f16d1c26149a473e41bce46b6",
+    "baseline.run_cwd": "sha256:ed26226772fdda53ca75b54ca43afc6c4f7b6893add2f2017d1da7c66f07e17c",
+    "baseline.run_env": "sha256:22ba1c66d33ed56176170d7515ab7c685706e50e55381e6d3538ede1e57058ea",
+    "baseline.run_exit_code": "sha256:40e4e87e6ecfc3a268c1bde72e8d750d5eee7186e8f85f944e2b96bde64c7152",
+    "baseline.run_output": "sha256:8d67d382c7f149a4f8f9d24a4ffd788a700727fa46073138a87ad9c7b2dbc7a5",
+    "baseline.run_separate_streams": "sha256:bfcf4ae087600bc47a13c17e0acc078710a71679af0f4ceb5219721898ddf9c6",
+    "coverage.custom_images.direct.oci": "sha256:b0fa823ebe706d4c73c4b1bfd999f2cb57b084ef29998734539890113415ea93",
+    "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.160"
+  },
+  "finished_at": "2026-11-26T13:10:42.514455+00:00",
+  "provider": "archil",
+  "revision": "600910522a58780d4aeb97395f460c696c0c3478",
+  "run_id": "public-5dd57a946566ca128e07",
+  "sdk_versions": {
+    "archil": "0.23.0",
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.160"
+  },
+  "selected_tests": [
+    "baseline.create_env",
+    "baseline.get",
+    "baseline.list",
+    "baseline.destroy",
+    "baseline.run_output",
+    "baseline.run_exit_code",
+    "baseline.run_separate_streams",
+    "baseline.run_cwd",
+    "baseline.run_env",
+    "baseline.files_write",
+    "baseline.files_read",
+    "baseline.process_stream",
+    "processes.reattach.true",
+    "baseline.environment_bash",
+    "baseline.environment_python3",
+    "baseline.outbound_network",
+    "baseline.process_eof_is_not_exit",
+    "baseline.no_metadata",
+    "baseline.files_write_binary",
+    "coverage.custom_images.direct.oci"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T13:09:54.429155+00:00",
+  "subject": {
+    "discovery_digest": "sha256:424ee3156e0417b3bff4b546ae000703c8023149ea22227f41d4e270812200b2",
+    "package": "sps-provider-archil",
+    "package_digest": "sha256:1c5493190bb5d5cb07472d6f5b5f3f0b39be5a0dfcf58b2d93220afda0a8b1ef",
+    "version": "0.1.11"
+  },
+  "suite_digest": "sha256:0520b84495af4b657eb117d7f30b59edf71c6ee8758adbff3b7c132def0bf196",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1346,
+      "id": "baseline.create_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "cHJlc2VudA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1185,
+      "id": "baseline.get",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "active"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1209,
+      "id": "baseline.list",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "sandboxes": {
+              "contains": true
+            }
+          },
+          "operation": "list",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1174,
+      "id": "baseline.destroy",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/lifecycle"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "destroy",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "state": {
+              "actual": {
+                "truncated": false,
+                "utf8": "destroyed"
+              },
+              "matches": true
+            }
+          },
+          "operation": "get",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1476,
+      "id": "baseline.run_output",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "b3V0",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1323,
+      "id": "baseline.run_exit_code",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1332,
+      "id": "baseline.run_separate_streams",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stderr": {
+              "actual": {
+                "b64": "ZXJyCg==",
+                "truncated": false
+              },
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "b3V0Cg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1280,
+      "id": "baseline.run_cwd",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "L3RtcAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1286,
+      "id": "baseline.run_env",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "b64": "Y29tbWFuZA==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1562,
+      "id": "baseline.files_write",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "aGVsbG8=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1415,
+      "id": "baseline.files_read",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "AP9maWxl",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 16280,
+      "id": "baseline.process_stream",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/process-output"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "clock.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 14,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "within_window": {
+              "matches": true
+            }
+          },
+          "operation": "clock.observe",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1530,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 11,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2306,
+      "id": "baseline.environment_bash",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/usr/bin/bash\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1283,
+      "id": "baseline.environment_python3",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/environment"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "/opt/venv/bin/python3\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1420,
+      "id": "baseline.outbound_network",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/outbound-network"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "served": {
+              "matches": true
+            }
+          },
+          "operation": "probe.http",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1792,
+      "id": "baseline.process_eof_is_not_exit",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/process-eof-not-exit",
+        "provider-api/process-eof-not-exit"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 7,
+              "matches": true
+            },
+            "exit_code_after_close": {
+              "matches": true
+            },
+            "state_after_close": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.process_eof",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 3698,
+      "id": "baseline.no_metadata",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/no-metadata"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "host_metadata_hidden": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1442,
+      "id": "baseline.files_write_binary",
+      "proves": [],
+      "result": "passed",
+      "rules": [
+        "baseline/files"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "MDBmZjAwODBmZTY2MDAK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2320,
+      "id": "coverage.custom_images.direct.oci",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "oci"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/oci"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "length": 400,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
