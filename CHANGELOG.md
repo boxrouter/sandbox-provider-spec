@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.163 — 2026-11-26
+
+- Declare Archil selected-user commands, file writes, and processes with live conformance evidence.
+
 ## 0.5.162 — 2026-11-26
 
 - Update the README to report the conformance suite's current count of 293 tests.
