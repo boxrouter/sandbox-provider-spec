@@ -467,12 +467,19 @@ def _memory_hog_outcome(
             return "process_killed_after_recovery", oom
         raise NativeFailure("memory_ceiling_unproven") from error
     exit_code = result.get("exit_code")
-    if isinstance(exit_code, bool) or not isinstance(exit_code, int):
+    if exit_code is not None and (isinstance(exit_code, bool) or not isinstance(exit_code, int)):
         raise NativeFailure("guest_fact_probe_invalid")
     stdout = result.get("stdout")
     if isinstance(stdout, bytes):
         stdout = stdout.decode("utf-8", "replace")
     if not isinstance(stdout, str) or "SPS_CEILING_ALLOCATOR_STARTED\n" not in stdout:
+        raise NativeFailure("memory_ceiling_unproven")
+    if exit_code is None:
+        # Some providers return an unknown exit after the guest kills the allocator.
+        # The missing code is not evidence: require the marked process's kernel OOM.
+        oom = _recover_oom_kill(driver, target, marker, memory_mib)
+        if oom is not None:
+            return "process_killed_after_recovery", oom
         raise NativeFailure("memory_ceiling_unproven")
     if exit_code == 0:
         return "completed", None

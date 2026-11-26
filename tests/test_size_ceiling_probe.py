@@ -77,7 +77,7 @@ class Ceiling(Driver):
             return {"exit_code": 0, "stdout": json.dumps(self.recovery)}
         if isinstance(self.hog, BaseException):
             raise self.hog
-        assert isinstance(self.hog, int)
+        assert self.hog is None or isinstance(self.hog, int)
         return {"exit_code": self.hog, "stdout": "SPS_CEILING_ALLOCATOR_STARTED\n"}
 
 
@@ -396,3 +396,16 @@ def test_cpu_burn_refuses_unbounded_worker_counts() -> None:
     facts = runpy.run_path(str(suite_path().parent / "fixtures/environment_facts.py"))
     with pytest.raises(ValueError, match="at most 128"):
         facts["observe_ceiling_use"]({"cpu": 129, "burn_seconds": 0.1})
+
+
+def test_unknown_allocator_exit_requires_matching_kernel_oom(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("sandbox_provider_spec.coverage_probe.time.sleep", lambda _: None)
+    recovery = {"pid": 42, "started": 10.0, "events": [{"pid": 42, "at": 11.0, "rss_kib": 4000000}]}
+    driver = Ceiling({}, use=burn(2, 2.0), hog=None, recovery=recovery)
+    evidence = json.loads(str(guest(driver, None, SIZE)["ceiling_evidence"]))
+    assert evidence["memory_outcome"] == "process_killed_after_recovery"
+    driver = Ceiling({}, use=burn(2, 2.0), hog=None)
+    with pytest.raises(NativeFailure, match="memory_ceiling_unproven"):
+        guest(driver, None, SIZE)
