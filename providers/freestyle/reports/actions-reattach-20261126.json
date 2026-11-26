@@ -1,0 +1,102 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "processes.reattach.true": "sha256:7a2074d73ce9cb49070a2e6ba9317bd51ac9655b5ab484eab1a13ee9ddb5f483"
+  },
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.81"
+  },
+  "finished_at": "2026-11-26T09:56:58.987683+00:00",
+  "provider": "freestyle",
+  "revision": "c2ed9366927c36e600e383a4698cd27eccfe1738",
+  "run_id": "public-470f81c70060e1fe14ba",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.81"
+  },
+  "selected_tests": [
+    "processes.reattach.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T09:56:56.906793+00:00",
+  "subject": {
+    "discovery_digest": "sha256:22267ed642c54922d0149b1bdd50429e6490494e52b241bbea25eb36809ed722",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:203781351bdbf33e7dcd5de8f321937f458e34266dc572b5adcc91f1858b84ae",
+    "version": "0.1.2"
+  },
+  "suite_digest": "sha256:144276936c2f564adb4adda7b43fbd89ea85944541815a4bba2a8e8d44487137",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 940,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 11,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

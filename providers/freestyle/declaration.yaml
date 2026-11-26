@@ -3,7 +3,7 @@ provider: freestyle
 # Every value is `unknown`, absent, a dated quote of Freestyle's documentation or API, or a committed
 # tester report (see evidence.md).
 verified:
-  date: 2026-11-23
+  date: 2026-11-26
   # Freestyle's API is called over plain HTTP: the adapter uses httpx, no Freestyle SDK.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.81"}
 resources:
@@ -31,10 +31,15 @@ resources:
   extendable_lifetime: unknown
 # `lifetime_timer` is left out: Freestyle's `ttlSeconds` backstop is enforced by a sweep minutes late (evidence.md).
 gates:
+  processes:
+  - reattach: true
   # `POST /pause` keeps memory and processes (a file in /dev/shm and a running process survived a pause).
   pause_resume:
   - keeps: files_and_memory
 evidence:
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/actions-reattach-20261126.json
   resources.kernel:
     source: https://www.freestyle.sh/docs/vms
     read: 2026-11-23
