@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.155 — 2026-11-26
+
+- Record verified Freestyle named-user selection for commands, files, and processes.
+
 ## 0.5.154 — 2026-11-26
 
 - Record Freestyle process reattachment evidence and declare the verified capability.
