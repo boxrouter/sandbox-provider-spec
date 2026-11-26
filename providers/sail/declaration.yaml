@@ -35,7 +35,6 @@ resources:
   # What a create without resources gets: the smallest offered size (this integration's choice;
   # Sail's own SDK default is 8 vCPUs, 64 GiB of memory and 256 GiB of disk).
   default_size: {cpu: 1, memory_mib: 16384, disk_mib: 32768}
-  size_is_ceiling: true
   default_user: root
   default_cwd: /
   root: [by_default]
@@ -122,9 +121,6 @@ evidence:
     quote: >-
       CPU: 1–64 vCPUs per Sailbox. Memory: 16–256 GiB per Sailbox. Disk: 8–1024 GiB per
       Sailbox.
-  resources.size_is_ceiling:
-    tests: [coverage.facts.size_is_ceiling.true]
-    report: reports/tester-default-coverage.json
   resources.compliance:
     source: https://docs.sailresearch.com/security
     read: '2026-11-23'
