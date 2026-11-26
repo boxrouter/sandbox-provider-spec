@@ -1,8 +1,9 @@
 spec: sandbox-provider-spec/0.1
 provider: archil
+class: default
 verified:
-  date: 2026-11-24
-  sdks: {archil: 0.23.0, httpx: 0.28.1}
+  date: 2026-11-26
+  sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.152}
 resources:
   kernel: dedicated
   sizes:
@@ -22,8 +23,13 @@ lifetime_timer:
   enforced_by: provider
   counts_paused_time: false
   at_end: [destroyed, paused]
-gates: {}
+gates:
+  processes:
+  - reattach: true
 evidence:
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/actions-reattach-20261126.json
   resources.kernel:
     source: https://docs.archil.com/compute/sandboxes/introduction
     read: 2026-11-24

@@ -4,11 +4,11 @@ class: default
 # Every value is `unknown`, absent, a dated quote of Sail's documentation or a committed
 # tester report (the `sps-provider-sail` adapter over Sail's HTTP API). The adapter serves
 # the baseline surface (create, get, list, destroy, run, files, native processes by reattach
-# and cost) and states six gates in discovery (user selection, pause and resume, previews,
-# network lockdown, custom images and snapshots), each proven by a tester run from a clean checkout. Every other gate stays
+# and cost) and states seven gates in discovery (processes, user selection, pause and resume,
+# previews, network lockdown, custom images and snapshots), each proven by a tester run from a clean checkout. Every other gate stays
 # unknown until a run report proves it.
 verified:
-  date: 2026-11-25
+  date: 2026-11-26
   # The adapter calls Sail's Sailbox HTTP API through httpx, not Sail's own SDK; the newest
   # report records the tester stack it ran with.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.142"}
@@ -68,6 +68,8 @@ lifetime_timer:
 # `open`, replaceable on a running Sailbox. A denylist is not declared: Sail blocks a name only
 # under an allowlist. Process input and cancel stay unclaimed (no native operation).
 gates:
+  processes:
+  - reattach: true
   snapshots:
   - keeps: files_only
     deletable: true
@@ -105,6 +107,9 @@ gates:
     switchable: true
     changeable: true
 evidence:
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/actions-reattach-20261126.json
   resources.sizes:
     source: https://docs.sailresearch.com/sailboxes-pricing.md
     read: 2026-11-24
