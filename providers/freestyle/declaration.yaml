@@ -31,12 +31,25 @@ resources:
   extendable_lifetime: unknown
 # `lifetime_timer` is left out: Freestyle's `ttlSeconds` backstop is enforced by a sweep minutes late (evidence.md).
 gates:
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
   processes:
   - reattach: true
   # `POST /pause` keeps memory and processes (a file in /dev/shm and a running process survived a pause).
   pause_resume:
   - keeps: files_and_memory
 evidence:
+  gates.user_selection.0.commands:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.files_write:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.process_start:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
     report: reports/actions-reattach-20261126.json
