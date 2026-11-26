@@ -151,6 +151,7 @@ def test_existing_check_ids_and_bodies_are_unchanged() -> None:
         "files.stream.v1.",
         "coverage.custom_images.prepare.dockerfile_distro",
         "coverage.custom_images.prepare.dockerfile_distro_context",
+        "coverage.custom_images.direct.",
         "coverage.custom_images.defaults.dockerfile",
         "coverage.custom_images.defaults.distro_dockerfile",
         "coverage.custom_images.defaults.registry",
