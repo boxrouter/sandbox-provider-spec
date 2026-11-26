@@ -1,0 +1,72 @@
+spec: sandbox-provider-spec/0.1
+provider: freestyle
+class: small
+verified:
+  date: 2026-11-26
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.156"}
+resources:
+  kernel: dedicated
+  size_is_ceiling: true
+  sizes:
+  - {cpu: 2, memory_mib: 4096, disk_mib: 16384}
+  default_size: {cpu: 2, memory_mib: 4096, disk_mib: 16384}
+  default_user: ubuntu
+  default_cwd: /home/ubuntu
+  root: [sudo]
+  max_lifetime_seconds: 315360000
+  gpus: unknown
+  regions: unknown
+  located_in: unknown
+  paused_retention_seconds: unknown
+  max_run_seconds: unknown
+  max_process_seconds: unknown
+  long_running: unknown
+  extendable_lifetime: unknown
+gates:
+  user_selection:
+  - commands: true
+    files_write: true
+    process_start: true
+  processes:
+  - reattach: true
+evidence:
+  resources.kernel:
+    source: https://www.freestyle.sh/docs/vms
+    read: 2026-11-23
+    quote: Freestyle VMs are full Linux virtual machines designed for long-running, complex tasks.
+  resources.sizes:
+    source: https://www.freestyle.sh/docs/vms/base-snapshots
+    read: 2026-11-26
+    quote: '| `freestyle/ubuntu-sm` | Ubuntu 24.04 LTS | 2 | 4 GiB | 16 GB |'
+  resources.default_size:
+    source: https://www.freestyle.sh/docs/vms/base-snapshots
+    read: 2026-11-26
+    quote: '| `freestyle/ubuntu-sm` | Ubuntu 24.04 LTS | 2 | 4 GiB | 16 GB |'
+  resources.max_lifetime_seconds:
+    source: https://api.freestyle.sh/v5/vms
+    read: 2026-11-23
+    quote: 'bad request: ttlSeconds cannot exceed 315360000 (10 years); got 99999999999'
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/actions-small-class-20261126.json
+  resources.default_user:
+    tests: [facts.default_user]
+    report: reports/actions-small-class-20261126.json
+  resources.default_cwd:
+    tests: [facts.default_cwd]
+    report: reports/actions-small-class-20261126.json
+  resources.root:
+    tests: [coverage.facts.root.sudo]
+    report: reports/actions-small-class-20261126.json
+  gates.processes.0.reattach:
+    tests: [processes.reattach.true]
+    report: reports/actions-small-class-20261126.json
+  gates.user_selection.0.commands:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-small-class-20261126.json
+  gates.user_selection.0.files_write:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-small-class-20261126.json
+  gates.user_selection.0.process_start:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-small-class-20261126.json

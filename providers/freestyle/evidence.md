@@ -11,7 +11,7 @@ proves. Values without evidence stay `unknown`.
 - `sizes`, `default_size`: the default base snapshot `freestyle/ubuntu` is 4 vCPU, 8 GiB, 32 GB
   (https://www.freestyle.sh/docs/vms/base-snapshots); a live create returned `resources` cpu 4, memory
   8192 (MiB), storage 32768 (MiB). `freestyle/ubuntu-sm` (2 vCPU, 4 GiB, 16 GB) also boots on the Free
-  plan (`evidence/probe-shapes-*`), but the adapter offers the default only. The 32 GB disk is the Free
+  plan (`evidence/probe-shapes-*`) and is offered as the `small` class. The 32 GB disk is the Free
   plan's maximum, so every plan can create it.
 - `default_user: ubuntu`, `default_cwd: /home/ubuntu`: `facts.default_user` and `facts.default_cwd`
   (`reports/prober-default-core.json`); the docs say the same ("an `ubuntu` user with passwordless sudo.
@@ -62,3 +62,13 @@ counter.
 
 Stated in the package README: a command on a paused VM wakes it instead of answering `conflict`, label
 values are at most 63 bytes, and a deleted VM cannot be told from one that never existed.
+
+## Small class verification
+
+The `small` class's baseline, default user and working directory, sudo access, CPU and memory
+ceiling, process reattachment, and selected-user operations passed in
+`reports/actions-small-class-20261126.json` (run `run-20261126T165620Z-07a5`, all sandboxes
+cleaned). The tester was spec revision `d8e1ddccf50c4e80b2b0b01cc3d6ce26c7038f14`, version
+0.5.156. It tested adapter revision `8cba0ae926`, package digest
+`sha256:eef9fae67f37efef4385ae4ef65162a95fed5e263107e2b3a5eeb5dd8dd6a97b`; the tester and
+adapter were separate clean checkouts. The class has no pause or large-file claims yet.
