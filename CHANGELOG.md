@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.161 — 2026-11-26
+
+- Record Archil direct OCI image and process reattachment conformance evidence.
+
 ## 0.5.160 — 2026-11-26
 
 - Test direct public OCI images without requiring provider-side image preparation, and select the correct check when preparation is not claimed.
