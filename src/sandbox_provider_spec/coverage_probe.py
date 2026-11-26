@@ -7,6 +7,7 @@ from __future__ import annotations
 import base64
 import json
 import math
+import secrets
 import shlex
 import time
 from collections.abc import Mapping
@@ -44,7 +45,18 @@ less than the allocation the provider sells, because the kernel keeps some for i
 # Allocate 64 MiB at a time until the process is killed or it reaches twice memory_mib.
 # Each page is written so the allocation is resident rather than only reserved.
 _MEMORY_EXHAUSTION_SCRIPT = """\
+import os
 import sys
+import time
+if len(sys.argv) > 2:
+    with open(sys.argv[2], "x", encoding="utf-8") as marker:
+        marker.write(f"{os.getpid()} {time.clock_gettime(time.CLOCK_BOOTTIME)}")
+    try:
+        with open("/proc/self/oom_score_adj", "w", encoding="utf-8") as score:
+            score.write("1000")
+    except OSError:
+        pass
+    print("SPS_CEILING_ALLOCATOR_STARTED", flush=True)
 step = 64 * 1024 * 1024
 page = 4096
 limit = int(sys.argv[1]) * 2 * 1024 * 1024
@@ -322,7 +334,7 @@ _CPU_CEILING_TOLERANCE = 0.05
 _USE_PROBE_FIELDS = {
     "processors",
     "cpu_quota",
-    "burn_threads",
+    "burn_workers",
     "burn_wall_seconds",
     "burn_cpu_seconds",
 }
@@ -334,7 +346,7 @@ def _ceiling_use_observation(payload: object) -> Mapping[str, object]:
         raise NativeFailure("guest_fact_probe_invalid")
     processors, quota = payload["processors"], payload["cpu_quota"]
     threads, wall, used = (
-        payload["burn_threads"],
+        payload["burn_workers"],
         payload["burn_wall_seconds"],
         payload["burn_cpu_seconds"],
     )
@@ -391,6 +403,8 @@ def _size_ceiling_use(
         observation = _ceiling_use_observation(_guest_json(result))
     except (ValueError, KeyError, TypeError):
         raise NativeFailure("guest_fact_probe_invalid") from None
+    if cast(int, observation["burn_workers"]) < max(2, math.ceil(requested_cpu * 2)):
+        raise NativeFailure("guest_fact_probe_invalid")
     measured = cast(float, observation["burn_cpu_seconds"]) / cast(
         float, observation["burn_wall_seconds"]
     )
@@ -408,41 +422,145 @@ def _size_ceiling_use(
             "size_is_ceiling": False,
             "ceiling_evidence": json.dumps(evidence, sort_keys=True),
         }
-    outcome = _memory_hog_outcome(driver, target, memory_mib)
+    # A heavily starved burn cannot establish a ceiling: it never exercised enough
+    # capacity to distinguish a cap from an overloaded host.
+    if measured < requested_cpu * 0.75:
+        raise NotRun("cpu_ceiling_unproven")
+    outcome, oom = _memory_hog_outcome(driver, target, memory_mib)
     evidence["memory_outcome"] = outcome
+    if oom is not None:
+        evidence["oom_observation"] = oom
     return {
         "size_is_ceiling": outcome != "completed",
         "ceiling_evidence": json.dumps(evidence, sort_keys=True),
     }
 
 
-def _memory_hog_outcome(driver: Driver, target: object, memory_mib: int) -> str:
+def _memory_hog_outcome(
+    driver: Driver, target: object, memory_mib: int
+) -> tuple[str, Mapping[str, object] | None]:
     """Run the allocation hog synchronously; classify how its attempt ended.
 
     `process_killed`, `refused` and `sandbox_ended` all prove the memory could not
     be held; `completed` means the hog wrote past twice the allocation alive.
     """
-    command = "python3 -c " + shlex.quote(_MEMORY_EXHAUSTION_SCRIPT) + " " + str(memory_mib)
+    marker = f"/tmp/sps-ceiling-oom-{secrets.token_hex(16)}"
+    command = (
+        "python3 -c "
+        + shlex.quote(_MEMORY_EXHAUSTION_SCRIPT)
+        + " "
+        + str(memory_mib)
+        + " "
+        + shlex.quote(marker)
+    )
     try:
         result = driver.call("run", target, {"bash_script": command, "timeout_ms": 200000})
     except Exception as error:  # pylint: disable=broad-exception-caught
         try:
             state = _sandbox_state(driver, target)
         except Exception:  # pylint: disable=broad-exception-caught
-            raise NativeFailure("memory_ceiling_unproven") from error
+            state = None
         if state in {"stopped", "destroyed"}:
-            return "sandbox_ended"
+            return "sandbox_ended", None
+        oom = _recover_oom_kill(driver, target, marker, memory_mib)
+        if oom is not None:
+            return "process_killed_after_recovery", oom
         raise NativeFailure("memory_ceiling_unproven") from error
     exit_code = result.get("exit_code")
     if isinstance(exit_code, bool) or not isinstance(exit_code, int):
         raise NativeFailure("guest_fact_probe_invalid")
+    stdout = result.get("stdout")
+    if isinstance(stdout, bytes):
+        stdout = stdout.decode("utf-8", "replace")
+    if not isinstance(stdout, str) or "SPS_CEILING_ALLOCATOR_STARTED\n" not in stdout:
+        raise NativeFailure("memory_ceiling_unproven")
     if exit_code == 0:
-        return "completed"
+        return "completed", None
     if exit_code in {-9, -15, 137, 143}:
-        return "process_killed"
+        return "process_killed", None
     # A nonzero exit that is not a kill (for example Python's MemoryError) is the
     # guest refusing the allocation; either way the memory was not held.
-    return "refused"
+    return "refused", None
+
+
+# This read-only recovery runs only after the allocator command lost its transport. It uses a
+# random marker created by that allocator before it touched memory, then returns kernel OOM lines
+# for the same PID. A killed guest agent, a stale kernel event, or an unrelated process is no proof.
+_OOM_RECOVERY_SCRIPT = r"""# SPS_CEILING_OOM_CHECK
+import json, re, subprocess, sys
+with open(sys.argv[1], encoding="utf-8") as marker:
+    pid, started = marker.read().split()
+pid = int(pid)
+started = float(started)
+lines = None
+for command in (["dmesg"], ["sudo", "-n", "dmesg"]):
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=8, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        continue
+    if result.returncode == 0:
+        lines = result.stdout.splitlines()
+        break
+if lines is None:
+    raise SystemExit(1)
+events = []
+for line in lines:
+    pattern = (r"^\[\s*([0-9]+(?:\.[0-9]+)?)\].*Killed process "
+               r"([0-9]+) \(python3(?:\.[0-9]+)*\).*anon-rss:([0-9]+)kB")
+    match = re.search(pattern, line)
+    if match and int(match.group(2)) == pid:
+        events.append({"at": float(match.group(1)), "pid": int(match.group(2)),
+                       "rss_kib": int(match.group(3))})
+print(json.dumps({"pid": pid, "started": started, "events": events[-8:]}))
+"""
+
+
+def _recover_oom_kill(
+    driver: Driver, target: object, marker: str, memory_mib: int
+) -> Mapping[str, object] | None:
+    """Correlate a post-disconnect kernel OOM event with this exact allocation attempt."""
+    command = "python3 -c " + shlex.quote(_OOM_RECOVERY_SCRIPT) + " " + shlex.quote(marker)
+    for attempt in range(3):
+        if attempt:
+            time.sleep(3)
+        try:
+            value = _guest_json(
+                driver.call("run", target, {"bash_script": command, "timeout_ms": 30000})
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            continue
+        if not isinstance(value, dict):
+            continue
+        pid, started, events = value.get("pid"), value.get("started"), value.get("events")
+        if (
+            isinstance(pid, bool)
+            or not isinstance(pid, int)
+            or pid <= 0
+            or isinstance(started, bool)
+            or not isinstance(started, int | float)
+            or not math.isfinite(started)
+            or started < 0
+            or not isinstance(events, list)
+        ):
+            continue
+        for event in events:
+            if not isinstance(event, dict):
+                continue
+            at, event_pid, rss = event.get("at"), event.get("pid"), event.get("rss_kib")
+            if (
+                not isinstance(at, bool)
+                and isinstance(at, int | float)
+                and math.isfinite(at)
+                and started <= at <= started + 210
+                and not isinstance(event_pid, bool)
+                and isinstance(event_pid, int)
+                and event_pid == pid
+                and not isinstance(rss, bool)
+                and isinstance(rss, int)
+                and 0 < rss <= memory_mib * 1024
+            ):
+                return {"pid": pid, "started": started, "at": at, "rss_kib": rss}
+    return None
 
 
 def _requested_size(inputs: Mapping[str, object]) -> tuple[float, int]:

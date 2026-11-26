@@ -224,7 +224,7 @@ def test_larger_bounds_do_not_prove_the_false_declaration() -> None:
         use={
             "processors": 8,
             "cpu_quota": None,
-            "burn_threads": 8,
+            "burn_workers": 8,
             "burn_wall_seconds": 4.0,
             "burn_cpu_seconds": 30.4,
         },

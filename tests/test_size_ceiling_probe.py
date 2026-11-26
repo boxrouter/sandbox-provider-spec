@@ -7,13 +7,15 @@ from __future__ import annotations
 import json
 import os
 import runpy
+import subprocess
+import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
-from sandbox_provider_spec.coverage_probe import guest
+from sandbox_provider_spec.coverage_probe import _OOM_RECOVERY_SCRIPT, guest
 from sandbox_provider_spec.driver import Driver, Inputs, NativeFailure, NotRun, Observation
 from sandbox_provider_spec.suite import suite_path
 
@@ -37,6 +39,7 @@ class Ceiling(Driver):
         use: object = None,
         hog: object = None,
         state: str = "active",
+        recovery: object = None,
     ) -> None:
         super().__init__()
         self.payload: object = {"membership": "0::/box\n", "files": files}
@@ -44,6 +47,7 @@ class Ceiling(Driver):
         self.use = use
         self.hog = hog
         self.state = state
+        self.recovery = recovery
         self.operations: list[str] = []
 
     def call(self, operation: str, target: object, inputs: Inputs) -> Observation:
@@ -67,10 +71,14 @@ class Ceiling(Driver):
                 raise NotRun("use_measurement_unproven")
             return {"exit_code": 0, "stdout": json.dumps(self.use)}
         assert probe is None, probe
+        if "SPS_CEILING_OOM_CHECK" in str(inputs.get("bash_script")):
+            if self.recovery is None:
+                raise OSError("still disconnected")
+            return {"exit_code": 0, "stdout": json.dumps(self.recovery)}
         if isinstance(self.hog, BaseException):
             raise self.hog
         assert isinstance(self.hog, int)
-        return {"exit_code": self.hog, "stdout": ""}
+        return {"exit_code": self.hog, "stdout": "SPS_CEILING_ALLOCATOR_STARTED\n"}
 
 
 def burn(
@@ -85,7 +93,7 @@ def burn(
     return {
         "processors": processors,
         "cpu_quota": quota,
-        "burn_threads": threads,
+        "burn_workers": threads,
         "burn_wall_seconds": wall,
         "burn_cpu_seconds": used_cpus * wall,
     }
@@ -265,8 +273,43 @@ def test_hog_taking_the_sandbox_down_proves_the_ceiling() -> None:
     assert json.loads(str(result["ceiling_evidence"]))["memory_outcome"] == "sandbox_ended"
 
 
-def test_failed_hog_on_a_live_sandbox_proves_nothing() -> None:
+def test_failed_hog_on_a_live_sandbox_proves_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("sandbox_provider_spec.coverage_probe.time.sleep", lambda _: None)
     driver = Ceiling({}, use=burn(2, 2.0), hog=OSError("lost"), state="active")
+    with pytest.raises(NativeFailure, match="memory_ceiling_unproven"):
+        guest(driver, None, SIZE)
+
+
+def test_recovered_kernel_oom_for_the_allocator_proves_the_ceiling(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("sandbox_provider_spec.coverage_probe.time.sleep", lambda _: None)
+    recovery = {"pid": 42, "started": 10.0, "events": [{"pid": 42, "at": 11.0, "rss_kib": 4000000}]}
+    driver = Ceiling({}, use=burn(2, 2.0), hog=OSError("lost"), recovery=recovery)
+    result = guest(driver, None, SIZE)
+    assert result["size_is_ceiling"] is True
+    assert (
+        json.loads(str(result["ceiling_evidence"]))["memory_outcome"]
+        == "process_killed_after_recovery"
+    )
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        {"pid": 43, "at": 11.0, "rss_kib": 4000000},
+        {"pid": 42, "at": 9.0, "rss_kib": 4000000},
+        {"pid": 42, "at": 221.0, "rss_kib": 4000000},
+        {"pid": 42, "at": 11.0, "rss_kib": 5000000},
+        {"pid": True, "at": 11.0, "rss_kib": 4000000},
+    ],
+)
+def test_unrelated_stale_or_over_limit_oom_is_not_proof(
+    monkeypatch: pytest.MonkeyPatch, event: dict[str, object]
+) -> None:
+    monkeypatch.setattr("sandbox_provider_spec.coverage_probe.time.sleep", lambda _: None)
+    recovery = {"pid": 42, "started": 10.0, "events": [event]}
+    driver = Ceiling({}, use=burn(2, 2.0), hog=OSError("lost"), recovery=recovery)
     with pytest.raises(NativeFailure, match="memory_ceiling_unproven"):
         guest(driver, None, SIZE)
 
@@ -285,3 +328,71 @@ def test_malformed_use_observations_are_errors(payload: dict[str, object]) -> No
     driver = Ceiling({}, use=payload)
     with pytest.raises(NativeFailure, match="guest_fact_probe_invalid"):
         guest(driver, None, SIZE)
+
+
+def test_nonzero_before_allocator_started_is_not_ceiling_proof() -> None:
+    class FailedBeforeStart(Ceiling):
+        def call(self, operation: str, target: object, inputs: Inputs) -> Observation:
+            if operation == "run" and "environment" not in inputs:
+                return {"exit_code": 1, "stdout": ""}
+            return super().call(operation, target, inputs)
+
+    driver = FailedBeforeStart({}, use=burn(2, 2.0), hog=1)
+    with pytest.raises(NativeFailure, match="memory_ceiling_unproven"):
+        guest(driver, None, SIZE)
+
+
+def test_kernel_oom_recovery_script_reads_the_exact_marked_process(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    marker = tmp_path / "marker"
+    marker.write_text("2097 279531.99", encoding="utf-8")
+    line = (
+        "[279547.234889] Out of memory: Killed process 2097 (python3) "
+        "total-vm:7948544kB, anon-rss:7869388kB, file-rss:4kB"
+    )
+    monkeypatch.setattr(sys, "argv", ["recovery", str(marker)])
+    monkeypatch.setattr(
+        subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, line, "")
+    )
+    exec(compile(_OOM_RECOVERY_SCRIPT, "<oom-recovery>", "exec"), {})  # noqa: S102
+    assert json.loads(capsys.readouterr().out) == {
+        "pid": 2097,
+        "started": 279531.99,
+        "events": [{"at": 279547.234889, "pid": 2097, "rss_kib": 7869388}],
+    }
+
+
+def test_a_starved_cpu_burn_does_not_prove_a_ceiling() -> None:
+    driver = Ceiling({}, use=burn(2, 0.5), hog=-9)
+    with pytest.raises(NotRun, match="cpu_ceiling_unproven"):
+        guest(driver, None, SIZE)
+
+
+def test_too_few_cpu_workers_are_invalid() -> None:
+    driver = Ceiling({}, use=burn(2, 1.9, threads=3), hog=-9)
+    with pytest.raises(NativeFailure, match="guest_fact_probe_invalid"):
+        guest(driver, None, SIZE)
+
+
+def test_cpu_burn_starts_independent_processes(monkeypatch: pytest.MonkeyPatch) -> None:
+    facts = runpy.run_path(str(suite_path().parent / "fixtures/environment_facts.py"))
+    real_popen = subprocess.Popen
+    pids: list[int] = []
+
+    def record(*args: Any, **kwargs: Any) -> subprocess.Popen[str]:
+        process = real_popen(*args, **kwargs)
+        pids.append(process.pid)
+        return process
+
+    monkeypatch.setattr(subprocess, "Popen", record)
+    observation = facts["observe_ceiling_use"]({"cpu": 2, "burn_seconds": 0.2})
+    assert observation["burn_workers"] == 4
+    assert len(set(pids)) == 4
+    assert observation["burn_cpu_seconds"] > 0
+
+
+def test_cpu_burn_refuses_unbounded_worker_counts() -> None:
+    facts = runpy.run_path(str(suite_path().parent / "fixtures/environment_facts.py"))
+    with pytest.raises(ValueError, match="at most 128"):
+        facts["observe_ceiling_use"]({"cpu": 129, "burn_seconds": 0.1})

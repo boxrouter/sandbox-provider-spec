@@ -9,7 +9,8 @@ import platform
 import pwd
 import shutil
 import subprocess
-import threading
+import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -220,35 +221,57 @@ def observe_allocation():
 
 
 def observe_ceiling_use(args):
-    """Measured CPU ceiling evidence: affinity, any quota, and a timed over-subscribed burn.
-
-    The burn runs at least twice the requested CPUs' worth of threads so an
-    unbounded guest measures more than the request. The runner, not this guest,
-    compares the measured CPU-seconds per wall-second with the request.
-    """
+    """Measure an oversubscribed CPU burn with independent processes, not GIL-bound threads."""
     requested = float(args["cpu"])
-    threads = max(2, math.ceil(requested * 2))
+    count = max(2, math.ceil(requested * 2))
+    if count > 256:
+        raise ValueError("CPU ceiling probe supports at most 128 requested CPUs")
     seconds = float(args.get("burn_seconds", 4.0))
-    stop = time.monotonic() + seconds
-
-    def spin():
-        while time.monotonic() < stop:
-            pass
-
-    workers = [threading.Thread(target=spin) for _ in range(threads)]
-    started_wall = time.monotonic()
-    started_cpu = time.process_time()
-    for worker in workers:
-        worker.start()
-    for worker in workers:
-        worker.join()
-    wall = time.monotonic() - started_wall
-    used = time.process_time() - started_cpu
+    worker = (
+        "import os,sys,time; "
+        "print('ready',flush=True); "
+        'exec("while not os.path.exists(sys.argv[1]): time.sleep(0.005)\\n"); '
+        "start=time.process_time(); end=time.monotonic()+float(sys.argv[2]); "
+        'exec("while time.monotonic()<end: pass\\n"); '
+        "print(time.process_time()-start,flush=True)"
+    )
+    with tempfile.TemporaryDirectory(prefix="sps-cpu-burn-") as directory:
+        gate = str(Path(directory) / "start")
+        workers = []
+        try:
+            for _ in range(count):
+                workers.append(
+                    subprocess.Popen(
+                        [sys.executable, "-c", worker, gate, str(seconds)],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                    )
+                )
+            for process in workers:
+                if process.stdout is None or process.stdout.readline().strip() != "ready":
+                    raise RuntimeError("CPU burn worker did not start")
+            started_wall = time.monotonic()
+            Path(gate).touch()
+            used = 0.0
+            for process in workers:
+                assert process.stdout is not None
+                used += float(process.stdout.readline().strip())
+                if process.wait() != 0:
+                    raise RuntimeError("CPU burn worker failed")
+            wall = time.monotonic() - started_wall
+        finally:
+            for process in workers:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait()
+                if process.stdout is not None:
+                    process.stdout.close()
     cpu_quota, _ = cgroup_limits()
     return {
         "processors": len(os.sched_getaffinity(0)),
         "cpu_quota": cpu_quota,
-        "burn_threads": threads,
+        "burn_workers": count,
         "burn_wall_seconds": round(wall, 3),
         "burn_cpu_seconds": round(used, 3),
     }
