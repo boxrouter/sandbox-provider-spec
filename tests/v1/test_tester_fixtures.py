@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import fcntl
 import json
 import re
 from pathlib import Path
@@ -249,15 +250,19 @@ def test_resume_returns_the_sandbox_so_a_step_can_bind_and_use_it() -> None:
 
 
 def test_pause_resume_files_and_memory_binds_the_resumed_sandbox() -> None:
-    for name in ("sps-marker", "sps-pid", "sps-release", "sps-result"):
-        Path("/tmp", name).unlink(missing_ok=True)
-    try:
-        report = run_tests(
-            PausableProvider(), TestOptions(tests=("pause_resume.files_and_memory",))
-        )
-    finally:
+    # Multiple CI slots share the host's /tmp, and this suite intentionally uses fixed absolute
+    # paths. Serialize same-host copies so one run cannot unlink another run's marker files.
+    with Path("/tmp/sps-pause-resume-files-and-memory.lock").open("a") as lock_file:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
         for name in ("sps-marker", "sps-pid", "sps-release", "sps-result"):
             Path("/tmp", name).unlink(missing_ok=True)
+        try:
+            report = run_tests(
+                PausableProvider(), TestOptions(tests=("pause_resume.files_and_memory",))
+            )
+        finally:
+            for name in ("sps-marker", "sps-pid", "sps-release", "sps-result"):
+                Path("/tmp", name).unlink(missing_ok=True)
     assert outcome(report) == {"pause_resume.files_and_memory": "passed"}, report["tests"]
 
 
