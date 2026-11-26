@@ -532,34 +532,29 @@ def _recover_oom_kill(
         if not isinstance(value, dict):
             continue
         pid, started, events = value.get("pid"), value.get("started"), value.get("events")
-        if (
-            isinstance(pid, bool)
-            or not isinstance(pid, int)
-            or pid <= 0
-            or isinstance(started, bool)
-            or not isinstance(started, int | float)
-            or not math.isfinite(started)
-            or started < 0
-            or not isinstance(events, list)
-        ):
+        if isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+            continue
+        if isinstance(started, bool) or not isinstance(started, int | float):
+            continue
+        if not math.isfinite(started) or started < 0:
+            continue
+        if not isinstance(events, list):
             continue
         for event in events:
             if not isinstance(event, dict):
                 continue
             at, event_pid, rss = event.get("at"), event.get("pid"), event.get("rss_kib")
-            if (
-                not isinstance(at, bool)
-                and isinstance(at, int | float)
-                and math.isfinite(at)
-                and started <= at <= started + 210
-                and not isinstance(event_pid, bool)
-                and isinstance(event_pid, int)
-                and event_pid == pid
-                and not isinstance(rss, bool)
-                and isinstance(rss, int)
-                and 0 < rss <= memory_mib * 1024
-            ):
-                return {"pid": pid, "started": started, "at": at, "rss_kib": rss}
+            if isinstance(at, bool) or not isinstance(at, int | float):
+                continue
+            if not math.isfinite(at) or at < started or at > started + 210:
+                continue
+            if isinstance(event_pid, bool) or not isinstance(event_pid, int) or event_pid != pid:
+                continue
+            if isinstance(rss, bool) or not isinstance(rss, int):
+                continue
+            if rss <= 0 or rss > memory_mib * 1024:
+                continue
+            return {"pid": pid, "started": started, "at": at, "rss_kib": rss}
     return None
 
 
