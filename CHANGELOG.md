@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.162 — 2026-11-26
+
+- Update the README to report the conformance suite's current count of 293 tests.
+
 ## 0.5.161 — 2026-11-26
 
 - Record Archil direct OCI image and process reattachment conformance evidence.
