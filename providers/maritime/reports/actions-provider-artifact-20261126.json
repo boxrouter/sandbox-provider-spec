@@ -1,0 +1,96 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "custom_images.provider_artifact": "sha256:d341f47bc093c6a1b04e6bb6b3054761161085aa0162f5b00eee05e1426b76ab"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.112"
+  },
+  "finished_at": "2026-11-26T18:15:50.145811+00:00",
+  "provider": "maritime",
+  "revision": "9eae474e941d7d5119ecbb0095cdaa76b44508b7",
+  "run_id": "public-9add13a010eb15a7853c",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.112"
+  },
+  "selected_tests": [
+    "custom_images.provider_artifact"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T18:15:38.048301+00:00",
+  "subject": {
+    "discovery_digest": "sha256:21bfec7f96c2792eb12a1d4c07715cf96b53ffeee3659fd520b0a80b3c340ffc",
+    "package": "sps-provider-maritime",
+    "package_digest": "sha256:d5b73f18b244da1960b37a7803c6d6821366692a74dca80e5cf172e6ae841d4a",
+    "version": "0.1.9"
+  },
+  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 5433,
+      "id": "custom_images.provider_artifact",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "provider_artifact"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/provider-artifact"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": "user\n<HOME>\n"
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 452,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

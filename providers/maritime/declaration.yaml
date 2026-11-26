@@ -5,9 +5,9 @@ class: default
 # tester report (the `sps-provider-maritime` adapter over Maritime's HTTP API, control plane
 # api.maritime.sh plus the per-sandbox data plane the create answer carries). The adapter
 # serves the baseline surface, directories, labels.update, account.capacity and
-# resume.lifetime, and discovery states six gates (pause/resume, previews, network
-# lockdown, processes, snapshots and user selection; custom images and idle shutdown stay unclaimed
-# pending fixtures). Everything else stays unknown until a run report proves it.
+# resume.lifetime, and discovery states pause/resume, previews, network lockdown, processes,
+# snapshots, user selection and native provider artifacts. Idle shutdown stays unclaimed.
+# Everything else stays unknown until a run report proves it.
 verified:
   date: 2026-11-26
   # The adapter calls Maritime's HTTP API through httpx, not Maritime's own SDK; the newest
@@ -51,9 +51,11 @@ lifetime_timer:
 # a resume keeps files and memory, background processes cancel and reattach, previews publish
 # any guest port on public or private access with the credential in the link, and the egress
 # policy is an allowlist of host names (with `*.` wildcards), `deny_all` or `open`, replaceable
-# on a running sandbox. idle_shutdown and custom_images stay out: their suite rows need
-# fixtures Maritime's timings cannot meet (idle granularity, a provider-artifact image).
+# on a running sandbox. A saved native artifact can be used to create a sandbox; this does
+# not claim image preparation. Idle shutdown stays out pending a suitable timing fixture.
 gates:
+  custom_images:
+  - source: provider_artifact
   previews:
   - access: [public, private]
     credential: link
@@ -78,6 +80,12 @@ gates:
     switchable: true
     changeable: true
 evidence:
+  # This report used tester revision 0c6b8e7e98238ee835f2b68acc0f82a833d89491:
+  # SPS 0.5.112 with the borrowed-artifact tester fix from Cloud #10198 backported.
+  # The independently checked adapter revision was 88f0b1e2bc; the report records its digest.
+  gates.custom_images.0.source:
+    tests: [custom_images.provider_artifact]
+    report: reports/actions-provider-artifact-20261126.json
   gates.user_selection.0.commands:
     tests: [coverage.guest_user.selectable]
     report: reports/actions-user-selection-20261126.json
