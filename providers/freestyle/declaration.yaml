@@ -5,9 +5,10 @@ provider: freestyle
 verified:
   date: 2026-11-26
   # Freestyle's API is called over plain HTTP: the adapter uses httpx, no Freestyle SDK.
-  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.81"}
+  sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.156"}
 resources:
   kernel: dedicated
+  size_is_ceiling: true
   # The default base snapshot `freestyle/ubuntu`: 4 vCPU, 8 GiB memory, 32 GB disk (the largest the Free
   # plan allows, so every plan can create it).
   sizes:
@@ -41,18 +42,21 @@ gates:
   pause_resume:
   - keeps: files_and_memory
 evidence:
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/actions-ceiling-refresh-20261126.json
   gates.user_selection.0.commands:
     tests: [coverage.guest_user.selectable]
-    report: reports/actions-user-selection-20261126.json
+    report: reports/actions-ceiling-refresh-20261126.json
   gates.user_selection.0.files_write:
     tests: [coverage.guest_user.selectable]
-    report: reports/actions-user-selection-20261126.json
+    report: reports/actions-ceiling-refresh-20261126.json
   gates.user_selection.0.process_start:
     tests: [coverage.guest_user.selectable]
-    report: reports/actions-user-selection-20261126.json
+    report: reports/actions-ceiling-refresh-20261126.json
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
-    report: reports/actions-reattach-20261126.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.kernel:
     source: https://www.freestyle.sh/docs/vms
     read: 2026-11-23
@@ -68,15 +72,15 @@ evidence:
   resources.default_user:
     tests:
     - facts.default_user
-    report: reports/tester-retry-20261123.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.default_cwd:
     tests:
     - facts.default_cwd
-    report: reports/tester-select-20261123.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.root:
     tests:
     - coverage.facts.root.sudo
-    report: reports/tester-select-20261123.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.max_lifetime_seconds:
     source: https://api.freestyle.sh/v5/vms
     read: 2026-11-23
@@ -84,12 +88,12 @@ evidence:
   gates.pause_resume.0.keeps:
     tests:
     - pause_resume.files_and_memory
-    report: reports/tester-default-core.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.file_stream_max_bytes.read:
     tests:
     - files.stream.v1.read.1gib
-    report: reports/tester-select-20261123.json
+    report: reports/actions-ceiling-refresh-20261126.json
   resources.file_stream_max_bytes.write:
     tests:
     - files.stream.v1.write.1gib
-    report: reports/tester-retry-20261123.json
+    report: reports/actions-ceiling-refresh-20261126.json

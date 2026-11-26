@@ -1,0 +1,298 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:3daef71dc9075f121b4eb4d88dbfcc4f7adaf51c58a9581bcd4da000ef34acdd",
+    "coverage.guest_user.selectable": "sha256:09f52a15a6db73d603293c2855a09223537fb9597f0101aad5d2f9675d5119fe",
+    "processes.reattach.true": "sha256:667412353dc58265a48c92767df9631f763068cedec4be1cc8938b6975d1f237"
+  },
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.156"
+  },
+  "finished_at": "2026-11-26T11:35:06.737434+00:00",
+  "provider": "freestyle",
+  "revision": "e8926b446e577e80b68842a4767b281797a254aa",
+  "run_id": "public-2a7b821d1fba007a7d38",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.156"
+  },
+  "selected_tests": [
+    "processes.reattach.true",
+    "coverage.guest_user.selectable",
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T11:34:37.989849+00:00",
+  "subject": {
+    "discovery_digest": "sha256:fbc3e9c8692acdfc320afc43565eac64715baaa90202aa2e4506e105a873b8b9",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:ab324287e7a2aa7a55c3412b2e367586828c826bfb5b999350f703ff5789d7ff",
+    "version": "0.1.4"
+  },
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1966,
+      "id": "processes.reattach.true",
+      "proves": [
+        {
+          "gate": "processes",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "processes/reattach"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.disconnect",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.reattach",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "stdout": {
+              "actual": {
+                "length": 11,
+                "type": "bytes"
+              },
+              "matches": true
+            }
+          },
+          "operation": "process.output",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2044,
+      "id": "coverage.guest_user.selectable",
+      "proves": [
+        {
+          "gate": "user_selection",
+          "knob": "commands",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "files_write",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "process_start",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyIDYwMAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "Y29uZm9ybWFuY2UK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 23608,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 14.713, \"burn_wall_seconds\": 4.032, \"burn_workers\": 8, \"cpu_quota\": null, \"processors\": 4}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 3.6490575396825395, \"memory_outcome\": \"process_killed_after_recovery\", \"method\": \"measured_use\", \"oom_observation\": {\"at\": 280745.419741, \"pid\": 2097, \"rss_kib\": 7869220, \"started\": 280729.282805712}, \"requested_cpu\": \"4\", \"requested_memory_bytes\": 8589934592}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
