@@ -50,7 +50,10 @@ LIFETIME_NOT_CLAIMED = (
 
 # A test that cannot apply to this form of the provider says so with one of these reasons, and
 # then counts for neither its section nor the run: the Python form has no link to reuse.
-NOT_APPLICABLE = frozenset({"the Python form has no link", LIFETIME_NOT_CLAIMED, NO_STATED_FACT})
+DIRECT_OCI_NOT_CLAIMED = "direct_oci_uses_separate_check"
+NOT_APPLICABLE = frozenset(
+    {"the Python form has no link", LIFETIME_NOT_CLAIMED, DIRECT_OCI_NOT_CLAIMED, NO_STATED_FACT}
+)
 
 # The tests that need an offered `cost` (contract section 10): a run of a 1.0 provider leaves them
 # out, and the `cost` operation reports `unsupported`, when discovery states no
@@ -143,10 +146,10 @@ COMMAND_FALLBACK = frozenset({"files.exists"})
 # already has. The tester's driver refuses every other source (`SetupRetryDriver.image_prepare`).
 BORROWED_PREPARE = "image.prepare"
 
-# The tests of a section whose ids do not start with the section's name: `user_selection` is
-# proved by the three operation tests that select a user, so its summary line counts them.
+# Tests whose ids do not start with their section name, but whose results count in its summary.
 SECTION_TESTS = {
     "user_selection": ("run.user", "files.write.user", "process.start.user"),
+    "custom_images": ("coverage.custom_images.direct.oci",),
 }
 TEST_SECTION = {test: section for section, tests in SECTION_TESTS.items() for test in tests}
 
@@ -286,9 +289,23 @@ def not_claimed_tests(discovery: Discovery | None, class_name: str | None = None
         return {}
     name = class_name or default_class(discovery)
     chosen = next((item for item in discovery.classes if item.id == name), None)
-    if chosen is not None and chosen.lifetime_enforced_by == "router":
-        return {LIFETIME_TEST: LIFETIME_NOT_CLAIMED}
-    return {}
+    omitted: dict[str, str] = {}
+    if chosen is not None:
+        if chosen.lifetime_enforced_by == "router":
+            omitted[LIFETIME_TEST] = LIFETIME_NOT_CLAIMED
+        variants = _variants(chosen.gates, "custom_images")
+
+        def offers_oci(variant: Mapping[str, object]) -> bool:
+            source = variant.get("source")
+            return source == "oci" or (isinstance(source, list) and "oci" in source)
+
+        direct = any(offers_oci(item) and item.get("prepared", False) is False for item in variants)
+        prepared = any(offers_oci(item) and item.get("prepared") is True for item in variants)
+        if direct and not prepared:
+            # The core OCI check calls image.prepare. A direct-only class is exercised by
+            # coverage.custom_images.direct.oci, which sends the reference straight to create.
+            omitted["custom_images.oci"] = DIRECT_OCI_NOT_CLAIMED
+    return omitted
 
 
 # The steps that read a label back, by the kind of record whose labels they read. A provider whose
@@ -462,8 +479,11 @@ def _consistent(
     access = _implied(test, "access", ("public", "private"))
     credential = _implied(test, "credential", ("link", "header"))
 
-    def holds(variant: Mapping[str, object], knob: str, value: object, fixed: bool) -> bool:
-        claimed = variant.get(knob)
+    def holds(
+        gate: str, variant: Mapping[str, object], knob: str, value: object, fixed: bool
+    ) -> bool:
+        default = False if gate == "custom_images" and knob == "prepared" else None
+        claimed = variant.get(knob, default)
         if value is _UNRESOLVED:
             return False
         return (
@@ -491,7 +511,7 @@ def _consistent(
         knobs["previews"] = []
     return all(
         any(
-            all(holds(variant, knob, value, fixed) for knob, value, fixed in wanted)
+            all(holds(gate, variant, knob, value, fixed) for knob, value, fixed in wanted)
             and (gate != "previews" or offers(variant))
             for variant in gates[gate]
         )
@@ -626,9 +646,14 @@ def select_tests(suite: Suite, discovery: Discovery | None, options: TestOptions
         elif head in {"baseline", "contract"}:
             wanted = True
         else:
-            wanted = (head in sections or _coverage_only(test, sections, heads)) and _consistent(
-                test, gates, options.fixtures
+            # A direct OCI variant needs its own check even though custom_images also has
+            # a core check, which exercises an image prepared before create.
+            eligible = (
+                head in sections
+                or _coverage_only(test, sections, heads)
+                or test.id == "coverage.custom_images.direct.oci"
             )
+            wanted = eligible and _consistent(test, gates, options.fixtures)
         if wanted and test.id in CLAIMED_TESTS and discovery is not None:
             # Left out unless the class lists its operation; a test named by its whole id stays.
             wanted = CLAIMED_TESTS[test.id] not in unsupported or test.id in options.tests
@@ -697,7 +722,11 @@ def _applies(row: Mapping[str, Any]) -> bool:
 
 def _shown(row: Mapping[str, Any]) -> str:
     """The status a summary line prints: a test that a claim leaves out reads `not_claimed`."""
-    return "not_claimed" if row.get("reason") == LIFETIME_NOT_CLAIMED else str(row["result"])
+    return (
+        "not_claimed"
+        if row.get("reason") in {LIFETIME_NOT_CLAIMED, DIRECT_OCI_NOT_CLAIMED}
+        else str(row["result"])
+    )
 
 
 def _worst(statuses: Sequence[str]) -> str:

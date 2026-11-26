@@ -665,6 +665,7 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
         STANDARD_BASE_ROW,
         GUEST_USER_ROW,
         TERMINAL_END_ROW,
+        "coverage.custom_images.direct.oci",
         *IMAGE_DEFAULTS_ROWS,
     }
     for identifier in set(live) & set(preserved):

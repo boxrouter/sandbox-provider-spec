@@ -1991,6 +1991,28 @@ tests:
       equals:
         exit_code: 0
         stdout: {utf8: c3BzLWFkZC1jb250ZXh0}
+- id: coverage.custom_images.direct.oci
+  title: A direct public OCI reference boots a sandbox without preparation.
+  rules: [custom_images/oci]
+  proves:
+  - {gate: custom_images, knob: source, value: oci}
+  - {gate: custom_images, knob: prepared, value: false}
+  steps:
+  - op: create
+    in:
+      image: $runner.oci_image
+      requirements:
+        custom_images: {source: oci, prepared: false}
+    as: box
+  - op: run
+    target: box
+    in:
+      sh_script: cat /etc/os-release
+      bash_script: cat /etc/os-release
+    expect:
+      equals:
+        exit_code: 0
+        stdout: {utf8_contains: $runner.image_marker}
 - id: coverage.custom_images.prepare.registry
   title: A prepared registry image boots a sandbox.
   rules: [custom_images/prepared]
