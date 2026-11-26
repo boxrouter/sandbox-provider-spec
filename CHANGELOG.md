@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.164 — 2026-11-26
+
+- Recover size ceiling evidence when an allocator exit is unknown and a matching kernel OOM record confirms the kill.
+
 ## 0.5.163 — 2026-11-26
 
 - Declare Archil selected-user commands, file writes, and processes with live conformance evidence.
