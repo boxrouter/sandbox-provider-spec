@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.152 — 2026-11-26
+
+- Serialize the pause/resume fixture that uses fixed `/tmp` paths so concurrent CI jobs cannot overwrite its test state.
+
 ## 0.5.151 — 2026-11-25
 
 - The HTTP reference test for a locked identity store now tolerates host scheduling delay while still proving that a timed-out request does not dispatch later.
