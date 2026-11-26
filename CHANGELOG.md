@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.166 — 2026-11-26
+
+- Record the verified 2-vCPU Freestyle Ubuntu class and its conformance evidence.
+
 ## 0.5.165 — 2026-11-26
 
 - Declare Maritime selected-user commands, file writes, and processes with live conformance evidence.
