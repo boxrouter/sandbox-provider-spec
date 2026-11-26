@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.159 — 2026-11-26
+
+- Keep OOM evidence validation clear while preserving its existing PID, timestamp, and RSS checks.
+
 ## 0.5.158 — 2026-11-26
 
 - Withdraw the Sail resource ceiling claim after a corrected CPU test exceeded its requested size.
