@@ -3,7 +3,7 @@ provider: archil
 class: default
 verified:
   date: 2026-11-26
-  sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.160}
+  sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.162}
 resources:
   kernel: dedicated
   sizes:
@@ -28,16 +28,27 @@ gates:
   - {source: oci, prepared: false}
   processes:
   - reattach: true
+  user_selection:
+  - {commands: true, files_write: true, process_start: true}
 evidence:
+  gates.user_selection.0.commands:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.files_write:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.process_start:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
   gates.custom_images.0.source:
     tests: [coverage.custom_images.direct.oci]
-    report: reports/actions-direct-oci-20261126.json
+    report: reports/actions-user-selection-20261126.json
   gates.custom_images.0.prepared:
     tests: [coverage.custom_images.direct.oci]
-    report: reports/actions-direct-oci-20261126.json
+    report: reports/actions-user-selection-20261126.json
   gates.processes.0.reattach:
     tests: [processes.reattach.true]
-    report: reports/actions-direct-oci-20261126.json
+    report: reports/actions-user-selection-20261126.json
   resources.kernel:
     source: https://docs.archil.com/compute/sandboxes/introduction
     read: 2026-11-24
