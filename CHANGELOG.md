@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.157 — 2026-11-26
+
+- Declare the fixed Freestyle VM size as a CPU and memory ceiling.
+
 ## 0.5.156 — 2026-11-26
 
 - Measure CPU ceilings with independent processes, and recover memory-ceiling evidence only from a matching, fresh kernel OOM record after a disconnected allocator.
