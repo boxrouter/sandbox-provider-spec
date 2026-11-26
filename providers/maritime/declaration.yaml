@@ -5,11 +5,11 @@ class: default
 # tester report (the `sps-provider-maritime` adapter over Maritime's HTTP API, control plane
 # api.maritime.sh plus the per-sandbox data plane the create answer carries). The adapter
 # serves the baseline surface, directories, labels.update, account.capacity and
-# resume.lifetime, and discovery states five gates (pause/resume, previews, network
-# lockdown, processes and snapshots; custom images and idle shutdown stay unclaimed
+# resume.lifetime, and discovery states six gates (pause/resume, previews, network
+# lockdown, processes, snapshots and user selection; custom images and idle shutdown stay unclaimed
 # pending fixtures). Everything else stays unknown until a run report proves it.
 verified:
-  date: 2026-11-24
+  date: 2026-11-26
   # The adapter calls Maritime's HTTP API through httpx, not Maritime's own SDK; the newest
   # report records the tester stack it ran with.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.112"}
@@ -63,6 +63,8 @@ gates:
   processes:
   - cancel: true
     reattach: true
+  user_selection:
+  - {commands: true, files_write: true, process_start: true}
   snapshots:
   - keeps: files_and_memory
     deletable: true
@@ -76,6 +78,15 @@ gates:
     switchable: true
     changeable: true
 evidence:
+  gates.user_selection.0.commands:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.files_write:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
+  gates.user_selection.0.process_start:
+    tests: [coverage.guest_user.selectable]
+    report: reports/actions-user-selection-20261126.json
   resources.kernel:
     source: https://maritime.sh/docs/ephemeral-sandboxes
     read: '2026-11-24'

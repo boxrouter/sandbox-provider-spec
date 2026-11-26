@@ -1,0 +1,187 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.guest_user.selectable": "sha256:09f52a15a6db73d603293c2855a09223537fb9597f0101aad5d2f9675d5119fe"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "ProviderDriver",
+    "version": "0.5.112"
+  },
+  "finished_at": "2026-11-26T16:14:18.279436+00:00",
+  "provider": "maritime",
+  "revision": "d7394e67929ae0c14791492dac46588f0c33291f",
+  "run_id": "public-4d5118445318ff77c48b",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.112"
+  },
+  "selected_tests": [
+    "coverage.guest_user.selectable"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T16:13:57.964142+00:00",
+  "subject": {
+    "discovery_digest": "sha256:f9af410931ef41e3cdba0499e576407852f511fd66d190d895929bc043fd002a",
+    "package": "sps-provider-maritime",
+    "package_digest": "sha256:49da082a12909ba9788cd249af4c2244caf63bd2f1865dc8b5244078c6a4e0fc",
+    "version": "0.1.8"
+  },
+  "suite_digest": "sha256:e1c57e01c5400b1b7f2fd073b5a3514e8d9f2b19450aa56e982c4ebb7916e592",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 11175,
+      "id": "coverage.guest_user.selectable",
+      "proves": [
+        {
+          "gate": "user_selection",
+          "knob": "commands",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "files_write",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "process_start",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyIDYwMAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "Y29uZm9ybWFuY2UK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
