@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.158 — 2026-11-26
+
+- Withdraw the Sail resource ceiling claim after a corrected CPU test exceeded its requested size.
+
 ## 0.5.157 — 2026-11-26
 
 - Declare the fixed Freestyle VM size as a CPU and memory ceiling.
