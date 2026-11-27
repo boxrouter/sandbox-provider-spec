@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.189 — 2026-11-27
+
+- Add tested Freestyle `disk_in_memory: false` facts for default and small VM classes.
+
 ## 0.5.188 — 2026-11-27
 
 - Say in Maritime's declaration that image_defaults and image_config are not claimed and runs_entrypoint is unknown (comment only).
