@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.190 — 2026-11-27
+
+- Maritime's declaration no longer claims Dockerfile prepared images (revert of #10700).
+
 ## 0.5.189 — 2026-11-27
 
 - Add tested Freestyle `disk_in_memory: false` facts for default and small VM classes.
