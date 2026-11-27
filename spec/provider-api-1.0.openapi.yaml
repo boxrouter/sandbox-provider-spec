@@ -1611,7 +1611,7 @@ components:
       propertyNames: {pattern: "^[A-Za-z_][A-Za-z0-9_]*$"}
       additionalProperties: {type: string}
       description: >-
-        Environment variables. Names and values together are at most 65536 bytes, counting 2 bytes of overhead per variable.
+        Environment variables. Names and values together are at most 65536 bytes of UTF-8.
     UserName:
       type: string
       pattern: "^[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}$"
