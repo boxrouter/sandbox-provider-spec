@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.176 — 2026-11-27
+
+- The declaration of a provider that sells a larger machine on a higher plan states the larger sizes behind a `team_plan` condition (`resources.needs.sizes`) and the other plans' ceiling in `resources.unmet_limits.sizes`, with the pricing page's machine-size row as evidence.
+
 ## 0.5.175 — 2026-11-27
 
 - `resources.unmet_limits.sizes` states the largest size, `{cpu, memory_mib}`, of an account
