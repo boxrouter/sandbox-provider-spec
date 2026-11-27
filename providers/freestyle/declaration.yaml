@@ -3,12 +3,13 @@ provider: freestyle
 # Every value is `unknown`, absent, a dated quote of Freestyle's documentation or API, or a committed
 # tester report (see evidence.md).
 verified:
-  date: 2026-11-26
+  date: 2026-11-27
   # Freestyle's API is called over plain HTTP: the adapter uses httpx, no Freestyle SDK.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.156"}
 resources:
   kernel: dedicated
   size_is_ceiling: true
+  disk_in_memory: false
   # The default base snapshot `freestyle/ubuntu`: 4 vCPU, 8 GiB memory, 32 GB disk (the largest the Free
   # plan allows, so every plan can create it).
   sizes:
@@ -45,6 +46,9 @@ evidence:
   resources.size_is_ceiling:
     tests: [coverage.facts.size_is_ceiling.true]
     report: reports/actions-ceiling-refresh-20261126.json
+  resources.disk_in_memory:
+    tests: [coverage.facts.disk_in_memory.false]
+    report: reports/actions-disk-in-memory-default-20261127.json
   gates.user_selection.0.commands:
     tests: [coverage.guest_user.selectable]
     report: reports/actions-ceiling-refresh-20261126.json

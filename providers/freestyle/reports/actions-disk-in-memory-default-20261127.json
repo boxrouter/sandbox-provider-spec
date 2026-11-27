@@ -1,0 +1,2249 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.desktop.control": "sha256:650fed19a4f482d509af4b624cbe56fe9ec8728a4c81bcac2121b0c11ce9fb5b",
+    "coverage.desktop.live_view": "sha256:70e6f0ae3f408c7c23ff0408ae164f6d48c9e53d3628862896687cee291145d9",
+    "coverage.docker.host": "sha256:8bdd37b806bdfdc6cc74a26d240c82579295cd1cffbb7e68a58272564e80304d",
+    "coverage.facts.arch.amd64": "sha256:2e3cb6f0b642bbe707c76a092dcf0b53ccd281f7a4237a2e344ce87b0b8fa8e6",
+    "coverage.facts.arch.arm64": "sha256:c8db24b62854534da3cdaf20a88ecd6663334aa0bc439d41708e882621b2f1d0",
+    "coverage.facts.disk_in_memory.false": "sha256:67432499933bbb84ffbf2461b3d8a8d1bb799475a06e9b912902ee5a95e957b3",
+    "coverage.facts.disk_in_memory.true": "sha256:901ab5ecc7f1e970a64d4d15f32ff4970d0f54d2e7ab9374677a293a6ba5fb46",
+    "coverage.facts.guest_reserved_tcp_ports.8080": "sha256:20ffde5a8289e678fdb72fc887341a5d9d7eba6dcbc717480b58279736f88e93",
+    "coverage.facts.ipv4_destination_reach.native": "sha256:2967eabb953765891c8d1c5f803f637d612991b8fd9a014db906c31a9ef04cee",
+    "coverage.facts.kernel_features.ebpf": "sha256:6bb1c09aa50b844be06e93f4ed6dffd4f46ad2f71669226b5f245da8dd5c98c4",
+    "coverage.facts.kernel_features.fuse": "sha256:6962e5b9c3293e31ee28e2fe10ab2ed869032c6eb679380cc66e12f0ffe2e8b1",
+    "coverage.facts.kernel_features.nested_cgroups": "sha256:9ccb585c225c301dcabd60fdb68ede38045fb96b52e303b2bed14a79bee71796",
+    "coverage.facts.kernel_features.netfilter": "sha256:5a71b04c597635ed8f2c16c9655de977f00555ad1f999564baa8673dc24309cc",
+    "coverage.facts.libc.glibc": "sha256:741310d2790cb8a96e6119aa6b0fcd74abfed43e4fd1141f26997e00ba434b09",
+    "coverage.facts.libc.musl": "sha256:3d994fc78e0dcfa94c8cbe2a039d6931afaa69bcca8e91981e396e4cee055e01",
+    "coverage.facts.max_lifetime.active": "sha256:f8e0dab30d2a5c62ea926c015a0ffcda90a38f2d5a6b3f638bc9b86968dbccfb",
+    "coverage.facts.max_process": "sha256:0d334f49ef0ace4bb6a30dced463bc9aa6bf727a89313c62ed5240eb4aeeb95d",
+    "coverage.facts.max_run": "sha256:d5c71c6c70e87137d1ed6379bebf8cad88bdacbc3d8d1585e1cfec9c596d24e1",
+    "coverage.facts.on_memory_exhausted.process_killed": "sha256:1bf9e023a49a39a2b82e48eb2bedae2f9462d25f495aa7ab0c954956079eeae6",
+    "coverage.facts.on_memory_exhausted.sandbox_ended": "sha256:c4c452eb0cba301048dd83bf88bc12f16f0a50e775d4037b8bec31ef99069c58",
+    "coverage.facts.outbound_ip_families.ipv4": "sha256:05ae447bd538ca0bc9d182ded9c7b59499f56c6099388c9a9bc388d02a9a1e7a",
+    "coverage.facts.outbound_ip_families.ipv6": "sha256:af0cd97a3835c517887964ad573fb6f2ba0175a6e277bffdd1f746c9defc3c68",
+    "coverage.facts.outbound_traffic.any_tcp": "sha256:ba6e9d0fd621f86df7e31d0a0e4757a709873f15e07c04eb65d2c3a02f6cb296",
+    "coverage.facts.outbound_traffic.http": "sha256:41731ae52ec97773731eb45174d2e025e86631e340a52485bd98b4e29c4c104a",
+    "coverage.facts.outbound_traffic.udp": "sha256:890cf6f797488a50da4870a588b015a2ed5bdafe9489e06a175d9cc646ead2a8",
+    "coverage.facts.package_manager.apk": "sha256:7820deb67a9932a05fc6710fd49a6ac8143e7d44abf9ca40116c9170cc592dca",
+    "coverage.facts.package_manager.apt": "sha256:d32f18cd89d125437c18f8ab07ee8e28a982e48d99529ffa81d4bd1c9bae1486",
+    "coverage.facts.package_manager.dnf": "sha256:318bf76a523a743184fc631f3f87720741486302e95741a76d13671f135fb879",
+    "coverage.facts.package_manager.none": "sha256:c0a0acf2c8410bc44d9c9184ab82a8cb0bc789916da522c444964a515966285a",
+    "coverage.facts.package_manager.pacman": "sha256:b05188bea76b463febc0d91ca115e21a2e53c6af32e9a3636c2b30f707e61af7",
+    "coverage.facts.root.by_default": "sha256:8446038dc89890bef93769772f7a2bab0b4037cee3673ef452cebcdb9765fd8d",
+    "coverage.facts.root.per_command": "sha256:4ba60c1f75f0b78db3500bd76fe3c7436fac0ccf0c81e67e68ad5850d1bb24c0",
+    "coverage.facts.root.sudo": "sha256:d674de14985f0ffe605c1e7c7fc3a3074d17e6cea39957168914680307d4489f",
+    "coverage.facts.size_is_ceiling.false": "sha256:647223cd614edb401f35d5b5805233e5ec9ee33254587f5900b483b6f734e21c",
+    "coverage.facts.size_is_ceiling.true": "sha256:c8bcf28abdee669bab0570ff16fa518de428c1378b9ed88796126401ca2bad0d",
+    "coverage.facts.sizes.delivered": "sha256:858e7324837ba8d2ae929c2dd6375c8e35bc9ce6998051a1016a71e7eecea08f",
+    "coverage.guest_user.selectable": "sha256:09f52a15a6db73d603293c2855a09223537fb9597f0101aad5d2f9675d5119fe",
+    "coverage.hidden_secrets.injection.sets_header": "sha256:4588bf5a0e00a332388dfb40c12eb52371892fae429f3bf515c9fce60857bce0",
+    "coverage.hidden_secrets.intercepts.all_https": "sha256:286a8bbef1b39f7bb82f6208e4ba5c68ab043f089cf900ba3319358ce3eff178",
+    "coverage.hidden_secrets.intercepts.injected_hosts": "sha256:a44e13d371611ef11e4035c8a2f579f2cfe10b5e8b5b5677e3193a4e7800954f",
+    "coverage.hidden_secrets.max_inject_into": "sha256:59d9d83e2297c0213c1186b2dbc463e34465909c5f8b929ce6520e5308d20d80",
+    "coverage.hidden_secrets.rotates.false": "sha256:4c18f42f5ca2c88f4d0b86f5b71c759ecbc096c470902fcdff9c727215893f38",
+    "coverage.hidden_secrets.rotates.true": "sha256:f0d0723d463dc1dc15b1bf7524aa15f5c4d799a8c55d712cff79e4e4e2cfd0d5",
+    "coverage.hidden_secrets.scrubs_responses.false": "sha256:6f39a546b297e859d3faabaaaf9f6dd209793e18166a3b33019abf8bb8fb34bf",
+    "coverage.hidden_secrets.scrubs_responses.true": "sha256:ee2c74e7ce4d83f781a545d164f44310d0e5c96e0b9ef3084c1b082ea1669f10",
+    "coverage.hidden_secrets.transparent.false": "sha256:dcd290e6d352223e7d1e1919af344c20f49ef09e68db4ec95bbccac5bce9abd1",
+    "coverage.hidden_secrets.transparent.true": "sha256:fefa575954fa54618b7a83687f6018b5cb5b49a9a40d595f6fb58aca617aa097",
+    "coverage.hidden_secrets.wildcards": "sha256:396b0b416f95d39164fe3a4d9aa3d0359588331ca98306f77765a767e3eecdb1",
+    "coverage.network_lockdown.allowlist.mixed": "sha256:f3fa91246e8d8c72bd94dd72d4c455480d0e048631d310610b197a787a00467f",
+    "coverage.network_lockdown.allowlist.range": "sha256:11d4531f05920b5d137c335973a83d888f5bdba886dfb7920f5fa0d2f9072d43",
+    "coverage.network_lockdown.changeable.false": "sha256:a85b3108c00b7f55de68e0fc651dae249eae4b3327234de872c3ded0d7841b36",
+    "coverage.network_lockdown.changeable.true": "sha256:49a74a306aa38a2d746ef47406d44416356c2a8e04f975190cf9cc0b6e1c9bb3",
+    "coverage.network_lockdown.denylist.addresses": "sha256:b4f0a1a65a37a5fce5ecdc5989c1f5a99de2782479e58f4e36330e6dde52217a",
+    "coverage.network_lockdown.denylist.mixed": "sha256:718e1b8e0ed52c6f0f8059512e834a4c3ad17b4dd06dd9133a67edaf7315e3fd",
+    "coverage.network_lockdown.denylist.names": "sha256:1fac600d4ad2aeac0c44acace669c61f36844b201012f538b76e8ab4eb6b3dfa",
+    "coverage.network_lockdown.max_deny": "sha256:57a3a29907e0b218f5a161f50c4307960a3f94eb305d306ba52b30ea31a8e0b8",
+    "coverage.network_lockdown.open": "sha256:dd1242eb67ff148560e31f90fa69495db512001907c085c482e1275776c6f703",
+    "coverage.network_lockdown.policy_transition.denylist": "sha256:15389588cc797fefdcb09f366531bcd1b8ded545dd5c7b8746d23c830623695e",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false": "sha256:a50352ee0986728188c6dabb1700f7051dbddd916bc1e2e14145e56166951e48",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true": "sha256:c10201c467913e9ee6869111380fc219f36be8a25bc37167a24800c750f379c5",
+    "coverage.network_lockdown.switchable.false": "sha256:9e772deeaf3b566858440326dae2637536094c2e0e83d4ed022377c540c6d855",
+    "coverage.network_lockdown.switchable.true": "sha256:da06d065ea75dcb0fa1382655996279ce22fb2cdaffc86524518d47ccb760fbb",
+    "coverage.previews.any_port": "sha256:6b1606eb37843eee7dfd03471984753b0af9c1045f72954072cf1c25fb4e76f1",
+    "coverage.previews.loopback": "sha256:f99fdc788617c73500bc0e7e8ead34b94f5af357e1f9d4a6d36f7e54f66b5fbb",
+    "coverage.previews.reserved_ports": "sha256:607755878b3ccca97fb743ca8872adf103962c118da3f9d32cb4fd95c467426d",
+    "coverage.previews.survives_pause": "sha256:3418dc4eab5c05df43ddd76f9438500917ca82b803d553fcafdce74e911222e8",
+    "coverage.previews.websocket": "sha256:1f8cb6c01c29817abe8c4ac687da220c3d06f937c84f56eb3090726abcbb2d72",
+    "coverage.tcp_ports.none": "sha256:4a70f7f6574ecc0f1f1c090f4594757eca1e16dabf92a674c0db213d052c185e",
+    "coverage.terminal.end": "sha256:51f8fc53244b955b36a9f21ea503128704c1fcaadd7167fd7dac0f0096452bcd",
+    "coverage.terminal.reattach": "sha256:348b368c4fdef5718aa45b70a725c17c6c26761d28a67d2c049b098d5335814d",
+    "coverage.volumes.read_only": "sha256:fe4bd38c920e5b51266cfcc7a1b60731d0083ec6b042d651ea75d1475bfd5e15"
+  },
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.167"
+  },
+  "finished_at": "2026-11-27T02:44:58.641977+00:00",
+  "provider": "freestyle",
+  "revision": "d4d166490a4f7ee64a1265dc97adad26e96467d4",
+  "run_id": "public-dee39dfccebee4f86901",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.167"
+  },
+  "selected_tests": [
+    "coverage.guest_user.selectable",
+    "coverage.facts.max_lifetime.active",
+    "coverage.volumes.read_only",
+    "coverage.facts.arch.amd64",
+    "coverage.facts.arch.arm64",
+    "coverage.facts.root.by_default",
+    "coverage.facts.root.sudo",
+    "coverage.facts.root.per_command",
+    "coverage.facts.kernel_features.fuse",
+    "coverage.facts.kernel_features.ebpf",
+    "coverage.facts.kernel_features.nested_cgroups",
+    "coverage.facts.kernel_features.netfilter",
+    "coverage.facts.outbound_traffic.http",
+    "coverage.facts.outbound_traffic.any_tcp",
+    "coverage.facts.outbound_traffic.udp",
+    "coverage.facts.package_manager.apt",
+    "coverage.facts.package_manager.apk",
+    "coverage.facts.package_manager.dnf",
+    "coverage.facts.package_manager.pacman",
+    "coverage.facts.package_manager.none",
+    "coverage.facts.libc.glibc",
+    "coverage.facts.libc.musl",
+    "coverage.facts.on_memory_exhausted.process_killed",
+    "coverage.facts.on_memory_exhausted.sandbox_ended",
+    "coverage.facts.disk_in_memory.true",
+    "coverage.facts.disk_in_memory.false",
+    "coverage.facts.size_is_ceiling.true",
+    "coverage.facts.size_is_ceiling.false",
+    "coverage.facts.sizes.delivered",
+    "coverage.facts.max_run",
+    "coverage.facts.max_process",
+    "coverage.docker.host",
+    "coverage.tcp_ports.none",
+    "coverage.desktop.control",
+    "coverage.desktop.live_view",
+    "coverage.previews.websocket",
+    "coverage.previews.loopback",
+    "coverage.previews.any_port",
+    "coverage.previews.survives_pause",
+    "coverage.previews.reserved_ports",
+    "coverage.terminal.reattach",
+    "coverage.terminal.end",
+    "coverage.network_lockdown.denylist.names",
+    "coverage.network_lockdown.denylist.addresses",
+    "coverage.network_lockdown.denylist.mixed",
+    "coverage.network_lockdown.allowlist.mixed",
+    "coverage.network_lockdown.allowlist.range",
+    "coverage.network_lockdown.changeable.true",
+    "coverage.network_lockdown.changeable.false",
+    "coverage.network_lockdown.switchable.true",
+    "coverage.network_lockdown.policy_transition.denylist",
+    "coverage.network_lockdown.open",
+    "coverage.network_lockdown.switchable.false",
+    "coverage.network_lockdown.switchable.cuts_open_connections.true",
+    "coverage.network_lockdown.switchable.cuts_open_connections.false",
+    "coverage.hidden_secrets.rotates.true",
+    "coverage.hidden_secrets.rotates.false",
+    "coverage.hidden_secrets.scrubs_responses.true",
+    "coverage.hidden_secrets.scrubs_responses.false",
+    "coverage.hidden_secrets.injection.sets_header",
+    "coverage.hidden_secrets.intercepts.injected_hosts",
+    "coverage.hidden_secrets.intercepts.all_https",
+    "coverage.hidden_secrets.max_inject_into",
+    "coverage.hidden_secrets.wildcards",
+    "coverage.network_lockdown.max_deny",
+    "coverage.hidden_secrets.transparent.true",
+    "coverage.hidden_secrets.transparent.false",
+    "coverage.facts.outbound_ip_families.ipv4",
+    "coverage.facts.outbound_ip_families.ipv6",
+    "coverage.facts.ipv4_destination_reach.native",
+    "coverage.facts.guest_reserved_tcp_ports.8080"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-27T02:33:54.014543+00:00",
+  "subject": {
+    "discovery_digest": "sha256:0908cd8f1afc052cb5eaea1a62bf9c844f3d223cb32163336ef6392d4b286490",
+    "package": "sps-provider-freestyle",
+    "package_digest": "sha256:9b59fa08e79f4d380d27e178c493173a76e8fde4330f8d8ebc39ba0843e5da5c",
+    "version": "0.1.8"
+  },
+  "suite_digest": "sha256:0520b84495af4b657eb117d7f30b59edf71c6ee8758adbff3b7c132def0bf196",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1856,
+      "id": "coverage.guest_user.selectable",
+      "proves": [
+        {
+          "gate": "user_selection",
+          "knob": "commands",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "files_write",
+          "value": true
+        },
+        {
+          "gate": "user_selection",
+          "knob": "process_start",
+          "value": true
+        }
+      ],
+      "reason": "provider_error",
+      "result": "error",
+      "rules": [
+        "user-selection/commands",
+        "user-selection/files-write",
+        "user-selection/process-start"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyCg==",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "files.write",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "cnVubmVyIDYwMAo=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "Y29uZm9ybWFuY2UK",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "operation": "process.start",
+          "reason": "provider_error",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.max_lifetime.active",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/max-lifetime"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.volumes.read_only",
+      "proves": [
+        {
+          "gate": "volumes",
+          "knob": "read_only_mounts",
+          "value": true
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "volumes/read-only"
+      ],
+      "steps": [
+        {
+          "operation": "volume.create",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 2250,
+      "id": "coverage.facts.arch.amd64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "amd64"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "arch": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1029,
+      "id": "coverage.facts.arch.arm64",
+      "proves": [
+        {
+          "fact": "resources.arch",
+          "value": [
+            "arm64"
+          ]
+        }
+      ],
+      "reason": "arch",
+      "result": "differs",
+      "rules": [
+        "facts/arch"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "arch": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 858,
+      "id": "coverage.facts.root.by_default",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "by_default"
+          ]
+        }
+      ],
+      "reason": "uid_zero",
+      "result": "differs",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 1203,
+      "id": "coverage.facts.root.sudo",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "sudo"
+          ]
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "uid_zero": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 783,
+      "id": "coverage.facts.root.per_command",
+      "proves": [
+        {
+          "fact": "resources.root",
+          "value": [
+            "per_command"
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/root"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 515,
+      "id": "coverage.facts.kernel_features.fuse",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "fuse"
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/kernel-fuse"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_kernel_feature",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 789,
+      "id": "coverage.facts.kernel_features.ebpf",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "ebpf"
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/kernel-ebpf"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_kernel_feature",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 398,
+      "id": "coverage.facts.kernel_features.nested_cgroups",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "nested_cgroups"
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/kernel-nested-cgroups"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_kernel_feature",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 780,
+      "id": "coverage.facts.kernel_features.netfilter",
+      "proves": [
+        {
+          "fact": "resources.kernel_features",
+          "value": [
+            "netfilter"
+          ]
+        }
+      ],
+      "reason": "driver_unimplemented",
+      "result": "not_run",
+      "rules": [
+        "facts/kernel-netfilter"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_kernel_feature",
+          "reason": "driver_unimplemented",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.http",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-http"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.any_tcp",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-tcp"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_traffic.udp",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-udp"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_outbound_traffic",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10744,
+      "id": "coverage.facts.package_manager.apt",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apt"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 835,
+      "id": "coverage.facts.package_manager.apk",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "apk"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 811,
+      "id": "coverage.facts.package_manager.dnf",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "dnf"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 940,
+      "id": "coverage.facts.package_manager.pacman",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "pacman"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 793,
+      "id": "coverage.facts.package_manager.none",
+      "proves": [
+        {
+          "fact": "resources.package_manager",
+          "value": "none"
+        }
+      ],
+      "reason": "installed",
+      "result": "differs",
+      "rules": [
+        "facts/package-manager"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "installed": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 916,
+      "id": "coverage.facts.libc.glibc",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "glibc"
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "libc": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 901,
+      "id": "coverage.facts.libc.musl",
+      "proves": [
+        {
+          "fact": "resources.libc",
+          "value": "musl"
+        }
+      ],
+      "reason": "libc",
+      "result": "differs",
+      "rules": [
+        "facts/libc"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "libc": {
+              "matches": false
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10948,
+      "id": "coverage.facts.on_memory_exhausted.process_killed",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "process_killed"
+        }
+      ],
+      "reason": "memory_allocator_exit_unproven",
+      "result": "error",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "memory_allocator_exit_unproven",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 10999,
+      "id": "coverage.facts.on_memory_exhausted.sandbox_ended",
+      "proves": [
+        {
+          "fact": "resources.on_memory_exhausted",
+          "value": "sandbox_ended"
+        }
+      ],
+      "reason": "memory_allocator_exit_unproven",
+      "result": "error",
+      "rules": [
+        "facts/on-memory-exhausted"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "fixture.coverage_fact",
+          "reason": "memory_allocator_exit_unproven",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6463,
+      "id": "coverage.facts.disk_in_memory.true",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": true
+        }
+      ],
+      "reason": "disk_in_memory",
+      "result": "differs",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": false
+            },
+            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1138688, \"memory_during_bytes\": 1134592, \"memory_after_bytes\": 1134592}\n"
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "differs"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 6903,
+      "id": "coverage.facts.disk_in_memory.false",
+      "proves": [
+        {
+          "fact": "resources.disk_in_memory",
+          "value": false
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/disk-in-memory"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "disk_in_memory": {
+              "matches": true
+            },
+            "stdout": "{\"disk_in_memory\": false, \"wrote_bytes\": 268435456, \"memory_source\": \"cgroup_shmem\", \"memory_before_bytes\": 1138688, \"memory_during_bytes\": 1134592, \"memory_after_bytes\": 1134592}\n"
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.size_is_ceiling.false",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.sizes.delivered",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/sizes"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 725,
+      "id": "coverage.facts.max_run",
+      "proves": [
+        {
+          "fact": "resources.max_run_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "reason": "WireError",
+      "result": "error",
+      "rules": [
+        "facts/max-run"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "operation": "run",
+          "reason": "WireError",
+          "result": "error"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "process",
+          "result": "already_released"
+        },
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 601144,
+      "id": "coverage.facts.max_process",
+      "proves": [
+        {
+          "fact": "resources.max_process_seconds",
+          "value": {
+            "at_least": 600
+          }
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/max-process"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "process.start",
+          "result": "passed"
+        },
+        {
+          "operation": "wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            }
+          },
+          "operation": "process.wait",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "data": {
+              "actual": {
+                "b64": "NjAw",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "files.read_bytes",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.docker.host",
+      "proves": [
+        {
+          "gate": "docker",
+          "knob": "networking",
+          "value": "host"
+        }
+      ],
+      "reason": "a create input that SPS 1.0 does not define",
+      "result": "unsupported",
+      "rules": [
+        "docker/runs-containers",
+        "docker/host"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_docker_create",
+          "reason": "a create input that SPS 1.0 does not define",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.tcp_ports.none",
+      "proves": [
+        {
+          "gate": "tcp_ports",
+          "knob": "tls",
+          "value": "none"
+        },
+        {
+          "gate": "tcp_ports",
+          "knob": "max_tcp_ports",
+          "value": {
+            "at_least": 2
+          }
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "tcp_ports/reachable",
+        "tcp_ports/tls-none"
+      ],
+      "steps": [
+        {
+          "operation": "tcp.link",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 2,
+      "id": "coverage.desktop.control",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "desktop/control"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 1,
+      "id": "coverage.desktop.live_view",
+      "proves": [
+        {
+          "gate": "desktop",
+          "value": true
+        },
+        {
+          "gate": "desktop",
+          "knob": "live_view",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "desktop/control",
+        "desktop/live-view"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.websocket",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "websocket",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "previews/websocket"
+      ],
+      "steps": [
+        {
+          "operation": "preview.link",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.loopback",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "loopback",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "previews/loopback"
+      ],
+      "steps": [
+        {
+          "operation": "preview.link",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.any_port",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "any_port",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "previews/any-port"
+      ],
+      "steps": [
+        {
+          "operation": "preview.link",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.survives_pause",
+      "proves": [
+        {
+          "gate": "previews",
+          "knob": "survives_pause",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "previews/survives-pause"
+      ],
+      "steps": [
+        {
+          "operation": "preview.link",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.previews.reserved_ports",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "previews/reserved-ports"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.terminal.reattach",
+      "proves": [
+        {
+          "gate": "terminal",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "terminal/reattach",
+        "provider-api/terminal-reattach"
+      ],
+      "steps": [
+        {
+          "operation": "terminal.open",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.terminal.end",
+      "proves": [
+        {
+          "gate": "terminal",
+          "knob": "reattach",
+          "value": true
+        }
+      ],
+      "reason": "discovery does not claim the section that needs this operation",
+      "result": "unsupported",
+      "rules": [
+        "provider-api/terminal-end"
+      ],
+      "steps": [
+        {
+          "operation": "terminal.open",
+          "reason": "discovery does not claim the section that needs this operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.names",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.addresses",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.denylist.mixed",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/denylist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.mixed",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.allowlist.range",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/allowlist",
+        "network_lockdown/entry-kinds"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.changeable.true",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable",
+        "provider-api/network-update"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.changeable.false",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/changeable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.true",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable",
+        "provider-api/network-update"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.policy_transition.denylist",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.open",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/open"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_network_checks",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.false",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.cuts_open_connections.true",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.switchable.cuts_open_connections.false",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/switchable"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.rotates.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.rotates.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "rotates",
+          "value": false
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/rotates"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.scrubs_responses.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.scrubs_responses.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "scrubs_responses",
+          "value": false
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/scrubs-responses"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.injection.sets_header",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "injection",
+          "value": "sets_header"
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/injection"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.intercepts.injected_hosts",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "injected_hosts"
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.intercepts.all_https",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "intercepts",
+          "value": "all_https"
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/intercepts"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.max_inject_into",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "hidden_secrets/max-inject-into"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.hidden_secrets.wildcards",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "hidden_secrets/wildcards"
+      ],
+      "steps": [
+        {
+          "operation": "create",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.network_lockdown.max_deny",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "network_lockdown/max-deny"
+      ],
+      "steps": [
+        {
+          "operation": "prepare",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.transparent.true",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": true
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "secret",
+          "result": "already_released"
+        }
+      ],
+      "duration_ms": 1,
+      "id": "coverage.hidden_secrets.transparent.false",
+      "proves": [
+        {
+          "gate": "hidden_secrets",
+          "knob": "transparent",
+          "value": false
+        }
+      ],
+      "reason": "the provider reports that it does not support the operation",
+      "result": "unsupported",
+      "rules": [
+        "hidden_secrets/transparent"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.coverage_secret",
+          "reason": "the provider reports that it does not support the operation",
+          "result": "unsupported"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_ip_families.ipv4",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-ip-families"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.address_families",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.outbound_ip_families.ipv6",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-ip-families"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.address_families",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.ipv4_destination_reach.native",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/outbound-ip-families"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.address_families",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    },
+    {
+      "class": "default",
+      "cleanup": [],
+      "duration_ms": 0,
+      "id": "coverage.facts.guest_reserved_tcp_ports.8080",
+      "proves": [],
+      "reason": "fixture_missing",
+      "result": "not_run",
+      "rules": [
+        "facts/guest-reserved-tcp-ports"
+      ],
+      "steps": [
+        {
+          "operation": "fixture.guest_reserved_tcp_ports",
+          "reason": "fixture_missing",
+          "result": "not_run"
+        }
+      ]
+    }
+  ]
+}

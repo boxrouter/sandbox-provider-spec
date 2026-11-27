@@ -8,6 +8,16 @@ proves. Values without evidence stay `unknown`.
 
 - `kernel: dedicated`: Freestyle's docs call every VM "a full Linux virtual machine"
   (https://www.freestyle.sh/docs/vms, read 2026-11-23).
+- `resources.disk_in_memory: false`: the default and small tester reports passed
+  `coverage.facts.disk_in_memory.false`; a 256 MiB `tmpfs` write left reported memory unchanged
+  (`reports/actions-disk-in-memory-default-20261127.json`,
+  `reports/actions-disk-in-memory-small-20261127.json`).
+  The default-class copy omits only the redundant top-level `class: default`, which this declaration
+  leaves implicit; its test rows retain their class. The source reports are in
+  `packages/sps-provider-freestyle/reports/tester-default-coverage.json` (SHA-256
+  `f8efedc41043d3bf869385274045d71b96590dd44cad421a76ccc105a463eb31`) and
+  `tester-small-coverage.json` (SHA-256
+  `682ad07ec7e7e5e1c81345f9afd2d79359b64e85c31081f5a47c19737f5824a8`).
 - `sizes`, `default_size`: the default base snapshot `freestyle/ubuntu` is 4 vCPU, 8 GiB, 32 GB
   (https://www.freestyle.sh/docs/vms/base-snapshots); a live create returned `resources` cpu 4, memory
   8192 (MiB), storage 32768 (MiB). `freestyle/ubuntu-sm` (2 vCPU, 4 GiB, 16 GB) also boots on the Free

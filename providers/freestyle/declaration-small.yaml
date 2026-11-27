@@ -2,11 +2,12 @@ spec: sandbox-provider-spec/0.1
 provider: freestyle
 class: small
 verified:
-  date: 2026-11-26
+  date: 2026-11-27
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.156"}
 resources:
   kernel: dedicated
   size_is_ceiling: true
+  disk_in_memory: false
   sizes:
   - {cpu: 2, memory_mib: 4096, disk_mib: 16384}
   default_size: {cpu: 2, memory_mib: 4096, disk_mib: 16384}
@@ -49,6 +50,9 @@ evidence:
   resources.size_is_ceiling:
     tests: [coverage.facts.size_is_ceiling.true]
     report: reports/actions-small-class-20261126.json
+  resources.disk_in_memory:
+    tests: [coverage.facts.disk_in_memory.false]
+    report: reports/actions-disk-in-memory-small-20261127.json
   resources.default_user:
     tests: [facts.default_user]
     report: reports/actions-small-class-20261126.json
