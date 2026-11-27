@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.187 — 2026-11-27
+
+- Maritime's declaration claims prepared Dockerfile images with a build context (`custom_images` source `dockerfile`, `prepared`, `build_context`), proved by `coverage.custom_images.prepare.dockerfile_distro_context` on the Maritime INTERNAL account.
+
 ## 0.5.186 — 2026-11-27
 
 - The Archil declaration states the root disk it was measured with, 1,031,019 MiB on every size (2026-11-27), where it said `unknown`.
