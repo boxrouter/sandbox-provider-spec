@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.192 — 2026-11-27
+
+- Spec: a variable a create is given overrides the image's environment (a Dockerfile's ENV), and a variable a command is given overrides both, as in Docker (baseline/lifecycle and baseline/run).
+
 ## 0.5.191 — 2026-11-27
 
 - Maritime's declaration claims Dockerfile prepared images again (#10700, reverted by #10718); its `image.prepare` also takes the standard image's OCI source.
