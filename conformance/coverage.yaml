@@ -738,7 +738,7 @@ tests:
     in:
       bash_script: python3 -c 'import time; started=time.monotonic(); time.sleep(600); print("sps-runtime-proof"
         if time.monotonic()-started >= 600 else "too-short")'
-      timeout_ms: 0
+      timeout_ms: 660000
     expect:
       equals:
         exit_code: 0

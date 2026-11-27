@@ -115,6 +115,24 @@ def test_every_bash_script_in_both_suite_files_is_text() -> None:
                     assert isinstance(given["bash_script"], str), (name, test["id"])
 
 
+def test_every_run_timeout_is_one_the_api_accepts_and_outlasts_what_it_proves() -> None:
+    """`RunRequest.timeout_ms` is at least 1: a 0, which 0.x read as no limit, is refused or ends
+    the command at once, so `coverage.facts.max_run` could pass on no provider."""
+    root = Path(__file__).resolve().parents[1] / "conformance"
+    for name in ("suite.yaml", "coverage.yaml"):
+        for test in yaml.safe_load((root / name).read_text())["tests"]:
+            proven = [
+                proof["value"]["at_least"] * 1000
+                for proof in test.get("proves", [])
+                if proof.get("fact") == "resources.max_run_seconds"
+            ]
+            for step in test.get("steps", []):
+                given = step.get("in")
+                timeout = given.get("timeout_ms") if isinstance(given, dict) else None
+                if step.get("op") == "run" and isinstance(timeout, int):
+                    assert timeout > max(proven, default=0), (name, test["id"], timeout)
+
+
 def test_custom_image_requirements_do_not_repeat_the_top_level_image() -> None:
     root = Path(__file__).resolve().parents[1] / "conformance"
     for name in ("suite.yaml", "coverage.yaml"):
