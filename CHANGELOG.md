@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.169 — 2026-11-27
+
+- `coverage.facts.max_run` runs its 600 s command with `timeout_ms: 660000`. It sent 0, which API
+  1.0 refuses or reads as an immediate timeout, so no provider could prove `max_run_seconds`.
+
 ## 0.5.168 — 2026-11-27
 
 - `sandbox_provider_spec.environment` owns the `Env` size limit (`ENVIRONMENT_MAX_BYTES`, `environment_bytes`): names and values together are at most 65536 bytes of UTF-8, with no per-variable overhead.
