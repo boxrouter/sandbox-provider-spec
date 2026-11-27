@@ -6,11 +6,14 @@ verified:
   sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.162}
 resources:
   kernel: dedicated
+  # Two GiB of memory per vCPU. The Console presets stop at 8 vCPU; the API takes 1 to 32 vCPU.
   sizes:
   - {cpu: 1, memory_mib: 2048}
   - {cpu: 2, memory_mib: 4096}
   - {cpu: 4, memory_mib: 8192}
   - {cpu: 8, memory_mib: 16384}
+  - {cpu: 16, memory_mib: 32768}
+  - {cpu: 32, memory_mib: 65536}
   regions: [archil:aws-us-east-1, archil:aws-us-west-2, archil:aws-eu-west-1]
   located_in: unknown
   max_lifetime_seconds: 86400
@@ -54,9 +57,9 @@ evidence:
     read: 2026-11-24
     quote: Each sandbox is a dedicated Firecracker microVM with its own Linux kernel.
   resources.sizes:
-    source: user-provided Archil Console screenshot
-    read: 2026-11-24
-    quote: Small 1 vCPU and 2 GiB; Medium 2 vCPU and 4 GiB; Large 4 vCPU and 8 GiB; XLarge 8 vCPU and 16 GiB.
+    source: https://docs.archil.com/compute/sandboxes/introduction
+    read: 2026-11-27
+    quote: support between 1 and 32 vCPU cores and between 0.25 and 64 GiB of memory.
   resources.regions:
     source: https://docs.archil.com/reference/regions
     read: 2026-11-24
