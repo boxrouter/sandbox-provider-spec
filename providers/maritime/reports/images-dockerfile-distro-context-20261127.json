@@ -1,0 +1,151 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.custom_images.prepare.dockerfile_distro_context": "sha256:78a74307fb6a3827eae5c1ca9c08a5337ccc8aea13e1442f9cf264020b2e7d80"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.186"
+  },
+  "finished_at": "2026-11-27T19:59:42.282881+00:00",
+  "provider": "maritime",
+  "revision": "bc233f5e94167f821d617971e25896e32fee4c80",
+  "run_id": "public-82b57b61853facd31947",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.186"
+  },
+  "selected_tests": [
+    "coverage.custom_images.prepare.dockerfile_distro_context"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-27T19:59:11.761412+00:00",
+  "subject": {
+    "discovery_digest": "sha256:62773ca093920471e0648e7ae7a8ae95139a94cb490fe7b52d60a3f03ae2c3df",
+    "package": "sps-provider-maritime",
+    "package_digest": "sha256:44587551c9de099f5a5227ceb7da6e2574bcceb9ae151126d798375cb4c4b37d",
+    "version": "0.1.12"
+  },
+  "suite_digest": "sha256:613397ef40373a11361d9a3f4cd988efb310a9a9ae653dac713e2d7681b77243",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        },
+        {
+          "kind": "image",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 22540,
+      "id": "coverage.custom_images.prepare.dockerfile_distro_context",
+      "proves": [
+        {
+          "gate": "custom_images",
+          "knob": "source",
+          "value": "dockerfile"
+        },
+        {
+          "gate": "custom_images",
+          "knob": "prepared",
+          "value": true
+        },
+        {
+          "gate": "custom_images",
+          "knob": "build_context",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "custom_images/prepared",
+        "custom_images/build-context"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "image.prepare",
+          "result": "passed"
+        },
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "YzNCekxXUnBjM1J5YnkxamIyNTBaWGgwTFdOdmNIaz0=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "QUFFQ0F3UUZCZ2NJQ1FvTERBME9Edz09",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "YzNCekxXUnBjM1J5YnkxamIyNTBaWGgwTFdGa1pBPT0=",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "exit_code": {
+              "actual": 0,
+              "matches": true
+            },
+            "stdout": {
+              "actual": {
+                "b64": "YzNCekxXUnBjM1J5YnkxamIyNTBaWGgwTFhWdWNHRmphMlZr",
+                "truncated": false
+              },
+              "matches": true
+            }
+          },
+          "operation": "run",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}
