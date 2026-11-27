@@ -51,6 +51,7 @@ T = TypeVar("T")
 
 UNKNOWN_IMAGE_ID = "sps-test-no-such-image"
 IMAGE_WAIT_SECONDS = 1800  # how long a prepared image may stay in `preparing`
+TEST_LAYOUT_BYTES = 256 * 1024 * 1024  # the tester's images are small; it holds one in memory
 _CONTEXT_CHUNK = 64 * 1024
 
 
@@ -272,7 +273,8 @@ class ImageSteps:
         if isinstance(source, PrivateOciSource):
             raise NotRun("a_private_image_cannot_be_read_without_its_credentials")
         try:
-            return build_layout(source.oci, source.digest)
+            with build_layout(source.oci, source.digest, limit=TEST_LAYOUT_BYTES) as layout:
+                return layout.read()
         except LayoutError:
             raise NotRun("oci_layout_could_not_be_built") from None
 

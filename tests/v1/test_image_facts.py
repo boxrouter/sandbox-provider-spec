@@ -10,7 +10,9 @@ import hashlib
 import io
 import json
 import tarfile
-from collections.abc import Mapping
+import tempfile
+import tracemalloc
+from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -45,7 +47,13 @@ from sandbox_provider_spec.v1 import (
 )
 from sandbox_provider_spec.v1.errors import ERROR_TABLE
 from sandbox_provider_spec.v1.http_client import HttpProvider
-from sandbox_provider_spec.v1.oci_layout import LayoutError, build_layout, split_reference
+from sandbox_provider_spec.v1.oci_layout import (
+    Layout,
+    LayoutError,
+    LayoutTooLarge,
+    build_layout,
+    split_reference,
+)
 from sandbox_provider_spec.v1.server import create_app
 from sandbox_provider_spec.v1.tester import TestOptions, run_tests, select_tests, shared_suite
 from sandbox_provider_spec.v1.types import (
@@ -525,15 +533,28 @@ def _sha(data: bytes) -> str:
 class FakeRegistry:
     """A registry that asks for a token, serves a two-platform index, one manifest and its blobs."""
 
-    def __init__(self, *, corrupt: str | None = None) -> None:
+    def __init__(self, *, corrupt: str | None = None, big_layer_mib: int | None = None) -> None:
+        # A big layer is generated as it is served and never held, and its manifest names the size
+        # it has, so a test of a large image allocates nothing.
+        self.big_layer_mib = big_layer_mib
         self.layer = b"layer-bytes" * 100
+        layer_size = len(self.layer)
+        layer_digest = _sha(self.layer)
+        if big_layer_mib is not None:
+            self.layer = b"L" * (1 << 20)
+            layer_size = big_layer_mib << 20
+            total = hashlib.sha256()
+            for _ in range(big_layer_mib):
+                total.update(self.layer)
+            layer_digest = "sha256:" + total.hexdigest()
+        self.layer_digest = layer_digest
         self.config = json.dumps({"os": "linux", "architecture": "amd64"}).encode()
         self.manifest = json.dumps(
             {
                 "schemaVersion": 2,
                 "mediaType": "application/vnd.oci.image.manifest.v1+json",
                 "config": {"digest": _sha(self.config), "size": len(self.config)},
-                "layers": [{"digest": _sha(self.layer), "size": len(self.layer)}],
+                "layers": [{"digest": layer_digest, "size": layer_size}],
             }
         ).encode()
         self.index = json.dumps(
@@ -567,12 +588,14 @@ class FakeRegistry:
             _sha(self.index): (self.index, "application/vnd.oci.image.index.v1+json"),
             _sha(self.manifest): (self.manifest, "application/vnd.oci.image.manifest.v1+json"),
             _sha(self.config): (self.config, "application/octet-stream"),
-            _sha(self.layer): (self.layer, "application/octet-stream"),
+            self.layer_digest: (self.layer, "application/octet-stream"),
         }
         digest = path.rsplit("/", 1)[-1]
         if digest not in blobs:
             return httpx.Response(404)
         data, media = blobs[digest]
+        if self.big_layer_mib is not None and digest == self.layer_digest:
+            return httpx.Response(200, content=(data for _ in range(self.big_layer_mib)))
         if digest == self.corrupt:
             data = data + b"!"
         return httpx.Response(200, content=data, headers={"content-type": media})
@@ -581,10 +604,15 @@ class FakeRegistry:
 def test_the_tester_builds_an_oci_layout_of_a_public_image_by_digest() -> None:
     registry = FakeRegistry()
     client = httpx.Client(transport=httpx.MockTransport(registry))
-    layout = build_layout(
-        f"reg.test/team/app@{_sha(registry.index)}", _sha(registry.index), client=client
-    )
-    with tarfile.open(fileobj=io.BytesIO(layout)) as archive:
+    with build_layout(
+        f"reg.test/team/app@{_sha(registry.index)}",
+        _sha(registry.index),
+        limit=1 << 20,
+        client=client,
+    ) as layout:
+        data = layout.read()
+        assert layout.size == len(data)
+    with tarfile.open(fileobj=io.BytesIO(data)) as archive:
         names = sorted(archive.getnames())
         assert json.loads(archive.extractfile("oci-layout").read()) == {  # type: ignore[union-attr]
             "imageLayoutVersion": "1.0.0"
@@ -598,21 +626,81 @@ def test_the_tester_builds_an_oci_layout_of_a_public_image_by_digest() -> None:
     assert not any("1111" in path for path in registry.paths)  # the other platform is not read
 
 
+def _layout_of(data: bytes) -> Layout:
+    file = tempfile.TemporaryFile()
+    file.write(data)
+    return Layout(file, len(data))
+
+
 @pytest.mark.parametrize("what", ["index", "layer"])
 def test_a_blob_that_does_not_match_its_digest_is_refused(what: str) -> None:
     registry = FakeRegistry()
     registry.corrupt = _sha(getattr(registry, what))
     client = httpx.Client(transport=httpx.MockTransport(registry))
     with pytest.raises(LayoutError, match="came back as"):
-        build_layout("reg.test/team/app", _sha(registry.index), client=client)
+        build_layout("reg.test/team/app", _sha(registry.index), limit=1 << 20, client=client)
 
 
 def test_an_image_the_registry_does_not_have_is_a_layout_error() -> None:
     client = httpx.Client(transport=httpx.MockTransport(FakeRegistry()))
     with pytest.raises(LayoutError, match="404"):
-        build_layout("reg.test/team/app", "sha256:" + "22" * 32, client=client)
+        build_layout("reg.test/team/app", "sha256:" + "22" * 32, limit=1 << 20, client=client)
     with pytest.raises(LayoutError, match="digest"):
-        build_layout("reg.test/team/app", "latest", client=client)
+        build_layout("reg.test/team/app", "latest", limit=1 << 20, client=client)
+
+
+def test_a_layout_over_the_old_256_mib_cap_is_built_in_a_file_not_in_memory() -> None:
+    registry = FakeRegistry(big_layer_mib=300)
+    client = httpx.Client(transport=httpx.MockTransport(registry))
+    tracemalloc.start()
+    try:
+        layout = build_layout(
+            f"reg.test/team/app@{_sha(registry.index)}",
+            _sha(registry.index),
+            limit=400 << 20,
+            client=client,
+        )
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    with layout:
+        assert layout.size > 300 << 20
+        assert peak < 64 << 20  # the layer streamed through the file, one chunk at a time
+        sent = 0
+        for chunk in asyncio.run(_collect(layout.chunks(4 << 20))):
+            sent += len(chunk)
+        assert sent == layout.size
+
+
+async def _collect(chunks: AsyncIterator[bytes]) -> list[bytes]:
+    return [chunk async for chunk in chunks]
+
+
+def test_an_image_over_the_limit_is_refused_naming_the_limit_before_any_blob_is_read() -> None:
+    registry = FakeRegistry(big_layer_mib=300)
+    client = httpx.Client(transport=httpx.MockTransport(registry))
+    with pytest.raises(LayoutTooLarge) as refused:
+        build_layout(
+            f"reg.test/team/app@{_sha(registry.index)}",
+            _sha(registry.index),
+            limit=256 << 20,
+            client=client,
+        )
+    assert refused.value.limit == 256 << 20
+    assert refused.value.size > 300 << 20
+    assert str(256 << 20) in str(refused.value)
+    assert not any("/blobs/" in path for path in registry.paths)
+
+
+def test_the_size_the_layout_is_checked_against_is_the_size_it_is_written_at() -> None:
+    registry = FakeRegistry()
+    client = httpx.Client(transport=httpx.MockTransport(registry))
+    top = _sha(registry.index)
+    with build_layout("reg.test/team/app", top, limit=1 << 20, client=client) as layout:
+        size = layout.size
+    with pytest.raises(LayoutTooLarge) as refused:
+        build_layout("reg.test/team/app", top, limit=size - 1, client=client)
+    assert refused.value.size == size
 
 
 @pytest.mark.parametrize(
@@ -712,9 +800,9 @@ def test_a_provider_that_lists_oci_layout_is_sent_the_layout_of_each_oci_image(
 ) -> None:
     built: list[tuple[str, str]] = []
 
-    def build(reference: str, digest: str) -> bytes:
+    def build(reference: str, digest: str, *, limit: int) -> Layout:
         built.append((reference, digest))
-        return LAYOUT
+        return _layout_of(LAYOUT)
 
     monkeypatch.setattr(suite_driver_images, "build_layout", build)
     report = run_tests(provider, TestOptions(tests=("images.v1.prepare_oci",)))
@@ -729,7 +817,7 @@ def test_a_provider_that_lists_no_layout_is_sent_no_context(
 ) -> None:
     ImageProvider.reset()
 
-    def never(reference: str, digest: str) -> bytes:
+    def never(reference: str, digest: str, *, limit: int) -> Layout:
         raise AssertionError("a layout was built")
 
     monkeypatch.setattr(suite_driver_images, "build_layout", never)
@@ -742,7 +830,7 @@ def test_a_provider_that_lists_no_layout_is_sent_no_context(
 def test_an_oci_layout_that_cannot_be_built_is_not_run_rather_than_failed(
     provider: LayoutProvider, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    def broken(reference: str, digest: str) -> bytes:
+    def broken(reference: str, digest: str, *, limit: int) -> Layout:
         raise LayoutError("the registry answered 503")
 
     monkeypatch.setattr(suite_driver_images, "build_layout", broken)
