@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.174 — 2026-11-27
+
+- The Beam declaration lists five more sizes (2 vCPU / 4 GiB, 4 / 8 GiB, 8 / 16 GiB, 16 / 32 GiB and 32 / 64 GiB) with
+  their `facts.sizes` and `coverage.facts.size_is_ceiling.true` reports, and `verified.date` is 2026-11-27.
+
 ## 0.5.173 — 2026-11-27
 
 - The Sail declaration lists two more sizes, 16 vCPU / 128 GiB / 256 GiB and 32 vCPU / 256 GiB / 512 GiB, and its
