@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.177 — 2026-11-27
+
+- A cited report may come from a newer `sandbox-provider-spec` tester than the declaration's `verified.sdks` names, or from any tester when it names none; an older tester and any other SDK version still have to match exactly.
+
 ## 0.5.176 — 2026-11-27
 
 - The declaration of a provider that sells a larger machine on a higher plan states the larger sizes behind a `team_plan` condition (`resources.needs.sizes`) and the other plans' ceiling in `resources.unmet_limits.sizes`, with the pricing page's machine-size row as evidence.
