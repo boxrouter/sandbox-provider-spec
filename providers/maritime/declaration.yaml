@@ -57,6 +57,9 @@ lifetime_timer:
 # on a running sandbox. A saved native artifact can be used to create a sandbox, and a Dockerfile
 # on Ubuntu 24.04 is prepared on a stock VM and saved as a snapshot (its base is the VM's own release,
 # or an image of that release laid over it; Maritime has no OCI source). Idle shutdown stays out pending a suitable timing fixture.
+# `image_defaults` and `image_config` are not claimed: a Dockerfile's ENV, WORKDIR and USER are not
+# defaults of a command (a request that needs them is refused `unsupported`), and `runs_entrypoint` is
+# `unknown`.
 gates:
   custom_images:
   - source: dockerfile
