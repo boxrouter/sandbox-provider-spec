@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.185 — 2026-11-27
+
+- `v1/oci_layout.py`: `build_layout(reference, digest, *, limit)` writes the OCI image layout to an anonymous temporary file and returns a `Layout` (`size`, `read()`, async `chunks()`, `close()`), instead of holding every blob in memory and returning one `bytes` tar. Blobs stream from the registry into the tar, hashed as they pass. The caller bounds the archive with `limit`, which is the provider's `limits.image_layout_bytes`: the manifests name each blob's size, so an image over it raises the new `LayoutTooLarge` (a `LayoutError` with `size` and `limit`) before any blob is downloaded. The fixed 256 MiB `MAX_LAYOUT_BYTES` is gone; the tester keeps its own `TEST_LAYOUT_BYTES` of 256 MiB for its small test images and reads the file into memory. A manifest is bounded at 4 MiB. No declaration, vocabulary or catalog change.
+
 ## 0.5.184 — 2026-11-27
 
 - Remove orphaned SPS report source manifests
