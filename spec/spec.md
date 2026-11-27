@@ -171,10 +171,13 @@ What every provider does, natively and the same way. A request never asks for it
 declaration never states it: a provider passes the baseline tests or it does not.
 
 - A provider **MUST** create a sandbox with the environment variables it is given, and let a <!-- rule: baseline/lifecycle -->
-  program get the sandbox, find it among the account's sandboxes and destroy it.
+  program get the sandbox, find it among the account's sandboxes and destroy it. A variable the
+  create is given **MUST** override the same variable in the image's environment (a
+  Dockerfile's `ENV`), as `docker run -e` does.
 - A command run in a sandbox **MUST** return its output and its exit status, with standard <!-- rule: baseline/run -->
   output and standard error kept apart, and **MUST** run in the working directory and with
-  the environment variables it is given.
+  the environment variables it is given. A variable the command is given **MUST** override the
+  same variable the sandbox was created with and the same variable in the image's environment.
 - A program **MUST** be able to write a file with any bytes into an existing directory <!-- rule: baseline/files -->
   and read a file's bytes back through the provider's file interface.
 - A program **MUST** be able to start a process in the background and read its output while <!-- rule: baseline/process-output -->
