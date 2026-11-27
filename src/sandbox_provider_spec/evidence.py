@@ -482,8 +482,31 @@ def provider_sdk_versions(report: dict[str, Any], verified_sdks: Any) -> Any:
     }
 
 
+TESTER = "sandbox-provider-spec"
+"""The distribution that ran a tester report. It is the tool that judged the provider, not an SDK
+the provider is verified with."""
+
+
+def _version_key(version: str) -> tuple[int, ...] | None:
+    parts = version.split(".")
+    return tuple(int(part) for part in parts) if all(part.isdecimal() for part in parts) else None
+
+
+def _tester_is_current(version: str, declared: Any) -> bool:
+    """A cited report may come from a newer tester than the declaration names, never an older one.
+
+    Provider SDK versions must match `verified.sdks` exactly; only the tester's own version is
+    allowed to be newer (or any version when the declaration names none), so a report from a
+    corrected check is accepted without rerunning every other report of the declaration.
+    """
+    if declared is None:
+        return True
+    reported, wanted = _version_key(version), _version_key(str(declared))
+    return reported is not None and wanted is not None and reported >= wanted
+
+
 def _is_version_matching_subset(report_sdks: Any, verified_sdks: Any) -> bool:
-    """Whether report SDKs match the declaration's verified versions."""
+    """Whether report SDKs match the declaration's verified versions (the tester may be newer)."""
     return (
         isinstance(report_sdks, dict)
         and bool(report_sdks)
@@ -492,8 +515,11 @@ def _is_version_matching_subset(report_sdks: Any, verified_sdks: Any) -> bool:
         and all(
             isinstance(version, str)
             and bool(version)
-            and package in verified_sdks
-            and version == verified_sdks[package]
+            and (
+                _tester_is_current(version, verified_sdks.get(package))
+                if package == TESTER
+                else package in verified_sdks and version == verified_sdks[package]
+            )
             for package, version in report_sdks.items()
         )
     )

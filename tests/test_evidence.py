@@ -1711,6 +1711,91 @@ def test_cited_report_requires_each_sdk_version_to_match(
 
 
 @pytest.mark.rule("declaration/evidence-holds")
+@pytest.mark.parametrize(
+    ("declared", "reported", "accepted"),
+    [
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "1", "sandbox-provider-spec": "0.5.175"},
+            True,
+        ),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            True,
+        ),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "1", "sandbox-provider-spec": "0.5.63"},
+            False,
+        ),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "1", "sandbox-provider-spec": "0.4.999"},
+            False,
+        ),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.9"},
+            {"sdk": "1", "sandbox-provider-spec": "0.5.10"},
+            True,
+        ),
+        ({"sdk": "1"}, {"sdk": "1", "sandbox-provider-spec": "0.5.175"}, True),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "2", "sandbox-provider-spec": "0.5.175"},
+            False,
+        ),
+        (
+            {"sdk": "1", "sandbox-provider-spec": "0.5.64"},
+            {"sdk": "1", "other": "1", "sandbox-provider-spec": "0.5.175"},
+            False,
+        ),
+    ],
+    ids=[
+        "newer-tester",
+        "same-tester",
+        "older-tester-patch",
+        "older-tester-minor",
+        "numeric-not-textual-order",
+        "tester-not-declared",
+        "newer-provider-sdk-still-refused",
+        "unlisted-provider-sdk-still-refused",
+    ],
+)
+def test_cited_report_may_come_from_a_newer_tester_but_not_an_older_or_other_sdk(
+    tmp_path: Path, declared: dict[str, str], reported: dict[str, str], accepted: bool
+) -> None:
+    tests = [
+        _test(
+            "facts.default_user", "passed", [{"fact": "resources.default_user", "value": "agent"}]
+        ),
+    ]
+    report_path = _report_repository(
+        tmp_path, tests, reports=[{"name": "run.json", "sdk_versions": reported}]
+    )
+    declaration = {
+        "provider": "e2b",
+        "class": "default",
+        "verified": {"date": "2026-09-30", "sdks": declared},
+        "resources": {"default_user": "agent"},
+        "gates": {},
+        "evidence": {
+            "resources.default_user": {
+                "tests": ["facts.default_user"],
+                "report": "reports/run.json",
+            },
+        },
+    }
+
+    errors = check_evidence(
+        declaration, source_path=report_path, schema_errors=_schema_errors, catalog=CATALOG
+    )
+
+    subset = [error for error in errors if "version-matching subset" in error]
+    assert (subset == []) is accepted
+
+
+@pytest.mark.rule("declaration/evidence-holds")
 @pytest.mark.parametrize("sdk_versions", [None, "missing"])
 def test_cited_report_with_bad_sdk_versions_returns_errors(
     tmp_path: Path, sdk_versions: Any
