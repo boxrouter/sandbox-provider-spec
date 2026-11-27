@@ -21,7 +21,8 @@ resources:
   paused_retention_seconds: unknown
   max_run_seconds: unknown
   max_process_seconds: unknown
-  disk_mib: unknown
+  # The root disk `df -m /` showed on one sandbox of each of the six sizes, 2026-11-27 (evidence.md, Disk).
+  disk_mib: 1031019
   outbound_traffic: unknown
 lifetime_timer:
   enforced_by: provider
@@ -61,6 +62,10 @@ evidence:
     source: https://docs.archil.com/compute/sandboxes/introduction
     read: 2026-11-27
     quote: support between 1 and 32 vCPU cores and between 0.25 and 64 GiB of memory.
+  resources.disk_mib:
+    source: https://docs.archil.com/administration/billing
+    read: 2026-11-27
+    quote: 'Maximum size per disk | 10 GB | Unlimited | Unlimited | Unlimited'
   resources.regions:
     source: https://docs.archil.com/reference/regions
     read: 2026-11-24
