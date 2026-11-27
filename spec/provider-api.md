@@ -140,7 +140,8 @@ An operation on a destroyed sandbox returns `not_found`; on a paused or stopped 
 
 `run` holds the call open until the command ends; longer work uses `process.start`. Running a
 command and getting a nonzero exit code is a result, not an error. The exit code is 128 + N when
-signal N ended the command.
+signal N ended the command. An `argv` element whose POSIX shell quoting is at most 32768 bytes reaches
+the program unchanged on every provider, so a caller sends larger input, such as a long script, as a file.
 
 - When `timeout_ms` passes, a provider **MUST** end the command and every process that the command <!-- rule: provider-api/run-timeout-ends-command -->
   started, and **MUST** return the output so far with `timed_out: true`.

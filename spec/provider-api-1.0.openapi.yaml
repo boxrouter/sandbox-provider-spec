@@ -2657,7 +2657,10 @@ components:
           minItems: 1
           maxItems: 1024
           items: {type: string}
-          description: The program and its arguments, run directly without a shell.
+          description: >-
+            The program and its arguments, run directly without a shell. An element whose POSIX shell quoting
+            (`shlex.quote` in Python) is at most 32768 bytes reaches the program unchanged; a caller sends larger
+            input as a file.
         cwd:
           anyOf: [{$ref: "#/components/schemas/FilePath"}, {type: "null"}]
           default: null
