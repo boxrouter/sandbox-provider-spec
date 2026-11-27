@@ -54,10 +54,19 @@ lifetime_timer:
 # a resume keeps files and memory, background processes cancel and reattach, previews publish
 # any guest port on public or private access with the credential in the link, and the egress
 # policy is an allowlist of host names (with `*.` wildcards), `deny_all` or `open`, replaceable
-# on a running sandbox. A saved native artifact can be used to create a sandbox; this does
-# not claim image preparation. Idle shutdown stays out pending a suitable timing fixture.
+# on a running sandbox. A saved native artifact can be used to create a sandbox, and a Dockerfile
+# on Ubuntu 24.04 is prepared on a stock VM and saved as a snapshot (its base is the VM's own release,
+# or an image of that release laid over it; Maritime has no OCI source to claim, but `image.prepare` also
+# takes the OCI image of the VM's own system that Cloud sends for the standard image). Idle shutdown stays
+# out pending a suitable timing fixture.
+# `image_defaults` and `image_config` are not claimed: a Dockerfile's ENV, WORKDIR and USER are not
+# defaults of a command (a request that needs them is refused `unsupported`), and `runs_entrypoint` is
+# `unknown`.
 gates:
   custom_images:
+  - source: dockerfile
+    prepared: true
+    build_context: true
   - source: provider_artifact
   previews:
   - access: [public, private]
@@ -87,6 +96,15 @@ evidence:
   # SPS 0.5.112 with the borrowed-artifact tester fix from Cloud #10198 backported.
   # The independently checked adapter revision was 88f0b1e2bc; the report records its digest.
   gates.custom_images.0.source:
+    tests: [coverage.custom_images.prepare.dockerfile_distro_context]
+    report: reports/images-dockerfile-distro-context-20261127.json
+  gates.custom_images.0.prepared:
+    tests: [coverage.custom_images.prepare.dockerfile_distro_context]
+    report: reports/images-dockerfile-distro-context-20261127.json
+  gates.custom_images.0.build_context:
+    tests: [coverage.custom_images.prepare.dockerfile_distro_context]
+    report: reports/images-dockerfile-distro-context-20261127.json
+  gates.custom_images.1.source:
     tests: [custom_images.provider_artifact]
     report: reports/actions-provider-artifact-20261126.json
   gates.user_selection.0.commands:
