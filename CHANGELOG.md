@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.172 — 2026-11-27
+
+- The Archil declaration lists two larger sizes, 16 vCPU / 32768 MiB and 32 vCPU / 65536 MiB, and cites
+  Archil's documented range of 1 to 32 vCPU and 0.25 to 64 GiB for its sizes.
+
 ## 0.5.171 — 2026-11-27
 
 - The Maritime declaration's size range takes a disk up to 500 GiB (`disk_mib: [12288, 512000]`), up from
