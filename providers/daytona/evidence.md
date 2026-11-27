@@ -69,6 +69,26 @@ resume, identify the SDK, default snapshot/image and user configuration; observe
 the native sandbox user metadata before restoring a scoped claim. The existing
 report remains unchanged as evidence of its original environment.
 
+## Long running — 2026-11-27
+
+The committed native report `reports/native-container-long-running-20261127.json`
+(class `container`) passes `facts.long_running`: the create asked
+`resources.long_running: true`, the driver sent `auto_stop_interval: 0` and
+`auto_pause_interval: 0`, `long_running.observe` read both fields back as 0
+(`idle_disabled: true`), and the sandbox still read `active` after the wait. This proves
+`resources.long_running: true` for the container class. An earlier report
+(`reports/20261012T151956Z-df-native-core-sps057-v0532.json`, DaytonaDriver 0.3.57,
+daytona 0.220.0) shows the same rows at an older SDK than `verified.sdks` declares,
+so the 2026-11-27 run is the cited one.
+
+The [sandboxes documentation](https://www.daytona.io/docs/en/sandboxes/) explains why an
+explicit pause interval matters: on sandbox classes that support pausing, auto-pause
+defaults to 60 minutes (with auto-stop disabled) when neither interval is provided, and
+at most one of `autoStopInterval` and `autoPauseInterval` may be non-zero. A create that
+sets only `autoStopInterval: 0` leaves the pause interval to the class default, so the
+serve path sends `autoPauseInterval: 0` as well. The declaration's only claimed
+`idle_shutdown` variant stops (`autoStopInterval`), never pauses.
+
 ## State transport
 
 The [Python SDK reference](https://www.daytona.io/docs/en/python-sdk/#polling-fallback)

@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: daytona
 class: container
 verified:
-  date: '2026-11-18'
+  date: '2026-11-27'
   sdks:
     daytona: 0.226.1
 resources:
@@ -31,6 +31,7 @@ resources:
   paused_retention_seconds: unlimited
   extendable_lifetime: true
   size_is_ceiling: true
+  long_running: true
   root:
   - sudo
   arch:
@@ -127,6 +128,10 @@ evidence:
     tests:
     - facts.extendable_lifetime
     report: reports/prober-default-core.json
+  resources.long_running:
+    tests:
+    - facts.long_running
+    report: reports/native-container-long-running-20261127.json
   resources.root:
     tests:
     - coverage.facts.root.sudo
