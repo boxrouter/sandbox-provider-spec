@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.180 — 2026-11-27
+
+- The Provider API states a guarantee for `argv`: an element whose POSIX shell quoting is at most 32768
+  bytes reaches the program unchanged. `sandbox_provider_spec.argv.ARGV_ELEMENT_QUOTED_BYTES` holds the number.
+
 ## 0.5.179 — 2026-11-27
 
 - Every `size_is_ceiling: true` declaration records a passing `coverage.facts.size_is_ceiling.true` report run with the corrected CPU burn (independent processes): Archil, Luxor and Maritime (2, 4 and 8 vCPU) now state and prove it, Agent37 vm, Blaxel, Boat, Boxd, E2B, Modal vm and Superserve replace reports whose threads could not exceed one CPU.
