@@ -4,7 +4,7 @@ class: default
 # Every value is `unknown`, absent or backed by a committed tester report (evidence.md says what each
 # rests on and what is left out).
 verified:
-  date: 2026-11-25
+  date: 2026-11-27
   # Beam's open-source client, whose generated gateway stubs the package calls (README.md).
   sdks: {"sandbox-provider-spec": "0.5.147"}
 resources:
@@ -12,17 +12,28 @@ resources:
   data_retention: retained
   kernel: unknown
   # Each size Cloud serves is proved by a live `facts.sizes` run at that size (the guest shows exactly the CPUs
-  # and MiB of memory asked) and is a ceiling: `coverage.facts.size_is_ceiling.true` passes at all four. Beam's
-  # documentation names no size range, so there is no quote.
+  # and MiB of memory asked) and is a ceiling: `coverage.facts.size_is_ceiling.true` passes at all nine. Beam's
+  # documentation names no size range, so there is no quote. Listed cheapest first (Beam bills each vCPU and each
+  # GiB at its own rate), which is the order the matcher takes the first size that fits.
   sizes:
   - cpu: 1
     memory_mib: 1024
   - cpu: 2
     memory_mib: 2048
+  - cpu: 2
+    memory_mib: 4096
   - cpu: 4
     memory_mib: 4096
+  - cpu: 4
+    memory_mib: 8192
   - cpu: 8
     memory_mib: 8192
+  - cpu: 8
+    memory_mib: 16384
+  - cpu: 16
+    memory_mib: 32768
+  - cpu: 32
+    memory_mib: 65536
   size_is_ceiling: true
   gpus: unknown
   regions: unknown
@@ -99,9 +110,19 @@ evidence:
     - tests: [facts.sizes]
       report: reports/tester-default-size-2.json
     - tests: [facts.sizes]
+      report: reports/tester-default-size-2cpu-4gib.json
+    - tests: [facts.sizes]
       report: reports/tester-default-size-4.json
     - tests: [facts.sizes]
+      report: reports/tester-default-size-4cpu-8gib.json
+    - tests: [facts.sizes]
       report: reports/tester-default-size-8.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-8cpu-16gib.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-16cpu-32gib.json
+    - tests: [facts.sizes]
+      report: reports/tester-default-size-32cpu-64gib.json
   resources.size_is_ceiling:
     reports:
     - tests: [coverage.facts.size_is_ceiling.true]
@@ -109,9 +130,19 @@ evidence:
     - tests: [coverage.facts.size_is_ceiling.true]
       report: reports/tester-default-size-2.json
     - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-2cpu-4gib.json
+    - tests: [coverage.facts.size_is_ceiling.true]
       report: reports/tester-default-size-4.json
     - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-4cpu-8gib.json
+    - tests: [coverage.facts.size_is_ceiling.true]
       report: reports/tester-default-size-8.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-8cpu-16gib.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-16cpu-32gib.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/tester-default-size-32cpu-64gib.json
   resources.extendable_lifetime:
     tests:
     - facts.extendable_lifetime
