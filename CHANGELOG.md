@@ -3,6 +3,12 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.184 — 2026-11-27
+
+- Remove orphaned SPS report source manifests
+
+Drop three source manifests whose sibling reports were replaced by the live size-ceiling reports. The Blaxel, Boat and Boxd declarations already cite the replacement reports.
+
 ## 0.5.183 — 2026-11-27
 
 - Sail's four `coverage.facts.size_is_ceiling.true` reports are rerun against the adapter's restore fix; all pass.
