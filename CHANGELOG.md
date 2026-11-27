@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.183 — 2026-11-27
+
+- Sail's four `coverage.facts.size_is_ceiling.true` reports are rerun against the adapter's restore fix; all pass.
+
 ## 0.5.182 — 2026-11-27
 
 - Sail's declaration states `size_is_ceiling: true` again, proven by `coverage.facts.size_is_ceiling.true` at 1, 2, 4
