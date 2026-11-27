@@ -3,6 +3,15 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.175 — 2026-11-27
+
+- `resources.unmet_limits.sizes` states the largest size, `{cpu, memory_mib}`, of an account
+  that does not meet a `resources.needs.sizes` condition, so a declaration can list the sizes
+  of the best plan without refusing every other account. The matcher offers such an account the
+  declared sizes under that ceiling, and the checker refuses a ceiling that leaves no declared
+  size or does not hold `default_size`. A condition without a ceiling still refuses a request
+  that asks a size.
+
 ## 0.5.174 — 2026-11-27
 
 - The Beam declaration lists five more sizes (2 vCPU / 4 GiB, 4 / 8 GiB, 8 / 16 GiB, 16 / 32 GiB and 32 / 64 GiB) with
