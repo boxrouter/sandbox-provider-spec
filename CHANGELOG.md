@@ -3,6 +3,12 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.170 — 2026-11-27
+
+- `sps-provider.yaml` takes an optional `discovery_confirms`: the `needs` conditions that the
+  package's `discovery()` reads for each account. `Provider.confirmed_conditions(discovery)`
+  returns those that an account's discovery shows are met.
+
 ## 0.5.169 — 2026-11-27
 
 - `coverage.facts.max_run` runs its 600 s command with `timeout_ms: 660000`. It sent 0, which API
