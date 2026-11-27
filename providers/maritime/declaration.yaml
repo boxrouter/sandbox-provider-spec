@@ -20,15 +20,16 @@ resources:
   package_manager: apt
   disk_in_memory: false
   # One range. A size is any vCPU, memory and disk inside it: Maritime sells exact resources, not
-  # only presets. The vCPU and memory bounds are the documented ones. The disk upper bound is the
-  # 100 GiB (`maxDiskGb`) that Maritime's account-limits endpoint stated for the account the
-  # adapter was run against, under the documented 500 GiB; the lower bound is the 12 GiB `small`
-  # preset's, the smallest disk a request that names none lands on, not the 5 GiB the API accepts.
-  # The adapter's discovery states the same range.
+  # only presets. The vCPU, memory and disk upper bounds are the documented ones (disk 500 GiB,
+  # created live on this account at 2 vCPU and 4 GiB on 2026-11-27); the 100 GiB `maxDiskGb` of
+  # Maritime's account-limits endpoint is the size ceiling for one agent, not for a virtual
+  # machine. The lower bound is the 12 GiB `small` preset's, the smallest disk a request that
+  # names none lands on, not the 5 GiB the API accepts. The adapter's discovery states the same
+  # range.
   sizes:
   - cpu: [1, 16]
     memory_mib: [1024, 65536]
-    disk_mib: [12288, 102400]
+    disk_mib: [12288, 512000]
   size_is_ceiling: unknown
   default_user: user
   default_cwd: /home/user
