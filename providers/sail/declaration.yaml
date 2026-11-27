@@ -40,9 +40,10 @@ resources:
   root: [by_default]
   gpus: unknown
   regions: unknown
-  # The longest `lifetime_seconds` this integration accepts on a create (Sail itself
-  # documents an unlimited lifetime); a longer request is refused, not clamped.
-  max_lifetime_seconds: 604800
+  # The longest `lifetime_seconds` this integration accepts on a create; a longer request is
+  # refused, not clamped. Sail accepts up to 4294967295 (or no lifetime at all), but Cloud
+  # stores a lifetime in 32-bit signed columns, so the cap is the largest 32-bit value.
+  max_lifetime_seconds: 2147483647
   max_run_seconds: unknown
   max_process_seconds: {at_least: 600}
   on_memory_exhausted: unknown
@@ -159,8 +160,10 @@ evidence:
       "Terminate this Sailbox after this many wall-clock seconds from creation, including
       time spent waiting for capacity, sleeping, or paused. ... Omit or pass null for
       unlimited lifetime. The deadline cannot be extended. Expiration is checked
-      periodically" — the API accepts 1 to 4294967295; this integration accepts up to
-      604800 (7 days) on a create.
+      periodically" — the API accepts 1 to 4294967295 (a create with 4294967285, the maximum
+      less this integration's 10 s margin, was accepted on 2026-11-27); this integration
+      accepts up to 2147483647 (68 years) on a create, the largest value Cloud's 32-bit
+      lifetime columns hold.
   resources.max_process_seconds:
     tests: [coverage.facts.max_process]
     report: reports/tester-default-coverage.json
