@@ -3,6 +3,14 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.171 — 2026-11-27
+
+- The Maritime declaration's size range takes a disk up to 500 GiB (`disk_mib: [12288, 512000]`), up from
+  100 GiB: a create at `diskGib` 500 reached running on the account on 2026-11-27, and the 100 GiB
+  `maxDiskGb` is the size ceiling for one agent, not for a virtual machine.
+- The Sail declaration's `resources.max_lifetime_seconds` is 2147483647 (68 years), up from 604800 (7 days),
+  with its evidence quote updated: Sail accepts up to 4294967295 and Cloud's 32-bit lifetime columns hold up to 2147483647.
+
 ## 0.5.170 — 2026-11-27
 
 - `sps-provider.yaml` takes an optional `discovery_confirms`: the `needs` conditions that the
