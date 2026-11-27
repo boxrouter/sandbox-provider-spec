@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.191 — 2026-11-27
+
+- Maritime's declaration claims Dockerfile prepared images again (#10700, reverted by #10718); its `image.prepare` also takes the standard image's OCI source.
+
 ## 0.5.190 — 2026-11-27
 
 - Maritime's declaration no longer claims Dockerfile prepared images (revert of #10700).
