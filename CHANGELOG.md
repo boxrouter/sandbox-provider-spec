@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.168 — 2026-11-27
+
+- `sandbox_provider_spec.environment` owns the `Env` size limit (`ENVIRONMENT_MAX_BYTES`, `environment_bytes`): names and values together are at most 65536 bytes of UTF-8, with no per-variable overhead.
+
 ## 0.5.167 — 2026-11-26
 
 - Record Maritime's tested native provider-artifact restore capability.
