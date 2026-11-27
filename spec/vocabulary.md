@@ -738,7 +738,7 @@ The reports themselves stay with the provider, usually under a non-disclosure ag
 request lists every audit it needs, such as `compliance: [soc2_type2]`.
 
 - A sandbox created with a declared size **MUST** receive that allocation. <!-- rule: facts/sizes -->
-- With `size_is_ceiling: true`, a sandbox created with a declared size **MUST NOT** use more CPU time per second than the size's `cpu`, or more memory than its `memory_mib`. <!-- rule: facts/size-is-ceiling -->
+- With `size_is_ceiling: true`, a sandbox created with a declared size **MUST NOT** use more CPU time per second than the size's `cpu`, or more memory than its `memory_mib`. A declaration **MAY** state `size_is_ceiling: true` only when it cites a passing `coverage.facts.size_is_ceiling.true` report, run with the check's current CPU burn. <!-- rule: facts/size-is-ceiling -->
 - A sandbox **MUST** be able to run continuously for `max_lifetime_seconds`. <!-- rule: facts/max-lifetime -->
 - With `extendable_lifetime: true`, the lifetime of a running sandbox **MUST** be able to <!-- rule: facts/extendable-lifetime -->
   be lengthened, and after a successful extension the provider **MUST** end the sandbox no later

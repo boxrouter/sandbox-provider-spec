@@ -686,6 +686,11 @@ def _check_cited_tests(
         if test.get("result") != expected_result:
             errors.append(f"test {identifier} must be {expected_result}, not {test.get('result')}")
             continue
+        if evidence_path == "resources.size_is_ceiling" and declared_value is True:
+            problem = _size_ceiling_proof_error(test)
+            if problem is not None:
+                errors.append(f"test {identifier} {problem}")
+                continue
         if unsupported:
             parts = evidence_path.split(".")
             gate = parts[1] if len(parts) > 1 else ""
@@ -695,6 +700,42 @@ def _check_cited_tests(
         proved_values.extend(_proof_values(test, evidence_path))
 
     return errors, [] if unsupported or errors else proved_values
+
+
+def _size_ceiling_proof_error(test: dict[str, Any]) -> str | None:
+    """Why a passed `coverage.facts.size_is_ceiling.true` result does not prove the ceiling.
+
+    Rule `facts/size-is-ceiling`: a declaration states the ceiling only with a passing report
+    that measured it. The probe records how in `ceiling_evidence`: exact enforced cgroup bounds,
+    or measured use, whose CPU burn runs independent processes (`burn_workers`). A report that
+    burned threads (`burn_threads`) could never use more than about one CPU, because they share
+    one interpreter lock, so it passed on any provider and proves nothing.
+    """
+    recorded: Any = None
+    for step in test.get("steps", []):
+        observations = step.get("observations") if isinstance(step, dict) else None
+        if isinstance(observations, dict) and "ceiling_evidence" in observations:
+            recorded = observations["ceiling_evidence"]
+    try:
+        evidence = json.loads(recorded) if isinstance(recorded, str) else None
+    except json.JSONDecodeError:
+        evidence = None
+    if not isinstance(evidence, dict):
+        return "records no ceiling evidence"
+    if evidence.get("method") == "enforced_cgroup_bounds":
+        return None
+    observed = evidence.get("cpu_observation")
+    if (
+        evidence.get("method") == "measured_use"
+        and isinstance(observed, dict)
+        and "burn_workers" in observed
+        and "burn_threads" not in observed
+    ):
+        return None
+    return (
+        "measured the CPU ceiling with threads, which share one interpreter lock and cannot "
+        "exceed one CPU; rerun it with the current check"
+    )
 
 
 def _proof_values(test: dict[str, Any], evidence_path: str) -> list[Any]:

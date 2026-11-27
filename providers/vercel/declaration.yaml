@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: vercel
 verified:
-  date: '2026-11-18'
+  date: '2026-11-27'
   sdks:
     vercel-sandbox: 0.9.0
 resources:
@@ -133,9 +133,8 @@ evidence:
     read: '2026-11-23'
     quote: "Vercel has a SOC 2 Type 2 attestation for Security, Confidentiality, and Availability. ... Vercel is ISO 27001:2022 certified."
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/prober-default-coverage.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-4gib-20261127.json
   resources.kernel:
     source: https://vercel.com/docs/sandbox/concepts
     read: '2026-09-30'

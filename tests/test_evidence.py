@@ -1795,6 +1795,62 @@ def test_cited_report_may_come_from_a_newer_tester_but_not_an_older_or_other_sdk
     assert (subset == []) is accepted
 
 
+CEILING_BOUNDS = {"method": "enforced_cgroup_bounds", "cpu_bound": "2"}
+CEILING_WORKERS = {
+    "method": "measured_use",
+    "cpu_observation": {"burn_workers": 4, "burn_cpu_seconds": 7.9, "processors": 2},
+}
+CEILING_THREADS = {
+    "method": "measured_use",
+    "cpu_observation": {"burn_threads": 4, "burn_cpu_seconds": 4.0, "processors": 2},
+}
+
+
+@pytest.mark.rule("facts/size-is-ceiling")
+@pytest.mark.parametrize(
+    ("recorded", "accepted"),
+    [
+        (CEILING_BOUNDS, True),
+        (CEILING_WORKERS, True),
+        (CEILING_THREADS, False),
+        ({"method": "measured_use", "cpu_observation": {}}, False),
+        ({"method": "guess"}, False),
+        (None, False),
+    ],
+    ids=["cgroup-bounds", "independent-processes", "threads", "no-burn", "unknown-method", "none"],
+)
+def test_size_ceiling_is_stated_only_with_a_proof_that_could_have_failed(
+    tmp_path: Path, recorded: dict[str, Any] | None, accepted: bool
+) -> None:
+    observations = {} if recorded is None else {"ceiling_evidence": json.dumps(recorded)}
+    ceiling = _test(
+        "coverage.facts.size_is_ceiling.true",
+        "passed",
+        [{"fact": "resources.size_is_ceiling", "value": True}],
+    )
+    ceiling["steps"] = [{"operation": "fixture.coverage_fact", "observations": observations}]
+    report_path = _report_repository(tmp_path, [ceiling])
+    declaration = {
+        "provider": "e2b",
+        "class": "default",
+        "verified": {"date": "2026-09-30", "sdks": {"sdk": "1"}},
+        "resources": {"size_is_ceiling": True},
+        "gates": {},
+        "evidence": {
+            "resources.size_is_ceiling": {
+                "tests": ["coverage.facts.size_is_ceiling.true"],
+                "report": "reports/run.json",
+            },
+        },
+    }
+
+    errors = check_evidence(
+        declaration, source_path=report_path, schema_errors=_schema_errors, catalog=CATALOG
+    )
+
+    assert ([error for error in errors if "size_is_ceiling" in error] == []) is accepted
+
+
 @pytest.mark.rule("declaration/evidence-holds")
 @pytest.mark.parametrize("sdk_versions", [None, "missing"])
 def test_cited_report_with_bad_sdk_versions_returns_errors(
