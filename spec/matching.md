@@ -363,8 +363,11 @@ A `resources.needs` fact whose condition is not met is not offered, unless the d
 `resources.unmet_limits` gives a finite ceiling for that fact and every unmet condition of
 it. Then the request is still matched against the declared fact, and must also not ask for
 more than the smallest of those ceilings (`lifetime_seconds` for `max_lifetime_seconds`,
-`disk_min_mib` for `disk_mib`). A condition with no ceiling, or with `unknown`, leaves the
-fact unanswered and the request is refused. A ceiling answers only its own fact: every
+`disk_min_mib` for `disk_mib`). For `sizes` the request is matched against the declared
+sizes under the smallest `cpu` and the smallest `memory_mib` of those ceilings: a size with
+more of either is not offered, a `[low, high]` range ends at the ceiling, and a size without
+`cpu` is bounded by its memory alone. A condition with no ceiling, or with `unknown`, leaves
+the fact unanswered and the request is refused. A ceiling answers only its own fact: every
 other unmet condition still applies.
 
 **Extensions.**

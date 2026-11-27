@@ -84,7 +84,7 @@ def test_a_ceiling_does_not_prove_support_the_declared_fact_still_applies() -> N
 @pytest.mark.parametrize(
     "unmet_limits, fragment",
     [
-        ({"sizes": {"plan": 1}}, "resources.unmet_limits.sizes"),
+        ({"cpu": {"plan": 1}}, "resources.unmet_limits.cpu"),
         (
             {"max_lifetime_seconds": {"other": 60}},
             "names no condition of needs.max_lifetime_seconds",
@@ -148,6 +148,158 @@ def _document(change: dict[str, Any]) -> dict[str, Any]:
             "resources.unmet_limits.max_lifetime_seconds.plan": quote,
         },
     }
+
+
+#: A plan sells the 8 CPU size; the accounts without it get up to 4 CPU and 8 GiB.
+PLAN_SIZES: dict[str, Any] = {
+    "sizes": [
+        {"cpu": 2, "memory_mib": 4096},
+        {"cpu": 4, "memory_mib": 8192},
+        {"cpu": 8, "memory_mib": 16384},
+    ],
+    "default_size": {"cpu": 2, "memory_mib": 4096},
+    "needs": {"sizes": ["plan"]},
+    "unmet_limits": {"sizes": {"plan": {"cpu": 4, "memory_mib": 8192}}},
+}
+
+
+def _size(declaration: Any, *, met: tuple[str, ...] = (), **asked: Any) -> Any:
+    """The size chosen, or the reason and sentence of each refusal."""
+    provisioned, failed = fit_resources(declaration, Request(resources=asked), Registry(), met)
+    if failed:
+        return [(failure["reason"], failure["detail"]) for _, failure in failed]
+    return provisioned.get("size")
+
+
+def test_a_confirmed_plan_gets_the_big_size_and_others_the_sizes_under_the_ceiling() -> None:
+    declaration = _declaration(**PLAN_SIZES)
+    assert _size(declaration, met=("plan",), cpu_min=8) == {"cpu": 8, "memory_mib": 16384}
+    assert _size(declaration, cpu_min=4) == {"cpu": 4, "memory_mib": 8192}
+    assert _size(declaration, memory_min_mib=8192) == {"cpu": 4, "memory_mib": 8192}
+    assert _size(declaration) is None
+
+
+@pytest.mark.parametrize("asked", [{"cpu_min": 8}, {"memory_min_mib": 8193}])
+def test_an_ask_above_the_size_ceiling_is_refused_with_what_the_account_allows(
+    asked: dict[str, int],
+) -> None:
+    _, failed = fit_resources(_declaration(**PLAN_SIZES), Request(resources=asked), Registry(), ())
+    ((_, failure),) = failed
+    assert failure["reason"] == "resource_mismatch"
+    assert failure["detail"].endswith("This account allows at most 4 CPU and 8,192 MiB of memory.")
+    assert failure.get("offered") == PLAN_SIZES["sizes"][:2]
+
+
+def test_a_size_ceiling_skips_a_preferred_size_above_it() -> None:
+    declaration = _declaration(
+        **{**PLAN_SIZES, "sizes": [{"cpu": 2, "memory_mib": 16384}, {"cpu": 4, "memory_mib": 8192}]}
+    )
+    assert _size(declaration, memory_min_mib=4096) == {"cpu": 4, "memory_mib": 8192}
+    assert _size(declaration, met=("plan",), memory_min_mib=4096) == {
+        "cpu": 2,
+        "memory_mib": 16384,
+    }
+
+
+def test_a_range_ends_at_the_size_ceiling() -> None:
+    declaration = _declaration(
+        **{**PLAN_SIZES, "sizes": [{"cpu": [1, 16], "memory_mib": [1024, 65536]}]}
+    )
+    assert _size(declaration, cpu_min=4) == {"cpu": 4, "memory_mib": 1024}
+    ((reason, _),) = _size(declaration, cpu_min=5)
+    assert reason == "resource_mismatch"
+    assert _size(declaration, met=("plan",), cpu_min=16) == {"cpu": 16, "memory_mib": 1024}
+
+
+def test_the_smallest_size_ceiling_of_the_unmet_conditions_wins_in_each_field() -> None:
+    declaration = _declaration(
+        **{
+            **PLAN_SIZES,
+            "needs": {"sizes": ["plan", "beta"]},
+            "unmet_limits": {
+                "sizes": {
+                    "plan": {"cpu": 4, "memory_mib": 16384},
+                    "beta": {"cpu": 8, "memory_mib": 4096},
+                }
+            },
+        }
+    )
+    assert _size(declaration, cpu_min=2) == {"cpu": 2, "memory_mib": 4096}
+    ((reason, _),) = _size(declaration, cpu_min=4)
+    assert reason == "resource_mismatch"
+    assert _size(declaration, met=("beta",), cpu_min=4) == {"cpu": 4, "memory_mib": 8192}
+
+
+@pytest.mark.parametrize(
+    "unmet_limits",
+    [
+        {},
+        {"sizes": {"plan": "unknown"}},
+        {"sizes": {"plan": {"cpu": 4}}},
+        {"sizes": {"plan": 4}},
+        {"sizes": {"other": {"cpu": 4, "memory_mib": 8192}}},
+    ],
+)
+def test_sizes_stay_unanswered_without_a_ceiling_for_the_unmet_condition(
+    unmet_limits: dict[str, Any],
+) -> None:
+    declaration = _declaration(**{**PLAN_SIZES, "unmet_limits": unmet_limits})
+    ((reason, _),) = _size(declaration, cpu_min=1)
+    assert reason == "resource_unknown"
+
+
+def _sizes_document(ceiling: Any, **resources: Any) -> dict[str, Any]:
+    document = _document({**PLAN_SIZES, "unmet_limits": {"sizes": {"plan": ceiling}}, **resources})
+    quote = document["evidence"]["resources.max_lifetime_seconds"]
+    document["resources"].pop("max_lifetime_seconds")
+    document["evidence"] = {
+        path: quote
+        for path in (
+            "resources.sizes",
+            "resources.default_size",
+            "resources.needs.sizes",
+            "resources.unmet_limits.sizes.plan",
+        )
+    }
+    return document
+
+
+def test_the_checker_accepts_a_size_ceiling_and_needs_its_citation() -> None:
+    document = _sizes_document({"cpu": 4, "memory_mib": 8192})
+    assert sandbox_provider_spec.check_declaration(document).errors == []
+    del document["evidence"]["resources.unmet_limits.sizes.plan"]
+    errors = sandbox_provider_spec.check_declaration(document).errors
+    assert any("resources.unmet_limits.sizes.plan" in error for error in errors), errors
+
+
+@pytest.mark.rule("declaration/size-ceiling-holds-a-size")
+@pytest.mark.parametrize(
+    "ceiling, fragment",
+    [
+        (4, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": 4}, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": 4, "memory_mib": 0}, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": True, "memory_mib": 8192}, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": 4, "memory_mib": 8192.5}, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": 4, "memory_mib": 8192, "disk_mib": 1}, "resources.unmet_limits.sizes.plan"),
+        ({"cpu": 1, "memory_mib": 8192}, "leaves no declared size"),
+        ({"cpu": 2, "memory_mib": 2048}, "leaves no declared size"),
+    ],
+)
+def test_the_checker_refuses_a_size_ceiling_that_is_malformed_or_holds_no_size(
+    ceiling: Any, fragment: str
+) -> None:
+    errors = sandbox_provider_spec.check_declaration(_sizes_document(ceiling)).errors
+    assert any(fragment in error for error in errors), errors
+
+
+@pytest.mark.rule("declaration/size-ceiling-holds-a-size")
+def test_the_checker_refuses_a_size_ceiling_below_the_default_size() -> None:
+    document = _sizes_document(
+        {"cpu": 2, "memory_mib": 4096}, default_size={"cpu": 4, "memory_mib": 8192}
+    )
+    errors = sandbox_provider_spec.check_declaration(document).errors
+    assert any("does not hold default_size" in error for error in errors), errors
 
 
 def test_confirming_a_condition_never_raises_a_lower_declared_cap() -> None:

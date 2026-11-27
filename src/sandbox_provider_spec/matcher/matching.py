@@ -20,7 +20,12 @@ import itertools
 from collections.abc import Iterable, Sequence
 from typing import Any, Final, NamedTuple, TypedDict
 
-from sandbox_provider_spec.check import UNMET_LIMIT_ASKS
+from sandbox_provider_spec.check import (
+    SIZE_CEILING_KEYS,
+    UNMET_LIMIT_ASKS,
+    is_size_ceiling,
+    sizes_within,
+)
 from sandbox_provider_spec.matcher.catalog import (
     ALL_OF,
     ALL_OF_RESOURCES,
@@ -460,13 +465,22 @@ def _no_size_detail(
 
 
 def _fit_size(
-    declaration: Declaration, request: Request
+    declaration: Declaration, request: Request, ceiling: Document | None = None
 ) -> tuple[Document, list[tuple[str, Failure]]]:
+    """The first size that holds the asks, among those under the account's `ceiling` if any."""
     asks, uncompared = size_asks(declaration, request)
     if not asks:
         return {}, []
     resources = declaration.resources
     sizes = resources.get("sizes")
+    limit = ""
+    if ceiling is not None and isinstance(sizes, list):
+        declared, sizes = sizes, sizes_within(sizes, ceiling)
+        if sizes != declared:
+            limit = (
+                f" This account allows at most {ceiling['cpu']:,} CPU and "
+                f"{ceiling['memory_mib']:,} MiB of memory."
+            )
     if not isinstance(sizes, list):
         # Nothing about sizing is established, except that a disk-only ask is compared with
         # the provider-wide `disk_mib`.
@@ -504,7 +518,8 @@ def _fit_size(
             "resource",
             "resource_mismatch",
             _no_size_detail(asks, uncompared, sizes, resources.get("disk_mib"))
-            + (" The memory ask includes the disk." if asks != request.size_asks else ""),
+            + (" The memory ask includes the disk." if asks != request.size_asks else "")
+            + limit,
             resource="sizes",
             asked=asks,
             offered=sizes,
@@ -582,6 +597,18 @@ def _unmet_ceiling(resources: Document, fact: str, missing: set[str]) -> int | N
     return None
 
 
+def _unmet_size_ceiling(resources: Document, missing: set[str]) -> Document | None:
+    """The largest size the unmet conditions of `sizes` all allow, if each states one."""
+    declared = resources.get("unmet_limits")
+    declared = declared.get("sizes") if isinstance(declared, dict) else None
+    if not isinstance(declared, dict) or not isinstance(resources.get("sizes"), list):
+        return None
+    found = [item for item in map(declared.get, missing) if is_size_ceiling(item)]
+    if len(found) != len(missing):
+        return None
+    return {key: min(item[key] for item in found) for key in SIZE_CEILING_KEYS}
+
+
 def fit_resources(
     declaration: Declaration,
     request: Request,
@@ -624,10 +651,15 @@ def fit_resources(
         dict.fromkeys(fact for ask, fact in PER_OPERATION_RESOURCES.items() if ask in asked)
     )
     ceilings: dict[str, int] = {}
+    size_ceiling: Document | None = None
     for fact in asked_facts:
         conditions = needs.get(fact, []) if isinstance(needs, dict) else []
         missing = set(conditions) - set(met_needs)
         if missing:
+            if fact == "sizes":
+                size_ceiling = _unmet_size_ceiling(resources, missing)
+                if size_ceiling is not None:
+                    continue
             ceiling = _unmet_ceiling(resources, fact, missing)
             if ceiling is not None:
                 ceilings[fact] = ceiling
@@ -734,7 +766,7 @@ def fit_resources(
                     offered=offered_ends,
                 )
             )
-    size, size_failed = _fit_size(declaration, request)
+    size, size_failed = _fit_size(declaration, request, size_ceiling)
     provisioned.update(size)
     failed += size_failed
 

@@ -172,14 +172,21 @@ omitted class keep `class: null`, and proof lookup compares that raw value. An e
   conflict or the documentation. `needs` has no key for a whole class: a class that only
   some accounts can use says so at the top of its `evidence.md`.
 - **`resources.unmet_limits`** gives the ceiling that holds for a fact while one of its
-  `resources.needs` conditions is not met: a map from a fact (`max_lifetime_seconds` or
-  `disk_mib`) to a map from one of that fact's conditions to a positive integer in the
-  fact's own unit, or `unknown`.
+  `resources.needs` conditions is not met: a map from a fact (`max_lifetime_seconds`,
+  `disk_mib` or `sizes`) to a map from one of that fact's conditions to the ceiling, or
+  `unknown`. For `max_lifetime_seconds` and `disk_mib` the ceiling is a positive integer
+  in the fact's own unit. For `sizes` it is the largest size those accounts get,
+  `{cpu: N, memory_mib: M}`, with both stated.
   `unmet_limits: {max_lifetime_seconds: {pro_plan: 3600}}` says a lower plan is documented
-  to allow at most 3600 seconds. Cite the provider's documentation for each ceiling under
-  `resources.unmet_limits.<fact>.<condition>`. Write a ceiling only where the provider
-  documents it for every account that does not meet the condition; a ceiling is not the
-  provider's physical maximum, allocates nothing, and does not make a request supported.
+  to allow at most 3600 seconds, and
+  `unmet_limits: {sizes: {pro_plan: {cpu: 4, memory_mib: 8192}}}` says it is documented to
+  allow no size above 4 CPU or 8192 MiB of memory. Cite the provider's documentation for
+  each ceiling under `resources.unmet_limits.<fact>.<condition>`. Write a ceiling only
+  where the provider documents it for every account that does not meet the condition; a
+  ceiling is not the provider's physical maximum, allocates nothing, and does not make a
+  request supported.
+- A `sizes` ceiling **MUST** leave at least one declared size under it, and the <!-- rule: declaration/size-ceiling-holds-a-size -->
+  `default_size` where one is declared.
 - **Limits** let a setting rule a variant out: `max_ports`, `max_allow` (allowlist
   entries), `max_deny` (denylist entries), `max_inject_into` (secret destinations),
   `max_mounts` and `max_tcp_ports` on their gates, and `max_gpus` under `resources`. Each is a positive number, `{at_least: N}` with
@@ -205,9 +212,11 @@ omitted class keep `class: null`, and proof lookup compares that raw value. An e
   matching chooses the first that fits. A provider that sizes freely writes a range,
   `{cpu: [0.25, 64], memory_mib: [128, 262144]}`. `sizes` and `disk_mib` are the allocation
   the provider sells, not what a program inside measures.
-- **Part of a list for better plans.** `needs` conditions a whole fact, so where only some
-  sizes or regions need a better plan, declare the ones every self-serve account gets and
-  name the rest in `evidence.md`.
+- **Part of a list for better plans.** `needs` conditions a whole fact. Where only some
+  sizes need a better plan, declare them all, name the condition under `needs.sizes` and
+  give the largest size of the other accounts under `unmet_limits.sizes`. Where only some
+  regions need a better plan, declare the ones every self-serve account gets and name the
+  rest in `evidence.md`.
 - **`located_in`** lists the countries a sandbox may run in when no region is pinned. A
   declaration **MUST** leave it out unless the provider says where it places such a <!-- rule: declaration/located-in-only-where-stated -->
   sandbox; a provider that places it wherever it has capacity has none.

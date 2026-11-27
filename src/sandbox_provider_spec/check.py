@@ -9,6 +9,7 @@ import ipaddress
 import json
 import math
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any, Final, TypeGuard
@@ -60,8 +61,11 @@ UNKNOWN_WORD = "any word the spec does not define"
 UNKNOWN_KEY = "unknown key"
 UNKNOWN_IN_LIST = "unknown inside a list"
 
-#: The facts that can carry an `unmet_limits` ceiling, each with the request ask it bounds.
+#: The facts whose `unmet_limits` ceiling is one number, each with the request ask it bounds.
+#: The ceiling of `sizes`, the other fact that can carry one, is a size (`sizes_within`).
 UNMET_LIMIT_ASKS: Final = {"max_lifetime_seconds": "lifetime_seconds", "disk_mib": "disk_min_mib"}
+#: What a `sizes` ceiling states, both of them: the largest CPU and memory a size may have.
+SIZE_CEILING_KEYS: Final = ("cpu", "memory_mib")
 
 #: The keys a declaration's `lifetime_timer` block may carry.
 LIFETIME_TIMER_KEYS: Final = frozenset(
@@ -680,7 +684,7 @@ def _check_resource_declarations(
                     if dependent not in resources or target == "unknown":
                         errors.append(f"needs names no declared resource value: {dependent}")
         elif key == "unmet_limits":
-            _check_unmet_limits(value, resources.get("needs"), errors)
+            _check_unmet_limits(value, resources, errors)
         elif key == "default_region":
             regions = resources.get("regions")
             if not isinstance(value, str) or not value:
@@ -919,15 +923,16 @@ def _check_needs(value: Any, path: str, allowed: set[str], errors: list[str]) ->
             errors.append(f"{UNKNOWN_WORD}: {path}.{name}")
 
 
-def _check_unmet_limits(value: Any, needs: Any, errors: list[str]) -> None:
+def _check_unmet_limits(value: Any, resources: dict[str, Any], errors: list[str]) -> None:
     """Each ceiling bounds one limited fact while one of that fact's own conditions is unmet."""
     if not isinstance(value, dict):
         errors.append(f"{UNKNOWN_WORD}: resources.unmet_limits")
         return
+    needs = resources.get("needs")
     needs = needs if isinstance(needs, dict) else {}
     for fact, ceilings in value.items():
         path = f"resources.unmet_limits.{fact}"
-        if fact not in UNMET_LIMIT_ASKS:
+        if fact != "sizes" and fact not in UNMET_LIMIT_ASKS:
             errors.append(f"{UNKNOWN_KEY}: {path}")
         if not isinstance(ceilings, dict) or not ceilings:
             errors.append(f"{UNKNOWN_WORD}: {path}")
@@ -938,10 +943,63 @@ def _check_unmet_limits(value: Any, needs: Any, errors: list[str]) -> None:
                 errors.append(
                     f"unmet_limits names no condition of needs.{fact}: {path}.{condition}"
                 )
-            if ceiling != "unknown" and not (
-                isinstance(ceiling, int) and not isinstance(ceiling, bool) and ceiling > 0
-            ):
+            if ceiling == "unknown":
+                continue
+            if fact == "sizes":
+                _check_size_ceiling(ceiling, resources, f"{path}.{condition}", errors)
+            elif not (isinstance(ceiling, int) and not isinstance(ceiling, bool) and ceiling > 0):
                 errors.append(f"{UNKNOWN_WORD}: {path}.{condition}")
+
+
+def _check_size_ceiling(
+    ceiling: Any, resources: dict[str, Any], path: str, errors: list[str]
+) -> None:
+    """A `sizes` ceiling states both of its keys, and leaves its accounts something to create."""
+    if not is_size_ceiling(ceiling):
+        errors.append(f"{UNKNOWN_WORD}: {path}")
+        return
+    sizes = resources.get("sizes")
+    if isinstance(sizes, list) and not sizes_within(sizes, ceiling):
+        errors.append(f"unmet_limits leaves no declared size: {path}")
+    default = resources.get("default_size")
+    if isinstance(default, dict) and not sizes_within([default], ceiling):
+        errors.append(f"unmet_limits does not hold default_size: {path}")
+
+
+def is_size_ceiling(value: Any) -> TypeGuard[dict[str, int | float]]:
+    """Whether `value` states a `sizes` ceiling: positive CPU and whole MiB, and nothing else."""
+    return (
+        isinstance(value, dict)
+        and set(value) == set(SIZE_CEILING_KEYS)
+        and all(_is_finite_number(item) and item > 0 for item in value.values())
+        and isinstance(value["memory_mib"], int)
+    )
+
+
+def sizes_within(sizes: list[Any], ceiling: Mapping[str, float]) -> list[Any]:
+    """The declared sizes under a ceiling of CPU and memory, in their declared order.
+
+    A `[low, high]` range ends at the ceiling. A size whose low end is above it is left out, as is
+    one whose value is not a number. A size without `cpu` has none to bound.
+    """
+    found: list[Any] = []
+    for size in sizes:
+        if not isinstance(size, dict):
+            continue
+        narrowed = dict(size)
+        for key in SIZE_CEILING_KEYS:
+            if key not in size:
+                continue
+            value, most = size[key], ceiling[key]
+            if isinstance(value, list) and len(value) == 2 and all(map(_is_finite_number, value)):
+                if value[0] > most:
+                    break
+                narrowed[key] = [value[0], min(value[1], most)]
+            elif not _is_finite_number(value) or value > most:
+                break
+        else:
+            found.append(narrowed)
+    return found
 
 
 def _check_variant_need_targets(
