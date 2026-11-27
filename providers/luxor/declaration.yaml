@@ -8,11 +8,19 @@ verified:
   sdks: {"sandbox-provider-spec": "0.5.116"}
 resources:
   kernel: dedicated
-  # The sizes every self-serve account gets (Starter: up to 4 cores and 8 GB); a Team workspace takes 16 cores and 64 GB.
+  # A Team workspace takes 16 cores and 64 GB; a Starter one is capped at 4 cores and 8 GB (`unmet_limits`).
   sizes:
-  - cpu: [1, 4]
-    memory_mib: [512, 8192]
+  - cpu: [1, 16]
+    memory_mib: [512, 65536]
     disk_mib: [5120, 102400]
+  needs:
+    sizes:
+    - team_plan
+  unmet_limits:
+    sizes:
+      team_plan:
+        cpu: 4
+        memory_mib: 8192
   default_size:
     cpu: 2
     memory_mib: 4096
@@ -73,8 +81,16 @@ evidence:
     quote: "A running full Linux VM"
   resources.sizes:
     source: https://luxor.ai/pricing
-    read: '2026-11-24'
-    quote: "Up to 4 cores and 8 GB RAM"
+    read: '2026-11-27'
+    quote: "Machine size | 4 cores, 8 GB RAM | 16 cores, 64 GB RAM"
+  resources.needs.sizes:
+    source: https://luxor.ai/pricing
+    read: '2026-11-27'
+    quote: "Machine size | 4 cores, 8 GB RAM | 16 cores, 64 GB RAM"
+  resources.unmet_limits.sizes.team_plan:
+    source: https://luxor.ai/pricing
+    read: '2026-11-27'
+    quote: "Machine size | 4 cores, 8 GB RAM | 16 cores, 64 GB RAM"
   resources.default_size:
     source: https://luxor.ai/docs/sandbox/sessions
     read: '2026-11-24'

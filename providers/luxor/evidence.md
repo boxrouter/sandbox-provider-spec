@@ -40,8 +40,13 @@ read `differs` here; they prove nothing about a router-enforced one. `extendable
 ## Declared from documentation quotes (read 2026-11-24)
 
 - `kernel: dedicated`: "A running full Linux VM" (/docs/sandbox/concepts).
-- `sizes`: 1 to 4 vCPU and 512 to 8192 MiB, the size every self-serve account gets ("Up to 4 cores and 8 GB RAM",
-  luxor.ai/pricing, Starter); a Team workspace takes up to 16 cores and 64 GB RAM. The disk range, 5 to 100 GiB,
+- `sizes`: 1 to 16 vCPU and 512 to 65536 MiB, the Team plan's machine ("Machine size: 4 cores, 8 GB RAM | 16 cores,
+  64 GB RAM", luxor.ai/pricing, read 2026-11-27). A 16-core, 65,536 MiB session was accepted on the Boxrouter workspace
+  (Team) on 2026-11-27, and `nproc` printed 16, `MemTotal` 66895552 kB (`limits/sizes.json` of the luxor-adapter lane).
+  `resources.needs.sizes: [team_plan]` and `unmet_limits.sizes.team_plan: {cpu: 4, memory_mib: 8192}` state that a
+  workspace without the Team plan (Starter) is capped at 4 cores and 8 GB RAM, the same pricing row. An account's
+  `discovery()` meets `team_plan` when `GetWorkspaceSandboxUsage` states `max_concurrent_jobs` of 100 or more
+  (Starter 5, Team 100, the pricing page's "Concurrent sessions" row; the Boxrouter workspace reads 100). The disk range, 5 to 100 GiB,
   is the API's own (the template resources row of /docs/sandbox/templates says "disk (5-100 GB)"; the adapter's create
   asks for it and Luxor accepts it).
 - `default_size`: "Unset options fall back to service defaults of 2 vCPU, 4096 MB, and a 5 GiB root disk." (/docs/sandbox/sessions).
