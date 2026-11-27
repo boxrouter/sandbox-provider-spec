@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.181 — 2026-11-27
+
+- A declaration states `size_is_ceiling: true` only with a passing `coverage.facts.size_is_ceiling.true` report whose CPU burn used independent processes or exact cgroup bounds (rule `facts/size-is-ceiling`); a report that burned threads is refused.
+- Vercel's declaration records the passing `coverage.facts.size_is_ceiling.true` report that proves its `size_is_ceiling: true` (the earlier report burned threads and could not fail).
+
 ## 0.5.180 — 2026-11-27
 
 - The Provider API states a guarantee for `argv`: an element whose POSIX shell quoting is at most 32768
