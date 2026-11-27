@@ -30,4 +30,4 @@ shares one SDK set; with the current adapter a process can be reattached after i
 
 ## Conformance
 
-The conformance fields cite `reports/default.json` and `reports/adapter-default-size-ceiling.json`. Ambiguous or untested behaviors stay `unknown` or `not_run` in the declaration and reports.
+The conformance fields cite `reports/default.json` and `reports/ceiling-2cpu-8gib-20261127.json`. Ambiguous or untested behaviors stay `unknown` or `not_run` in the declaration and reports.

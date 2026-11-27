@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: blaxel
 verified:
-  date: '2026-11-23'
+  date: '2026-11-27'
   sdks:
     blaxel: 0.4.8
     sandbox-provider-spec: 0.5.75
@@ -70,9 +70,8 @@ evidence:
     read: '2026-11-23'
     quote: "SOC 2 Type II, ISO 27001, and HIPAA BAA coverage extends across the full platform. That includes Sandboxes and Batch Jobs."
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/adapter-default-size-ceiling.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-4gib-20261127.json
   resources.kernel:
     source: https://blaxel.ai/platform/sandboxes
     read: '2026-10-16'

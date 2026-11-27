@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: modal
 class: vm
 verified:
-  date: '2026-11-18'
+  date: '2026-11-27'
   sdks:
     modal: 1.6.1
 resources:
@@ -103,9 +103,8 @@ evidence:
       to ensure your containers can be scheduled for execution. Requests exceeding the maximum will be
       rejected with an InvalidError.
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/prober-vm-coverage.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-vm-2cpu-4gib-20261127.json
   resources.regions:
     source: https://modal.com/docs/guide/region-selection
     read: '2026-10-04'

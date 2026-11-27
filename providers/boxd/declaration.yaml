@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boxd
 verified:
-  date: 2026-11-22
+  date: 2026-11-27
   sdks: {boxd: 0.3.0, sandbox-provider-spec: 0.5.64}
 resources:
   kernel: dedicated
@@ -201,7 +201,7 @@ evidence:
     quote: 'An isolated machine has no automatic credential: Boxd() raises AuthenticationError there, so pass an API key.'
   resources.size_is_ceiling:
     tests: [coverage.facts.size_is_ceiling.true]
-    report: reports/adapter-default-size-ceiling.json
+    report: reports/ceiling-2cpu-8gib-20261127.json
   resources.disk_in_memory:
     tests: [coverage.facts.disk_in_memory.false]
     report: reports/prober-disk-in-memory-20261116.json

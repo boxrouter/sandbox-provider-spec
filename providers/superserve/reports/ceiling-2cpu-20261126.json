@@ -1,0 +1,70 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:3daef71dc9075f121b4eb4d88dbfcc4f7adaf51c58a9581bcd4da000ef34acdd"
+  },
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.156"
+  },
+  "finished_at": "2026-11-26T11:49:34.119657+00:00",
+  "provider": "superserve",
+  "revision": "e8926b446e577e80b68842a4767b281797a254aa",
+  "run_id": "public-47a0352a8a5724470089",
+  "sdk_versions": {
+    "sandbox-provider-spec": "0.5.156"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T11:49:20.308575+00:00",
+  "subject": {
+    "discovery_digest": "sha256:f7f2f13ebff4a54ebea3964318ebc4918f7fcac944949b1e9c7ae0a640e66648",
+    "package": "sps-provider-superserve",
+    "package_digest": "sha256:b5b72c9afc43e39382001a76b9d87ee63ccac6253c9ae337fc92f371928c9571",
+    "version": "0.1.29"
+  },
+  "suite_digest": "sha256:0105a1139810f4bd4878ee4c86d3fe782e675307da1fce391a5eea2633a0d2d2",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 12501,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 8.001, \"burn_wall_seconds\": 4.014, \"burn_workers\": 4, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.9932735426008965, \"memory_outcome\": \"process_killed\", \"method\": \"measured_use\", \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

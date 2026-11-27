@@ -2,7 +2,7 @@ spec: sandbox-provider-spec/0.1
 provider: archil
 class: default
 verified:
-  date: 2026-11-26
+  date: 2026-11-27
   sdks: {archil: 0.23.0, httpx: 0.28.1, sandbox-provider-spec: 0.5.162}
 resources:
   kernel: dedicated
@@ -14,6 +14,7 @@ resources:
   - {cpu: 8, memory_mib: 16384}
   - {cpu: 16, memory_mib: 32768}
   - {cpu: 32, memory_mib: 65536}
+  size_is_ceiling: true
   regions: [archil:aws-us-east-1, archil:aws-us-west-2, archil:aws-eu-west-1]
   located_in: unknown
   max_lifetime_seconds: 86400
@@ -80,3 +81,6 @@ evidence:
     source: https://pypi.org/project/archil/0.23.0/
     read: 2026-11-24
     quote: Both TTLs pause the sandbox ... Create a sandbox with on_timeout="delete" to delete it and its disk.
+  resources.size_is_ceiling:
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-4gib-20261127.json

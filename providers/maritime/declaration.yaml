@@ -9,7 +9,7 @@ class: default
 # snapshots, user selection and native provider artifacts. Idle shutdown stays unclaimed.
 # Everything else stays unknown until a run report proves it.
 verified:
-  date: 2026-11-26
+  date: 2026-11-27
   # The adapter calls Maritime's HTTP API through httpx, not Maritime's own SDK; the newest
   # report records the tester stack it ran with.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.112"}
@@ -30,7 +30,9 @@ resources:
   - cpu: [1, 16]
     memory_mib: [1024, 65536]
     disk_mib: [12288, 512000]
-  size_is_ceiling: unknown
+  size_is_ceiling: true
+  # Proven at 2, 4 and 8 vCPU. At 16 vCPU the check could not run (cpu_ceiling_unproven: the host withheld
+  # CPU time, so the burn never reached the size); that is no violation and no proof.
   default_user: user
   default_cwd: /home/user
   root: [sudo]
@@ -213,3 +215,11 @@ evidence:
   gates.network_lockdown.1.changeable:
     tests: [coverage.network_lockdown.changeable.true]
     report: reports/tester-default-coverage.json
+  resources.size_is_ceiling:
+    reports:
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/ceiling-2cpu-20261126.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/ceiling-4cpu-20261127.json
+    - tests: [coverage.facts.size_is_ceiling.true]
+      report: reports/ceiling-8cpu-20261127.json

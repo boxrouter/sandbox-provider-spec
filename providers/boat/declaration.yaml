@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: boat
 verified:
-  date: '2026-11-19'
+  date: '2026-11-27'
   sdks:
     boat-sdk: 1.13.0
 resources:
@@ -61,9 +61,8 @@ evidence:
     - lifetime_timer.at_end.destroyed
     report: reports/prober-default-core.json
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/adapter-default-size-ceiling.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-4gib-20261127.json
   resources.disk_in_memory:
     tests:
     - coverage.facts.disk_in_memory.false

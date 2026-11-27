@@ -5,7 +5,7 @@ class: vm
 # kernel. Every value is `unknown` or absent until a committed run report or a dated quote of
 # Agent37's documentation proves it.
 verified:
-  date: 2026-11-24
+  date: 2026-11-27
   # The client package the adapter calls Agent37 with: Agent37 publishes no SDK, so its HTTP client.
   sdks: {"httpx": "0.28.1", "sandbox-provider-spec": "0.5.116"}
 resources:
@@ -96,9 +96,8 @@ evidence:
       Omitted, most templates use 2 vCPU / 4 GB. ... When omitted, it defaults to 12 GB for these
       two VM templates, or 4, 6, 12, or 24 GB by shape for other templates.
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/prober-vm-coverage.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-vm-2cpu-4gib-20261127.json
   resources.default_user:
     tests: [facts.default_user]
     report: reports/adapter-vm-defaults.json

@@ -1,0 +1,72 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:c8bcf28abdee669bab0570ff16fa518de428c1378b9ed88796126401ca2bad0d"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.163"
+  },
+  "finished_at": "2026-11-26T15:53:15.705247+00:00",
+  "provider": "maritime",
+  "revision": "7752d9974d209ed5885e6bbd0f7635aeda33fb6d",
+  "run_id": "public-43552e02cdbe95f6ca46",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.163"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-26T15:52:48.824665+00:00",
+  "subject": {
+    "discovery_digest": "sha256:a407beba3f4c2a4a8520da1fbd0d5d659874fa107262ee6a0ddf323d38038760",
+    "package": "sps-provider-maritime",
+    "package_digest": "sha256:d302925241c333a09c80dff30dcf3f502b2ff2dca44de3aa60ebb6fb738a65c3",
+    "version": "0.1.7"
+  },
+  "suite_digest": "sha256:0520b84495af4b657eb117d7f30b59edf71c6ee8758adbff3b7c132def0bf196",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 18536,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 7.9, \"burn_wall_seconds\": 4.025, \"burn_workers\": 4, \"cpu_quota\": null, \"processors\": 2}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 1.9627329192546583, \"memory_outcome\": \"process_killed_after_recovery\", \"method\": \"measured_use\", \"oom_observation\": {\"at\": 19.330451, \"pid\": 775, \"rss_kib\": 3893712, \"started\": 13.174972844}, \"requested_cpu\": \"2\", \"requested_memory_bytes\": 4294967296}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

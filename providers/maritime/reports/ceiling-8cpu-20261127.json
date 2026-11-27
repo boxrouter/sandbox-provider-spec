@@ -1,0 +1,72 @@
+{
+  "baseline": "not_run",
+  "check_digests": {
+    "coverage.facts.size_is_ceiling.true": "sha256:c8bcf28abdee669bab0570ff16fa518de428c1378b9ed88796126401ca2bad0d"
+  },
+  "class": "default",
+  "clean": true,
+  "driver": {
+    "name": "AllocationDriver",
+    "version": "0.5.168"
+  },
+  "finished_at": "2026-11-27T02:58:16.640219+00:00",
+  "provider": "maritime",
+  "revision": "8020a79cecfe693aea2b830887c23da643be25ff",
+  "run_id": "public-c62b054b0fb9256f8988",
+  "sdk_versions": {
+    "httpx": "0.28.1",
+    "sandbox-provider-spec": "0.5.168"
+  },
+  "selected_tests": [
+    "coverage.facts.size_is_ceiling.true"
+  ],
+  "spec": "sandbox-provider-spec/0.1",
+  "started_at": "2026-11-27T02:57:40.028648+00:00",
+  "subject": {
+    "discovery_digest": "sha256:21bfec7f96c2792eb12a1d4c07715cf96b53ffeee3659fd520b0a80b3c340ffc",
+    "package": "sps-provider-maritime",
+    "package_digest": "sha256:c63802cd2772d4cdbf7f639f6f5edf523531c1f2d6ec17e0bc93ee9572f02b76",
+    "version": "0.1.11"
+  },
+  "suite_digest": "sha256:0520b84495af4b657eb117d7f30b59edf71c6ee8758adbff3b7c132def0bf196",
+  "tests": [
+    {
+      "class": "default",
+      "cleanup": [
+        {
+          "kind": "sandbox",
+          "result": "deleted"
+        }
+      ],
+      "duration_ms": 29466,
+      "id": "coverage.facts.size_is_ceiling.true",
+      "proves": [
+        {
+          "fact": "resources.size_is_ceiling",
+          "value": true
+        }
+      ],
+      "result": "passed",
+      "rules": [
+        "facts/size-is-ceiling"
+      ],
+      "steps": [
+        {
+          "observations": {},
+          "operation": "create",
+          "result": "passed"
+        },
+        {
+          "observations": {
+            "ceiling_evidence": "{\"cpu_observation\": {\"burn_cpu_seconds\": 31.99, \"burn_wall_seconds\": 4.046, \"burn_workers\": 16, \"cpu_quota\": null, \"processors\": 8}, \"cpu_tolerance\": 0.05, \"measured_cpus\": 7.906574394463667, \"memory_outcome\": \"process_killed_after_recovery\", \"method\": \"measured_use\", \"oom_observation\": {\"at\": 24.45491, \"pid\": 914, \"rss_kib\": 16170200, \"started\": 9.497106128}, \"requested_cpu\": \"8\", \"requested_memory_bytes\": 17179869184}",
+            "size_is_ceiling": {
+              "matches": true
+            }
+          },
+          "operation": "fixture.coverage_fact",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

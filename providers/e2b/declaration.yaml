@@ -1,7 +1,7 @@
 spec: sandbox-provider-spec/0.1
 provider: e2b
 verified:
-  date: '2026-11-22'
+  date: '2026-11-27'
   sdks:
     e2b: 2.59.0
     e2b-code-interpreter: 2.11.3
@@ -118,9 +118,8 @@ evidence:
     read: '2026-11-23'
     quote: "Yes. E2B has a SOC 2 Type II report."
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/tester-default-coverage.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-4gib-20261127.json
   resources.kernel:
     source: https://docs.e2b.dev/faq/security-and-compliance
     read: '2026-10-16'

@@ -3,7 +3,7 @@ provider: superserve
 # Every value is `unknown`, absent, a dated quote of Superserve's documentation or a committed adapter
 # report (see evidence.md).
 verified:
-  date: 2026-11-22
+  date: 2026-11-27
   # The official Superserve Python SDK, as in the adapter's spec.py `sdk_packages` (the open-source
   # export strips BoxRouter packages, so only the provider SDK is named here).
   sdks: {"superserve": "0.12.0", "sandbox-provider-spec": "0.5.63"}
@@ -148,9 +148,8 @@ evidence:
       | Default | 1 vCPU | 1 GiB (1024 MiB) | | Pro max | 16 vCPU | 64 GiB (65536 MiB) | Limits
       depend on your team's plan.
   resources.size_is_ceiling:
-    tests:
-    - coverage.facts.size_is_ceiling.true
-    report: reports/prober-default-coverage.json
+    tests: [coverage.facts.size_is_ceiling.true]
+    report: reports/ceiling-2cpu-20261126.json
   resources.default_user:
     tests: [facts.default_user]
     report: reports/adapter-defaults.json
