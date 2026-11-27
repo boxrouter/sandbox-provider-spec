@@ -19,19 +19,22 @@ resources:
   libc: glibc
   package_manager: apt
   disk_in_memory: false
-  # The four sizes the adapter offers (Sail's limits, rounded up to a power of two: 1, 2, 4 and
-  # 8 vCPUs with 16, 16, 32 and 64 GiB of memory and 32, 32, 64 and 128 GiB of state disk). A
-  # create's request floors pick the smallest listed size that meets them; each value is a
-  # limit, not a reservation, and Sail bills the actual usage below it. The guest starts with
-  # 16 GiB of memory visible at every size and grows toward the limit as the workload uses it
-  # (measured 2026-11-25 on the 8 vCPU / 64 GiB size: MemTotal 16, 24, 38 and 58 GiB while 11,
-  # 15, 21 and 40 GiB were held), so `coverage.facts.sizes.delivered`, which reads an idle
-  # guest, passes at 16 GiB and differs above it.
+  # The six sizes the adapter offers (Sail's limits, rounded up to a power of two: 1, 2, 4, 8,
+  # 16 and 32 vCPUs with 16, 16, 32, 64, 128 and 256 GiB of memory and 32, 32, 64, 128, 256 and
+  # 512 GiB of state disk; 64 vCPUs is in public beta, where Sail asks users to reach out, so it
+  # is not offered). A create's request floors pick the smallest listed size that meets them;
+  # each value is a limit, not a reservation, and Sail bills the actual usage below it. The
+  # guest starts with 16 GiB of memory visible at every size and grows toward the limit as the
+  # workload uses it (measured 2026-11-25 on the 8 vCPU / 64 GiB size: MemTotal 16, 24, 38 and
+  # 58 GiB while 11, 15, 21 and 40 GiB were held), so `coverage.facts.sizes.delivered`, which
+  # reads an idle guest, passes at 16 GiB and differs above it.
   sizes:
   - {cpu: 1, memory_mib: 16384, disk_mib: 32768}
   - {cpu: 2, memory_mib: 16384, disk_mib: 32768}
   - {cpu: 4, memory_mib: 32768, disk_mib: 65536}
   - {cpu: 8, memory_mib: 65536, disk_mib: 131072}
+  - {cpu: 16, memory_mib: 131072, disk_mib: 262144}
+  - {cpu: 32, memory_mib: 262144, disk_mib: 524288}
   # What a create without resources gets: the smallest offered size (this integration's choice;
   # Sail's own SDK default is 8 vCPUs, 64 GiB of memory and 256 GiB of disk).
   default_size: {cpu: 1, memory_mib: 16384, disk_mib: 32768}
@@ -116,6 +119,8 @@ evidence:
     quote: >-
       CPU: 1–64 vCPUs per Sailbox. Memory: 16–256 GiB per Sailbox. Disk: 8–1024 GiB per
       Sailbox. Limits round up to the next power of two. Limits cap what a workload can use.
+      Creates at 16 vCPU / 128 GiB / 256 GiB and 32 vCPU / 256 GiB / 512 GiB were accepted
+      and ran on 2026-11-27 (each reported those limits back and was terminated at once).
   resources.default_size:
     source: https://docs.sailresearch.com/sailboxes-pricing.md
     read: 2026-11-24
