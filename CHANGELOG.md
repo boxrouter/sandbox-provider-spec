@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.182 — 2026-11-27
+
+- Sail's declaration states `size_is_ceiling: true` again, proven by `coverage.facts.size_is_ceiling.true` at 1, 2, 4
+  and 8 vCPU (16, 16, 32 and 64 GiB) against the adapter that holds every sandbox to its size.
+
 ## 0.5.181 — 2026-11-27
 
 - A declaration states `size_is_ceiling: true` only with a passing `coverage.facts.size_is_ceiling.true` report whose CPU burn used independent processes or exact cgroup bounds (rule `facts/size-is-ceiling`); a report that burned threads is refused.
