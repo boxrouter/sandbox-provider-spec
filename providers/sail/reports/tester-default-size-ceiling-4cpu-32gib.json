@@ -7,26 +7,26 @@
   "clean": true,
   "driver": {
     "name": "AllocationDriver",
-    "version": "0.5.177"
+    "version": "0.5.182"
   },
-  "finished_at": "2026-11-27T05:40:18.289727+00:00",
+  "finished_at": "2026-11-27T07:07:10.595894+00:00",
   "provider": "sail",
-  "revision": "a7d8885d8adffba48a5c735541d7553ba103ef5a",
-  "run_id": "public-75a0742a69c0115f07d0",
+  "revision": "212db4bbd03e75a19c1221c382e2bc88943b0c51",
+  "run_id": "public-0631f763d66363d436a3",
   "sdk_versions": {
     "httpx": "0.28.1",
-    "sandbox-provider-spec": "0.5.177"
+    "sandbox-provider-spec": "0.5.182"
   },
   "selected_tests": [
     "coverage.facts.size_is_ceiling.true"
   ],
   "spec": "sandbox-provider-spec/0.1",
-  "started_at": "2026-11-27T05:40:03.865006+00:00",
+  "started_at": "2026-11-27T07:07:06.800456+00:00",
   "subject": {
     "discovery_digest": "sha256:b7cf440be1000e346cc423751fcc6e8b2bc9be876991a19e0439b9a431854332",
     "package": "sps-provider-sail",
-    "package_digest": "sha256:5db40978b64a346364e2edda4931b8ef01668c7ff5e7beb0e27882b226601dc4",
-    "version": "0.2.14"
+    "package_digest": "sha256:f0440ed582099bd8079423fc2ce91c1b0eba77b11bb1be68e6ee46e21741e72a",
+    "version": "0.2.15"
   },
   "suite_digest": "sha256:613397ef40373a11361d9a3f4cd988efb310a9a9ae653dac713e2d7681b77243",
   "tests": [
@@ -38,7 +38,7 @@
           "result": "deleted"
         }
       ],
-      "duration_ms": 1817,
+      "duration_ms": 1637,
       "id": "coverage.facts.size_is_ceiling.true",
       "proves": [
         {
@@ -58,7 +58,7 @@
         },
         {
           "observations": {
-            "ceiling_evidence": "{\"cpu_bound\": \"4\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 15701630976, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/workloads/cpu.max\": \"400000 100000\", \"/sys/fs/cgroup/workloads/jobs/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/workloads/jobs/exec-e9d12e4c-57a5-40b8-b9d5-189ee66856e8-f1f5c8a1db7e1d1a/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/workloads/jobs/exec-e9d12e4c-57a5-40b8-b9d5-189ee66856e8-f1f5c8a1db7e1d1a/memory.max\": \"max\", \"/sys/fs/cgroup/workloads/jobs/memory.max\": \"max\", \"/sys/fs/cgroup/workloads/memory.max\": \"15701630976\"}, \"membership\": \"0::/workloads/jobs/exec-e9d12e4c-57a5-40b8-b9d5-189ee66856e8-f1f5c8a1db7e1d1a\"}, \"requested_cpu\": \"4\", \"requested_memory_bytes\": 34359738368}",
+            "ceiling_evidence": "{\"cpu_bound\": \"4\", \"limitations\": \"Visible cgroup bounds only; no VM or exceedance inference.\", \"memory_bound_bytes\": 15701630976, \"method\": \"enforced_cgroup_bounds\", \"observation\": {\"files\": {\"/sys/fs/cgroup/workloads/cpu.max\": \"400000 100000\", \"/sys/fs/cgroup/workloads/jobs/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/workloads/jobs/exec-9bb0bf02-1019-4c3b-9d4f-fd37b8cfb2e5-ac528df4586744dc/cpu.max\": \"max 100000\", \"/sys/fs/cgroup/workloads/jobs/exec-9bb0bf02-1019-4c3b-9d4f-fd37b8cfb2e5-ac528df4586744dc/memory.max\": \"max\", \"/sys/fs/cgroup/workloads/jobs/memory.max\": \"max\", \"/sys/fs/cgroup/workloads/memory.max\": \"15701630976\"}, \"membership\": \"0::/workloads/jobs/exec-9bb0bf02-1019-4c3b-9d4f-fd37b8cfb2e5-ac528df4586744dc\"}, \"requested_cpu\": \"4\", \"requested_memory_bytes\": 34359738368}",
             "size_is_ceiling": {
               "matches": true
             }
