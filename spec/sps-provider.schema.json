@@ -53,6 +53,12 @@
       "default": false,
       "description": "True when the provider's `list` stops showing a sandbox as soon as it is destroyed, so an empty listing can never show that a sandbox which has ended did exist. A consumer that must prove a sandbox never existed (for example to release a hold for a create whose answer was lost) then cannot rely on an older ended sandbox still being listed."
     },
+    "discovery_confirms": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1},
+      "description": "The `resources.needs` conditions that `discovery()` reads from the provider for each account. For each name, an account's discovery states every fact that needs it at the static discovery's value only when the package has read from the provider that the account meets it, and states a narrower value otherwise. A consumer may take such a condition as met from the account's discovery. It takes no condition left out of this list as met from a discovery."
+    },
     "api_domains": {
       "type": "array",
       "minItems": 1,

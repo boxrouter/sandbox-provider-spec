@@ -24,7 +24,11 @@ from sandbox_provider_spec.v1 import (
     ERROR_TABLE,
     PROVIDER_FAULT,
     CreateRequest,
+    Discovery,
+    Limits,
     Provider,
+    ProviderInfo,
+    SandboxClass,
     SpsError,
     WireError,
     error_from_json,
@@ -441,6 +445,50 @@ def test_forgets_ended_sandboxes_defaults_to_false_and_reads_the_manifest(
     )
 
 
+@pytest.mark.parametrize(
+    ("declared", "live", "met"),
+    [
+        (["paid"], {"max_lifetime_seconds": 900}, {"paid"}),  # unnarrowed: read and met
+        (["paid"], {"max_lifetime_seconds": 60}, set()),  # narrowed: not met
+        (["paid"], {}, set()),  # the fact left out
+        ([], {"max_lifetime_seconds": 900}, set()),  # the same for every account: says nothing
+    ],
+)
+def test_an_account_discovery_confirms_only_the_conditions_the_package_declares_it_reads(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    declared: list[str],
+    live: dict[str, Any],
+    met: set[str],
+) -> None:
+    make_package(tmp_path, "plan_provider", {**GOOD_MANIFEST, "discovery_confirms": declared})
+    impl = import_package(monkeypatch, tmp_path, "plan_provider").Impl
+
+    def discovery(resources: dict[str, Any]) -> Discovery:
+        klass = SandboxClass(
+            id="default",
+            name="Default",
+            ready=True,
+            resources=resources,
+            lifetime_timer={},
+            images=(),
+            prices=(),
+        )
+        return Discovery(
+            spec_version="1.0",
+            provider=ProviderInfo("example", "Example Cloud", "https://example.test"),
+            limits=Limits(*[1] * 7),
+            classes=(klass,),
+        )
+
+    needs = {"max_lifetime_seconds": ["paid"], "disk_mib": ["beta"]}
+    ceiling = discovery({"max_lifetime_seconds": 900, "disk_mib": 10, "needs": needs})
+    impl.static_discovery = classmethod(lambda cls: ceiling)
+    account = discovery({**live, "disk_mib": 10, "needs": needs})
+    # `beta` is at its ceiling too, but the package never says that it reads it.
+    assert impl.confirmed_conditions(account) == frozenset(met)
+
+
 def test_subclass_without_a_manifest_fails_when_defined(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -475,6 +523,7 @@ def test_a_class_in_this_test_package_has_no_manifest() -> None:
         {"api_domains": ["https://api.example.com"]},
         {"api_domains": []},
         {"forgets_ended_sandboxes": "yes"},  # a boolean
+        {"discovery_confirms": "paid_plan"},  # a list
         {"surprise": 1},
     ],
 )

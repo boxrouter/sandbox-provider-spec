@@ -11,7 +11,7 @@ from datetime import datetime
 from importlib.metadata import entry_points
 from importlib.resources import as_file, files
 from types import MappingProxyType
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 from jsonschema import Draft202012Validator
 
@@ -113,6 +113,9 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
     api_domains: ClassVar[tuple[str, ...]] = ()  # every host name the adapter connects to
     #: The provider's `list` stops showing a sandbox once it is destroyed (`sps-provider.yaml`).
     forgets_ended_sandboxes: ClassVar[bool] = False
+    #: The `needs` conditions that `discovery()` reads from the provider for each account
+    #: (`sps-provider.yaml`); `confirmed_conditions` answers them.
+    discovery_confirms: ClassVar[tuple[str, ...]] = ()
 
     def __init_subclass__(cls, *, manifest: bool = True, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -141,6 +144,26 @@ class Provider(ABC):  # pylint: disable=too-many-public-methods
         cls.credential_fields = fields
         cls.api_domains = tuple(data["api_domains"])
         cls.forgets_ended_sandboxes = data.get("forgets_ended_sandboxes", False)
+        cls.discovery_confirms = tuple(data.get("discovery_confirms", ()))
+
+    @classmethod
+    def confirmed_conditions(cls, account: Discovery) -> frozenset[str]:
+        """The conditions of `discovery_confirms` that an account's `discovery()` shows it meets:
+        those whose every `resources.needs` fact it states at the static discovery's value. No
+        other condition is ever answered here, because a discovery that is the same for every
+        account says nothing about one account."""
+        if not cls.discovery_confirms:
+            return frozenset()
+        offered = {item.id: item.resources for item in account.classes}
+        shown: dict[str, list[bool]] = {}
+        for item in cls.static_discovery().classes:
+            live = offered.get(item.id, {})
+            needs = cast("Mapping[str, Sequence[str]]", item.resources.get("needs", {}))
+            for fact, names in needs.items():
+                unnarrowed = fact in live and live[fact] == item.resources.get(fact)
+                for name in set(names) & set(cls.discovery_confirms):
+                    shown.setdefault(name, []).append(unnarrowed)
+        return frozenset(name for name, seen in shown.items() if all(seen))
 
     def __init__(self, credentials: Mapping[str, str]) -> None:
         """Raises SpsError("unauthenticated") when a declared field is missing or empty."""
