@@ -104,6 +104,41 @@ and outbound-traffic facts describe prerequisites; none alone establishes this g
   Its identity basis **MUST NOT** claim an unobserved provider incarnation, creation time, session,
   or historical public Core binding. It makes no claim for read, shared, or branch mounts.
 
+- An engine-native provider-terminal read handover **MUST** bind the actual sandbox, workspace, <!-- rule: fuse_mount/provider-terminal-handover-read-engine-134 -->
+  route, provider, account and native sandbox ID for the terminated owner and successor. Its terminal
+  receipt **MUST** confirm termination and its issuance **MUST** be current. Each delegation **MUST**
+  be revoked successfully against its matching orphaned or owner-client basis, and Cloud **MUST**
+  confirm that all delegations are clear before dispatching a no-force successor. The successor's
+  sandbox, engine and native identities **MUST** differ from the owner's; it **MUST** be mounted in
+  `read` mode, and owned-resource cleanup **MUST** complete. A competing admission **MUST** be refused
+  while the same connected read-only client remains able to read, without revoking its delegation or
+  dispatching a successor. A write attempt **MUST** receive `EROFS`, and the expected bytes **MUST**
+  match the readback.
+
+- An engine-native provider-terminal shared handover **MUST** bind the actual sandbox, workspace, <!-- rule: fuse_mount/provider-terminal-handover-shared-engine-134 -->
+  route, provider, account and native sandbox ID for the terminated owner and successor. Its terminal
+  receipt **MUST** confirm termination and its issuance **MUST** be current. Each delegation **MUST**
+  be revoked successfully against its matching orphaned or owner-client basis, and Cloud **MUST**
+  confirm that all delegations are clear before dispatching a no-force successor. The successor's
+  sandbox, engine and native identities **MUST** differ from the owner's; it **MUST** be mounted in
+  `shared` mode, and owned-resource cleanup **MUST** complete. A competing admission **MUST** be refused
+  while the same connected writer remains able to write, without revoking its delegation or
+  dispatching a successor. Evidence **MUST** record a default-user write, acknowledged `fsync` and
+  `sync`, the checkpoint identity, and matching expected and observed readback digests.
+
+- An engine-native provider-terminal branch handover **MUST** bind the actual sandbox, workspace, <!-- rule: fuse_mount/provider-terminal-branch-fork-engine-134 -->
+  route, provider, account and native sandbox ID for the terminated owner and successor. Its terminal
+  receipt **MUST** confirm termination and its issuance **MUST** be current. Each delegation **MUST**
+  be revoked successfully against its matching orphaned or owner-client basis, and Cloud **MUST**
+  confirm that all delegations are clear before dispatching a no-force successor. The successor's
+  sandbox, engine and native identities **MUST** differ from the owner's; it **MUST** be mounted in
+  `branch` mode, and owned-resource cleanup **MUST** complete. A competing admission **MUST** be refused
+  while the same connected writer remains able to write, without revoking its delegation or
+  dispatching a successor. Both forks **MUST** use the same acknowledged source checkpoint and have
+  distinct branch identities. Evidence **MUST** record a default-user write, acknowledged `fsync` and
+  `sync`, matching branch and source readbacks, the private marker's absence from the branch and
+  parent, and an unchanged source head. Branch mode is a separate view, not a security boundary.
+
 - The SPS 0.3.132 environment-profile handover check **MUST** bind the actual provider route and <!-- rule: fuse_mount/provider-terminal-handover-env-132 -->
   account, execution class, access mode and exact prepared Core image handle, including its
   provider, ID, key and resources. It records the environment credential kind without inventing a
