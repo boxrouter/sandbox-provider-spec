@@ -3,6 +3,11 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.195 — 2026-11-28
+
+- Correct the documented conformance-suite count after adding engine-native handover checks.
+- Document the engine-native read, shared, and branch handover rules exercised by coverage tests.
+
 ## 0.5.194 — 2026-11-28
 
 - Add separate engine-native provider-terminal handover checks for read, shared, and branch attachments while retaining the historical mode checks.
