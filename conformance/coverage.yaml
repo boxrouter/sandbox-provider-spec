@@ -2684,6 +2684,57 @@ tests:
       record:
       - fuse_mount_handover
 
+- id: fuse_mount.provider_terminal_handover_read_engine_134
+  title: An engine-native provider-terminal read handover preserves its access guarantees.
+  rules:
+  - fuse_mount/provider-terminal-handover-read-engine-134
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_read_engine_134
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: read
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_handover_shared_engine_134
+  title: An engine-native provider-terminal shared handover preserves its access guarantees.
+  rules:
+  - fuse_mount/provider-terminal-handover-shared-engine-134
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_shared_engine_134
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: shared
+    expect:
+      record:
+      - fuse_mount_handover
+
+- id: fuse_mount.provider_terminal_branch_fork_engine_134
+  title: An engine-native provider-terminal branch handover preserves its access guarantees.
+  rules:
+  - fuse_mount/provider-terminal-branch-fork-engine-134
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_branch_fork_engine_134
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: branch
+    expect:
+      record:
+      - fuse_mount_handover
+
 - id: fuse_mount.provider_terminal_handover_engine_133
   title: An engine-native provider-terminal write handover binds the observed route, account and sandbox identity.
   rules:

@@ -685,6 +685,9 @@ def test_preserved_coverage_suite_entry_is_only_the_prior_suite() -> None:
         TERMINAL_END_ROW,
         "coverage.custom_images.direct.oci",
         "fuse_mount.provider_terminal_handover_engine_133",
+        "fuse_mount.provider_terminal_handover_read_engine_134",
+        "fuse_mount.provider_terminal_handover_shared_engine_134",
+        "fuse_mount.provider_terminal_branch_fork_engine_134",
         *IMAGE_DEFAULTS_ROWS,
     }
     for identifier in set(live) & set(preserved):

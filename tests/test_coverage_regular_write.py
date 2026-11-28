@@ -158,6 +158,9 @@ def test_existing_check_ids_and_bodies_are_unchanged() -> None:
         "coverage.custom_images.prepare.dockerfile_standard_base_context",
         "coverage.terminal.end",
         "fuse_mount.provider_terminal_handover_engine_133",
+        "fuse_mount.provider_terminal_handover_read_engine_134",
+        "fuse_mount.provider_terminal_handover_shared_engine_134",
+        "fuse_mount.provider_terminal_branch_fork_engine_134",
     )
     prior = [test.id for test in suite.tests if not test.id.startswith(later)]
     assert "files.regular_write.usability.v1.exact_bytes" not in prior

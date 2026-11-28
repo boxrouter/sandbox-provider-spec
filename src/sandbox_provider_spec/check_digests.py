@@ -83,6 +83,27 @@ OPERATION_DEPENDENCIES: Mapping[str, tuple[str, ...]] = {
         "fuse_mount_handover_shared_130.py",
     ),
     "fixture.fuse_mount_provider_terminal_branch_fork": ("fuse_mount_handover_branch_131.py",),
+    "fixture.fuse_mount_provider_terminal_handover_read_engine_134": (
+        "fuse_mount_handover_mode_engine_134.py",
+        "fuse_mount_handover_engine_133.py",
+        "fuse_mount_handover_env_132.py",
+        "fuse_mount_handover_mode_130.py",
+        "fuse_mount_handover_130.py",
+    ),
+    "fixture.fuse_mount_provider_terminal_handover_shared_engine_134": (
+        "fuse_mount_handover_mode_engine_134.py",
+        "fuse_mount_handover_engine_133.py",
+        "fuse_mount_handover_env_132.py",
+        "fuse_mount_handover_mode_130.py",
+        "fuse_mount_handover_130.py",
+    ),
+    "fixture.fuse_mount_provider_terminal_branch_fork_engine_134": (
+        "fuse_mount_handover_mode_engine_134.py",
+        "fuse_mount_handover_engine_133.py",
+        "fuse_mount_handover_env_132.py",
+        "fuse_mount_handover_mode_130.py",
+        "fuse_mount_handover_130.py",
+    ),
     "fixture.fuse_mount_provider_terminal_handover_engine_133": (
         "fuse_mount_handover_engine_133.py",
         "fuse_mount_handover_env_132.py",
