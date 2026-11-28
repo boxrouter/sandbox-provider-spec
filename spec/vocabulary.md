@@ -96,6 +96,14 @@ and outbound-traffic facts describe prerequisites; none alone establishes this g
   from both, and an unchanged source head. It claims no branch Save, reusable branch, publication of
   the source head, persistence guarantee, or security boundary.
 
+- The engine-native provider-terminal write handover check **MUST** bind the actual sandbox, <!-- rule: fuse_mount/provider-terminal-handover-engine-133 -->
+  workspace, route, provider, account and native sandbox ID observed for both the terminated owner
+  and successor. The two native identities **MUST** differ within their provider account. It **MUST**
+  verify the provider's terminal observation before the old credential
+  is revoked, the exact issuance is cleared before successor dispatch, and saved data is read back.
+  Its identity basis **MUST NOT** claim an unobserved provider incarnation, creation time, session,
+  or historical public Core binding. It makes no claim for read, shared, or branch mounts.
+
 - The SPS 0.3.132 environment-profile handover check **MUST** bind the actual provider route and <!-- rule: fuse_mount/provider-terminal-handover-env-132 -->
   account, execution class, access mode and exact prepared Core image handle, including its
   provider, ID, key and resources. It records the environment credential kind without inventing a

@@ -2684,6 +2684,23 @@ tests:
       record:
       - fuse_mount_handover
 
+- id: fuse_mount.provider_terminal_handover_engine_133
+  title: An engine-native provider-terminal write handover binds the observed route, account and sandbox identity.
+  rules:
+  - fuse_mount/provider-terminal-handover-engine-133
+  proves:
+  - gate: fuse_mount
+    value: true
+  steps:
+  - op: fixture.fuse_mount_provider_terminal_handover_engine_133
+    in:
+      create: $runner.fuse_mount_create
+      prerequisites: $runner.fuse_mount_prerequisites
+      access_mode: write
+    expect:
+      record:
+      - fuse_mount_handover
+
 - id: fuse_mount.provider_terminal_handover_env_132
   title: A provider-terminal FUSE handover binds the actual environment route and prepared image handle.
   rules:
