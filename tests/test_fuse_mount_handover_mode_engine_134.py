@@ -37,7 +37,7 @@ def facts(mode: str) -> dict[str, Any]:
         row = result[field]
         del row["public_core_binding_sha256"]
         del row["binding_basis"]
-        identity = dict(
+        identity: dict[str, str] = dict(
             zip(
                 ENGINE_IDENTITY_BASIS,
                 (suffix, "workspace", "route", "e2b", "account", suffix),
