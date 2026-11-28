@@ -116,7 +116,7 @@ docker-engine: not eligible
 Matching runs offline without provider credentials and without creating a sandbox. Exit code 0 means that at least one declaration qualifies; exit code 1 means that no declaration qualifies or that an input file is invalid. A `baseline_failed` refusal means that the declaration's cited reports do not establish a clean pass across every baseline test that all providers must pass. The [tutorial](docs/getting-started.md) walks through checking requests and reading refusal reasons in detail.
 
 <!-- sps:counts -->
-The vocabulary has 16 gates and 48 knobs; the conformance suite has 294 tests.
+The vocabulary has 16 gates and 48 knobs; the conformance suite has 297 tests.
 
 ## What Is In This Repository
 
