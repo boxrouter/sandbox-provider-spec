@@ -3,6 +3,10 @@
 Notable changes to the specification and its tools. [GOVERNANCE.md](GOVERNANCE.md#versioning)
 says what each kind of release may change.
 
+## 0.5.194 — 2026-11-28
+
+- Add separate engine-native provider-terminal handover checks for read, shared, and branch attachments while retaining the historical mode checks.
+
 ## 0.5.193 — 2026-11-28
 
 - Add a separate write-only provider-terminal FUSE handover check for route-scoped engine identities, without changing historical public Core binding checks.
